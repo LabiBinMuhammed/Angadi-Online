@@ -1,0 +1,313 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/supabase_client.dart';
+import 'vendor_theme_helper.dart';
+
+class VendorCreditScreen extends StatefulWidget {
+  const VendorCreditScreen({super.key});
+  @override
+  State<VendorCreditScreen> createState() => _VendorCreditScreenState();
+}
+
+class _VendorCreditScreenState extends State<VendorCreditScreen> {
+  List<Map<String, dynamic>> _credits = [];
+  bool _loading = true;
+  String? _shopId;
+  String _searchQuery = '';
+  final _searchCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+    _searchCtrl.addListener(() {
+      setState(() {
+        _searchQuery = _searchCtrl.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    if (!mounted) return;
+    setState(() => _loading = true);
+
+    final uid = supabase.auth.currentUser!.id;
+    final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
+    _shopId = ownerRes?['shop_id'] as String?;
+    if (_shopId == null) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+
+    final res = await supabase
+        .from('shop_user_credits')
+        .select('*, users(name, phone)')
+        .eq('shop_id', _shopId!)
+        .order('created_at', ascending: false);
+
+    if (mounted) {
+      setState(() {
+        _credits = (res as List).cast<Map<String, dynamic>>();
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _toggle(Map<String, dynamic> c, String field) async {
+    final next = !(c[field] as bool? ?? false);
+    await supabase.from('shop_user_credits').update({field: next}).eq('id', c['id']);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(field == 'is_credit_enabled'
+            ? 'Credit account ${next ? 'enabled' : 'disabled'}'
+            : 'Customer account ${next ? 'blocked' : 'unblocked'}'),
+        backgroundColor: const Color(0xFF1E293B),
+      ),
+    );
+    _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filtered = _credits.where((c) {
+      final name = ((c['users'] as Map?)?['name'] as String? ?? '').toLowerCase();
+      final phone = (c['users'] as Map?)?['phone'] as String? ?? '';
+      return name.contains(_searchQuery.toLowerCase()) || phone.contains(_searchQuery);
+    }).toList();
+
+    return Scaffold(
+      backgroundColor: kVendorBg,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: kVendorText,
+        title: const Text('Credit Management', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+      ),
+      body: Column(
+        children: [
+          // Toolbar Search bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextField(
+              controller: _searchCtrl,
+              style: const TextStyle(color: Colors.white, fontSize: 15),
+              decoration: vendorInputDecoration(
+                hintText: 'Search customer by name or phone...',
+                prefixIcon: const Icon(Icons.search_rounded, color: kVendorSubText),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, color: kVendorSubText),
+                        onPressed: () => _searchCtrl.clear(),
+                      )
+                    : null,
+              ),
+            ),
+          ),
+
+          // Customer list
+          Expanded(
+            child: _loading
+                ? const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)))
+                : filtered.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.credit_card_off_outlined, size: 64, color: kVendorSubText.withOpacity(0.5)),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No credit records found',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorSubText),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        itemCount: filtered.length,
+                        itemBuilder: (context, i) {
+                          final c = filtered[i];
+                          final isEnabled = c['is_credit_enabled'] as bool? ?? false;
+                          final isBlocked = c['is_blocked'] as bool? ?? false;
+                          final limit = c['credit_limit'];
+                          final used = c['used_amount'] ?? 0;
+                          final name = (c['users'] as Map?)?['name'] ?? 'Guest Customer';
+                          final phone = (c['users'] as Map?)?['phone'] ?? '';
+
+                          Color statusColor = const Color(0xFF94A3B8);
+                          if (isBlocked) {
+                            statusColor = const Color(0xFFF87171);
+                          } else if (isEnabled) {
+                            statusColor = const Color(0xFF4ADE80);
+                          }
+
+                          return Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(14),
+                            decoration: vendorCardDecoration(radius: 20),
+                            child: Row(
+                              children: [
+                                // Icon
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: statusColor.withOpacity(0.2)),
+                                  ),
+                                  child: Icon(
+                                    isBlocked
+                                        ? Icons.block_rounded
+                                        : isEnabled
+                                            ? Icons.credit_card_rounded
+                                            : Icons.credit_card_off_rounded,
+                                    color: statusColor,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+
+                                // Details
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        name,
+                                        style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 15),
+                                      ),
+                                      if (phone.isNotEmpty) ...[
+                                        const SizedBox(height: 2),
+                                        Text(phone, style: const TextStyle(color: kVendorSubText, fontSize: 12)),
+                                      ],
+                                      const SizedBox(height: 6),
+                                      Row(
+                                        children: [
+                                          VendorBadge(
+                                            label: isEnabled ? 'Enabled' : 'Disabled',
+                                            type: isEnabled ? VendorBadgeType.success : VendorBadgeType.neutral,
+                                          ),
+                                          const SizedBox(width: 6),
+                                          VendorBadge(
+                                            label: isBlocked ? 'Blocked' : 'Active',
+                                            type: isBlocked ? VendorBadgeType.danger : VendorBadgeType.success,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // Limit setup & used display
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const Text('Used / Limit', style: TextStyle(color: kVendorSubText, fontSize: 10)),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '₹$used',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14,
+                                            color: limit != null && used >= (limit as num) * 0.8
+                                                ? const Color(0xFFF87171)
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                        const Text(' / ', style: TextStyle(color: kVendorSubText, fontSize: 12)),
+                                        Text(
+                                          limit != null ? '₹$limit' : '₹—',
+                                          style: const TextStyle(color: kVendorSubText, fontSize: 13),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    
+                                    // Action buttons row
+                                    Row(
+                                      children: [
+                                        // Enable/Disable toggle
+                                        _MiniActionButton(
+                                          icon: Icons.power_settings_new_rounded,
+                                          color: isEnabled ? const Color(0xFF4ADE80) : kVendorSubText,
+                                          onPressed: () => _toggle(c, 'is_credit_enabled'),
+                                          tooltip: isEnabled ? 'Disable Credit' : 'Enable Credit',
+                                        ),
+                                        const SizedBox(width: 4),
+                                        // Block/Unblock toggle
+                                        _MiniActionButton(
+                                          icon: isBlocked ? Icons.shield_rounded : Icons.block_rounded,
+                                          color: isBlocked ? const Color(0xFFF87171) : kVendorSubText,
+                                          onPressed: () => _toggle(c, 'is_blocked'),
+                                          tooltip: isBlocked ? 'Unblock Customer' : 'Block Customer',
+                                        ),
+                                        const SizedBox(width: 4),
+                                        // History
+                                        _MiniActionButton(
+                                          icon: Icons.history_rounded,
+                                          color: const Color(0xFF60A5FA),
+                                          onPressed: () => context.push('/vendor/credit/${c['user_id']}'),
+                                          tooltip: 'View History',
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MiniActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onPressed;
+  final String tooltip;
+
+  const _MiniActionButton({
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+    required this.tooltip,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.02),
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(color: Colors.white.withOpacity(0.1)),
+          ),
+          child: Center(
+            child: Icon(icon, color: color, size: 14),
+          ),
+        ),
+      ),
+    );
+  }
+}
