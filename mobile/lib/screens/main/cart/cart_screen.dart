@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:village_market/core/supabase_client.dart';
+import 'package:village_market/theme/theme_service.dart';
 import '../../../core/cart_service.dart';
 import '../../../models/models.dart';
 
@@ -11,7 +15,426 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  final double _discount = 5.2; // Match original hardcode/UI discount
+  String? _userRole;
+  List<dynamic> _deliverySettings = [];
+  List<dynamic> _placedOrders = [];
+  bool _loadingSettings = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserRole();
+    _loadDeliverySettings();
+    CartService.instance.addListener(_onCartChanged);
+    ThemeService.instance.addListener(_onThemeChanged);
+  }
+
+  @override
+  void dispose() {
+    CartService.instance.removeListener(_onCartChanged);
+    ThemeService.instance.removeListener(_onThemeChanged);
+    super.dispose();
+  }
+
+  void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _onCartChanged() {
+    if (mounted) {
+      _loadDeliverySettings();
+    }
+  }
+
+  Future<void> _loadDeliverySettings() async {
+    final cart = CartService.instance;
+    final shopIds = cart.items.map((i) => i.item.shopId).toSet().toList();
+    if (shopIds.isEmpty) return;
+
+    if (mounted) setState(() => _loadingSettings = true);
+    try {
+      // Fetch settings
+      final settingsRes = await supabase
+          .from('shop_delivery_settings')
+          .select('*')
+          .inFilter('shop_id', shopIds);
+
+      // Fetch placed orders (next 7 days)
+      final todayStr = DateTime.now().toIso8601String().split('T')[0];
+      final maxDateStr = DateTime.now().add(const Duration(days: 7)).toIso8601String().split('T')[0];
+
+      final countsRes = await supabase
+          .from('orders')
+          .select('shop_id, delivery_date, delivery_slot')
+          .inFilter('shop_id', shopIds)
+          .not('payment_type', 'is', null)
+          .neq('status', 'cancelled')
+          .gte('delivery_date', todayStr)
+          .lte('delivery_date', maxDateStr);
+
+      if (mounted) {
+        setState(() {
+          _deliverySettings = settingsRes as List<dynamic>;
+          _placedOrders = countsRes as List<dynamic>;
+        });
+        _applyAutoSuggestion();
+      }
+    } catch (e) {
+      debugPrint('Error loading delivery settings: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _loadingSettings = false);
+      }
+    }
+  }
+
+  Map<String, dynamic> _getSlotStatus(DateTime date) {
+    bool morningDisabled = false;
+    bool eveningDisabled = false;
+    String morningReason = '';
+    String eveningReason = '';
+
+    final dateStr = date.toIso8601String().split('T')[0];
+    final todayStr = DateTime.now().toIso8601String().split('T')[0];
+    final isToday = dateStr == todayStr;
+
+    final now = DateTime.now();
+    final currentTimeStr = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}';
+
+    final cart = CartService.instance;
+    final shopIds = cart.items.map((i) => i.item.shopId).toSet().toList();
+
+    for (final shopId in shopIds) {
+      final settings = _deliverySettings.firstWhere(
+        (s) => s['shop_id'] == shopId,
+        orElse: () => {
+          'morning_enabled': true,
+          'evening_enabled': true,
+          'morning_order_limit': 50,
+          'evening_order_limit': 50,
+          'morning_cutoff_time': '08:00:00',
+          'evening_cutoff_time': '14:00:00'
+        },
+      );
+
+      // 1. Check if enabled by shop
+      if (!(settings['morning_enabled'] as bool)) {
+        morningDisabled = true;
+        morningReason = 'disabled';
+      }
+      if (!(settings['evening_enabled'] as bool)) {
+        eveningDisabled = true;
+        eveningReason = 'disabled';
+      }
+
+      // 2. Check cutoff time (if today)
+      if (isToday) {
+        if (currentTimeStr.compareTo(settings['morning_cutoff_time'] as String) >= 0) {
+          morningDisabled = true;
+          morningReason = 'cutoff';
+        }
+        if (currentTimeStr.compareTo(settings['evening_cutoff_time'] as String) >= 0) {
+          eveningDisabled = true;
+          eveningReason = 'cutoff';
+        }
+      }
+
+      // 3. Check capacity limit
+      final morningPlacedCount = _placedOrders.where((o) =>
+          o['shop_id'] == shopId &&
+          o['delivery_date'] == dateStr &&
+          o['delivery_slot'] == 'morning').length;
+      final eveningPlacedCount = _placedOrders.where((o) =>
+          o['shop_id'] == shopId &&
+          o['delivery_date'] == dateStr &&
+          o['delivery_slot'] == 'evening').length;
+
+      if (morningPlacedCount >= (settings['morning_order_limit'] as int)) {
+        morningDisabled = true;
+        morningReason = 'capacity';
+      }
+      if (eveningPlacedCount >= (settings['evening_order_limit'] as int)) {
+        eveningDisabled = true;
+        eveningReason = 'capacity';
+      }
+    }
+
+    return {
+      'morningDisabled': morningDisabled,
+      'eveningDisabled': eveningDisabled,
+      'morningReason': morningReason,
+      'eveningReason': eveningReason,
+    };
+  }
+
+  void _applyAutoSuggestion() {
+    final cart = CartService.instance;
+    var date = cart.selectedDate;
+    var slot = cart.selectedSlot;
+
+    var status = _getSlotStatus(date);
+    if (slot == 'morning' && status['morningDisabled'] as bool) {
+      if (!(status['eveningDisabled'] as bool)) {
+        cart.setSelectedSlot('evening');
+      } else {
+        // Find next day's available slot
+        for (int i = 1; i <= 7; i++) {
+          final nextDate = date.add(Duration(days: i));
+          final nextStatus = _getSlotStatus(nextDate);
+          if (!(nextStatus['morningDisabled'] as bool)) {
+            cart.setSelectedDate(nextDate);
+            cart.setSelectedSlot('morning');
+            break;
+          } else if (!(nextStatus['eveningDisabled'] as bool)) {
+            cart.setSelectedDate(nextDate);
+            cart.setSelectedSlot('evening');
+            break;
+          }
+        }
+      }
+    } else if (slot == 'evening' && status['eveningDisabled'] as bool) {
+      // Find next day's available slot
+      for (int i = 1; i <= 7; i++) {
+        final nextDate = date.add(Duration(days: i));
+        final nextStatus = _getSlotStatus(nextDate);
+        if (!(nextStatus['morningDisabled'] as bool)) {
+          cart.setSelectedDate(nextDate);
+          cart.setSelectedSlot('morning');
+          break;
+        } else if (!(nextStatus['eveningDisabled'] as bool)) {
+          cart.setSelectedDate(nextDate);
+          cart.setSelectedSlot('evening');
+          break;
+        }
+      }
+    }
+  }
+
+  Widget _buildDeliveryScheduleCard(BuildContext context, Color kCardBg, Color kBorder, Color kText, Color kSubText, Color kGreen) {
+    final cart = CartService.instance;
+    final date = cart.selectedDate;
+    final slot = cart.selectedSlot;
+
+    final dateStr = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final status = _getSlotStatus(date);
+    final morningDisabled = status['morningDisabled'] as bool;
+    final eveningDisabled = status['eveningDisabled'] as bool;
+    final morningReason = status['morningReason'] as String;
+    final eveningReason = status['eveningReason'] as String;
+
+    String getReasonText(String reason) {
+      final l10n = AppLocalizations.of(context)!;
+      if (reason == 'cutoff') return l10n.cutoffPassed;
+      if (reason == 'capacity') return l10n.limitReached;
+      return l10n.unavailable;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(top: 24, bottom: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: kCardBg,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: kBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.access_time_filled, color: Color(0xFF4CD964), size: 20),
+              const SizedBox(width: 8),
+              Text(
+                AppLocalizations.of(context)!.deliverySchedule,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kText),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          
+          // Date Selector
+          GestureDetector(
+            onTap: () async {
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: date,
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 7)),
+              );
+              if (picked != null) {
+                cart.setSelectedDate(picked);
+                // Adjust default slot if selected date is today and slot is disabled
+                final nextStatus = _getSlotStatus(picked);
+                if (slot == 'morning' && nextStatus['morningDisabled'] as bool) {
+                  cart.setSelectedSlot('evening');
+                } else if (slot == 'evening' && nextStatus['eveningDisabled'] as bool) {
+                  cart.setSelectedSlot('morning');
+                }
+              }
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF5F5F5),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: kBorder),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month, color: kSubText, size: 18),
+                      const SizedBox(width: 10),
+                      Text(
+                        dateStr,
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kText),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    AppLocalizations.of(context)!.changeDate,
+                    style: const TextStyle(color: Color(0xFF4CD964), fontWeight: FontWeight.w700, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Morning/Evening Slots
+          Row(
+            children: [
+              // Morning
+              Expanded(
+                child: Opacity(
+                  opacity: morningDisabled ? 0.5 : 1.0,
+                  child: GestureDetector(
+                    onTap: morningDisabled ? null : () => cart.setSelectedSlot('morning'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: slot == 'morning'
+                            ? const Color(0xFF4CD964).withOpacity(0.15)
+                            : kCardBg,
+                        border: Border.all(
+                          color: slot == 'morning'
+                              ? const Color(0xFF4CD964)
+                              : kBorder,
+                          width: slot == 'morning' ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.wb_sunny,
+                            color: slot == 'morning' ? const Color(0xFF1E4D1E) : kSubText,
+                            size: 20,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(context)!.morning,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: slot == 'morning' ? const Color(0xFF1E4D1E) : kSubText,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            morningDisabled ? getReasonText(morningReason) : '7 AM - 12 PM',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: morningDisabled ? Colors.red : kSubText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              
+              // Evening
+              Expanded(
+                child: Opacity(
+                  opacity: eveningDisabled ? 0.5 : 1.0,
+                  child: GestureDetector(
+                    onTap: eveningDisabled ? null : () => cart.setSelectedSlot('evening'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: slot == 'evening'
+                            ? const Color(0xFFF97316).withOpacity(0.15)
+                            : kCardBg,
+                        border: Border.all(
+                          color: slot == 'evening'
+                              ? const Color(0xFFF97316)
+                              : kBorder,
+                          width: slot == 'evening' ? 2 : 1,
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.nightlight_round,
+                            color: slot == 'evening' ? const Color(0xFFEA580C) : kSubText,
+                            size: 20,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            AppLocalizations.of(context)!.evening,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: slot == 'evening' ? const Color(0xFFEA580C) : kSubText,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            eveningDisabled ? getReasonText(eveningReason) : '4 PM - 8 PM',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: eveningDisabled ? Colors.red : kSubText,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _loadUserRole() async {
+    final user = supabase.auth.currentUser;
+    if (user != null) {
+      try {
+        final profile = await supabase.from('users').select('role').eq('id', user.id).single();
+        if (mounted) {
+          setState(() {
+            _userRole = profile['role'] as String?;
+          });
+        }
+      } catch (e) {
+        debugPrint('Error loading role in CartScreen: $e');
+      }
+    }
+  }
 
   String _getFallbackEmoji(Item item) {
     final name = item.name.toLowerCase();
@@ -29,7 +452,15 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const kBg = Color(0xFFFAFAFA);
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = ThemeService.instance.isDarkMode;
+    final kBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA);
+    final kCardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final kText = isDark ? Colors.white : const Color(0xFF1A1A1A);
+    final kSubText = isDark ? const Color(0xFF94A3B8) : const Color(0xFF555555);
+    final kBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    final kTitleColor = isDark ? const Color(0xFF4CD964) : const Color(0xFF1E4D1E);
+
     const kGreen = Color(0xFF4CD964);
     final cart = CartService.instance;
 
@@ -52,37 +483,110 @@ class _CartScreenState extends State<CartScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
-                        onTap: () => context.go('/home'),
-                        child: Container(
-                          width: 44, height: 44,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.grey[200]!),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (context.canPop()) {
+                                context.pop();
+                              } else {
+                                context.go('/home');
+                              }
+                            },
+                            child: Container(
+                              width: 44, height: 44,
+                              decoration: BoxDecoration(
+                                color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0xFF334155) : Colors.grey[200]!),
+                              ),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF555555),
+                              ),
+                            ),
                           ),
-                          child: const Icon(Icons.arrow_back, color: Color(0xFF555555)),
-                        ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (_userRole == 'shop_owner' || _userRole == 'admin') ...[
+                                GestureDetector(
+                                  onTap: () => context.push('/vendor/dashboard'),
+                                  child: Container(
+                                    width: 44, height: 44,
+                                    decoration: BoxDecoration(
+                                      color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0xFF334155) : Colors.grey[200]!),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: HugeIcon(
+                                      icon: HugeIcons.strokeRoundedStore01,
+                                      color: ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF555555),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                              if (_userRole == 'admin') ...[
+                                GestureDetector(
+                                  onTap: () => context.push('/admin/dashboard'),
+                                  child: Container(
+                                    width: 44, height: 44,
+                                    decoration: BoxDecoration(
+                                      color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0xFF334155) : Colors.grey[200]!),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: HugeIcon(
+                                      icon: HugeIcons.strokeRoundedSecurityCheck,
+                                      color: ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF555555),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                              ],
+                              GestureDetector(
+                                onTap: () => context.push('/notifications'),
+                                child: Container(
+                                  width: 44, height: 44,
+                                  decoration: BoxDecoration(
+                                    color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0xFF334155) : Colors.grey[200]!),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: HugeIcon(
+                                    icon: HugeIcons.strokeRoundedNotification01,
+                                    color: ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF555555),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Text(
-                            'My Bag',
+                          Text(
+                            l10n.myBag,
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF1E4D1E),
+                              color: kTitleColor,
                               letterSpacing: -1,
                             ),
                           ),
                           Text(
-                            '${cartItems.length} items',
-                            style: const TextStyle(
+                            l10n.itemsCount(cartItems.length),
+                            style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey,
+                              color: kSubText,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -99,9 +603,9 @@ class _CartScreenState extends State<CartScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
-                                'Your bag is empty',
-                                style: TextStyle(
+                              Text(
+                                l10n.yourBagIsEmpty,
+                                style: const TextStyle(
                                   fontSize: 18,
                                   color: Colors.grey,
                                   fontWeight: FontWeight.w600,
@@ -116,7 +620,7 @@ class _CartScreenState extends State<CartScreen> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                                child: const Text('Browse Shops', style: TextStyle(color: Colors.white)),
+                                child: Text(l10n.browseShops, style: const TextStyle(color: Colors.white)),
                               )
                             ],
                           ),
@@ -142,8 +646,9 @@ class _CartScreenState extends State<CartScreen> {
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                                       decoration: BoxDecoration(
-                                        color: Colors.white,
+                                        color: kCardBg,
                                         borderRadius: BorderRadius.circular(24),
+                                        border: Border.all(color: kBorder),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.black.withValues(alpha: 0.03),
@@ -170,18 +675,18 @@ class _CartScreenState extends State<CartScreen> {
                                               children: [
                                                 Text(
                                                   item.item.name,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w700,
-                                                    color: Color(0xFF1A1A1A),
+                                                    color: kText,
                                                   ),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Text(
                                                   item.variant.label,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     fontSize: 12,
-                                                    color: Colors.grey,
+                                                    color: kSubText,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -202,21 +707,25 @@ class _CartScreenState extends State<CartScreen> {
                                           Column(
                                             crossAxisAlignment: CrossAxisAlignment.end,
                                             children: [
-                                              Container(
-                                                width: 24, height: 24,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(color: Colors.grey[200]!),
+                                              GestureDetector(
+                                                onTap: () => cart.removeItem(item.variant.id),
+                                                child: Container(
+                                                  width: 24, height: 24,
+                                                  decoration: BoxDecoration(
+                                                    color: kCardBg,
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(color: kBorder),
+                                                  ),
+                                                  child: const Icon(Icons.delete_outline, color: Color(0xFFFF4757), size: 14),
                                                 ),
-                                                child: const Icon(Icons.favorite, color: Color(0xFFFF4757), size: 12),
                                               ),
                                               const SizedBox(height: 12),
                                               Container(
                                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.white,
+                                                  color: kCardBg,
                                                   borderRadius: BorderRadius.circular(12),
+                                                  border: Border.all(color: kBorder),
                                                   boxShadow: [
                                                     BoxShadow(
                                                       color: Colors.black.withValues(alpha: 0.04),
@@ -228,16 +737,17 @@ class _CartScreenState extends State<CartScreen> {
                                                   children: [
                                                     GestureDetector(
                                                       onTap: () => cart.updateQuantity(item.variant.id, item.quantity - 1.0),
-                                                      child: const Icon(Icons.remove, size: 16, color: Colors.grey),
+                                                      child: Icon(Icons.remove, size: 16, color: kSubText),
                                                     ),
                                                     const SizedBox(width: 12),
                                                     Text(
                                                       item.quantity % 1 == 0
                                                           ? item.quantity.toInt().toString()
                                                           : item.quantity.toStringAsFixed(1),
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         fontSize: 14,
                                                         fontWeight: FontWeight.w600,
+                                                        color: kText,
                                                       ),
                                                     ),
                                                     const SizedBox(width: 12),
@@ -256,49 +766,15 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 )),
 
-                            // Promo code
-                            Container(
-                              margin: const EdgeInsets.symmetric(vertical: 24),
-                              padding: const EdgeInsets.only(left: 20, right: 6, top: 6, bottom: 6),
-                              decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(20)),
-                              child: Row(
-                                children: [
-                                  const Expanded(
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                        hintText: 'Promo Code',
-                                        border: InputBorder.none,
-                                        hintStyle: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
-                                      ),
-                                      style: TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF333333)),
-                                    ),
-                                  ),
-                                  WidgetApplyButton(),
-                                ],
-                              ),
-                            ),
+                            _buildDeliveryScheduleCard(context, kCardBg, kBorder, kText, kSubText, kGreen),
+
+                            const SizedBox(height: 16),
 
                             // Summary
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Total', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1A1A1A))),
-                                Text('₹ ${subtotal.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: kGreen)),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Discount', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1A1A1A))),
-                                Text('₹ ${_discount.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Color(0xFFFF4757))),
-                              ],
-                            ),
-                            Container(height: 1, color: Colors.grey[200], margin: const EdgeInsets.symmetric(vertical: 16)),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text('Total', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF1A1A1A))),
+                                Text(l10n.total, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: kText)),
                                 Text('₹ ${finalTotal.toStringAsFixed(0)}', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: kGreen)),
                               ],
                             ),
@@ -316,9 +792,9 @@ class _CartScreenState extends State<CartScreen> {
                                   elevation: 8,
                                   shadowColor: kGreen.withValues(alpha: 0.4),
                                 ),
-                                child: const Text(
-                                  'Proceed To Checkout',
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                                child: Text(
+                                  l10n.proceedToCheckout,
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
                                 ),
                               ),
                             )
@@ -334,21 +810,5 @@ class _CartScreenState extends State<CartScreen> {
   }
 }
 
-class WidgetApplyButton extends StatelessWidget {
-  const WidgetApplyButton({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {},
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF1E4D1E),
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      ),
-      child: const Text('Apply', style: TextStyle(fontWeight: FontWeight.w600)),
-    );
-  }
-}
 

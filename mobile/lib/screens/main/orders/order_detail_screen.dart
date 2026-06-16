@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -31,17 +34,20 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           .select('*, items(name), item_variants:vw_item_variants_with_fallback(label, price)')
           .eq('order_id', widget.orderId),
       supabase.from('order_addresses').select('*').eq('order_id', widget.orderId).maybeSingle(),
+      supabase.from('shop_reviews').select('*').eq('order_id', widget.orderId).maybeSingle(),
     ]);
 
     return _Data(
       order:      results[0] as Map<String, dynamic>,
       items:      List<Map<String, dynamic>>.from(results[1] as List),
       address:    results[2] as Map<String, dynamic>?,
+      review:     results[3] as Map<String, dynamic>?,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<_Data>(
       future: _future,
       builder: (context, snapshot) {
@@ -56,8 +62,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         final price    = (order['total_final_price'] as num?)?.toDouble()
                       ?? (order['total_estimated_price'] as num?)?.toDouble();
 
+        final orderNumber = order['order_number'];
+        final deliveryDate = order['delivery_date'];
+        final deliverySlot = order['delivery_slot'] as String?;
+
         return Scaffold(
-          appBar: AppBar(title: Text('Order #${widget.orderId.substring(0, 8).toUpperCase()}')),
+          appBar: AppBar(
+            title: Text(orderNumber != null ? 'Order #$orderNumber' : 'Order #${widget.orderId.substring(0, 8).toUpperCase()}'),
+          ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -77,6 +89,26 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
                 const SizedBox(height: 12),
 
+                // Delivery Schedule
+                if (deliveryDate != null && deliverySlot != null) ...[
+                  Card(
+                    child: ListTile(
+                      leading: Text(
+                        deliverySlot == 'morning' ? '☀️' : '🌙',
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      title: Text(
+                        '${deliverySlot == 'morning' ? "Morning" : "Evening"} Slot (${deliverySlot == 'morning' ? '7 AM - 12 PM' : '4 PM - 8 PM'})',
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      subtitle: Text(
+                        'On ${DateFormat('d MMM yyyy').format(DateTime.parse(deliveryDate as String))}',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
                 // Address
                 if (addr != null) ...[
                   Card(
@@ -85,7 +117,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('📍 Delivery Address',
+                          Text(l10n.orderDetailAddressSection,
                               style: TextStyle(fontWeight: FontWeight.w700)),
                           const SizedBox(height: 8),
                           Text('${addr['contact_name']} · ${addr['contact_phone']}'),
@@ -95,7 +127,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             Text(addr['address_line_2'] as String,
                                 style: const TextStyle(color: Color(0xFF64748B))),
                           if (addr['landmark'] != null)
-                            Text('Near: ${addr['landmark']}',
+                            Text(l10n.nearLandmarkLabel(addr['landmark'] ?? ''),
                                 style: const TextStyle(color: Color(0xFF64748B))),
                         ],
                       ),
@@ -111,7 +143,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('🧾 Items', style: TextStyle(fontWeight: FontWeight.w700)),
+                        Text(l10n.orderDetailItemsSection, style: const TextStyle(fontWeight: FontWeight.w700)),
                         const SizedBox(height: 12),
                         ...d.items.map((oi) {
                           final itemName    = (oi['items']         as Map?)?['name']  ?? '';
@@ -161,7 +193,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text('Total', style: TextStyle(fontWeight: FontWeight.w700)),
+                            Text(l10n.total, style: const TextStyle(fontWeight: FontWeight.w700)),
                             Text(price != null ? '₹${price.toStringAsFixed(0)}' : '—',
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
                           ],
@@ -170,9 +202,92 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     ),
                   ),
                 ),
+
+                // Review Card
+                if (d.review != null) ...[
+                  const SizedBox(height: 12),
+                  Card(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFECFDF5),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                l10n.orderDetailReviewSection,
+                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                              ),
+                              Row(
+                                children: List.generate(5, (index) {
+                                  final ratingVal = d.review!['final_rating'] as num? ?? 0.0;
+                                  return Icon(
+                                    index < ratingVal.round() ? Icons.star_rounded : Icons.star_outline_rounded,
+                                    color: const Color(0xFFF59E0B),
+                                    size: 18,
+                                  );
+                                }),
+                              ),
+                            ],
+                          ),
+                          if (d.review!['title'] != null && d.review!['title'].toString().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              d.review!['title'] as String,
+                              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                            ),
+                          ],
+                          if (d.review!['review'] != null && d.review!['review'].toString().isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              d.review!['review'] as String,
+                              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
+          bottomNavigationBar: (status == 'delivered' && d.review == null)
+              ? SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final result = await context.push<bool>('/orders/${widget.orderId}/review');
+                          if (result == true) {
+                            setState(() {
+                              _future = _fetch();
+                            });
+                          }
+                        },
+                        icon: const Icon(Icons.rate_review_rounded, color: Colors.white),
+                        label: Text(
+                          l10n.leaveShopReviewButton,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF128C7E), // kWaGreenDark
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : null,
         );
       },
     );
@@ -183,5 +298,6 @@ class _Data {
   final Map<String, dynamic> order;
   final List<Map<String, dynamic>> items;
   final Map<String, dynamic>? address;
-  _Data({required this.order, required this.items, this.address});
+  final Map<String, dynamic>? review;
+  _Data({required this.order, required this.items, this.address, this.review});
 }

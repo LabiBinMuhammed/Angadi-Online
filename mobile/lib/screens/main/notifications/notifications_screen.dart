@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 
@@ -32,34 +33,39 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   static const _statusIcon = {
     'pending': '🕐', 'packing': '📦', 'delivering': '🚴', 'delivered': '✅', 'cancelled': '❌',
   };
-  static const _statusMsg = {
-    'pending': 'Your order has been placed',
-    'packing': 'Shop is preparing your order',
-    'delivering': 'Your order is on the way!',
-    'delivered': 'Order delivered successfully 🎉',
-    'cancelled': 'Order was cancelled',
-  };
+  String _getStatusMsg(String status, AppLocalizations l10n) {
+    switch (status) {
+      case 'pending': return l10n.orderNotificationPlaced;
+      case 'packing': return l10n.orderNotificationPreparing;
+      case 'delivering': return l10n.orderNotificationOnWay;
+      case 'delivered': return l10n.orderNotificationDelivered;
+      case 'cancelled': return l10n.orderNotificationCancelled;
+      default: return status;
+    }
+  }
 
   String _timeAgo(String dateStr) {
+    final l10n = AppLocalizations.of(context)!;
     final diff = DateTime.now().difference(DateTime.parse(dateStr));
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
+    if (diff.inMinutes < 60) return l10n.minutesAgo(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.hoursAgo(diff.inHours);
+    return l10n.daysAgo(diff.inDays);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(title: Text(l10n.notificationsTitle)),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _future,
         builder: (context, snap) {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final orders = snap.data!;
           if (orders.isEmpty) {
-            return const Center(child: Column(
+            return Center(child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [Text('🔔', style: TextStyle(fontSize: 48)), SizedBox(height: 12), Text('No notifications yet')],
+              children: [const Text('🔔', style: TextStyle(fontSize: 48)), const SizedBox(height: 12), Text(l10n.noNotificationsYet)],
             ));
           }
           return ListView.separated(
@@ -80,7 +86,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   (o['shops'] as Map?)?['name'] ?? 'Shop',
                   style: TextStyle(fontWeight: isUnread ? FontWeight.w700 : FontWeight.w500),
                 ),
-                subtitle: Text(_statusMsg[o['status']] ?? o['status']),
+                subtitle: Text(_getStatusMsg(o['status'] ?? 'pending', l10n)),
                 trailing: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -90,7 +96,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Container(
                         margin: const EdgeInsets.only(top: 4),
                         width: 8, height: 8,
-                        decoration: const BoxDecoration(color: kWaGreen, shape: BoxShape.circle),
+                        decoration: BoxDecoration(color: kWaGreen, shape: BoxShape.circle),
                       ),
                   ],
                 ),

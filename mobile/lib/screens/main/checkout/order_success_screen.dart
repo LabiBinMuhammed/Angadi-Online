@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 class OrderSuccessScreen extends StatelessWidget {
@@ -7,6 +8,7 @@ class OrderSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -17,10 +19,10 @@ class OrderSuccessScreen extends StatelessWidget {
               children: [
                 const Text('✅', style: TextStyle(fontSize: 72)),
                 const SizedBox(height: 24),
-                const Text('Order Placed!',
+                Text(AppLocalizations.of(context)!.orderPlacedTitle,
                     style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
-                Text('Order #${orderId.substring(0, orderId.length.clamp(0, 8)).toUpperCase()}',
+                Text(AppLocalizations.of(context)!.orderIdLabel(orderId.substring(0, orderId.length.clamp(0, 8)).toUpperCase()),
                     style: const TextStyle(color: Color(0xFF64748B), fontSize: 14)),
                 const SizedBox(height: 12),
                 const Text(
@@ -31,12 +33,12 @@ class OrderSuccessScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: () => context.go('/orders'),
-                  child: const Text('View My Orders'),
+                  child: Text(AppLocalizations.of(context)!.viewMyOrdersButton),
                 ),
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: () => context.go('/home'),
-                  child: const Text('Continue Shopping'),
+                  child: Text(AppLocalizations.of(context)!.continueShoppingButton),
                 ),
               ],
             ),

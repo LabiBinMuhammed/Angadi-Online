@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/supabase_client.dart';
@@ -25,34 +26,49 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
   }
 
   Future<void> _load() async {
-    final uid = supabase.auth.currentUser!.id;
-    final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-    final shopId = ownerRes?['shop_id'] as String?;
+    try {
+      final uid = supabase.auth.currentUser!.id;
+      final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
+      final shopId = ownerRes?['shop_id'] as String?;
 
-    final results = await Future.wait<dynamic>([
-      supabase.from('users').select('name, phone').eq('id', widget.userId).single(),
-      if (shopId != null)
-        supabase.from('shop_user_credits').select('*').eq('shop_id', shopId).eq('user_id', widget.userId).maybeSingle()
-      else
-        Future<Map<String, dynamic>?>.value(null),
-      if (shopId != null)
-        supabase
-            .from('orders')
-            .select('id, status, created_at, total_final_price')
-            .eq('shop_id', shopId)
-            .eq('user_id', widget.userId)
-            .order('created_at', ascending: false)
-      else
-        Future<List<Map<String, dynamic>>>.value([]),
-    ]);
+      final results = await Future.wait<dynamic>([
+        supabase.from('users').select('name, phone').eq('id', widget.userId).single(),
+        if (shopId != null)
+          supabase.from('shop_user_credit').select('*').eq('shop_id', shopId).eq('user_id', widget.userId).maybeSingle()
+        else
+          Future<Map<String, dynamic>?>.value(null),
+        if (shopId != null)
+          supabase
+              .from('orders')
+              .select('id, status, created_at, total_final_price')
+              .eq('shop_id', shopId)
+              .eq('user_id', widget.userId)
+              .order('created_at', ascending: false)
+        else
+          Future<List<Map<String, dynamic>>>.value([]),
+      ]);
 
-    if (mounted) {
-      setState(() {
-        _user = results[0] as Map<String, dynamic>?;
-        _credit = results[1] as Map<String, dynamic>?;
-        _orders = ((results[2] as List?) ?? []).cast<Map<String, dynamic>>();
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _user = results[0] as Map<String, dynamic>?;
+          _credit = results[1] as Map<String, dynamic>?;
+          _orders = ((results[2] as List?) ?? []).cast<Map<String, dynamic>>();
+          _loading = false;
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('Error loading user credit details: $e\n$stack');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading credit details: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -98,8 +114,8 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                       children: [
                         CircleAvatar(
                           radius: 24,
-                          backgroundColor: const Color(0xFF8B5CF6).withOpacity(0.12),
-                          child: const Icon(Icons.person_rounded, color: Color(0xFFC084FC), size: 28),
+                          backgroundColor: const Color(0xFF8B5CF6).withValues(alpha: 0.12),
+                          child: const HugeIcon(icon: HugeIcons.strokeRoundedUser, color: Color(0xFFC084FC), size: 28),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -114,7 +130,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                                 const SizedBox(height: 2),
                                 Text(
                                   phone,
-                                  style: const TextStyle(fontSize: 13, color: kVendorSubText),
+                                  style: TextStyle(fontSize: 13, color: kVendorSubText),
                                 ),
                               ],
                             ],
@@ -131,14 +147,14 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                       _MiniStat(
                         label: 'Credit Used',
                         value: '₹$used',
-                        icon: Icons.credit_card_rounded,
+                        icon: HugeIcons.strokeRoundedCreditCard,
                         iconColor: const Color(0xFFEF4444),
                       ),
                       const SizedBox(width: 12),
                       _MiniStat(
                         label: 'Credit Limit',
                         value: limit != null ? '₹$limit' : '₹∞',
-                        icon: Icons.speed_rounded,
+                        icon: HugeIcons.strokeRoundedDashboardSpeed01,
                         iconColor: const Color(0xFF3B82F6),
                       ),
                       const SizedBox(width: 12),
@@ -146,7 +162,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                         label: 'Account Status',
                         value: statusLabel,
                         valueColor: statusColor,
-                        icon: isBlocked ? Icons.block_rounded : Icons.verified_user_rounded,
+                        icon: isBlocked ? HugeIcons.strokeRoundedUnavailable : HugeIcons.strokeRoundedUserCheck01,
                         iconColor: statusColor,
                       ),
                     ],
@@ -166,9 +182,9 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 40.0),
                         child: Column(
                           children: [
-                            Icon(Icons.receipt_long_rounded, size: 48, color: kVendorSubText.withOpacity(0.3)),
+                            HugeIcon(icon: HugeIcons.strokeRoundedReceiptText, size: 48, color: kVendorSubText.withValues(alpha: 0.3)),
                             const SizedBox(height: 12),
-                            const Text(
+                            Text(
                               'No order transactions found',
                               style: TextStyle(color: kVendorSubText, fontSize: 14),
                             ),
@@ -193,11 +209,11 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.04),
+                              color: Colors.white.withValues(alpha: 0.04),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white.withOpacity(0.08)),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                             ),
-                            child: const Icon(Icons.receipt_long_rounded, color: kVendorSubText, size: 18),
+                            child: HugeIcon(icon: HugeIcons.strokeRoundedReceiptText, color: kVendorSubText, size: 18),
                           ),
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -225,11 +241,11 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                                 if (dateStr.isNotEmpty)
                                   Text(
                                     dateStr,
-                                    style: const TextStyle(color: kVendorSubText, fontSize: 12),
+                                    style: TextStyle(color: kVendorSubText, fontSize: 12),
                                   ),
                                 Text(
                                   status.toUpperCase(),
-                                  style: const TextStyle(color: kVendorSubText, fontSize: 11, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: kVendorSubText, fontSize: 11, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -248,7 +264,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
 class _MiniStat extends StatelessWidget {
   final String label, value;
   final Color? valueColor;
-  final IconData icon;
+  final List<List<dynamic>> icon;
   final Color iconColor;
 
   const _MiniStat({
@@ -270,7 +286,7 @@ class _MiniStat extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, color: iconColor, size: 20),
+            HugeIcon(icon: icon, color: iconColor, size: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -289,7 +305,7 @@ class _MiniStat extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 10, color: kVendorSubText),
+                  style: TextStyle(fontSize: 10, color: kVendorSubText),
                 ),
               ],
             ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
+import 'vendor_drawer.dart';
+
 
 class VendorCreditScreen extends StatefulWidget {
   const VendorCreditScreen({super.key});
@@ -37,41 +40,69 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
     if (!mounted) return;
     setState(() => _loading = true);
 
-    final uid = supabase.auth.currentUser!.id;
-    final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-    _shopId = ownerRes?['shop_id'] as String?;
-    if (_shopId == null) {
-      if (mounted) setState(() => _loading = false);
-      return;
-    }
+    try {
+      final uid = supabase.auth.currentUser!.id;
+      final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
+      _shopId = ownerRes?['shop_id'] as String?;
+      if (_shopId == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
 
-    final res = await supabase
-        .from('shop_user_credits')
-        .select('*, users(name, phone)')
-        .eq('shop_id', _shopId!)
-        .order('created_at', ascending: false);
+      final res = await supabase
+          .from('shop_user_credit')
+          .select('*, users(name, phone)')
+          .eq('shop_id', _shopId!)
+          .order('created_at', ascending: false);
 
-    if (mounted) {
-      setState(() {
-        _credits = (res as List).cast<Map<String, dynamic>>();
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _credits = (res as List).cast<Map<String, dynamic>>();
+          _loading = false;
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('Error loading vendor credits: $e\n$stack');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading credits: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _toggle(Map<String, dynamic> c, String field) async {
     final next = !(c[field] as bool? ?? false);
-    await supabase.from('shop_user_credits').update({field: next}).eq('id', c['id']);
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(field == 'is_credit_enabled'
-            ? 'Credit account ${next ? 'enabled' : 'disabled'}'
-            : 'Customer account ${next ? 'blocked' : 'unblocked'}'),
-        backgroundColor: const Color(0xFF1E293B),
-      ),
-    );
-    _load();
+    try {
+      await supabase.from('shop_user_credit').update({field: next}).eq('id', c['id']);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(field == 'is_credit_enabled'
+                ? 'Credit account ${next ? 'enabled' : 'disabled'}'
+                : 'Customer account ${next ? 'blocked' : 'unblocked'}'),
+            backgroundColor: const Color(0xFF1E293B),
+          ),
+        );
+      }
+      _load();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -84,12 +115,22 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
 
     return Scaffold(
       backgroundColor: kVendorBg,
+      drawer: const VendorDrawer(currentRoute: '/vendor/credit'),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
         title: const Text('Credit Management', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
       ),
+
       body: Column(
         children: [
           // Toolbar Search bar
@@ -100,10 +141,10 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
               style: const TextStyle(color: Colors.white, fontSize: 15),
               decoration: vendorInputDecoration(
                 hintText: 'Search customer by name or phone...',
-                prefixIcon: const Icon(Icons.search_rounded, color: kVendorSubText),
+                prefixIcon: HugeIcon(icon: HugeIcons.strokeRoundedSearch01, color: kVendorSubText),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear_rounded, color: kVendorSubText),
+                        icon: HugeIcon(icon: HugeIcons.strokeRoundedCancel01, color: kVendorSubText),
                         onPressed: () => _searchCtrl.clear(),
                       )
                     : null,
@@ -120,9 +161,9 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.credit_card_off_outlined, size: 64, color: kVendorSubText.withOpacity(0.5)),
+                            HugeIcon(icon: HugeIcons.strokeRoundedCreditCard, size: 64, color: kVendorSubText.withValues(alpha: 0.5)),
                             const SizedBox(height: 16),
-                            const Text(
+                            Text(
                               'No credit records found',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorSubText),
                             ),
@@ -159,19 +200,16 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                   width: 44,
                                   height: 44,
                                   decoration: BoxDecoration(
-                                    color: statusColor.withOpacity(0.12),
+                                    color: statusColor.withValues(alpha: 0.12),
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: statusColor.withOpacity(0.2)),
+                                    border: Border.all(color: statusColor.withValues(alpha: 0.2)),
                                   ),
-                                  child: Icon(
-                                    isBlocked
-                                        ? Icons.block_rounded
+                                  child: HugeIcon(icon: isBlocked
+                                        ? HugeIcons.strokeRoundedUnavailable
                                         : isEnabled
-                                            ? Icons.credit_card_rounded
-                                            : Icons.credit_card_off_rounded,
-                                    color: statusColor,
-                                    size: 20,
-                                  ),
+                                            ? HugeIcons.strokeRoundedCreditCard
+                                            : HugeIcons.strokeRoundedCreditCard, color: statusColor,
+                                    size: 20,),
                                 ),
                                 const SizedBox(width: 14),
 
@@ -186,7 +224,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                       ),
                                       if (phone.isNotEmpty) ...[
                                         const SizedBox(height: 2),
-                                        Text(phone, style: const TextStyle(color: kVendorSubText, fontSize: 12)),
+                                        Text(phone, style: TextStyle(color: kVendorSubText, fontSize: 12)),
                                       ],
                                       const SizedBox(height: 6),
                                       Row(
@@ -210,7 +248,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    const Text('Used / Limit', style: TextStyle(color: kVendorSubText, fontSize: 10)),
+                                    Text('Used / Limit', style: TextStyle(color: kVendorSubText, fontSize: 10)),
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
@@ -224,10 +262,10 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                                 : Colors.white,
                                           ),
                                         ),
-                                        const Text(' / ', style: TextStyle(color: kVendorSubText, fontSize: 12)),
+                                        Text(' / ', style: TextStyle(color: kVendorSubText, fontSize: 12)),
                                         Text(
                                           limit != null ? '₹$limit' : '₹—',
-                                          style: const TextStyle(color: kVendorSubText, fontSize: 13),
+                                          style: TextStyle(color: kVendorSubText, fontSize: 13),
                                         ),
                                       ],
                                     ),
@@ -238,7 +276,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                       children: [
                                         // Enable/Disable toggle
                                         _MiniActionButton(
-                                          icon: Icons.power_settings_new_rounded,
+                                          icon: HugeIcons.strokeRoundedShutDown,
                                           color: isEnabled ? const Color(0xFF4ADE80) : kVendorSubText,
                                           onPressed: () => _toggle(c, 'is_credit_enabled'),
                                           tooltip: isEnabled ? 'Disable Credit' : 'Enable Credit',
@@ -246,7 +284,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                         const SizedBox(width: 4),
                                         // Block/Unblock toggle
                                         _MiniActionButton(
-                                          icon: isBlocked ? Icons.shield_rounded : Icons.block_rounded,
+                                          icon: isBlocked ? HugeIcons.strokeRoundedShield01 : HugeIcons.strokeRoundedUnavailable,
                                           color: isBlocked ? const Color(0xFFF87171) : kVendorSubText,
                                           onPressed: () => _toggle(c, 'is_blocked'),
                                           tooltip: isBlocked ? 'Unblock Customer' : 'Block Customer',
@@ -254,7 +292,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                         const SizedBox(width: 4),
                                         // History
                                         _MiniActionButton(
-                                          icon: Icons.history_rounded,
+                                          icon: HugeIcons.strokeRoundedWorkHistory,
                                           color: const Color(0xFF60A5FA),
                                           onPressed: () => context.push('/vendor/credit/${c['user_id']}'),
                                           tooltip: 'View History',
@@ -276,7 +314,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
 }
 
 class _MiniActionButton extends StatelessWidget {
-  final IconData icon;
+  final List<List<dynamic>> icon;
   final Color color;
   final VoidCallback onPressed;
   final String tooltip;
@@ -299,12 +337,12 @@ class _MiniActionButton extends StatelessWidget {
           width: 30,
           height: 30,
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.02),
+            color: Colors.white.withValues(alpha: 0.02),
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.white.withOpacity(0.1)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Center(
-            child: Icon(icon, color: color, size: 14),
+            child: HugeIcon(icon: icon, color: color, size: 14),
           ),
         ),
       ),

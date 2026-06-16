@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import '../../theme/theme_service.dart';
 
 // ─── Design Tokens (Vendor Premium Theme) ────────────────────────────────────
-const Color kVendorBg = Color(0xFF09090B);
-const Color kVendorText = Color(0xFFF8FAFC);
-const Color kVendorSubText = Color(0xFF94A3B8);
+Color get kVendorBg => ThemeService.instance.isDarkMode ? const Color(0xFF09090B) : const Color(0xFFF8FAFC);
+Color get kVendorText => ThemeService.instance.isDarkMode ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
+Color get kVendorSubText => ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
-const Color kVendorCardBg = Color(0x06FFFFFF);      // ~2% white
-const Color kVendorCardBorder = Color(0x14FFFFFF);  // ~8% white
-const Color kVendorInputBg = Color(0x0DFFFFFF);     // ~5% white
+Color get kVendorCardBg => ThemeService.instance.isDarkMode ? const Color(0x06FFFFFF) : Colors.white;      // ~2% white / solid white
+Color get kVendorCardBorder => ThemeService.instance.isDarkMode ? const Color(0x14FFFFFF) : const Color(0xFFE2E8F0);  // ~8% white / light border
+Color get kVendorInputBg => ThemeService.instance.isDarkMode ? const Color(0x0DFFFFFF) : const Color(0xFFF1F5F9);     // ~5% white / light grey
 
 BoxDecoration vendorCardDecoration({double radius = 24}) {
   return BoxDecoration(
@@ -31,7 +32,7 @@ InputDecoration vendorInputDecoration({
     suffixIcon: suffixIcon,
     filled: true,
     fillColor: kVendorInputBg,
-    labelStyle: const TextStyle(color: kVendorSubText, fontSize: 14),
+    labelStyle: TextStyle(color: kVendorSubText, fontSize: 14),
     hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
@@ -151,10 +152,10 @@ class VendorOutlineButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: disabled ? null : onPressed,
         style: OutlinedButton.styleFrom(
-          backgroundColor: Colors.white.withOpacity(0.03),
-          foregroundColor: Colors.white,
+          backgroundColor: ThemeService.instance.isDarkMode ? Colors.white.withValues(alpha: 0.03) : Colors.black.withValues(alpha: 0.03),
+          foregroundColor: ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF0F172A),
           side: BorderSide(
-            color: borderColor ?? Colors.white.withOpacity(0.15),
+            color: borderColor ?? (ThemeService.instance.isDarkMode ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.15)),
             width: 1,
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -191,31 +192,32 @@ class VendorBadge extends StatelessWidget {
     Color fg;
     Color border;
 
+    final isDark = ThemeService.instance.isDarkMode;
     switch (type) {
       case VendorBadgeType.success:
-        bg = const Color(0x2622C55E); // 15% opacity success
-        fg = const Color(0xFF4ADE80);
-        border = const Color(0x3322C55E);
+        bg = isDark ? const Color(0x2622C55E) : const Color(0xFFDCFCE7);
+        fg = isDark ? const Color(0xFF4ADE80) : const Color(0xFF15803D);
+        border = isDark ? const Color(0x3322C55E) : const Color(0xFFBBF7D0);
         break;
       case VendorBadgeType.warning:
-        bg = const Color(0x26EAB308);
-        fg = const Color(0xFFFACC15);
-        border = const Color(0x33EAB308);
+        bg = isDark ? const Color(0x26EAB308) : const Color(0xFFFEF3C7);
+        fg = isDark ? const Color(0xFFFACC15) : const Color(0xFFB45309);
+        border = isDark ? const Color(0x33EAB308) : const Color(0xFFFDE68A);
         break;
       case VendorBadgeType.danger:
-        bg = const Color(0x26EF4444);
-        fg = const Color(0xFFF87171);
-        border = const Color(0x33EF4444);
+        bg = isDark ? const Color(0x26EF4444) : const Color(0xFFFEE2E2);
+        fg = isDark ? const Color(0xFFF87171) : const Color(0xFFB91C1C);
+        border = isDark ? const Color(0x33EF4444) : const Color(0xFFFCA5A5);
         break;
       case VendorBadgeType.info:
-        bg = const Color(0x263B82F6);
-        fg = const Color(0xFF60A5FA);
-        border = const Color(0x333B82F6);
+        bg = isDark ? const Color(0x263B82F6) : const Color(0xFFDBEAFE);
+        fg = isDark ? const Color(0xFF60A5FA) : const Color(0xFF1D4ED8);
+        border = isDark ? const Color(0x333B82F6) : const Color(0xFFBFDBFE);
         break;
       case VendorBadgeType.neutral:
-        bg = const Color(0x2694A3B8);
-        fg = const Color(0xFFCBD5E1);
-        border = const Color(0x3394A3B8);
+        bg = isDark ? const Color(0x2694A3B8) : const Color(0xFFF1F5F9);
+        fg = isDark ? const Color(0xFFCBD5E1) : const Color(0xFF475569);
+        border = isDark ? const Color(0x3394A3B8) : const Color(0xFFE2E8F0);
         break;
     }
 

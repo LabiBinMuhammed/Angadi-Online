@@ -1,0 +1,118 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { useTranslation, Locale } from '@/lib/i18n/I18nContext'
+
+const LANGUAGES = [
+  { code: 'en', label: '🇬🇧 English' },
+  { code: 'ar', label: '🇸🇦 العربية' },
+  { code: 'hi', label: '🇮🇳 हिंदी' },
+  { code: 'ml', label: '🇮🇳 Malayalam' },
+]
+
+export default function SettingsClient({ preferredLanguage }: { preferredLanguage: string }) {
+  const [lang, setLang] = useState(preferredLanguage)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const router = useRouter()
+  const { setLocale, t } = useTranslation()
+
+  async function saveLang(code: string) {
+    setLang(code)
+    setSaving(true)
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      await supabase.from('user_profiles').update({ preferred_language: code }).eq('user_id', user.id)
+    }
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+    
+    // Dynamically switch the locale (sets cookie, document direction, and re-routes path)
+    setLocale(code as Locale)
+  }
+
+  async function handleLogout() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+    router.refresh()
+  }
+
+  return (
+    <div style={{ maxWidth: 540 }}>
+      <div className="wa-list">
+        {/* Language */}
+        <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid var(--wa-separator)' }}>
+          <p className="font-semibold" style={{ marginBottom: '.75rem' }}>🌐 {t('settings.language')}</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+            {LANGUAGES.map(l => (
+              <label
+                key={l.code}
+                id={`lang-${l.code}`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '.75rem',
+                  padding: '.5rem .75rem', borderRadius: 'var(--radius-md)',
+                  cursor: 'pointer', background: lang === l.code ? 'var(--wa-bg)' : 'transparent',
+                  transition: 'background .12s',
+                }}
+              >
+                <input
+                  type="radio"
+                  name="language"
+                  value={l.code}
+                  checked={lang === l.code}
+                  onChange={() => saveLang(l.code)}
+                  style={{ accentColor: 'var(--wa-green-dark)' }}
+                />
+                <span>{l.label}</span>
+                {lang === l.code && saving && <span className="spinner" style={{ width: 14, height: 14 }} />}
+                {lang === l.code && saved && <span style={{ color: 'var(--wa-green)', fontSize: '.85rem' }}>✓ Saved</span>}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* App info */}
+        <div className="wa-list-item" style={{ cursor: 'default' }}>
+          <span>📱</span>
+          <div className="wa-item-body">
+            <p className="wa-item-title">App version</p>
+            <p className="wa-item-sub">Village Market 1.0.0</p>
+          </div>
+        </div>
+
+        {/* Notifications preference */}
+        <div className="wa-list-item" style={{ cursor: 'default' }}>
+          <span>🔔</span>
+          <div className="wa-item-body">
+            <p className="wa-item-title">Order notifications</p>
+            <p className="wa-item-sub">Enabled for all order updates</p>
+          </div>
+        </div>
+
+        {/* Privacy */}
+        <div className="wa-list-item" style={{ cursor: 'default' }}>
+          <span>🔒</span>
+          <div className="wa-item-body">
+            <p className="wa-item-title">Privacy</p>
+            <p className="wa-item-sub">Your data is stored securely</p>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: '1.5rem' }}>
+        <button
+          id="settings-logout"
+          className="btn btn-danger btn-full"
+          onClick={handleLogout}
+        >
+          {t('common.sign_out')}
+        </button>
+      </div>
+    </div>
+  )
+}

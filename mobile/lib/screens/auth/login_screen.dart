@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../core/auth_service.dart';
 import '../../core/supabase_client.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,31 +14,73 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailCtrl    = TextEditingController();
+  final _phoneCtrl    = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  bool _useOtp = true;
   bool _loading = false;
   bool _showPw = false;
   String? _error;
+  String _selectedCountryCode = '+91';
 
-  Future<void> _login() async {
+  String _normalizePhone(String phone, String countryCode) {
+    String cleaned = phone.replaceAll(RegExp(r'[\s\-\(\)]'), '');
+    if (cleaned.startsWith('+')) return cleaned;
+    if (cleaned.startsWith('00')) return '+' + cleaned.substring(2);
+    if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    }
+    final codeWithoutPlus = countryCode.replaceAll('+', '');
+    if (cleaned.startsWith(codeWithoutPlus)) {
+      return '+' + cleaned;
+    }
+    return countryCode + cleaned;
+  }
+
+  Future<void> _handleLogin() async {
+    if (_loading) return;
     setState(() { _loading = true; _error = null; });
     try {
-      final email = _emailCtrl.text.trim();
-      if (email.isEmpty) {
-        throw const AuthException('Please enter your email address.');
+      final rawPhone = _phoneCtrl.text.trim();
+      if (rawPhone.isEmpty) {
+        throw const AuthException('Please enter your phone number.');
       }
-      if (_passwordCtrl.text.isEmpty) {
-        throw const AuthException('Please enter your password.');
+      final phone = _normalizePhone(rawPhone, _selectedCountryCode);
+
+      if (_useOtp) {
+        // Option 1: Phone + OTP
+        await authService.sendOtp(phone);
+        if (mounted) {
+          context.push('/otp-verification', extra: {
+            'phone': phone,
+            'flow': 'login',
+          });
+        }
+      } else {
+        // Option 2: Phone + Password
+        if (_passwordCtrl.text.isEmpty) {
+          throw const AuthException('Please enter your password.');
+        }
+        final res = await authService.loginWithPassword(phone, _passwordCtrl.text);
+        if (mounted) {
+          final userId = res.user?.id;
+          if (userId != null) {
+            final userRecord = await supabase
+                .from('users')
+                .select('id, name')
+                .eq('id', userId)
+                .maybeSingle();
+            final name = userRecord?['name'] as String?;
+            if (userRecord == null || name == null || name == 'User' || name.trim().isEmpty) {
+              context.go('/complete-registration');
+              return;
+            }
+          }
+          context.go('/home');
+        }
       }
-      
-      await supabase.auth.signInWithPassword(
-        email: email,
-        password: _passwordCtrl.text,
-      );
-      if (mounted) context.go('/home');
     } on AuthException catch (e) {
       if (e.message.contains('Invalid login credentials')) {
-        setState(() => _error = 'Incorrect email or password. Please try again.');
+        setState(() => _error = 'Incorrect phone number or password. Please try again.');
       } else {
         setState(() => _error = e.message);
       }
@@ -49,15 +93,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _emailCtrl.dispose();
+    _phoneCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.instance.isDarkMode;
     return Scaffold(
-      backgroundColor: kNeutral50,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -65,9 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // Brand Hero Banner
             Container(
               height: 230,
-              decoration: const BoxDecoration(
-                color: kWaTeal,
-              ),
+              decoration: BoxDecoration(color: kWaTeal),
               child: Stack(
                 children: [
                   Positioned(
@@ -78,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 160,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: Colors.white.withAlpha(20),
                       ),
                     ),
                   ),
@@ -90,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 100,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: Colors.white.withAlpha(20),
                       ),
                     ),
                   ),
@@ -106,13 +149,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.1),
+                                color: Colors.black.withAlpha(25),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               )
                             ],
                           ),
-                          child: const Icon(Icons.storefront, size: 36, color: kWaTeal),
+                          child: Icon(Icons.storefront, size: 36, color: kWaTeal),
                         ),
                         const SizedBox(height: 12),
                         const Text(
@@ -128,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           "Your community's local marketplace",
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
+                            color: Colors.white.withAlpha(204),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),
@@ -146,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                  Text(
                     'Welcome back',
                     style: TextStyle(
                       fontSize: 22,
@@ -157,45 +200,129 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    'Sign in to your Village Market account',
+                    'Sign in with your phone number',
                     style: TextStyle(
                       fontSize: 14,
                       color: kNeutral500,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
+                  const SizedBox(height: 20),
+
+                  // Login Method Toggle
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : kNeutral100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setState(() { _useOtp = true; _error = null; }),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: _useOtp ? kWaTeal : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'OTP Code',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: _useOtp ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setState(() { _useOtp = false; _error = null; }),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: !_useOtp ? kWaTeal : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Password',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: !_useOtp ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 24),
 
-                  // Email Input
+                  // Phone Input
                   _buildInputField(
-                    label: 'Email address',
-                    hintText: 'you@example.com',
-                    controller: _emailCtrl,
-                    prefixIcon: Icons.mail_outline,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
+                    label: 'Phone number',
+                    hintText: '98765 43210',
+                    controller: _phoneCtrl,
+                    prefixIcon: Icons.phone_android_outlined,
+                    keyboardType: TextInputType.phone,
+                    textInputAction: _useOtp ? TextInputAction.done : TextInputAction.next,
+                    onSubmitted: _useOtp ? (_) => _handleLogin() : null,
+                    countryCode: _selectedCountryCode,
+                    onCountryCodeChanged: (val) {
+                      if (val != null) {
+                        setState(() {
+                          _selectedCountryCode = val;
+                        });
+                      }
+                    },
                   ),
                   const SizedBox(height: 18),
 
-                  // Password Input
-                  _buildInputField(
-                    label: 'Password',
-                    hintText: '••••••••',
-                    controller: _passwordCtrl,
-                    prefixIcon: Icons.lock_outline,
-                    obscureText: !_showPw,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _login(),
-                    suffixIcon: GestureDetector(
-                      onTap: () => setState(() => _showPw = !_showPw),
-                      child: Icon(
-                        _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        size: 20,
-                        color: kNeutral500,
+                  // Password Input (if not OTP)
+                  if (!_useOtp) ...[
+                    _buildInputField(
+                      label: 'Password',
+                      hintText: '••••••••',
+                      controller: _passwordCtrl,
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: !_showPw,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _handleLogin(),
+                      suffixIcon: GestureDetector(
+                        onTap: () => setState(() => _showPw = !_showPw),
+                        child: Icon(
+                          _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          size: 20,
+                          color: kNeutral500,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => context.push('/forgot-password'),
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: kWaTeal,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                  ],
 
                   // Error Box
                   if (_error != null) ...[
@@ -205,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   // Submit Button
                   ElevatedButton(
-                    onPressed: _loading ? null : _login,
+                    onPressed: _loading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: kWaTeal,
                       foregroundColor: Colors.white,
@@ -228,13 +355,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Sign In'),
+                        : Text(_useOtp ? 'Send OTP Code' : 'Sign In'),
                   ),
                   const SizedBox(height: 24),
 
                   // Footer Redirection
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       const Text(
                         "Don't have an account? ",
@@ -242,7 +370,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       GestureDetector(
                         onTap: () => context.push('/signup'),
-                        child: const Text(
+                        child: Text(
                           'Create one',
                           style: TextStyle(
                             color: kWaTeal,
@@ -273,6 +401,8 @@ class _LoginScreenState extends State<LoginScreen> {
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
     void Function(String)? onSubmitted,
+    String? countryCode,
+    void Function(String?)? onCountryCodeChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -289,14 +419,47 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: kNeutral100,
+            color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : kNeutral100,
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Icon(prefixIcon, size: 18, color: kNeutral500),
-              const SizedBox(width: 12),
+              if (countryCode != null && onCountryCodeChanged != null) ...[
+                DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: countryCode,
+                    dropdownColor: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: '+91', child: Text('🇮🇳 +91')),
+                      DropdownMenuItem(value: '+971', child: Text('🇦🇪 +971')),
+                      DropdownMenuItem(value: '+966', child: Text('🇸🇦 +966')),
+                      DropdownMenuItem(value: '+968', child: Text('🇴🇲 +968')),
+                      DropdownMenuItem(value: '+974', child: Text('🇶🇦 +974')),
+                      DropdownMenuItem(value: '+973', child: Text('🇧🇭 +973')),
+                      DropdownMenuItem(value: '+965', child: Text('🇰🇼 +965')),
+                      DropdownMenuItem(value: '+1', child: Text('🇺🇸 +1')),
+                      DropdownMenuItem(value: '+44', child: Text('🇬🇧 +44')),
+                    ],
+                    onChanged: onCountryCodeChanged,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 1,
+                  height: 20,
+                  color: kNeutral300,
+                ),
+                const SizedBox(width: 8),
+              ] else ...[
+                Icon(prefixIcon, size: 18, color: kNeutral500),
+                const SizedBox(width: 12),
+              ],
               Expanded(
                 child: TextField(
                   controller: controller,
@@ -304,7 +467,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: keyboardType,
                   textInputAction: textInputAction,
                   onSubmitted: onSubmitted,
-                  style: const TextStyle(fontSize: 15, color: kNeutral800, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 15, color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800, fontWeight: FontWeight.w500),
                   decoration: InputDecoration(
                     hintText: hintText,
                     hintStyle: const TextStyle(color: kNeutral400, fontWeight: FontWeight.w400),

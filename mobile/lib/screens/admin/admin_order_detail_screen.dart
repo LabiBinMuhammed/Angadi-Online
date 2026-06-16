@@ -14,11 +14,14 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
   bool _loading = true;
 
   static const _statusColor = {
-    'pending':    Color(0xFFF59E0B),
-    'packing':    Color(0xFF3B82F6),
-    'delivering': Color(0xFF3B82F6),
-    'delivered':  Color(0xFF22C55E),
-    'cancelled':  Color(0xFFEF4444),
+    'pending':          Color(0xFFF59E0B),
+    'accepted':         Color(0xFF0EA5E9),
+    'packing':          Color(0xFF3B82F6),
+    'ready':            Color(0xFF8B5CF6),
+    'out_for_delivery': Color(0xFFFB923C),
+    'delivering':       Color(0xFFFB923C),
+    'delivered':        Color(0xFF22C55E),
+    'cancelled':        Color(0xFFEF4444),
   };
 
   @override
@@ -38,7 +41,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: kWaTeal, foregroundColor: Colors.white,
-        title: Text('Order #${widget.orderId.substring(0, 8)}'),
+        title: Text(_order!['order_number'] != null ? 'Order #${_order!['order_number']}' : 'Order #${widget.orderId.substring(0, 8)}'),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -67,6 +70,26 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Delivery Slot Details
+                  if (_order!['delivery_date'] != null && _order!['delivery_slot'] != null) ...[
+                    Card(
+                      child: ListTile(
+                        leading: Text(
+                          _order!['delivery_slot'] == 'morning' ? '☀️' : '🌙',
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        title: Text(
+                          '${_order!['delivery_slot'] == 'morning' ? "Morning" : "Evening"} Slot (${_order!['delivery_slot'] == 'morning' ? '7 AM - 12 PM' : '4 PM - 8 PM'})',
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        subtitle: Text(
+                          'Deliver on: ${_order!['delivery_date']}',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
                   const Text('Items', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                   const SizedBox(height: 8),
                   ...(((_order!['order_items'] as List?) ?? []).map((oi) => Card(
@@ -92,7 +115,7 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         const Text('Final Total', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                         Text(
                           '₹${_order!['total_final_price'] ?? _order!['total_estimated_price'] ?? '—'}',
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: kWaTeal),
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 20, color: kWaTeal),
                         ),
                       ]),
                     ),

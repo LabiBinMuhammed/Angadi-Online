@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
 import '../../../core/cart_service.dart';
+import '../../../core/language_service.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final String itemId;
@@ -25,10 +28,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
   Future<_Data> _fetch() async {
     final results = await Future.wait([
-      supabase.from('items').select('*, item_images(*)').eq('id', widget.itemId).single(),
+      supabase.from('items').select('*, item_images(*), item_translations(*)').eq('id', widget.itemId).single(),
       supabase
           .from('vw_item_variants_with_fallback')
-          .select('*')
+          .select('*, variant_translations(*)')
           .eq('item_id', widget.itemId)
           .eq('is_active', true)
           .order('is_default', ascending: false),
@@ -47,6 +50,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<_Data>(
       future: _future,
       builder: (context, snapshot) {
@@ -54,8 +58,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         final d = snapshot.data!;
+        final localizedDesc = d.item.getLocalizedDescription(LanguageService.instance.locale.languageCode);
         return Scaffold(
-          appBar: AppBar(title: Text(d.item.name)),
+          appBar: AppBar(title: Text(d.item.getLocalizedName(LanguageService.instance.locale.languageCode))),
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,11 +80,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(d.item.name,
+                      Text(d.item.getLocalizedName(LanguageService.instance.locale.languageCode),
                           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-                      if (d.item.description != null) ...[
+                      if (localizedDesc != null && localizedDesc.isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Text(d.item.description!,
+                        Text(localizedDesc,
                             style: const TextStyle(color: Color(0xFF64748B), fontSize: 14)),
                       ],
                       if (d.config != null) ...[
@@ -94,7 +99,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
                       // Variants
                       if (d.variants.isNotEmpty) ...[
-                        const Text('Select Option',
+                        Text(AppLocalizations.of(context)!.selectOption,
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
                         const SizedBox(height: 12),
                         Wrap(
@@ -114,7 +119,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Text(
-                                  v.price != null ? '${v.label} — ₹${v.price!.toStringAsFixed(0)}' : v.label,
+                                  v.price != null ? '${v.getLocalizedLabel(LanguageService.instance.locale.languageCode)} — ₹${v.price!.toStringAsFixed(0)}' : v.getLocalizedLabel(LanguageService.instance.locale.languageCode),
                                   style: TextStyle(
                                     color: isSelected ? Colors.white : const Color(0xFF334155),
                                     fontWeight: FontWeight.w600, fontSize: 13,
@@ -131,9 +136,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                         const SizedBox(height: 20),
                         Row(
                           children: [
-                            const Text('Quantity', style: TextStyle(fontWeight: FontWeight.w600)),
+                            Text(AppLocalizations.of(context)!.quantityLabel, style: const TextStyle(fontWeight: FontWeight.w600)),
                             const Spacer(),
-                            IconButton(icon: const Icon(Icons.remove_circle_outline),
+                            IconButton(icon: const HugeIcon(icon: HugeIcons.strokeRoundedMinusSignCircle),
                                 onPressed: () => setState(() => _quantity = (_quantity - 1.0).clamp(0.1, 99.0))),
                             Text(
                               _quantity % 1 == 0
@@ -141,7 +146,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                   : _quantity.toStringAsFixed(1),
                               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                             ),
-                            IconButton(icon: const Icon(Icons.add_circle_outline),
+                            IconButton(icon: const HugeIcon(icon: HugeIcons.strokeRoundedAddCircle),
                                 onPressed: () => setState(() => _quantity += 1.0)),
                           ],
                         ),
@@ -168,7 +173,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: _added ? const Color(0xFF22C55E) : const Color(0xFF0EA5E9),
                           ),
-                          child: Text(_added ? '✓ Added to cart' : '🛒 Add to cart'),
+                          child: Text(_added ? AppLocalizations.of(context)!.addedToCartLabel : AppLocalizations.of(context)!.addToCartLabel),
                         ),
                       ),
                     ],

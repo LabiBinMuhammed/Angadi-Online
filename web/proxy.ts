@@ -1,7 +1,69 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const locales = ['en', 'ml', 'hi', 'ar']
+const defaultLocale = 'en'
+
+// Helper to determine the locale for a request
+function getLocale(request: NextRequest): string {
+  // 1. Check NEXT_LOCALE cookie
+  const cookieLocale = request.cookies.get('NEXT_LOCALE')?.value
+  if (cookieLocale && locales.includes(cookieLocale)) {
+    return cookieLocale
+  }
+
+  // 2. Parse browser Accept-Language header
+  const acceptLanguage = request.headers.get('accept-language')
+  if (acceptLanguage) {
+    const matched = acceptLanguage
+      .split(',')
+      .map(lang => lang.split(';')[0].trim().substring(0, 2))
+      .find(lang => locales.includes(lang))
+    
+    if (matched) return matched
+  }
+
+  // 3. Fallback to default English
+  return defaultLocale
+}
+
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // 1. Locale Redirect Check
+  // Skip locale check for API routes, Next.js internals, and files containing extensions
+  const isApiOrAsset = pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')
+
+  if (!isApiOrAsset) {
+    const pathnameIsMissingLocale = locales.every(
+      locale => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+    )
+
+    if (pathnameIsMissingLocale) {
+      const locale = getLocale(request)
+      // Redirect /home -> /en/home
+      const redirectUrl = new URL(
+        `/${locale}${pathname === '/' ? '' : pathname}${request.nextUrl.search}`,
+        request.url
+      )
+      return NextResponse.redirect(redirectUrl)
+    }
+  }
+
+  // Extract the locale prefix and resolve clean pathname for auth guards
+  const locale = pathname.split('/')[1]
+  let cleanPathname = pathname
+  for (const loc of locales) {
+    if (pathname.startsWith(`/${loc}/`)) {
+      cleanPathname = pathname.substring(loc.length + 1)
+      break
+    } else if (pathname === `/${loc}`) {
+      cleanPathname = '/'
+      break
+    }
+  }
+
+  // 2. Supabase Auth Guards
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(
@@ -13,8 +75,6 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          // Write cookies to both the request and the response so that
-          // the session is properly forwarded to Server Components.
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
@@ -27,15 +87,10 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  // To prevent rate limiting from Next.js Link prefetching triggering middleware repeatedly,
-  // we use getSession() instead of getUser(). getSession() decodes the JWT locally without
-  // making a network request to Supabase on every route change or prefetch.
   const {
     data: { session },
   } = await supabase.auth.getSession()
   const user = session?.user
-
-  const { pathname } = request.nextUrl
 
   // Helper to preserve cookies on redirects
   const redirect = (url: URL) => {
@@ -49,28 +104,53 @@ export async function proxy(request: NextRequest) {
   // Routes that don't require authentication
   const publicRoutes = ['/login', '/signup']
   const isPublicRoute =
-    publicRoutes.some((r) => pathname.startsWith(r)) || pathname === '/'
+    publicRoutes.some((r) => cleanPathname.startsWith(r)) || cleanPathname === '/'
 
   // Unauthenticated user → redirect to login
   if (!user && !isPublicRoute) {
     const loginUrl = request.nextUrl.clone()
-    loginUrl.pathname = '/login'
+    loginUrl.pathname = `/${locale}/login`
     return redirect(loginUrl)
+  }
+
+  // Resolve selected_location_id if user is authenticated but cookie is missing
+  if (user && !request.cookies.has('selected_location_id')) {
+    const { data: addrs } = await supabase
+      .from('user_addresses')
+      .select('location_id')
+      .eq('user_id', user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(1)
+
+    let locationId = addrs?.[0]?.location_id
+
+    if (!locationId) {
+      const { data: firstLoc } = await supabase
+        .from('locations')
+        .select('id')
+        .order('name')
+        .limit(1)
+        .maybeSingle()
+      locationId = firstLoc?.id
+    }
+
+    if (locationId) {
+      request.cookies.set('selected_location_id', locationId)
+      supabaseResponse.cookies.set('selected_location_id', locationId, { maxAge: 3153600000, path: '/' })
+    }
   }
 
   // Already authenticated → don't allow accessing /login or /signup
   if (user && isPublicRoute) {
     const homeUrl = request.nextUrl.clone()
-    homeUrl.pathname = '/home'
+    homeUrl.pathname = `/${locale}/home`
     return redirect(homeUrl)
   }
 
   // Role-based route guard
-  if (user && (pathname.startsWith('/vendor') || pathname.startsWith('/admin'))) {
-    // 1. Get role from JWT metadata (fast, no network request)
+  if (user && (cleanPathname.startsWith('/vendor') || cleanPathname.startsWith('/admin'))) {
     const metadataRole = user.user_metadata?.role as string | undefined
-
-    // 2. Only hit the DB if we don't have a role in metadata, OR if we need to verify a shop_owner's setup
     let role = metadataRole
 
     if (!role) {
@@ -83,23 +163,22 @@ export async function proxy(request: NextRequest) {
     }
 
     // Access control
-    if (pathname.startsWith('/vendor') && role !== 'shop_owner' && role !== 'admin') {
+    if (cleanPathname.startsWith('/vendor') && role !== 'shop_owner' && role !== 'admin') {
       const homeUrl = request.nextUrl.clone()
-      homeUrl.pathname = '/home'
+      homeUrl.pathname = `/${locale}/home`
       return redirect(homeUrl)
     }
 
-    if (pathname.startsWith('/admin') && role !== 'admin') {
+    if (cleanPathname.startsWith('/admin') && role !== 'admin') {
       const homeUrl = request.nextUrl.clone()
-      homeUrl.pathname = '/home'
+      homeUrl.pathname = `/${locale}/home`
       return redirect(homeUrl)
     }
 
-    // 3. Shop Setup Check (Only for shop_owners visiting vendor pages other than /vendor/shop)
-    // We only do this if it's NOT a prefetch request to save on API calls
+    // Shop Setup Check (Only for shop_owners visiting vendor pages other than /vendor/shop)
     const isPrefetch = request.headers.get('next-router-prefetch') || request.headers.get('purpose') === 'prefetch'
 
-    if (role === 'shop_owner' && pathname.startsWith('/vendor') && pathname !== '/vendor/shop' && !isPrefetch) {
+    if (role === 'shop_owner' && cleanPathname.startsWith('/vendor') && cleanPathname !== '/vendor/shop' && !isPrefetch) {
       const { data: ownerRow } = await supabase
         .from('shop_owners')
         .select('shop_id')
@@ -109,13 +188,12 @@ export async function proxy(request: NextRequest) {
 
       if (!ownerRow?.shop_id) {
         const setupUrl = request.nextUrl.clone()
-        setupUrl.pathname = '/vendor/shop'
+        setupUrl.pathname = `/${locale}/vendor/shop`
         return redirect(setupUrl)
       }
     }
   }
 
-  // Always return the supabaseResponse so cookies are properly forwarded
   return supabaseResponse
 }
 

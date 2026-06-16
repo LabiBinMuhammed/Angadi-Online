@@ -190,7 +190,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   Widget _buildVariantImagePreview(Map<String, dynamic> v) {
     final src = v['image_source'];
     if (src == null) {
-      return const Icon(Icons.add_a_photo_outlined, size: 16, color: kVendorSubText);
+      return Icon(Icons.add_a_photo_outlined, size: 16, color: kVendorSubText);
     }
     if (src is String && src.isNotEmpty) {
       return Image.network(src, fit: BoxFit.cover);
@@ -206,7 +206,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
         },
       );
     }
-    return const Icon(Icons.add_a_photo_outlined, size: 16, color: kVendorSubText);
+    return Icon(Icons.add_a_photo_outlined, size: 16, color: kVendorSubText);
   }
 
   Future<String?> _uploadImage(XFile image) async {
@@ -567,7 +567,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               ),
               height: 4,
               decoration: BoxDecoration(
-                color: active ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.1),
+                color: active ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -609,9 +609,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.02),
+                  color: Colors.white.withValues(alpha: 0.02),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                 ),
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -690,7 +690,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                       const SizedBox(height: 4),
                       Text(
                         'Mode: ${demo['sell_mode'] ?? 'Manual'}',
-                        style: const TextStyle(fontSize: 10, color: kVendorSubText),
+                        style: TextStyle(fontSize: 10, color: kVendorSubText),
                       ),
                     ],
                   ),
@@ -699,7 +699,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
             },
           )
         else
-          const Text(
+          Text(
             'No templates found for this category.',
             style: TextStyle(color: kVendorSubText, fontSize: 14),
           ),
@@ -726,7 +726,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
@@ -754,19 +754,19 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                     width: 100,
                     margin: const EdgeInsets.only(right: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.02),
+                      color: Colors.white.withValues(alpha: 0.02),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         style: BorderStyle.solid,
                       ),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.add_photo_alternate_outlined, color: kVendorSubText.withOpacity(0.8), size: 24),
+                        Icon(Icons.add_photo_alternate_outlined, color: kVendorSubText.withValues(alpha: 0.8), size: 24),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Add Image',
                           style: TextStyle(color: kVendorSubText, fontSize: 10, fontWeight: FontWeight.w500),
                         ),
@@ -805,7 +805,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                         gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
-                          colors: [Colors.black.withOpacity(0.6), Colors.transparent],
+                          colors: [Colors.black.withValues(alpha: 0.6), Colors.transparent],
                         ),
                       ),
                     ),
@@ -837,7 +837,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
+                            color: Colors.black.withValues(alpha: 0.6),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.close_rounded, color: Colors.white, size: 12),
@@ -865,7 +865,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Sell Mode',
           style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: kVendorSubText),
         ),
@@ -896,10 +896,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0x1F3B82F6) : Colors.black.withOpacity(0.2),
+                  color: isSelected ? const Color(0x1F3B82F6) : Colors.black.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.1),
+                    color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.1),
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -918,7 +918,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                     const SizedBox(height: 4),
                     Text(
                       mode['desc']!,
-                      style: const TextStyle(fontSize: 10, color: kVendorSubText),
+                      style: TextStyle(fontSize: 10, color: kVendorSubText),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -942,9 +942,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.2),
+        color: Colors.black.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1153,7 +1153,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
         children: [
           Text(
             'Live Customer Preview'.toUpperCase(),
-            style: const TextStyle(color: kVendorSubText, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            style: TextStyle(color: kVendorSubText, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
           ),
           const SizedBox(height: 12),
           Row(
@@ -1178,7 +1178,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                             },
                           )
                         : Image.network(_imageSources[0] as String, fit: BoxFit.cover))
-                    : const Icon(Icons.shopping_bag_outlined, color: kVendorSubText),
+                    : Icon(Icons.shopping_bag_outlined, color: kVendorSubText),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1205,7 +1205,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                               margin: const EdgeInsets.only(right: 6),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: isDefault ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.1),
+                                color: isDefault ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
@@ -1218,7 +1218,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
@@ -1276,9 +1276,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.2),
+                    color: Colors.black.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.05)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1303,7 +1303,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                                   labelText: 'Base Unit',
                                 ),
                                 items: [
-                                  const DropdownMenuItem(value: null, child: Text('— Select Unit —', style: TextStyle(color: kVendorSubText))),
+                                  DropdownMenuItem(value: null, child: Text('— Select Unit —', style: TextStyle(color: kVendorSubText))),
                                   ..._units.map((u) => DropdownMenuItem(
                                         value: u['id'] as String,
                                         child: Text('${u['name']} (${u['symbol']})', style: const TextStyle(color: Colors.white)),
@@ -1334,7 +1334,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'e.g. Set 1kg = ₹25. This sets the baseline calculation.',
-                        style: TextStyle(fontSize: 10, color: kVendorSubText.withOpacity(0.8)),
+                        style: TextStyle(fontSize: 10, color: kVendorSubText.withValues(alpha: 0.8)),
                       ),
                     ],
                   ),
@@ -1345,9 +1345,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withOpacity(0.05)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1384,9 +1384,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                                 width: 48,
                                 height: 48,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.03),
+                                  color: Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: _buildVariantImagePreview(v),
@@ -1407,12 +1407,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                                     decoration: vendorInputDecoration(
                                       labelText: 'Size',
                                     ),
-                                    items: const [
+                                    items: [
                                       DropdownMenuItem(value: null, child: Text('Size', style: TextStyle(color: kVendorSubText, fontSize: 11))),
-                                      DropdownMenuItem(value: 'Small', child: Text('Small', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                      DropdownMenuItem(value: 'Medium', child: Text('Medium', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                      DropdownMenuItem(value: 'Large', child: Text('Large', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                      DropdownMenuItem(value: 'Extra Large', child: Text('Extra Large', style: TextStyle(color: Colors.white, fontSize: 11))),
+                                      const DropdownMenuItem(value: 'Small', child: Text('Small', style: TextStyle(color: Colors.white, fontSize: 11))),
+                                      const DropdownMenuItem(value: 'Medium', child: Text('Medium', style: TextStyle(color: Colors.white, fontSize: 11))),
+                                      const DropdownMenuItem(value: 'Large', child: Text('Large', style: TextStyle(color: Colors.white, fontSize: 11))),
+                                      const DropdownMenuItem(value: 'Extra Large', child: Text('Extra Large', style: TextStyle(color: Colors.white, fontSize: 11))),
                                     ],
                                     onChanged: (val) => _handleDynamicVariantChange(index, 'size', val ?? ''),
                                   ),
@@ -1440,14 +1440,14 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                                   alignment: Alignment.centerLeft,
                                   padding: const EdgeInsets.symmetric(horizontal: 12),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.05),
+                                    color: Colors.white.withValues(alpha: 0.05),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
                                     v['price'] != null && v['price'].toString().isNotEmpty
                                         ? '₹${v['price']}'
                                         : '—',
-                                    style: const TextStyle(color: kVendorSubText, fontSize: 13),
+                                    style: TextStyle(color: kVendorSubText, fontSize: 13),
                                   ),
                                 ),
                               ),

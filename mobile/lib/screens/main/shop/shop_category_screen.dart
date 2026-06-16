@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
+import '../../../core/language_service.dart';
 
 class ShopCategoryScreen extends StatefulWidget {
   final String shopId;
@@ -23,10 +25,10 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
 
   Future<_Data> _fetch() async {
     final results = await Future.wait([
-      supabase.from('categories').select('id, name').eq('id', widget.categoryId).single(),
+      supabase.from('categories').select('id, name, category_translations(*)').eq('id', widget.categoryId).single(),
       supabase
           .from('items')
-          .select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*)')
+          .select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*), item_translations(*)')
           .eq('shop_id', widget.shopId)
           .eq('category_id', widget.categoryId)
           .eq('is_active', true)
@@ -41,6 +43,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<_Data>(
       future: _future,
       builder: (context, snapshot) {
@@ -49,9 +52,9 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
         }
         final d = snapshot.data!;
         return Scaffold(
-          appBar: AppBar(title: Text(d.category.name)),
+          appBar: AppBar(title: Text(d.category.getLocalizedName(LanguageService.instance.locale.languageCode))),
           body: d.items.isEmpty
-              ? const Center(child: Text('No items in this category'))
+              ? Center(child: Text(l10n.noItemsInCategory))
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -82,7 +85,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
                             padding: const EdgeInsets.all(10),
                             child: Align(
                               alignment: Alignment.centerLeft,
-                              child: Text(item.name,
+                              child: Text(item.getLocalizedName(LanguageService.instance.locale.languageCode),
                                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                                   maxLines: 2, overflow: TextOverflow.ellipsis),
                             ),

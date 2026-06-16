@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
@@ -91,8 +93,9 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(_isEdit ? 'Edit Address' : 'Add Address')),
+      appBar: AppBar(title: Text(_isEdit ? l10n.editAddressTitle : l10n.addAddressButton)),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : Form(
@@ -101,10 +104,10 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
                 padding: const EdgeInsets.all(16),
                 children: [
                   // Label
-                  const Text('Label', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text(l10n.labelFieldTitle, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 8),
                   Row(
-                    children: ['Home', 'Work', 'Other'].map((l) => Padding(
+                    children: [l10n.labelHome, l10n.labelWork, l10n.labelOther].map((l) => Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
                         label: Text(l),
@@ -118,35 +121,35 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
 
                   TextFormField(
                     controller: _contactName,
-                    decoration: const InputDecoration(labelText: 'Contact Name *'),
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
+                    decoration: InputDecoration(labelText: l10n.contactNameLabel),
+                    validator: (v) => v!.isEmpty ? l10n.fieldRequiredValidation : null,
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _contactPhone,
-                    decoration: const InputDecoration(labelText: 'Contact Phone *'),
+                    decoration: InputDecoration(labelText: l10n.contactPhoneLabel),
                     keyboardType: TextInputType.phone,
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
+                    validator: (v) => v!.isEmpty ? l10n.fieldRequiredValidation : null,
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _addr1,
-                    decoration: const InputDecoration(labelText: 'Address Line 1 *'),
-                    validator: (v) => v!.isEmpty ? 'Required' : null,
+                    decoration: InputDecoration(labelText: l10n.addressLine1Label),
+                    validator: (v) => v!.isEmpty ? l10n.fieldRequiredValidation : null,
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _addr2,
-                    decoration: const InputDecoration(labelText: 'Address Line 2'),
+                    decoration: InputDecoration(labelText: l10n.addressLine2Label),
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _landmark,
-                    decoration: const InputDecoration(labelText: 'Landmark'),
+                    decoration: InputDecoration(labelText: l10n.landmarkLabel),
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 16),
@@ -161,7 +164,7 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
                         border: Border.all(color: kNeutral200),
                       ),
                       child: Row(children: [
-                        const Icon(Icons.location_on, color: Color(0xFF128C7E)),
+                        const HugeIcon(icon: HugeIcons.strokeRoundedLocation01, color: Color(0xFF128C7E)),
                         const SizedBox(width: 8),
                         Text('${_lat!.toStringAsFixed(5)}, ${_lng!.toStringAsFixed(5)}',
                             style: const TextStyle(fontSize: 13)),
@@ -170,20 +173,20 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
 
                   const SizedBox(height: 8),
                   OutlinedButton.icon(
-                    icon: const Icon(Icons.my_location),
-                    label: const Text('Pin my location (OSM)'),
+                    icon: const HugeIcon(icon: HugeIcons.strokeRoundedGps01),
+                    label: Text(l10n.pinMyLocationButton),
                     onPressed: () {
                       // OSM location picker — opens in browser or uses geolocator
                       // For now store rough coords via geolocation
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Map picker coming soon (OpenStreetMap)')),
+                        SnackBar(content: Text(l10n.mapPickerComingSoon)),
                       );
                     },
                   ),
                   const SizedBox(height: 16),
 
                   CheckboxListTile(
-                    title: const Text('Set as default address'),
+                    title: Text(l10n.setAsDefaultAddress),
                     value: _isDefault,
                     activeColor: kWaGreen,
                     contentPadding: EdgeInsets.zero,
@@ -196,7 +199,7 @@ class _AddEditAddressScreenState extends State<AddEditAddressScreen> {
                     style: ElevatedButton.styleFrom(backgroundColor: kWaTeal),
                     child: _saving
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : Text(_isEdit ? 'Update Address' : 'Add Address'),
+                        : Text(_isEdit ? l10n.updateAddressButton : l10n.addAddressButton),
                   ),
                 ],
               ),

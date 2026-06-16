@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
+import 'vendor_drawer.dart';
+
 
 class VendorItemsScreen extends StatefulWidget {
   const VendorItemsScreen({super.key});
@@ -62,6 +66,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
   }
 
   Future<void> _toggleActive(Map<String, dynamic> item) async {
+    final l10n = AppLocalizations.of(context)!;
     final currentStatus = item['status'] as String? ?? (item['is_active'] == true ? 'published' : 'draft');
     final nextStatus = currentStatus == 'published' ? 'hidden' : 'published';
     final nextIsActive = (nextStatus == 'published');
@@ -73,7 +78,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Item marked as ${nextStatus == 'published' ? 'Live' : 'Hidden'}'),
+        content: Text(nextStatus == 'published' ? l10n.itemMarkedLive : l10n.itemMarkedHidden),
         backgroundColor: const Color(0xFF1E293B),
       ),
     );
@@ -81,16 +86,17 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
   }
 
   Future<void> _deleteItem(Map<String, dynamic> item) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1E293B),
-        title: const Text('Delete Product', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: Text('Permanently delete "${item['name']}"? This cannot be undone.', style: const TextStyle(color: kVendorSubText)),
+        title: Text(l10n.deleteProductDialogTitle, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text(l10n.deleteProductDialogMessage(item['name'] ?? ''), style: TextStyle(color: kVendorSubText)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: kVendorSubText)),
+            child: Text('Cancel', style: TextStyle(color: kVendorSubText)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -106,7 +112,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
       }).eq('id', item['id']);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Product deleted successfully'), backgroundColor: Color(0xFF1E293B)),
+        SnackBar(content: Text(l10n.productDeletedSuccess), backgroundColor: const Color(0xFF1E293B)),
       );
       _load();
     }
@@ -114,6 +120,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final filtered = _items.where((i) {
       final name = (i['name'] as String? ?? '').toLowerCase();
       final matchesSearch = name.contains(_searchQuery.toLowerCase());
@@ -135,18 +142,28 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
 
     return Scaffold(
       backgroundColor: kVendorBg,
+      drawer: const VendorDrawer(currentRoute: '/vendor/items'),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
-        title: const Text('Manage Products', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        title: Text(l10n.manageProductsTitle, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_circle_outline_rounded, size: 26, color: Color(0xFF60A5FA)),
+            icon: const HugeIcon(icon: HugeIcons.strokeRoundedAddCircle, size: 26, color: Color(0xFF60A5FA)),
             onPressed: () => context.push('/vendor/items/new').then((_) => _load()),
           ),
         ],
       ),
+
       body: Column(
         children: [
           // Toolbar (Search & Filter Capsule buttons)
@@ -159,11 +176,11 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                   controller: _searchCtrl,
                   style: const TextStyle(color: Colors.white, fontSize: 15),
                   decoration: vendorInputDecoration(
-                    hintText: 'Search products by name...',
-                    prefixIcon: const Icon(Icons.search_rounded, color: kVendorSubText),
+                    hintText: l10n.searchProductsPlaceholder,
+                    prefixIcon: HugeIcon(icon: HugeIcons.strokeRoundedSearch01, color: kVendorSubText),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, color: kVendorSubText),
+                            icon: HugeIcon(icon: HugeIcons.strokeRoundedCancel01, color: kVendorSubText),
                             onPressed: () => _searchCtrl.clear(),
                           )
                         : null,
@@ -177,22 +194,22 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                   child: Row(
                     children: [
                       _FilterButton(
-                        label: 'All',
+                        label: l10n.filterAll,
                         selected: _filter == 'all',
                         onTap: () => setState(() => _filter = 'all'),
                       ),
                       _FilterButton(
-                        label: 'Live',
+                        label: l10n.filterLive,
                         selected: _filter == 'active',
                         onTap: () => setState(() => _filter = 'active'),
                       ),
                       _FilterButton(
-                        label: 'Draft',
+                        label: l10n.filterDraft,
                         selected: _filter == 'draft',
                         onTap: () => setState(() => _filter = 'draft'),
                       ),
                       _FilterButton(
-                        label: 'Inactive',
+                        label: l10n.filterInactive,
                         selected: _filter == 'inactive',
                         onTap: () => setState(() => _filter = 'inactive'),
                       ),
@@ -212,10 +229,10 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.inventory_2_outlined, size: 64, color: kVendorSubText.withOpacity(0.5)),
+                            HugeIcon(icon: HugeIcons.strokeRoundedPackage, size: 64, color: kVendorSubText.withValues(alpha: 0.5)),
                             const SizedBox(height: 16),
-                            const Text(
-                              'No products found',
+                            Text(
+                              l10n.noProductsFound,
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorSubText),
                             ),
                           ],
@@ -231,26 +248,26 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                           
                           // Determine status badge metadata
                           VendorBadgeType badgeType = VendorBadgeType.neutral;
-                          String badgeLabel = 'Draft';
+                          String badgeLabel = l10n.statusDraft;
 
                           if (status == 'published') {
                             badgeType = VendorBadgeType.success;
-                            badgeLabel = 'Live';
+                            badgeLabel = l10n.filterLive;
                           } else if (status == 'incomplete') {
                             badgeType = VendorBadgeType.warning;
-                            badgeLabel = 'Incomplete';
+                            badgeLabel = l10n.statusIncomplete;
                           } else if (status == 'ready') {
                             badgeType = VendorBadgeType.info;
-                            badgeLabel = 'Ready';
+                            badgeLabel = l10n.statusReady;
                           } else if (status == 'hidden') {
                             badgeType = VendorBadgeType.neutral;
-                            badgeLabel = 'Hidden';
+                            badgeLabel = l10n.statusHidden;
                           } else if (status == 'rejected') {
                             badgeType = VendorBadgeType.danger;
-                            badgeLabel = 'Rejected';
+                            badgeLabel = l10n.statusRejected;
                           } else if (status == 'out_of_stock') {
                             badgeType = VendorBadgeType.warning;
-                            badgeLabel = 'Out Of Stock';
+                            badgeLabel = l10n.statusOutOfStock;
                           }
 
                           return Container(
@@ -272,9 +289,9 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                       : Container(
                                           width: 48,
                                           height: 48,
-                                          color: Colors.white.withOpacity(0.05),
-                                          child: const Center(
-                                            child: Icon(Icons.inventory_2_rounded, color: kVendorSubText, size: 22),
+                                          color: Colors.white.withValues(alpha: 0.05),
+                                          child: Center(
+                                            child: HugeIcon(icon: HugeIcons.strokeRoundedPackage, color: kVendorSubText, size: 22),
                                           ),
                                         ),
                                 ),
@@ -301,12 +318,12 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withOpacity(0.05),
+                                              color: Colors.white.withValues(alpha: 0.05),
                                               borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
                                               categoryName,
-                                              style: const TextStyle(fontSize: 10, color: kVendorSubText),
+                                              style: TextStyle(fontSize: 10, color: kVendorSubText),
                                             ),
                                           ),
                                           const SizedBox(width: 8),
@@ -324,23 +341,23 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                   children: [
                                     // Power Toggle
                                     _ActionButton(
-                                      icon: Icons.power_settings_new_rounded,
+                                      icon: HugeIcons.strokeRoundedShutDown,
                                       color: status == 'published' ? const Color(0xFF60A5FA) : kVendorSubText,
                                       onPressed: () => _toggleActive(item),
-                                      tooltip: status == 'published' ? 'Deactivate' : 'Go Live',
+                                      tooltip: status == 'published' ? l10n.deactivateTooltip : l10n.goLiveTooltip,
                                     ),
                                     const SizedBox(width: 6),
                                     // Edit
                                     _ActionButton(
-                                      icon: Icons.edit_rounded,
-                                      color: Colors.white.withOpacity(0.7),
+                                      icon: HugeIcons.strokeRoundedPencilEdit02,
+                                      color: Colors.white.withValues(alpha: 0.7),
                                       onPressed: () => context.push('/vendor/items/${item['id']}').then((_) => _load()),
                                       tooltip: 'Edit',
                                     ),
                                     const SizedBox(width: 6),
                                     // Delete
                                     _ActionButton(
-                                      icon: Icons.delete_rounded,
+                                      icon: HugeIcons.strokeRoundedDelete02,
                                       color: const Color(0xFFF87171),
                                       bgColor: const Color(0x26EF4444),
                                       borderColor: const Color(0x4DEF4444),
@@ -374,21 +391,22 @@ class _FilterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.03),
+          color: selected ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(99),
           border: Border.all(
-            color: selected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.08),
+            color: selected ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.08),
           ),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF3B82F6).withOpacity(0.3),
+                    color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   )
@@ -409,7 +427,7 @@ class _FilterButton extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  final IconData icon;
+  final List<List<dynamic>> icon;
   final Color color;
   final Color? bgColor;
   final Color? borderColor;
@@ -427,6 +445,7 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -436,12 +455,12 @@ class _ActionButton extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: bgColor ?? Colors.white.withOpacity(0.03),
+            color: bgColor ?? Colors.white.withValues(alpha: 0.03),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: borderColor ?? Colors.white.withOpacity(0.12)),
+            border: Border.all(color: borderColor ?? Colors.white.withValues(alpha: 0.12)),
           ),
           child: Center(
-            child: Icon(icon, color: color, size: 16),
+            child: HugeIcon(icon: icon, color: color, size: 16),
           ),
         ),
       ),

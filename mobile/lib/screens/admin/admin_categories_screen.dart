@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
+import 'admin_drawer.dart';
 
 /// Admin Categories Screen
 class AdminCategoriesScreen extends StatefulWidget {
@@ -50,6 +51,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/categories'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Categories')),
       body: Column(
         children: [
@@ -107,6 +109,7 @@ class AdminLogsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/logs'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Activity Logs')),
       body: const Center(child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -136,6 +139,7 @@ class AdminSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/settings'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Global Settings')),
       body: ListView.separated(
         itemCount: _items.length,
@@ -172,20 +176,30 @@ class _AdminCreditScreenState extends State<AdminCreditScreen> {
   void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
-    final res = await supabase.from('shop_user_credits').select('*, users(name, phone), shops(name)').order('used_amount', ascending: false).limit(100);
-    if (mounted) {
-      final list = (res as List).cast<Map<String, dynamic>>();
-      setState(() {
-        _credits = list;
-        _totalUsed = list.fold(0.0, (sum, c) => sum + ((c['used_amount'] as num?)?.toDouble() ?? 0));
-        _loading = false;
-      });
+    try {
+      final res = await supabase.from('shop_user_credit').select('*, users(name, phone), shops(name)').order('used_amount', ascending: false).limit(100);
+      if (mounted) {
+        final list = (res as List).cast<Map<String, dynamic>>();
+        setState(() {
+          _credits = list;
+          _totalUsed = list.fold(0.0, (sum, c) => sum + ((c['used_amount'] as num?)?.toDouble() ?? 0));
+          _loading = false;
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('Error loading admin credit: $e\n$stack');
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/credit'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Credit Monitor')),
       body: Column(
         children: [

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
 import '../../../core/cart_service.dart';
+import '../../../../widgets/directional_huge_icon.dart';
+import '../../../../core/language_service.dart';
 
 const _kBg = Color(0xFFFAFAFA);
 const _kGreenDark = Color(0xFF32B84A);
@@ -69,9 +73,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Future<void> _loadData() async {
     try {
       final res = await Future.wait([
-        supabase.from('categories').select('id, name').eq('is_active', true).order('name'),
+        supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
         supabase.from('shops').select('id, name').order('name'),
-        supabase.from('items').select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*)').eq('is_active', true).isFilter('deleted_at', null).order('name'),
+        supabase.from('items').select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*), item_translations(*)').eq('is_active', true).isFilter('deleted_at', null).order('name'),
         supabase.from('item_variants').select('item_id, price').eq('is_active', true).eq('is_default', true),
       ]);
 
@@ -113,6 +117,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _kBg,
       body: SafeArea(
@@ -146,6 +151,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       return hasProduct && c.name.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       key: const ValueKey('grid'),
       physics: const BouncingScrollPhysics(),
@@ -153,11 +159,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title
-          const Padding(
-            padding: EdgeInsets.fromLTRB(24, 24, 24, 8),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
             child: Text(
-              'Categories',
-              style: TextStyle(
+              l10n.categoriesTitle,
+              style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w900,
                 color: _kText,
@@ -165,11 +171,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               ),
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(
-              'Explore fresh products by category',
-              style: TextStyle(
+              l10n.exploreCategoriesSubtitle,
+              style: const TextStyle(
                 fontSize: 15,
                 color: _kSubLighter,
                 fontWeight: FontWeight.w500,
@@ -194,9 +200,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   Expanded(
                     child: TextField(
                       onChanged: (v) => setState(() => _searchQuery = v),
-                      decoration: const InputDecoration(
-                        hintText: 'Search categories...',
-                        hintStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
+                      decoration: InputDecoration(
+                        hintText: l10n.searchCategoriesPlaceholder,
+                        hintStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
                         border: InputBorder.none,
                       ),
                     ),
@@ -208,9 +214,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
           // Grid
           filteredCats.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
-                  child: Center(child: Text('No categories found', style: TextStyle(color: _kSubLighter))),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 40),
+                  child: Center(child: Text(l10n.noCategoriesFound, style: const TextStyle(color: _kSubLighter))),
                 )
               : GridView.builder(
                   padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
@@ -266,7 +272,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  cat.name,
+                                  cat.getLocalizedName(LanguageService.instance.locale.languageCode),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,
@@ -275,7 +281,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  '$count items',
+                                  l10n.itemsCount(count),
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: _kSub,
@@ -296,6 +302,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   }
 
   Widget _buildCategoryDetails() {
+    final l10n = AppLocalizations.of(context)!;
     final cat = _selectedCategory!;
     final catItems = _items.where((i) => i.categoryId == cat.id).toList();
 
@@ -324,7 +331,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.arrow_back, color: _kText),
+                  child: const DirectionalHugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: _kText),
                 ),
               ),
               const SizedBox(width: 16),
@@ -333,7 +340,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      cat.name,
+                      cat.getLocalizedName(LanguageService.instance.locale.languageCode),
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -342,7 +349,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${catItems.length} products available',
+                      l10n.productsAvailable(catItems.length),
                       style: const TextStyle(
                         fontSize: 13,
                         color: _kSubLighter,
@@ -373,7 +380,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         // Items List
         Expanded(
           child: catItems.isEmpty
-              ? const Center(child: Text('No items in this category yet.', style: TextStyle(color: _kSubLighter)))
+              ? Center(child: Text(l10n.noItemsInCategory, style: const TextStyle(color: _kSubLighter)))
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(24, 8, 24, 100),
                   physics: const BouncingScrollPhysics(),
@@ -431,7 +438,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.name,
+                                  item.getLocalizedName(LanguageService.instance.locale.languageCode),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,
@@ -513,10 +520,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               const SizedBox(height: 12),
                               ElevatedButton(
                                 onPressed: () async {
-                                  final scName = item.name;
+                                  final scName = item.getLocalizedName(LanguageService.instance.locale.languageCode);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Adding $scName to cart...'),
+                                      content: Text(l10n.addingToCartMessage(scName)),
                                       duration: const Duration(milliseconds: 500),
                                     ),
                                   );
@@ -525,7 +532,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text('$scName added to cart!'),
+                                        content: Text(l10n.addedToCartMessage(scName)),
                                         duration: const Duration(seconds: 1),
                                       ),
                                     );
@@ -542,12 +549,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   elevation: 0,
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.add_shopping_cart, size: 14),
-                                    SizedBox(width: 6),
-                                    Text('Add', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+                                    const Icon(Icons.add_shopping_cart, size: 14),
+                                    const SizedBox(width: 6),
+                                    Text(l10n.addButtonLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
                                   ],
                                 ),
                               ),

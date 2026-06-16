@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
+import 'admin_drawer.dart';
 
 class AdminShopsScreen extends StatefulWidget {
   const AdminShopsScreen({super.key});
@@ -33,6 +34,7 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/shops'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Shop Management')),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -87,6 +89,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
   Widget build(BuildContext context) {
     final filtered = _users.where((u) => _role == 'all' || u['role'] == _role).toList();
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/users'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('User Management')),
       body: Column(
         children: [
@@ -145,6 +148,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   List<Map<String, dynamic>> _orders = [];
   bool _loading = true;
   String _status = 'all';
+  String _slotFilter = 'all';
+  DateTime? _dateFilter;
 
   @override
   void initState() { super.initState(); _load(); }
@@ -156,20 +161,32 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _orders.where((o) => _status == 'all' || o['status'] == _status).toList();
+    final filtered = _orders.where((o) {
+      if (_status != 'all' && o['status'] != _status) return false;
+      if (_slotFilter != 'all' && o['delivery_slot'] != _slotFilter) return false;
+      if (_dateFilter != null) {
+        if (o['delivery_date'] == null) return false;
+        final oDate = DateTime.parse(o['delivery_date'] as String);
+        if (oDate.year != _dateFilter!.year || oDate.month != _dateFilter!.month || oDate.day != _dateFilter!.day) return false;
+      }
+      return true;
+    }).toList();
+
     return Scaffold(
+      drawer: const AdminDrawer(currentRoute: '/admin/orders'),
       appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('All Orders')),
       body: Column(
         children: [
+          // Status Filter Row
           SizedBox(
             height: 50,
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              children: ['all', 'pending', 'packing', 'delivering', 'delivered', 'cancelled'].map((s) => Padding(
+              children: ['all', 'pending', 'accepted', 'packing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'].map((s) => Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: FilterChip(
-                  label: Text(s[0].toUpperCase() + s.substring(1)),
+                  label: Text(s == 'all' ? 'All Statuses' : s[0].toUpperCase() + s.substring(1).replaceAll('_', ' ')),
                   selected: _status == s,
                   selectedColor: kWaGreen,
                   onSelected: (_) => setState(() => _status = s),
@@ -177,6 +194,87 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               )).toList(),
             ),
           ),
+
+          // Date Filter Row
+          SizedBox(
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              children: [
+                FilterChip(
+                  label: const Text('All Dates'),
+                  selected: _dateFilter == null,
+                  selectedColor: kWaGreen,
+                  onSelected: (_) => setState(() => _dateFilter = null),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Today'),
+                  selected: _dateFilter != null && DateUtils.isSameDay(_dateFilter!, DateTime.now()),
+                  selectedColor: kWaGreen,
+                  onSelected: (_) => setState(() => _dateFilter = DateTime.now()),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('Tomorrow'),
+                  selected: _dateFilter != null && DateUtils.isSameDay(_dateFilter!, DateTime.now().add(const Duration(days: 1))),
+                  selectedColor: kWaGreen,
+                  onSelected: (_) => setState(() => _dateFilter = DateTime.now().add(const Duration(days: 1))),
+                ),
+                const SizedBox(width: 8),
+                ActionChip(
+                  avatar: const Icon(Icons.calendar_today, size: 14),
+                  label: Text(_dateFilter != null && !DateUtils.isSameDay(_dateFilter!, DateTime.now()) && !DateUtils.isSameDay(_dateFilter!, DateTime.now().add(const Duration(days: 1)))
+                      ? '${_dateFilter!.day}/${_dateFilter!.month}/${_dateFilter!.year}'
+                      : 'Pick Date'),
+                  onPressed: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _dateFilter ?? DateTime.now(),
+                      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+                      lastDate: DateTime.now().add(const Duration(days: 30)),
+                    );
+                    if (picked != null) {
+                      setState(() => _dateFilter = picked);
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // Slot Filter Row
+          SizedBox(
+            height: 50,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              children: [
+                FilterChip(
+                  label: const Text('All Slots'),
+                  selected: _slotFilter == 'all',
+                  selectedColor: kWaGreen,
+                  onSelected: (_) => setState(() => _slotFilter = 'all'),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('☀️ Morning'),
+                  selected: _slotFilter == 'morning',
+                  selectedColor: kWaGreen,
+                  onSelected: (_) => setState(() => _slotFilter = 'morning'),
+                ),
+                const SizedBox(width: 8),
+                FilterChip(
+                  label: const Text('🌙 Evening'),
+                  selected: _slotFilter == 'evening',
+                  selectedColor: kWaGreen,
+                  onSelected: (_) => setState(() => _slotFilter = 'evening'),
+                ),
+              ],
+            ),
+          ),
+
           _loading
               ? const Expanded(child: Center(child: CircularProgressIndicator()))
               : Expanded(
@@ -185,12 +283,35 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, i) {
                       final o = filtered[i];
+                      final displayOrderNumber = o['order_number'] != null
+                          ? '#${o['order_number']}'
+                          : '#${(o['id'] as String).substring(0, 8)}';
+
                       return ListTile(
                         leading: const CircleAvatar(backgroundColor: Color(0xFFE0F2FE), child: Icon(Icons.receipt, color: Color(0xFF0369A1), size: 20)),
-                        title: Text('${(o['users'] as Map?)?['name'] ?? '—'} → ${(o['shops'] as Map?)?['name'] ?? '—'}',
+                        title: Text('${(o['users'] as Map?)?['name'] ?? '—'} → ${(o['shops'] as Map?)?['name'] ?? '—'} $displayOrderNumber',
                             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                        subtitle: Text('#${(o['id'] as String).substring(0, 8)} · ${o['status']}'),
-                        trailing: Text('₹${o['total_final_price'] ?? '—'}', style: const TextStyle(fontWeight: FontWeight.w700)),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('ID: ${(o['id'] as String).substring(0, 8)} · status: ${o['status'].toString().toUpperCase()}'),
+                            if (o['delivery_date'] != null && o['delivery_slot'] != null)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  '${o['delivery_slot'] == 'morning' ? "☀️ Morning" : "🌙 Evening"} Slot (${o['delivery_date']})',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: o['delivery_slot'] == 'morning'
+                                        ? const Color(0xFF16A34A)
+                                        : const Color(0xFFEA580C),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        trailing: Text('₹ ${(o['total_final_price'] ?? o['total_estimated_price'] ?? 0.0).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w700)),
                         onTap: () => context.push('/admin/orders/${o['id']}'),
                       );
                     },

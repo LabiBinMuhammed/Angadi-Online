@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
@@ -73,7 +74,7 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
                     ..._orders.map((o) => Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
-                        leading: const Icon(Icons.receipt_long, color: Color(0xFF0369A1)),
+                        leading: const HugeIcon(icon: HugeIcons.strokeRoundedReceiptText, color: Color(0xFF0369A1)),
                         title: Text('${(o['shops'] as Map?)?['name'] ?? 'Shop'}', style: const TextStyle(fontWeight: FontWeight.w600)),
                         subtitle: Text('#${(o['id'] as String).substring(0, 8)} · ${o['status']}'),
                         trailing: Text('₹${o['total_final_price'] ?? '—'}', style: const TextStyle(fontWeight: FontWeight.w700)),

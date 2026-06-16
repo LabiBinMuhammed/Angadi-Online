@@ -1,0 +1,563 @@
+{
+  "@@locale": "en",
+  "appTitle": "Village Market",
+  "navHome": "Home",
+  "navOrders": "Orders",
+  "navCart": "Bag",
+  "navProfile": "Profile",
+  "navSettings": "Settings",
+  "searchPlaceholder": "Search products...",
+  "addToCart": "Add to Cart",
+  "buyNow": "Buy Now",
+  "save": "Save",
+  "cancel": "Cancel",
+  "edit": "Edit",
+  "delete": "Delete",
+  "signOut": "Sign Out",
+  "settingsTitle": "Settings",
+  "languagePreference": "Language Preference",
+  "themeMode": "Theme Mode",
+  "darkMode": "Dark Mode",
+  "lightMode": "Light Mode",
+  "cashOnDelivery": "Cash on Delivery",
+  "creditPayment": "Credit Payment",
+  "placeOrder": "Place Order",
+  "totalPrice": "Total Price",
+  "orderStatusPending": "Pending",
+  "orderStatusPacking": "Packing",
+  "orderStatusDelivering": "Delivering",
+  "orderStatusDelivered": "Delivered",
+  "orderStatusCancelled": "Cancelled",
+  "heyGreeting": "Hey",
+  "findGroceriesSubtitle": "Find fresh groceries you want",
+  "searchShopsPlaceholder": "Search shops...",
+  "searchItemsPlaceholder": "Search items...",
+  "noShopsFound": "No shops found.",
+  "noItemsFound": "No items found.",
+  "productsLabel": "products",
+  "categoriesTitle": "Categories",
+  "clearLabel": "CLEAR",
+  "popularTitle": "Popular",
+  "shopItemsTitle": "Shop Items",
+  "addButtonLabel": "Add",
+  "bestOrganic": "Best organic fresh vegetables",
+  "greatDeals": "Great deals on fruit",
+  "addingToCartMessage": "Adding {name} to cart...",
+  "@addingToCartMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addedToCartMessage": "{name} added to cart!",
+  "@addedToCartMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deliverySchedule": "Delivery Schedule",
+  "changeDate": "Change Date",
+  "morning": "Morning",
+  "evening": "Evening",
+  "myBag": "My Bag",
+  "yourBagIsEmpty": "Your bag is empty",
+  "browseShops": "Browse Shops",
+  "total": "Total",
+  "proceedToCheckout": "Proceed To Checkout",
+  "cutoffPassed": "Cutoff passed",
+  "limitReached": "Limit reached",
+  "unavailable": "Unavailable",
+  "itemsCount": "{count} items",
+  "@itemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exploreCategoriesSubtitle": "Explore fresh products by category",
+  "searchCategoriesPlaceholder": "Search categories...",
+  "noCategoriesFound": "No categories found",
+  "productsAvailable": "{count} products available",
+  "@productsAvailable": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noItemsInCategory": "No items in this category yet.",
+  "checkoutTitle": "Checkout",
+  "deliveryAddressTitle": "Delivery Address",
+  "selectAddressLabel": "Select Address",
+  "changeAddressLabel": "Change Address",
+  "addNewAddressLabel": "Add New Address",
+  "noAddressesFound": "No addresses found.",
+  "contactNameLabel": "Contact Name *",
+  "fullNamePlaceholder": "Full Name",
+  "contactPhoneLabel": "Contact Phone *",
+  "addressLine1Label": "Address Line 1 *",
+  "addressLine1Placeholder": "Street, building, house no.",
+  "addressLine2Label": "Address Line 2 (Optional)",
+  "addressLine2Placeholder": "Apartment, floor, unit",
+  "landmarkLabel": "Landmark (Optional)",
+  "landmarkPlaceholder": "E.g., near City Mall",
+  "saveToAddressBook": "Save to my address book",
+  "closeButton": "Close",
+  "backButton": "Back",
+  "useAddressButton": "Use Address",
+  "thisTimeOnlyLabel": "This Time Only",
+  "noAddressSelected": "No address selected",
+  "deliveryScheduleTitle": "DELIVERY SCHEDULE",
+  "paymentMethodTitle": "Payment Method",
+  "orderSummaryTitle": "Order Summary",
+  "totalAmountTitle": "Total Amount",
+  "placeOrderButton": "Place Order",
+  "fillRequiredFieldsError": "Please fill all required (*) fields.",
+  "orderPlacementFailed": "Order placement failed: {error}",
+  "@orderPlacementFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "orderPlacedTitle": "Order Placed!",
+  "orderIdLabel": "Order #{orderId}",
+  "@orderIdLabel": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderReceivedSubtitle": "Your order has been received and will be packed shortly.",
+  "viewMyOrdersButton": "View My Orders",
+  "continueShoppingButton": "Continue Shopping",
+  "guestUser": "Guest",
+  "failedToLoadHomeData": "Failed to load home data: {error}",
+  "@failedToLoadHomeData": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "productLabel": "Product",
+  "removedFromFavoritesMessage": "{name} removed from favorites",
+  "@removedFromFavoritesMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "addedToFavoritesMessage": "{name} added to favorites",
+  "@addedToFavoritesMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdateFavoriteStatus": "Failed to update favorite status",
+  "pinLimitReached": "You can only pin up to 3 shops. Please unpin a shop first.",
+  "unpinnedSuccessfully": "{name} unpinned successfully",
+  "@unpinnedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pinnedSuccessfully": "{name} pinned successfully",
+  "@pinnedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToUpdatePinStatus": "Failed to update pin status",
+  "shopReviewsTooltip": "Shop Reviews & Feedback",
+  "productsCount": "{count} products",
+  "@productsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectOption": "Select Option",
+  "quantityLabel": "Quantity",
+  "addedToCartLabel": "Added to cart",
+  "addToCartLabel": "Add to cart",
+  "notificationsTitle": "Notifications",
+  "noNotificationsYet": "No notifications yet",
+  "orderNotificationPlaced": "Your order has been placed",
+  "orderNotificationPreparing": "Shop is preparing your order",
+  "orderNotificationOnWay": "Your order is on the way!",
+  "orderNotificationDelivered": "Order delivered successfully 🎉",
+  "orderNotificationCancelled": "Order was cancelled",
+  "minutesAgo": "{count}m ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hoursAgo": "{count}h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "daysAgo": "{count}d ago",
+  "@daysAgo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewShopTitle": "Review {shopName}",
+  "@reviewShopTitle": {
+    "placeholders": {
+      "shopName": {
+        "type": "String"
+      }
+    }
+  },
+  "rateYourExperienceTitle": "Rate your experience",
+  "rateExperienceSubtitle": "Please rate the following aspects of your order from {shopName}.",
+  "@rateExperienceSubtitle": {
+    "placeholders": {
+      "shopName": {
+        "type": "String"
+      }
+    }
+  },
+  "productQualityRatingLabel": "Product Quality",
+  "productQualityRatingSub": "How was the quality of the products?",
+  "productQualityRatingHint": "Fresh products, good quality, original items...",
+  "deliveryTimelinessRatingLabel": "Delivery Timeliness",
+  "deliveryTimelinessRatingSub": "Was your order delivered on time?",
+  "deliveryTimelinessRatingHint": "Morning delivery arrived on time...\nEvening delivery was delayed...",
+  "orderAccuracyRatingLabel": "Order Accuracy",
+  "orderAccuracyRatingSub": "Did you receive exactly what you ordered?",
+  "orderAccuracyRatingHint": "Correct items, correct quantity, correct variants...",
+  "overallExperienceRatingLabel": "Overall Experience",
+  "overallExperienceRatingSub": "Tell us about your overall experience.",
+  "overallExperienceRatingHint": "Friendly service, great experience, will order again...",
+  "calculatedAverageLabel": "Calculated Average:",
+  "submitReviewButton": "Submit Review",
+  "reviewSubmittedSuccess": "Review submitted successfully!",
+  "reviewSubmittedFailed": "Failed to submit review: {error}",
+  "@reviewSubmittedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "myOrdersTitle": "My Orders",
+  "noOrdersYet": "No orders yet",
+  "noOrdersSubtitle": "You haven't placed any orders yet. Start shopping to see your history here.",
+  "todayLabel": "Today",
+  "last7DaysLabel": "Last 7 Days",
+  "last30DaysLabel": "Last 30 Days",
+  "allTimeLabel": "All Time",
+  "allSlotsLabel": "All Slots",
+  "morningSlotLabel": "☀️ Morning Slot",
+  "eveningSlotLabel": "🌙 Evening Slot",
+  "pendingStatus": "Pending",
+  "acceptedStatus": "Accepted",
+  "readyForDeliveryStatus": "Ready for Delivery",
+  "outForDeliveryStatus": "Out for Delivery",
+  "onTheWayStatus": "On the way",
+  "deliveredStatus": "Delivered",
+  "cancelledStatus": "Cancelled",
+  "morningTimeLabel": "☀️ Morning",
+  "eveningTimeLabel": "🌙 Evening",
+  "deliverOnLabel": "Deliver on: {date}",
+  "@deliverOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "orderDetailAddressSection": "📍 Delivery Address",
+  "orderDetailItemsSection": "🧾 Items",
+  "orderDetailReviewSection": "⭐ Your Review",
+  "leaveShopReviewButton": "Leave Shop Review",
+  "nearLandmarkLabel": "Near: {landmark}",
+  "@nearLandmarkLabel": {
+    "placeholders": {
+      "landmark": {
+        "type": "String"
+      }
+    }
+  },
+  "myAddressesTitle": "My Addresses",
+  "addAddressButton": "Add Address",
+  "noAddressesSaved": "No addresses saved",
+  "defaultAddressBadge": "DEFAULT",
+  "editAddressTitle": "Edit Address",
+  "labelFieldTitle": "Label",
+  "labelHome": "Home",
+  "labelWork": "Work",
+  "labelOther": "Other",
+  "fieldRequiredValidation": "Required",
+  "pinMyLocationButton": "Pin my location (OSM)",
+  "mapPickerComingSoon": "Map picker coming soon (OpenStreetMap)",
+  "setAsDefaultAddress": "Set as default address",
+  "updateAddressButton": "Update Address",
+  "favoriteProductsTitle": "Favorite Products",
+  "noFavoritesYet": "No favorites yet",
+  "noFavoritesSubtitle": "Tap the heart icon on any product to save it here",
+  "browseProductsButton": "Browse Products",
+  "outOfStockMessage": "{name} is currently out of stock",
+  "@outOfStockMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "platformFeedbackTitle": "Platform Feedback",
+  "submitFeedbackTab": "Submit Feedback",
+  "feedbackHistoryTab": "Feedback History",
+  "valueFeedbackHeader": "We value your feedback",
+  "feedbackInstruction": "Let us know if you found a bug, want to request a feature, or have suggestions to improve the platform.",
+  "feedbackTypeLabel": "Feedback Type",
+  "suggestionOption": "Suggestion",
+  "complaintOption": "Complaint",
+  "bugReportOption": "Bug Report",
+  "featureRequestOption": "Feature Request",
+  "generalOption": "General",
+  "rateExperienceHeader": "How would you rate your experience?",
+  "yourMessageLabel": "Your Message",
+  "feedbackPlaceholder": "Describe your feedback in detail here...",
+  "enterMessageError": "Please enter your message",
+  "messageLengthError": "Message must be at least 10 characters",
+  "feedbackSubmittedSuccess": "Feedback submitted successfully! Thank you.",
+  "noFeedbackHistory": "No feedback submitted yet",
+  "pinnedShopsTitle": "Pinned Shops",
+  "noPinnedShopsYet": "No pinned shops yet",
+  "noPinnedShopsSubtitle": "Pin favorite shops for quick access",
+  "guestUserLabel": "Guest User",
+  "myProfileTitle": "My Profile",
+  "noPhoneNumberLabel": "No phone number",
+  "personalInfoSection": "Personal Info",
+  "emailLabel": "Email",
+  "genderLabel": "Gender",
+  "birthdayLabel": "Birthday",
+  "languageLabel": "Language",
+  "preferencesSection": "Preferences",
+  "recentPurchasesLabel": "Recent Purchases",
+  "purchaseHistoryLabel": "Purchase History",
+  "platformFeedbackLabel": "Platform Feedback",
+  "managementSection": "Management",
+  "vendorPanelLabel": "Vendor Panel",
+  "vendorPanelSubtitle": "Manage your shop & orders",
+  "adminPanelLabel": "Admin Panel",
+  "adminPanelSubtitle": "System administration",
+  "searchHistoryPlaceholder": "Search order number, shop, product...",
+  "noHistoryFound": "No purchase history found",
+  "noHistorySubtitle": "Try modifying your filters or search query",
+  "csvButtonLabel": "CSV",
+  "reportButtonLabel": "Report",
+  "noOrdersToExport": "No orders to export",
+  "csvCopiedSuccess": "Purchase history CSV copied to clipboard! You can paste and save it as a file.",
+  "reportCopiedSuccess": "Order history text report copied to clipboard! Ready to print or share.",
+  "totalLabel": "TOTAL",
+  "viewDetailsButton": "View Details",
+  "searchPurchasesPlaceholder": "Search purchases...",
+  "sevenDaysFilter": "7 Days",
+  "thirtyDaysFilter": "30 Days",
+  "ninetyDaysFilter": "90 Days",
+  "mostRecentSort": "Most Recent",
+  "mostOrderedSort": "Most Ordered",
+  "noRecentPurchases": "No recent purchases",
+  "noRecentPurchasesSubtitle": "Start shopping to build your history",
+  "reorderButton": "Reorder",
+  "outOfStockLabel": "Out Stock",
+  "searchShopsHint": "Search shops…",
+  "searchForShopsLabel": "Search for shops",
+  "recentSearchesTitle": "Recent",
+  "clearButtonLabel": "Clear",
+  "noShopsFoundMessage": "No shops found",
+  "generalStoreFallback": "General Store",
+  "catalogTab": "Catalog",
+  "reviewsTab": "Reviews",
+  "noItemsInShop": "No items in this shop",
+  "noReviewsYet": "No reviews yet",
+  "noReviewsSubtitle": "Be the first customer to review this shop.",
+  "writeFirstReviewButton": "Write First Review",
+  "reviewsTitle": "Reviews",
+  "verifiedPurchaseBadge": "Verified Purchase",
+  "anonymousReviewer": "Anonymous",
+  "runPreparedSuccess": "Run prepared successfully! Orders linked.",
+  "runPreparedFailed": "Failed to prepare run: {error}",
+  "@runPreparedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "runUpdatedMessage": "Run updated to: {status}",
+  "@runUpdatedMessage": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "runUpdatedFailed": "Failed to update run: {error}",
+  "@runUpdatedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveryRunsManagementTitle": "Delivery Runs Management",
+  "runNotStarted": "Not Started",
+  "runPrepare": "Prepare Run",
+  "runPacking": "Packing",
+  "runStartDelivery": "Start Delivery",
+  "runOutForDelivery": "Out for Delivery",
+  "runComplete": "Complete Run",
+  "runCompleted": "Completed",
+  "ordersCountLabel": "Orders",
+  "runValueLabel": "Value",
+  "viewOrdersButton": "View Orders",
+  "vendorPanelTitle": "Vendor Panel",
+  "welcomeBackTo": "Welcome back to ",
+  "viewMyShopButton": "View My Shop",
+  "quickActionsTitle": "Quick Actions",
+  "addNewProductAction": "Add New Product",
+  "viewProductsAction": "View Products",
+  "manageOrdersAction": "Manage Orders",
+  "commissionStatsAction": "Commission Stats",
+  "customerCreditAction": "Customer Credit",
+  "shopSettingsAction": "Shop Settings",
+  "vendorPortalTitle": "Vendor Portal",
+  "vendorDrawerDashboard": "Dashboard",
+  "vendorDrawerAllProducts": "All Products",
+  "vendorDrawerAddProduct": "Add Product",
+  "vendorDrawerOrders": "Orders",
+  "vendorDrawerCustomerCredit": "Customer Credit",
+  "vendorDrawerCommissions": "Commissions",
+  "vendorDrawerMyShops": "My Shops",
+  "backToMarketplace": "Back to Marketplace",
+  "itemMarkedLive": "Product is now Live",
+  "itemMarkedHidden": "Product is now Hidden",
+  "deleteProductDialogTitle": "Delete Product",
+  "deleteProductDialogMessage": "Permanently delete \"{name}\"? This cannot be undone.",
+  "@deleteProductDialogMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "productDeletedSuccess": "Product deleted successfully",
+  "manageProductsTitle": "Manage Products",
+  "searchProductsPlaceholder": "Search products by name...",
+  "filterAll": "All",
+  "filterLive": "Live",
+  "filterDraft": "Draft",
+  "filterInactive": "Inactive",
+  "noProductsFound": "No products found",
+  "statusDraft": "Draft",
+  "statusIncomplete": "Incomplete",
+  "statusReady": "Ready",
+  "statusHidden": "Hidden",
+  "statusRejected": "Rejected",
+  "statusOutOfStock": "Out Of Stock",
+  "deactivateTooltip": "Deactivate",
+  "goLiveTooltip": "Go Live",
+  "vendorManageOrdersTitle": "Manage Orders",
+  "resetDateButton": "Reset Date",
+  "allStatusesFilter": "All Statuses",
+  "vendorDeliverOnLabel": "Deliver on: {date}",
+  "@vendorDeliverOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "vendorNoOrders": "No orders yet",
+  "vendorNoStatusOrders": "No {status} orders found",
+  "@vendorNoStatusOrders": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTimelineTitle": "Order Timeline",
+  "orderedItemsTitle": "Ordered Items",
+  "totalFinalPriceTitle": "Total Final Price",
+  "cancelOrderButton": "Cancel Order",
+  "shopCreatedSuccess": "Shop created successfully!",
+  "shopCreatedFailed": "Failed to create shop: {error}",
+  "@shopCreatedFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "vendorShopsTitle": "Shop Settings",
+  "shopProfileSection": "Shop Profile",
+  "manageShopSettingsSubtitle": "Manage your shop details and settings",
+  "setupShopSubtitle": "Set up your shop to start selling",
+  "yourShopsTitle": "Your Shops",
+  "orderNotificationsTitle": "Order notifications",
+  "orderNotificationsSubtitle": "Enabled for all order updates",
+  "appVersionTitle": "App version",
+  "failedToAddToCart": "Failed to add to cart",
+  "failedToLoadOrderDetails": "Failed to load order details: {error}",
+  "@failedToLoadOrderDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadHistory": "Failed to load history: {error}",
+  "@failedToLoadHistory": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToSubmitFeedback": "Failed to submit feedback: {error}",
+  "@failedToSubmitFeedback": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "failedToLoadReviews": "Failed to load reviews: {error}",
+  "@failedToLoadReviews": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

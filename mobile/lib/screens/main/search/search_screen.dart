@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
 import '../../../theme/app_theme.dart';
@@ -60,16 +61,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final q = _controller.text.trim();
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           controller: _controller,
           focusNode: _focus,
-          decoration: const InputDecoration(
-            hintText: 'Search shops…',
+          decoration: InputDecoration(
+            hintText: l10n.searchShopsHint,
             border: InputBorder.none,
-            hintStyle: TextStyle(color: kNeutral400),
+            hintStyle: const TextStyle(color: kNeutral400),
             filled: false,
           ),
           style: const TextStyle(fontSize: 16),
@@ -85,9 +87,9 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: q.isEmpty
           ? _recent.isEmpty
-              ? const Center(child: Column(
+              ? Center(child: Column(
                   mainAxisSize: MainAxisSize.min,
-                  children: [Text('🔍', style: TextStyle(fontSize: 48)), SizedBox(height: 12), Text('Search for shops', style: TextStyle(fontSize: 16))],
+                  children: [const Text('🔍', style: TextStyle(fontSize: 48)), const SizedBox(height: 12), Text(l10n.searchForShopsLabel, style: const TextStyle(fontSize: 16))],
                 ))
               : Padding(
                   padding: const EdgeInsets.all(16),
@@ -95,8 +97,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text('Recent', style: TextStyle(fontWeight: FontWeight.w700)),
-                        TextButton(onPressed: () => setState(() => _recent = []), child: const Text('Clear')),
+                        Text(l10n.recentSearchesTitle, style: const TextStyle(fontWeight: FontWeight.w700)),
+                        TextButton(onPressed: () => setState(() => _recent = []), child: Text(l10n.clearButtonLabel)),
                       ]),
                       Wrap(
                         spacing: 8, runSpacing: 8,
@@ -111,7 +113,7 @@ class _SearchScreenState extends State<SearchScreen> {
           : _loading
               ? const Center(child: CircularProgressIndicator())
               : _results.isEmpty
-                  ? const Center(child: Text('No shops found'))
+                  ? Center(child: Text(l10n.noShopsFound))
                   : ListView.separated(
                       itemCount: _results.length,
                       separatorBuilder: (_, __) => const Divider(height: 1),
@@ -123,7 +125,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Text('🏪'),
                           ),
                           title: Text(shop.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                          subtitle: Text(shop.type ?? 'General Store'),
+                          subtitle: Text(shop.type ?? l10n.generalStoreFallback),
                           trailing: const Icon(Icons.chevron_right),
                           onTap: () {
                             _saveRecent(_controller.text.trim());

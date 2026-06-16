@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
+import '../../widgets/directional_huge_icon.dart';
 import 'vendor_theme_helper.dart';
 
 class VendorOrderProcessingScreen extends StatefulWidget {
@@ -14,12 +17,16 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
   bool _loading = true;
   bool _updating = false;
 
-  static const _flow = ['pending', 'packing', 'delivering', 'delivered'];
+  static const _flow = ['pending', 'accepted', 'packing', 'ready', 'out_for_delivery', 'delivered'];
   static const _statusLabel = {
     'pending': '🕐 Pending',
+    'accepted': '🤝 Accepted',
     'packing': '📦 Packing',
+    'ready': '🛎️ Ready',
+    'out_for_delivery': '🚴 Out for Delivery',
     'delivering': '🚴 Delivering',
     'delivered': '✅ Delivered',
+    'cancelled': '❌ Cancelled',
   };
 
   @override
@@ -55,10 +62,11 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_loading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: kVendorBg,
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA))),
+        body: const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA))),
       );
     }
     
@@ -85,7 +93,10 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
-        title: Text('Order #${widget.orderId.substring(0, 8).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        title: Text(
+          o['order_number'] != null ? 'Order #${o['order_number']}' : 'Order #${widget.orderId.substring(0, 8).toUpperCase()}',
+          style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -100,8 +111,8 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 children: [
                   CircleAvatar(
                     radius: 22,
-                    backgroundColor: const Color(0xFF3B82F6).withOpacity(0.12),
-                    child: const Icon(Icons.person_rounded, color: Color(0xFF60A5FA), size: 24),
+                    backgroundColor: const Color(0xFF3B82F6).withValues(alpha: 0.12),
+                    child: const HugeIcon(icon: HugeIcons.strokeRoundedUser, color: Color(0xFF60A5FA), size: 24),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
@@ -115,7 +126,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                         const SizedBox(height: 2),
                         Text(
                           (o['users'] as Map?)?['phone'] ?? 'No phone number',
-                          style: const TextStyle(color: kVendorSubText, fontSize: 13),
+                          style: TextStyle(color: kVendorSubText, fontSize: 13),
                         ),
                       ],
                     ),
@@ -125,7 +136,41 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            // Delivery Slot Card
+            if (o['delivery_date'] != null && o['delivery_slot'] != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: vendorCardDecoration(radius: 24),
+                child: Row(
+                  children: [
+                    Text(
+                      o['delivery_slot'] == 'morning' ? '☀️' : '🌙',
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${o['delivery_slot'] == 'morning' ? "Morning" : "Evening"} Delivery Slot',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Deliver on: ${o['delivery_date']}',
+                            style: TextStyle(color: kVendorSubText, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // Progress Timeline Indicator
             Container(
@@ -134,9 +179,9 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Order Timeline',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+                  Text(
+                    l10n.orderTimelineTitle,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -149,7 +194,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                               height: 6,
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
-                                color: done ? const Color(0xFF4ADE80) : Colors.white.withOpacity(0.08),
+                                color: done ? const Color(0xFF4ADE80) : Colors.white.withValues(alpha: 0.08),
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),
@@ -179,9 +224,9 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Ordered Items',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white, letterSpacing: -0.5),
+                  Text(
+                    l10n.orderedItemsTitle,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white, letterSpacing: -0.5),
                   ),
                   const SizedBox(height: 12),
                   ...((o['order_items'] as List?) ?? []).map((oi) {
@@ -197,8 +242,8 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                 : Container(
                                     width: 44,
                                     height: 44,
-                                    color: Colors.white.withOpacity(0.05),
-                                    child: const Center(child: Icon(Icons.inventory_2_rounded, color: kVendorSubText, size: 20)),
+                                    color: Colors.white.withValues(alpha: 0.05),
+                                    child: Center(child: HugeIcon(icon: HugeIcons.strokeRoundedPackage, color: kVendorSubText, size: 20)),
                                   ),
                           ),
                           const SizedBox(width: 14),
@@ -214,7 +259,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                   const SizedBox(height: 2),
                                   Text(
                                     'Quantity: ${oi['quantity']}',
-                                    style: const TextStyle(color: kVendorSubText, fontSize: 12),
+                                    style: TextStyle(color: kVendorSubText, fontSize: 12),
                                   ),
                                 ],
                               ],
@@ -238,9 +283,9 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Total Final Price',
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                      Text(
+                        l10n.totalFinalPriceTitle,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                       ),
                       Text(
                         '₹${o['total_final_price'] ?? o['total_estimated_price'] ?? '—'}',
@@ -263,7 +308,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                   children: [
                     Text('Mark as ${nextStatus[0].toUpperCase()}${nextStatus.substring(1)}'),
                     const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward_rounded, size: 18),
+                    const DirectionalHugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, size: 18),
                   ],
                 ),
               ),
@@ -274,9 +319,9 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 width: double.infinity,
                 onPressed: _updating ? null : () => _updateStatus('cancelled'),
                 borderColor: const Color(0x4DEF4444),
-                child: const Text(
-                  'Cancel Order',
-                  style: TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.bold),
+                child: Text(
+                  l10n.cancelOrderButton,
+                  style: const TextStyle(color: Color(0xFFF87171), fontWeight: FontWeight.bold),
                 ),
               ),
             ],

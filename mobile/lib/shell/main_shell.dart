@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+import '../theme/theme_service.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -16,17 +18,24 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final idx = _currentIndex(context);
+    final isDark = ThemeService.instance.isDarkMode;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA),
       body: child,
       // Stack for custom bottom navigation
       bottomNavigationBar: Container(
         height: 80,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 40, offset: const Offset(0, -10))],
+          boxShadow: [
+            BoxShadow(
+              color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.04),
+              blurRadius: 40,
+              offset: const Offset(0, -10),
+            )
+          ],
         ),
         child: Stack(
           clipBehavior: Clip.none,
@@ -39,10 +48,10 @@ class MainShell extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(context, icon: Icons.home_outlined, activeIcon: Icons.home_rounded, label: 'Home', index: 0, currentIndex: idx, path: '/home'),
-                  _buildNavItem(context, icon: Icons.crop_free_rounded, activeIcon: Icons.crop_free_rounded, label: 'Orders', index: 1, currentIndex: idx, path: '/orders'),
-                  _buildNavItem(context, icon: Icons.shopping_bag_outlined, activeIcon: Icons.shopping_bag_rounded, label: 'Bag', index: 2, currentIndex: idx, path: '/cart', isBag: true),
-                  _buildNavItem(context, icon: Icons.person_outline_rounded, activeIcon: Icons.person_rounded, label: 'Profile', index: 3, currentIndex: idx, path: '/profile'),
+                  _buildNavItem(context, icon: HugeIcons.strokeRoundedHome01, activeIcon: HugeIcons.strokeRoundedHome01, label: 'Home', index: 0, currentIndex: idx, path: '/home', isDark: isDark),
+                  _buildNavItem(context, icon: HugeIcons.strokeRoundedCrop, activeIcon: HugeIcons.strokeRoundedCrop, label: 'Orders', index: 1, currentIndex: idx, path: '/orders', isDark: isDark),
+                  _buildNavItem(context, icon: HugeIcons.strokeRoundedShoppingBag01, activeIcon: HugeIcons.strokeRoundedShoppingBag01, label: 'Bag', index: 2, currentIndex: idx, path: '/cart', isBag: true, isDark: isDark),
+                  _buildNavItem(context, icon: HugeIcons.strokeRoundedUser, activeIcon: HugeIcons.strokeRoundedUser, label: 'Profile', index: 3, currentIndex: idx, path: '/profile', isDark: isDark),
                 ],
               ),
             ),
@@ -51,7 +60,14 @@ class MainShell extends StatelessWidget {
             Positioned(
               bottom: 8,
               left: MediaQuery.of(context).size.width / 2 - 65,
-              child: Container(width: 130, height: 5, decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10))),
+              child: Container(
+                width: 130,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             )
           ],
         ),
@@ -61,13 +77,14 @@ class MainShell extends StatelessWidget {
 
   Widget _buildNavItem(
     BuildContext context, {
-    required IconData icon,
-    required IconData activeIcon,
+    required List<List<dynamic>> icon,
+    required List<List<dynamic>> activeIcon,
     required String label,
     required int index,
     required int currentIndex,
     required String path,
     bool isBag = false,
+    required bool isDark,
   }) {
     final isActive = index == currentIndex;
     
@@ -78,7 +95,7 @@ class MainShell extends StatelessWidget {
     final Matrix4 transform = isActive
         ? (Matrix4.identity()..translate(0.0, -18.0))
         : Matrix4.identity();
-
+ 
     return GestureDetector(
       onTap: () => context.go(path),
       behavior: HitTestBehavior.opaque,
@@ -123,10 +140,10 @@ class MainShell extends StatelessWidget {
                   alignment: Alignment.center,
                   clipBehavior: Clip.none,
                   children: [
-                    Icon(
-                      isActive ? activeIcon : icon,
+                    HugeIcon(
+                      icon: isActive ? activeIcon : icon,
                       size: 22,
-                      color: isActive ? Colors.white : const Color(0xFF999999),
+                      color: isActive ? Colors.white : (isDark ? const Color(0xFF64748B) : const Color(0xFF999999)),
                     ),
                     if (isBag)
                       Positioned(
@@ -139,7 +156,7 @@ class MainShell extends StatelessWidget {
                             color: const Color(0xFFFF4757),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: isActive ? const Color(0xFF32B84A) : Colors.white,
+                              color: isActive ? const Color(0xFF32B84A) : (isDark ? const Color(0xFF1E293B) : Colors.white),
                               width: 2,
                             ),
                           ),
@@ -156,7 +173,9 @@ class MainShell extends StatelessWidget {
             style: TextStyle(
               fontSize: 10,
               fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-              color: isActive ? const Color(0xFF2B5A2B) : const Color(0xFF999999),
+              color: isActive
+                  ? (isDark ? const Color(0xFF4CD964) : const Color(0xFF2B5A2B))
+                  : (isDark ? const Color(0xFF64748B) : const Color(0xFF999999)),
             ),
             child: Text(label),
           ),

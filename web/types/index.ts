@@ -3,10 +3,11 @@
 export type UserRole = 'customer' | 'shop_owner' | 'admin'
 export type SellMode    = 'Manual' | 'Fixed' | 'Dynamic' | 'Portion'
 export type VariantType = 'Manual' | 'Fixed' | 'Dynamic' | 'Portion'
-export type OrderStatus = 'pending' | 'packing' | 'delivering' | 'delivered' | 'cancelled'
+export type OrderStatus = 'pending' | 'accepted' | 'packing' | 'ready' | 'out_for_delivery' | 'delivered' | 'cancelled'
 export type OrderItemStatus = 'pending' | 'adjusted' | 'approved' | 'rejected'
 export type ItemStatus = 'draft' | 'incomplete' | 'ready' | 'published' | 'hidden' | 'rejected' | 'out_of_stock'
 export type PaymentType = 'cod' | 'credit'
+export type DeliverySlot = 'morning' | 'evening'
 
 // ─── Users ────────────────────────────────────────────────────────────────────
 
@@ -219,9 +220,36 @@ export interface Order {
   total_estimated_price?: number
   total_final_price?: number
   payment_type?: PaymentType
+  delivery_date?: string
+  delivery_slot?: DeliverySlot
+  order_number?: number
+  delivery_batch_id?: string
   status: OrderStatus
   created_at: string
   updated_at: string
+}
+
+export interface ShopDeliverySettings {
+  id: string
+  shop_id: string
+  morning_enabled: boolean
+  evening_enabled: boolean
+  morning_order_limit: number
+  evening_order_limit: number
+  morning_cutoff_time: string
+  evening_cutoff_time: string
+  created_at: string
+  updated_at: string
+}
+
+export interface DeliveryBatch {
+  id: string
+  shop_id: string
+  delivery_date: string
+  delivery_slot: DeliverySlot
+  status: 'pending' | 'delivering' | 'completed'
+  notes?: string
+  created_at: string
 }
 
 export interface OrderItem {
@@ -284,3 +312,17 @@ export interface ApiError {
 }
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiError
+
+export interface PinnedShop {
+  id: string
+  user_id: string
+  shop_id: string
+  created_at: string
+}
+
+export interface FavoriteItem {
+  id: string
+  user_id: string
+  item_id: string
+  created_at: string
+}

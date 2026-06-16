@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
 
 class AddressesScreen extends StatefulWidget {
@@ -30,14 +32,15 @@ class _AddressesScreenState extends State<AddressesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Addresses'),
+        title: Text(l10n.myAddressesTitle),
         actions: [
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const HugeIcon(icon: HugeIcons.strokeRoundedAdd01),
             onPressed: () {}, 
-            tooltip: 'Add Address',
+            tooltip: l10n.addAddressButton,
           ),
         ],
       ),
@@ -55,12 +58,12 @@ class _AddressesScreenState extends State<AddressesScreen> {
                 children: [
                   const Text('📍', style: TextStyle(fontSize: 60)),
                   const SizedBox(height: 16),
-                  const Text('No addresses saved',
+                  Text(l10n.noAddressesSaved,
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () {}, 
-                    child: const Text('Add Address'),
+                    child: Text(l10n.addAddressButton),
                   ),
                 ],
               ),
@@ -76,7 +79,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
               return Card(
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  leading: const Icon(Icons.location_on_outlined, color: Color(0xFF0EA5E9)),
+                  leading: const HugeIcon(icon: HugeIcons.strokeRoundedLocation01, color: Color(0xFF0EA5E9)),
                   title: Row(children: [
                     Text(a['label'] as String,
                         style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -88,7 +91,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                           color: const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text('DEFAULT',
+                        child: Text(l10n.defaultAddressBadge,
                             style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700,
                                 color: Color(0xFF166534))),
                       ),
@@ -103,7 +106,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                     ],
                   ),
                   trailing: IconButton(
-                    icon: const Icon(Icons.edit_outlined, size: 18),
+                    icon: const HugeIcon(icon: HugeIcons.strokeRoundedPencilEdit02, size: 18),
                     onPressed: () {}, 
                   ),
                 ),

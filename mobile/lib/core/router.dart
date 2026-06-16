@@ -20,19 +20,31 @@ import '../screens/main/profile/add_edit_address_screen.dart';
 import '../screens/main/notifications/notifications_screen.dart';
 import '../screens/main/settings/settings_screen.dart';
 import '../screens/vendor/vendor_dashboard_screen.dart';
+import '../screens/vendor/vendor_commission_screen.dart';
 import '../screens/vendor/vendor_items_screen.dart';
 import '../screens/vendor/vendor_add_edit_item_screen.dart';
 import '../screens/vendor/vendor_orders_screen.dart';
 import '../screens/vendor/vendor_order_processing_screen.dart';
 import '../screens/vendor/vendor_credit_screen.dart';
 import '../screens/vendor/vendor_user_credit_screen.dart';
+import '../screens/vendor/vendor_shops_screen.dart';
+import '../screens/vendor/vendor_shop_detail_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/admin_screens.dart';
 import '../screens/admin/admin_user_detail_screen.dart';
 import '../screens/admin/admin_order_detail_screen.dart';
 import '../screens/admin/admin_categories_screen.dart';
+import '../screens/admin/admin_commission_screen.dart';
+import '../screens/admin/admin_shops_billing_screen.dart';
 import '../shell/main_shell.dart';
 import '../screens/main/categories/categories_screen.dart';
+import '../screens/main/profile/feedback_screen.dart';
+import '../screens/main/orders/leave_review_screen.dart';
+import '../screens/admin/admin_feedbacks_screen.dart';
+import '../screens/main/profile/pinned_shops_screen.dart';
+import '../screens/main/profile/recent_purchases_screen.dart';
+import '../screens/main/profile/purchase_history_screen.dart';
+import '../screens/main/profile/favorites_screen.dart';
 
 final _rootNavigatorKey  = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -74,13 +86,20 @@ GoRouter buildRouter() {
 
       // ── Vendor routes ─────────────────────────────────────────────────
       GoRoute(path: '/vendor/dashboard',  builder: (_, __) => const VendorDashboardScreen()),
+      GoRoute(path: '/vendor/commission', builder: (_, __) => const VendorCommissionScreen()),
       GoRoute(path: '/vendor/items',      builder: (_, __) => const VendorItemsScreen()),
       GoRoute(path: '/vendor/items/new',  builder: (_, __) => const VendorAddEditItemScreen()),
       GoRoute(
         path: '/vendor/items/:itemId',
         builder: (_, state) => VendorAddEditItemScreen(itemId: state.pathParameters['itemId']),
       ),
-      GoRoute(path: '/vendor/orders',     builder: (_, __) => const VendorOrdersScreen()),
+      GoRoute(
+        path: '/vendor/orders',
+        builder: (_, state) => VendorOrdersScreen(
+          date: state.uri.queryParameters['date'],
+          slot: state.uri.queryParameters['slot'],
+        ),
+      ),
       GoRoute(
         path: '/vendor/orders/:orderId',
         builder: (_, state) => VendorOrderProcessingScreen(orderId: state.pathParameters['orderId']!),
@@ -89,6 +108,11 @@ GoRouter buildRouter() {
       GoRoute(
         path: '/vendor/credit/:userId',
         builder: (_, state) => VendorUserCreditScreen(userId: state.pathParameters['userId']!),
+      ),
+      GoRoute(path: '/vendor/shop',       builder: (_, __) => const VendorShopsScreen()),
+      GoRoute(
+        path: '/vendor/shop/:shopId',
+        builder: (_, state) => VendorShopDetailScreen(shopId: state.pathParameters['shopId']!),
       ),
 
       // ── Admin routes ──────────────────────────────────────────────────
@@ -105,9 +129,12 @@ GoRouter buildRouter() {
         builder: (_, state) => AdminOrderDetailScreen(orderId: state.pathParameters['orderId']!),
       ),
       GoRoute(path: '/admin/categories',  builder: (_, __) => const AdminCategoriesScreen()),
+      GoRoute(path: '/admin/commission',  builder: (_, __) => const AdminCommissionScreen()),
+      GoRoute(path: '/admin/commission/shops', builder: (_, __) => const AdminShopsBillingScreen()),
       GoRoute(path: '/admin/logs',        builder: (_, __) => const AdminLogsScreen()),
       GoRoute(path: '/admin/settings',    builder: (_, __) => const AdminSettingsScreen()),
       GoRoute(path: '/admin/credit',      builder: (_, __) => const AdminCreditScreen()),
+      GoRoute(path: '/admin/feedbacks',   builder: (_, __) => const AdminFeedbacksScreen()),
 
       // ── Main shell (bottom nav) ───────────────────────────────────────
       ShellRoute(
@@ -121,7 +148,10 @@ GoRouter buildRouter() {
             routes: [
               GoRoute(
                 path: 'shop/:shopId',
-                builder: (_, state) => ShopScreen(shopId: state.pathParameters['shopId']!),
+                builder: (_, state) => ShopScreen(
+                  shopId: state.pathParameters['shopId']!,
+                  initialTab: state.uri.queryParameters['tab'],
+                ),
                 routes: [
                   GoRoute(
                     path: 'category/:categoryId',
@@ -175,6 +205,14 @@ GoRouter buildRouter() {
                 builder: (_, state) => OrderDetailScreen(
                   orderId: state.pathParameters['orderId']!,
                 ),
+                routes: [
+                  GoRoute(
+                    path: 'review',
+                    builder: (_, state) => LeaveReviewScreen(
+                      orderId: state.pathParameters['orderId']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -194,6 +232,11 @@ GoRouter buildRouter() {
                 builder: (_, state) => AddEditAddressScreen(addressId: state.pathParameters['addressId']),
               ),
               GoRoute(path: 'settings', builder: (_, __) => const SettingsScreen()),
+              GoRoute(path: 'feedback', builder: (_, __) => const FeedbackScreen()),
+              GoRoute(path: 'pinned-shops', builder: (_, __) => const PinnedShopsScreen()),
+              GoRoute(path: 'recent-purchases', builder: (_, __) => const RecentPurchasesScreen()),
+              GoRoute(path: 'purchase-history', builder: (_, __) => const PurchaseHistoryScreen()),
+              GoRoute(path: 'favorites', builder: (_, __) => const FavoritesScreen()),
             ],
           ),
         ],

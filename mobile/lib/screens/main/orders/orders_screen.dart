@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 
 
@@ -38,10 +40,24 @@ class _OrdersScreenState extends State<OrdersScreen> {
     }
   }
 
+  String _getStatusLabel(String status, AppLocalizations l10n) {
+    switch (status) {
+      case 'pending': return l10n.orderStatusPending;
+      case 'packing': return l10n.orderStatusPacking;
+      case 'delivering': return l10n.orderStatusDelivering;
+      case 'delivered': return l10n.orderStatusDelivered;
+      case 'cancelled': return l10n.orderStatusCancelled;
+      default: return status.toUpperCase();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final localeCode = Localizations.localeOf(context).languageCode;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('My Orders')),
+      appBar: AppBar(title: Text(l10n.myOrdersTitle)),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _future,
         builder: (context, snapshot) {
@@ -56,11 +72,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 children: [
                   const Text('📦', style: TextStyle(fontSize: 60)),
                   const SizedBox(height: 16),
-                  const Text('No orders yet', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                  Text(l10n.noOrdersYet, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: () => context.go('/home'),
-                    child: const Text('Start Shopping'),
+                    child: Text(l10n.continueShoppingButton),
                   ),
                 ],
               ),
@@ -83,7 +99,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   child: ListTile(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     title: Text(shopName, style: const TextStyle(fontWeight: FontWeight.w700)),
-                    subtitle: Text('${date.day} ${_monthName(date.month)} ${date.year}',
+                    subtitle: Text(DateFormat.yMMMd(localeCode).format(date),
                         style: const TextStyle(fontSize: 12)),
                     trailing: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -99,7 +115,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             color: _statusColor(status).withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Text(status.toUpperCase(),
+                          child: Text(_getStatusLabel(status, l10n),
                               style: TextStyle(
                                 color: _statusColor(status),
                                 fontSize: 10, fontWeight: FontWeight.w700,
@@ -116,9 +132,4 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
     );
   }
-
-  String _monthName(int m) => const [
-    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-  ][m];
 }

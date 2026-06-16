@@ -69,11 +69,30 @@ class Shop {
 class Category {
   final String id;
   final String name;
+  final List<Map<String, dynamic>>? categoryTranslations;
 
-  const Category({required this.id, required this.name});
+  const Category({required this.id, required this.name, this.categoryTranslations});
 
-  factory Category.fromJson(Map<String, dynamic> json) =>
-      Category(id: json['id'] as String, name: json['name'] as String);
+  factory Category.fromJson(Map<String, dynamic> json) => Category(
+        id: json['id'] as String,
+        name: json['name'] as String,
+        categoryTranslations: (json['category_translations'] as List?)
+            ?.map((e) => Map<String, dynamic>.from(e as Map))
+            .toList(),
+      );
+
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'en') return name;
+    if (categoryTranslations == null) return name;
+    final trans = categoryTranslations!.firstWhere(
+      (t) => t['language_code'] == languageCode,
+      orElse: () => <String, dynamic>{},
+    );
+    if (trans.isNotEmpty && trans['name'] != null && trans['name'].toString().isNotEmpty) {
+      return trans['name'] as String;
+    }
+    return name;
+  }
 }
 
 class Unit {
@@ -165,6 +184,7 @@ class Item {
   final bool isActive;
   final List<ItemSellConfig> itemSellConfig;
   final List<ItemVariant> itemVariants;
+  final List<Map<String, dynamic>>? itemTranslations;
 
   const Item({
     required this.id,
@@ -177,6 +197,7 @@ class Item {
     required this.isActive,
     this.itemSellConfig = const [],
     this.itemVariants = const [],
+    this.itemTranslations,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
@@ -223,7 +244,36 @@ class Item {
               ?.map((e) => ItemVariant.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
+      itemTranslations: (json['item_translations'] as List?)
+              ?.map((e) => Map<String, dynamic>.from(e as Map))
+              .toList(),
     );
+  }
+
+  String getLocalizedName(String languageCode) {
+    if (languageCode == 'en') return name;
+    if (itemTranslations == null) return name;
+    final trans = itemTranslations!.firstWhere(
+      (t) => t['language_code'] == languageCode,
+      orElse: () => <String, dynamic>{},
+    );
+    if (trans.isNotEmpty && trans['name'] != null && trans['name'].toString().isNotEmpty) {
+      return trans['name'] as String;
+    }
+    return name;
+  }
+
+  String? getLocalizedDescription(String languageCode) {
+    if (languageCode == 'en') return description;
+    if (itemTranslations == null) return description;
+    final trans = itemTranslations!.firstWhere(
+      (t) => t['language_code'] == languageCode,
+      orElse: () => <String, dynamic>{},
+    );
+    if (trans.isNotEmpty && trans['description'] != null && trans['description'].toString().isNotEmpty) {
+      return trans['description'] as String;
+    }
+    return description;
   }
 }
 
@@ -237,6 +287,7 @@ class ItemVariant {
   final bool isDefault;
   final bool isActive;
   final String? imageUrl;
+  final List<Map<String, dynamic>>? variantTranslations;
 
   const ItemVariant({
     required this.id,
@@ -248,6 +299,7 @@ class ItemVariant {
     required this.isDefault,
     required this.isActive,
     this.imageUrl,
+    this.variantTranslations,
   });
 
   factory ItemVariant.fromJson(Map<String, dynamic> json) {
@@ -280,7 +332,23 @@ class ItemVariant {
       isDefault: json['is_default'] as bool? ?? false,
       isActive: json['is_active'] as bool? ?? true,
       imageUrl: json['image_url'] as String?,
+      variantTranslations: (json['variant_translations'] as List?)
+              ?.map((e) => Map<String, dynamic>.from(e as Map))
+              .toList(),
     );
+  }
+
+  String getLocalizedLabel(String languageCode) {
+    if (languageCode == 'en') return label;
+    if (variantTranslations == null) return label;
+    final trans = variantTranslations!.firstWhere(
+      (t) => t['language_code'] == languageCode,
+      orElse: () => <String, dynamic>{},
+    );
+    if (trans.isNotEmpty && trans['label'] != null && trans['label'].toString().isNotEmpty) {
+      return trans['label'] as String;
+    }
+    return label;
   }
 }
 
@@ -444,4 +512,159 @@ class CartItem {
     }
     return (variant.price ?? 0.0) * quantity;
   }
+}
+
+class FeedbackModel {
+  final String id;
+  final String? userId;
+  final String type;
+  final int? rating;
+  final String message;
+  final String status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final String? userName;
+
+  const FeedbackModel({
+    required this.id,
+    this.userId,
+    required this.type,
+    this.rating,
+    required this.message,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+    this.userName,
+  });
+
+  factory FeedbackModel.fromJson(Map<String, dynamic> json) => FeedbackModel(
+        id: json['id'] as String,
+        userId: json['user_id'] as String?,
+        type: json['type'] as String,
+        rating: json['rating'] as int?,
+        message: json['message'] as String,
+        status: json['status'] as String? ?? 'new',
+        createdAt: DateTime.parse(json['created_at'] as String),
+        updatedAt: DateTime.parse(json['updated_at'] as String),
+        userName: json['users']?['name'] as String?,
+      );
+}
+class ShopReview {
+  final String id;
+  final String shopId;
+  final String userId;
+  final String orderId;
+  final int productQualityRating;
+  final int deliveryExperienceRating;
+  final int? deliveryTimelinessRating;
+  final int orderAccuracyRating;
+  final int overallExperienceRating;
+  final String? productQualityDescription;
+  final String? productQualityReview;
+  final String? deliveryExperienceDescription;
+  final String? deliveryTimelinessReview;
+  final String? orderAccuracyDescription;
+  final String? orderAccuracyReview;
+  final String? overallExperienceDescription;
+  final String? overallExperienceReview;
+  final double finalRating;
+  final String? title;
+  final String? review;
+  final DateTime createdAt;
+  final String? reviewerName;
+
+  const ShopReview({
+    required this.id,
+    required this.shopId,
+    required this.userId,
+    required this.orderId,
+    required this.productQualityRating,
+    required this.deliveryExperienceRating,
+    this.deliveryTimelinessRating,
+    required this.orderAccuracyRating,
+    required this.overallExperienceRating,
+    this.productQualityDescription,
+    this.productQualityReview,
+    this.deliveryExperienceDescription,
+    this.deliveryTimelinessReview,
+    this.orderAccuracyDescription,
+    this.orderAccuracyReview,
+    this.overallExperienceDescription,
+    this.overallExperienceReview,
+    required this.finalRating,
+    this.title,
+    this.review,
+    required this.createdAt,
+    this.reviewerName,
+  });
+
+  factory ShopReview.fromJson(Map<String, dynamic> json) => ShopReview(
+        id: json['id'] as String,
+        shopId: json['shop_id'] as String,
+        userId: json['user_id'] as String,
+        orderId: json['order_id'] as String,
+        productQualityRating: json['product_quality_rating'] as int,
+        deliveryExperienceRating: json['delivery_experience_rating'] as int,
+        deliveryTimelinessRating: json['delivery_timeliness_rating'] as int?,
+        orderAccuracyRating: json['order_accuracy_rating'] as int,
+        overallExperienceRating: json['overall_experience_rating'] as int,
+        productQualityDescription: json['product_quality_description'] as String?,
+        productQualityReview: json['product_quality_review'] as String?,
+        deliveryExperienceDescription: json['delivery_experience_description'] as String?,
+        deliveryTimelinessReview: json['delivery_timeliness_review'] as String?,
+        orderAccuracyDescription: json['order_accuracy_description'] as String?,
+        orderAccuracyReview: json['order_accuracy_review'] as String?,
+        overallExperienceDescription: json['overall_experience_description'] as String?,
+        overallExperienceReview: json['overall_experience_review'] as String?,
+        finalRating: (json['final_rating'] as num).toDouble(),
+        title: json['title'] as String?,
+        review: json['review'] as String?,
+        createdAt: DateTime.parse(json['created_at'] as String),
+        reviewerName: json['users']?['name'] as String?,
+      );
+}
+
+class ShopRatingSummary {
+  final String shopId;
+  final double averageRating;
+  final int totalReviews;
+  final int stars;
+  final double avgProductQuality;
+  final double avgDeliveryTimeliness;
+  final double avgOrderAccuracy;
+  final double avgOverallExperience;
+  final int commissionComplianceStars;
+  final int orderPerformanceStars;
+  final int salesPerformanceStars;
+  final DateTime updatedAt;
+
+  const ShopRatingSummary({
+    required this.shopId,
+    required this.averageRating,
+    required this.totalReviews,
+    required this.stars,
+    required this.avgProductQuality,
+    required this.avgDeliveryTimeliness,
+    required this.avgOrderAccuracy,
+    required this.avgOverallExperience,
+    required this.commissionComplianceStars,
+    required this.orderPerformanceStars,
+    required this.salesPerformanceStars,
+    required this.updatedAt,
+  });
+
+  factory ShopRatingSummary.fromJson(Map<String, dynamic> json) => ShopRatingSummary(
+        shopId: json['shop_id'] as String,
+        averageRating: (json['average_rating'] as num? ?? 0.0).toDouble(),
+        totalReviews: json['total_reviews'] as int? ?? 0,
+        stars: json['stars'] as int? ?? 0,
+        avgProductQuality: (json['avg_product_quality'] as num? ?? 0.0).toDouble(),
+        avgDeliveryTimeliness: (json['avg_delivery_timeliness'] as num? ?? 0.0).toDouble(),
+        avgOrderAccuracy: (json['avg_order_accuracy'] as num? ?? 0.0).toDouble(),
+        avgOverallExperience: (json['avg_overall_experience'] as num? ?? 0.0).toDouble(),
+        commissionComplianceStars: json['commission_compliance_stars'] as int? ?? 0,
+        orderPerformanceStars: json['order_performance_stars'] as int? ?? 0,
+        salesPerformanceStars: json['sales_performance_stars'] as int? ?? 0,
+        updatedAt: DateTime.parse(json['updated_at'] as String? ?? DateTime.now().toIso8601String()),
+      );
 }

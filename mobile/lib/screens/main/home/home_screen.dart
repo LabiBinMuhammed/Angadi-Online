@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
 import '../../../core/cart_service.dart';
+import '../../../theme/theme_service.dart';
+import '../../../core/language_service.dart';
+import '../../../l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 
 // ── Colors ────────────────────────────────────────────────────────────────────
-const _kBg = Color(0xFFFAFAFA);
+Color get _kBg => ThemeService.instance.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA);
 const _kGreen = Color(0xFF4CD964);
 const _kGreenDark = Color(0xFF32B84A);
-const _kYellow = Color(0xFFFBCC5C);
-const _kText = Color(0xFF1A1A1A);
-const _kSub = Color(0xFF555555);
-const _kSubLighter = Color(0xFF888888);
+Color get _kText => ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF1A1A1A);
+Color get _kSub => ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF555555);
+Color get _kSubLighter => ThemeService.instance.isDarkMode ? const Color(0xFF64748B) : const Color(0xFF888888);
+Color get _kCardBg => ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+Color get _kBorder => ThemeService.instance.isDarkMode ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+Color get _kInputBg => ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFF0F2F5);
+
 
 String _initials(String name) {
   final parts = name.trim().split(' ');
@@ -44,7 +52,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   bool _loading = true;
   String _userName = 'Guest';
-  String? _avatarUrl;
   
   String? _userRole;
   
@@ -59,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _selectedCategory;
   
   final Set<String> _likedItems = {};
+  Set<String> _pinnedShopIds = {};
   final Map<String, String> _selectedVariantIds = {};
   final Map<String, double> _localQtys = {};
   final Map<String, TextEditingController> _qtyControllers = {};
@@ -81,7 +89,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final user = supabase.auth.currentUser;
     if (user != null) {
       _userName = user.userMetadata?['name'] ?? 'Yona';
-      _avatarUrl = user.userMetadata?['avatar_url'];
       try {
         final profile = await supabase.from('users').select('role').eq('id', user.id).single();
         _userRole = profile['role'] as String?;
@@ -90,60 +97,199 @@ class _HomeScreenState extends State<HomeScreen> {
       }
     }
 
-    final res = await Future.wait([
-      supabase.from('shops').select('id, name, type').order('name'),
-      supabase.from('items').select('*, item_sell_config(*), item_variants:vw_item_variants_with_fallback(*), item_images(*)').eq('is_active', true).isFilter('deleted_at', null).order('name'),
-      supabase.from('categories').select('id, name').eq('is_active', true).order('name'),
-      supabase.from('units').select('*'),
-    ]);
+    try {
+      final res = await Future.wait([
+        supabase.from('shops').select('id, name, type').order('name'),
+        supabase.from('items').select('*, item_translations(*), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*, variant_translations(*)), item_images(*)').eq('is_active', true).isFilter('deleted_at', null).order('name'),
+        supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
+        supabase.from('units').select('*'),
+      ]);
 
-    final shops = (res[0] as List).map((j) => Shop.fromJson(j)).toList();
-    final itemsList = (res[1] as List).map((j) => Item.fromJson(j)).toList();
-    final cats = (res[2] as List).map((j) => Category.fromJson(j)).toList();
-    final unitsList = (res[3] as List).map((j) => Unit.fromJson(j)).toList();
+      final shops = (res[0] as List).map((j) => Shop.fromJson(j)).toList();
+      final itemsList = (res[1] as List).map((j) => Item.fromJson(j)).toList();
+      final cats = (res[2] as List).map((j) => Category.fromJson(j)).toList();
+      final unitsList = (res[3] as List).map((j) => Unit.fromJson(j)).toList();
 
-    Map<String, List<Item>> itemsMap = {};
-    for (var item in itemsList) {
-      itemsMap[item.shopId] = (itemsMap[item.shopId] ?? [])..add(item);
-    }
+      List<String> pinnedShopIds = [];
+      List<String> favoriteItemIds = [];
+      if (user != null) {
+        try {
+          final pinnedRes = await supabase.from('customer_pinned_shops').select('shop_id').eq('user_id', user.id);
+          pinnedShopIds = (pinnedRes as List).map((p) => p['shop_id'] as String).toList();
+        } catch (e) {
+          debugPrint('Error loading pinned shop IDs: $e');
+        }
 
-    for (var item in itemsList) {
-      if (item.itemVariants.isNotEmpty) {
-        final defaultVariant = item.itemVariants.firstWhere(
-          (v) => v.isDefault,
-          orElse: () => item.itemVariants.first,
+        try {
+          final favsRes = await supabase.from('customer_favorite_items').select('item_id').eq('user_id', user.id);
+          favoriteItemIds = (favsRes as List).map((f) => f['item_id'] as String).toList();
+        } catch (e) {
+          debugPrint('Error loading favorite item IDs: $e');
+        }
+      }
+
+      Map<String, List<Item>> itemsMap = {};
+      for (var item in itemsList) {
+        itemsMap[item.shopId] = (itemsMap[item.shopId] ?? [])..add(item);
+      }
+
+      for (var item in itemsList) {
+        if (item.itemVariants.isNotEmpty) {
+          final defaultVariant = item.itemVariants.firstWhere(
+            (v) => v.isDefault,
+            orElse: () => item.itemVariants.first,
+          );
+          _selectedVariantIds[item.id] = defaultVariant.id;
+        }
+        
+        final config = item.itemSellConfig.isNotEmpty ? item.itemSellConfig.first : null;
+        if (config?.sellMode == SellMode.manual) {
+          _localQtys[item.id] = 1.0;
+          _qtyControllers[item.id] = TextEditingController(text: '1.0');
+        } else {
+          _localQtys[item.id] = 1.0;
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _shops = shops;
+          _allItems = itemsMap;
+          _categories = cats;
+          _units = unitsList;
+          _pinnedShopIds = Set<String>.from(pinnedShopIds);
+          _likedItems.clear();
+          _likedItems.addAll(favoriteItemIds);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading home data: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.failedToLoadHomeData(e.toString()))),
         );
-        _selectedVariantIds[item.id] = defaultVariant.id;
       }
-      
-      final config = item.itemSellConfig.isNotEmpty ? item.itemSellConfig.first : null;
-      if (config?.sellMode == SellMode.manual) {
-        _localQtys[item.id] = 1.0;
-        _qtyControllers[item.id] = TextEditingController(text: '1.0');
-      } else {
-        _localQtys[item.id] = 1.0;
+    } finally {
+      if (mounted) {
+        setState(() {
+          _loading = false;
+        });
       }
-    }
-
-    if (mounted) {
-      setState(() {
-        _shops = shops;
-        _allItems = itemsMap;
-        _categories = cats;
-        _units = unitsList;
-        _loading = false;
-      });
     }
   }
 
-  void _toggleLike(String id) {
+  Future<void> _toggleLike(String id) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    final isLiked = _likedItems.contains(id);
+    
+    String itemName = 'Product';
+    _allItems.forEach((shopId, items) {
+      final found = items.firstWhere(
+        (i) => i.id == id,
+        orElse: () => const Item(id: '', shopId: '', name: '', hasVariants: false, isActive: false),
+      );
+      if (found.id.isNotEmpty) {
+        itemName = found.name;
+      }
+    });
+
     setState(() {
-      if (_likedItems.contains(id)) {
+      if (isLiked) {
         _likedItems.remove(id);
       } else {
         _likedItems.add(id);
       }
     });
+
+    try {
+      if (isLiked) {
+        await supabase.from('customer_favorite_items').delete().eq('user_id', user.id).eq('item_id', id);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.removedFromFavoritesMessage(itemName))),
+          );
+        }
+      } else {
+        await supabase.from('customer_favorite_items').insert({'user_id': user.id, 'item_id': id});
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.addedToFavoritesMessage(itemName))),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error toggling favorite: $e');
+      setState(() {
+        if (isLiked) {
+          _likedItems.add(id);
+        } else {
+          _likedItems.remove(id);
+        }
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.failedToUpdateFavoriteStatus)),
+        );
+      }
+    }
+  }
+
+  Future<void> _togglePinShop(String shopId, String shopName) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+
+    final isPinned = _pinnedShopIds.contains(shopId);
+
+    if (!isPinned && _pinnedShopIds.length >= 3) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.pinLimitReached)),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      if (isPinned) {
+        _pinnedShopIds.remove(shopId);
+      } else {
+        _pinnedShopIds.add(shopId);
+      }
+    });
+
+    try {
+      if (isPinned) {
+        await supabase.from('customer_pinned_shops').delete().eq('user_id', user.id).eq('shop_id', shopId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.unpinnedSuccessfully(shopName))),
+          );
+        }
+      } else {
+        await supabase.from('customer_pinned_shops').insert({'user_id': user.id, 'shop_id': shopId});
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.pinnedSuccessfully(shopName))),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error toggling shop pin: $e');
+      setState(() {
+        if (isPinned) {
+          _pinnedShopIds.add(shopId);
+        } else {
+          _pinnedShopIds.remove(shopId);
+        }
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.failedToUpdatePinStatus)),
+        );
+      }
+    }
   }
 
   String _formatQty(double qty) {
@@ -173,6 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildItemCard(Item item) {
+    final l10n = AppLocalizations.of(context)!;
     final isLiked = _likedItems.contains(item.id);
     
     final config = item.itemSellConfig.isNotEmpty ? item.itemSellConfig.first : null;
@@ -214,8 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _kCardBg,
         borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: _kBorder),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -257,8 +405,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          item.name,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _kText),
+                          item.getLocalizedName(LanguageService.instance.locale.languageCode),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _kText),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -269,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Text('₹${price.toStringAsFixed(0)}', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: _kGreen)),
                           if (priceUnit.isNotEmpty)
-                            Text(priceUnit, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey)),
+                            Text(priceUnit, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _kSub)),
                         ],
                       ),
                     ],
@@ -299,17 +447,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: isActive ? _kGreen : const Color(0xFFE2E8F0),
+                                color: isActive ? _kGreen : _kBorder,
                                 width: isActive ? 1.5 : 1,
                               ),
-                              color: isActive ? const Color(0xFFE8F9EC) : Colors.white,
+                              color: isActive ? const Color(0xFFE8F9EC) : _kCardBg,
                             ),
                             child: Text(
-                              v.label,
+                              v.getLocalizedLabel(LanguageService.instance.locale.languageCode),
                               style: TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.w700,
-                                color: isActive ? _kGreenDark : const Color(0xFF4B5563),
+                                color: isActive ? _kGreenDark : (ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF4B5563)),
                               ),
                             ),
                           ),
@@ -332,8 +480,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _kCardBg,
                   shape: BoxShape.circle,
+                  border: Border.all(color: _kBorder),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.06),
@@ -372,7 +521,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                      child: TextField(
                                        controller: _qtyControllers[item.id],
                                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _kGreenDark),
+                                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _kGreenDark),
                                        decoration: const InputDecoration(
                                          contentPadding: EdgeInsets.zero,
                                          isDense: true,
@@ -423,7 +572,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                height: 32,
                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                decoration: BoxDecoration(
-                                 color: Colors.grey[100],
+                                 color: ThemeService.instance.isDarkMode ? const Color(0xFF27272A) : Colors.grey[100],
                                  borderRadius: BorderRadius.circular(16),
                                ),
                                child: Row(
@@ -432,7 +581,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                      child: TextField(
                                        controller: _qtyControllers[item.id],
                                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _kText),
+                                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _kText),
                                        decoration: const InputDecoration(
                                          contentPadding: EdgeInsets.zero,
                                          isDense: true,
@@ -451,7 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                    const SizedBox(width: 4),
                                    Text(
                                      _units.firstWhere((u) => u.id == config?.baseUnitId, orElse: () => const Unit(id: '', name: '', symbol: 'kg', unitGroupId: '', baseMultiplier: 1.0)).symbol,
-                                     style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _kSub),
+                                     style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _kSub),
                                    ),
                                  ],
                                ),
@@ -459,12 +608,12 @@ class _HomeScreenState extends State<HomeScreen> {
                            ),
                            const SizedBox(width: 8),
                            GestureDetector(
-                             onTap: () async {
-                               final currentQty = _localQtys[item.id] ?? 1.0;
-                               final scName = item.name;
+                              onTap: () async {
+                                final currentQty = _localQtys[item.id] ?? 1.0;
+                                final scName = item.getLocalizedName(LanguageService.instance.locale.languageCode);
                                ScaffoldMessenger.of(context).showSnackBar(
                                  SnackBar(
-                                   content: Text('Adding $scName to cart...'),
+                                   content: Text(l10n.addingToCartMessage(scName)),
                                    duration: const Duration(milliseconds: 500),
                                  ),
                                );
@@ -478,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
                                  ScaffoldMessenger.of(context).showSnackBar(
                                    SnackBar(
-                                     content: Text('$scName added to cart!'),
+                                     content: Text(l10n.addedToCartMessage(scName)),
                                      duration: const Duration(seconds: 1),
                                    ),
                                  );
@@ -491,10 +640,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                  color: _kGreen,
                                  borderRadius: BorderRadius.circular(16),
                                ),
-                               child: const Center(
+                               child: Center(
                                  child: Text(
-                                   'Add',
-                                   style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                                   l10n.addButtonLabel,
+                                   style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                                  ),
                                ),
                              ),
@@ -548,7 +697,7 @@ class _HomeScreenState extends State<HomeScreen> {
                          height: 32,
                          padding: const EdgeInsets.symmetric(horizontal: 4),
                          decoration: BoxDecoration(
-                           color: Colors.grey[100],
+                           color: ThemeService.instance.isDarkMode ? const Color(0xFF27272A) : Colors.grey[100],
                            borderRadius: BorderRadius.circular(16),
                          ),
                          child: Row(
@@ -562,11 +711,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                    _localQtys[item.id] = newQty;
                                  });
                                },
-                               child: const Icon(Icons.remove, size: 14, color: _kSub),
+                               child: Icon(Icons.remove, size: 14, color: _kSub),
                              ),
                              Text(
                                _formatQty(_localQtys[item.id] ?? 1.0),
-                               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _kText),
+                               style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: _kText),
                              ),
                              GestureDetector(
                                onTap: () {
@@ -576,7 +725,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                    _localQtys[item.id] = newQty;
                                  });
                                },
-                               child: const Icon(Icons.add, size: 14, color: _kSub),
+                               child: Icon(Icons.add, size: 14, color: _kSub),
                              ),
                            ],
                          ),
@@ -584,12 +733,12 @@ class _HomeScreenState extends State<HomeScreen> {
                      ),
                      const SizedBox(width: 8),
                      GestureDetector(
-                       onTap: () async {
-                         final currentQty = _localQtys[item.id] ?? 1.0;
-                         final scName = item.name;
+                        onTap: () async {
+                          final currentQty = _localQtys[item.id] ?? 1.0;
+                          final scName = item.getLocalizedName(LanguageService.instance.locale.languageCode);
                          ScaffoldMessenger.of(context).showSnackBar(
                            SnackBar(
-                             content: Text('Adding $scName to cart...'),
+                             content: Text(l10n.addingToCartMessage(scName)),
                              duration: const Duration(milliseconds: 500),
                            ),
                          );
@@ -603,7 +752,7 @@ class _HomeScreenState extends State<HomeScreen> {
                            ScaffoldMessenger.of(context).hideCurrentSnackBar();
                            ScaffoldMessenger.of(context).showSnackBar(
                              SnackBar(
-                               content: Text('$scName added to cart!'),
+                               content: Text(l10n.addedToCartMessage(scName)),
                                duration: const Duration(seconds: 1),
                              ),
                            );
@@ -616,10 +765,10 @@ class _HomeScreenState extends State<HomeScreen> {
                            color: _kGreen,
                            borderRadius: BorderRadius.circular(16),
                          ),
-                         child: const Center(
+                         child: Center(
                            child: Text(
-                             'Add',
-                             style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                             l10n.addButtonLabel,
+                             style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
                            ),
                          ),
                        ),
@@ -636,20 +785,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: _kBg,
       body: SafeArea(
         child: _loading 
             ? const Center(child: CircularProgressIndicator(color: _kGreenDark))
             : _selectedShopId == null
-                ? _buildLeftPanel()
-                : _buildRightPanel(),
+                ? _buildLeftPanel(l10n)
+                : _buildRightPanel(l10n),
       ),
     );
   }
 
-  Widget _buildLeftPanel() {
+  Widget _buildLeftPanel(AppLocalizations l10n) {
     final filteredShops = _shops.where((s) => s.name.toLowerCase().contains(_shopSearch.toLowerCase())).toList();
+    filteredShops.sort((a, b) {
+      final aPinned = _pinnedShopIds.contains(a.id) ? 1 : 0;
+      final bPinned = _pinnedShopIds.contains(b.id) ? 1 : 0;
+      return bPinned.compareTo(aPinned);
+    });
 
     return Column(
       children: [
@@ -659,77 +814,111 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () => context.push('/profile'),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: Colors.orange[200],
-                    shape: BoxShape.circle,
-                    image: _avatarUrl != null ? DecorationImage(image: NetworkImage(_avatarUrl!), fit: BoxFit.cover) : null,
-                  ),
-                  child: _avatarUrl == null 
-                      ? Center(child: Text(_initials(_userName), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)))
-                      : null,
-                ),
-              ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: _kCardBg,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
-                  border: Border.all(color: Colors.grey[200]!),
+                  border: Border.all(color: _kBorder),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Text('Home', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                    SizedBox(width: 4),
-                    Icon(Icons.keyboard_arrow_down, size: 16),
+                    Text(l10n.navHome, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: _kText)),
+                    const SizedBox(width: 4),
+                    HugeIcon(icon: HugeIcons.strokeRoundedArrowDown01, size: 16, color: _kText),
                   ],
                 ),
               ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (_userRole == 'shop_owner') ...[
+                  if (_userRole == 'shop_owner' || _userRole == 'admin') ...[
                     GestureDetector(
                       onTap: () => context.push('/vendor/dashboard'),
                       child: Container(
-                        width: 44,
-                        height: 44,
+                        width: 36,
+                        height: 36,
+                        alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: ThemeService.instance.isDarkMode ? const Color(0x1F60A5FA) : const Color(0x152563EB),
                           shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
+                          border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0x3D60A5FA) : const Color(0x3D2563EB)),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
                         ),
-                        child: const Icon(Icons.storefront_outlined, color: _kSub),
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedStore01,
+                          color: ThemeService.instance.isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                  ],
+                  if (_userRole == 'admin') ...[
+                    GestureDetector(
+                      onTap: () => context.push('/admin/dashboard'),
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: ThemeService.instance.isDarkMode ? const Color(0x1F818CF8) : const Color(0x154F46E5),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0x3D818CF8) : const Color(0x3D4F46E5)),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
+                        ),
+                        child: HugeIcon(
+                          icon: HugeIcons.strokeRoundedSecurityCheck,
+                          color: ThemeService.instance.isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                          size: 16,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),
                   ],
                   GestureDetector(
+                    onTap: () => context.push('/profile/recent-purchases'),
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: _kCardBg,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: _kBorder),
+                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
+                      ),
+                      alignment: Alignment.center,
+                      child: HugeIcon(icon: HugeIcons.strokeRoundedClock01, color: _kSub, size: 16),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
                     onTap: () => context.push('/notifications'),
                     child: Container(
-                      width: 44,
-                      height: 44,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: _kCardBg,
                         shape: BoxShape.circle,
-                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))],
+                        border: Border.all(color: _kBorder),
+                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
                       ),
                       child: Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Icon(Icons.notifications_none, color: _kSub),
+                          HugeIcon(icon: HugeIcons.strokeRoundedNotification01, color: _kSub, size: 16),
                           Positioned(
-                            top: 12,
-                            right: 12,
+                            top: 8,
+                            right: 8,
                             child: Container(
                               width: 8,
                               height: 8,
-                              decoration: BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle, border: Border.all(color: Colors.white, width: 2)),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: ThemeService.instance.isDarkMode ? _kCardBg : Colors.white, width: 2),
+                              ),
                             ),
                           )
                         ],
@@ -759,13 +948,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Row(
                           children: [
-                            Text('Hey $_userName', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: _kText, letterSpacing: -0.5)),
+                            Expanded(
+                              child: Text(
+                                '${l10n.heyGreeting} ${_userName == 'Guest' ? l10n.guestUser : _userName}',
+                                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: _kText, letterSpacing: -0.5),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                             const SizedBox(width: 8),
                             const Text('👋', style: TextStyle(fontSize: 24)),
                           ],
                         ),
                         const SizedBox(height: 6),
-                        const Text('Find fresh groceries you want', style: TextStyle(fontSize: 15, color: _kSubLighter, fontWeight: FontWeight.w500)),
+                        Text(l10n.findGroceriesSubtitle, style: TextStyle(fontSize: 15, color: _kSubLighter, fontWeight: FontWeight.w500)),
                       ],
                     ),
                   ),
@@ -780,15 +976,16 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           height: 54,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(color: const Color(0xFFF0F2F5), borderRadius: BorderRadius.circular(18)),
+                          decoration: BoxDecoration(color: _kInputBg, borderRadius: BorderRadius.circular(18), border: Border.all(color: _kBorder)),
                           child: Row(
                             children: [
-                              const Icon(Icons.search, color: Colors.grey),
+                              Icon(Icons.search, color: _kSubLighter),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextField(
                                   onChanged: (v) => setState(() => _shopSearch = v),
-                                  decoration: const InputDecoration(hintText: 'Search shops...', hintStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500), border: InputBorder.none),
+                                  style: TextStyle(color: _kText, fontWeight: FontWeight.w500),
+                                  decoration: InputDecoration(hintText: l10n.searchShopsPlaceholder, hintStyle: TextStyle(color: _kSubLighter, fontWeight: FontWeight.w500), border: InputBorder.none),
                                 ),
                               ),
                             ],
@@ -810,11 +1007,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                // Shops List
-                filteredShops.isEmpty 
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 40),
-                    child: Center(child: Text('No shops found.', style: TextStyle(color: _kSubLighter))),
+
+                filteredShops.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 40),
+                    child: Center(child: Text(l10n.noShopsFound, style: TextStyle(color: _kSubLighter))),
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
@@ -825,10 +1022,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       final shop = filteredShops[index];
                       
-                      final bgColors = [const Color(0xFFFCEDEF), const Color(0xFFF4E9F9)];
+                      final bgColors = ThemeService.instance.isDarkMode 
+                          ? [const Color(0xFF1E293B), const Color(0xFF27272A)] 
+                          : [const Color(0xFFFCEDEF), const Color(0xFFF4E9F9)];
                       final bg = bgColors[index % bgColors.length];
                       final shopItemsCount = _allItems[shop.id]?.length ?? (index == 0 ? 122 : 75);
-                      final subtitle = index == 0 ? 'Best organic fresh vegetables' : 'Great deals on fruit';
+                      final subtitle = index == 0 ? l10n.bestOrganic : l10n.greatDeals;
+
+                      final isNarrow = MediaQuery.of(context).size.width < 380;
 
                       return GestureDetector(
                         onTap: () {
@@ -838,35 +1039,85 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(24)),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 6))]),
-                                child: shop.logoUrl != null
-                                    ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
-                                    : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey))),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                child: Column(
+                          padding: EdgeInsets.all(isNarrow ? 16 : 20),
+                          decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(24), border: Border.all(color: _kBorder)),
+                          child: isNarrow
+                              ? Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(shop.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kText)),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: 64,
+                                          height: 64,
+                                          decoration: BoxDecoration(color: _kCardBg, shape: BoxShape.circle, border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 4))]),
+                                          child: shop.logoUrl != null
+                                              ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
+                                              : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey))),
+                                        ),
+                                        IconButton(
+                                          icon: Icon(
+                                            _pinnedShopIds.contains(shop.id) ? Icons.bookmark : Icons.bookmark_outline,
+                                            color: _pinnedShopIds.contains(shop.id) ? const Color(0xFFEC4899) : Colors.grey,
+                                            size: 20,
+                                          ),
+                                          onPressed: () => _togglePinShop(shop.id, shop.name),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(shop.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kText)),
                                     const SizedBox(height: 6),
-                                    Text('$shopItemsCount products', style: const TextStyle(fontSize: 14, color: _kSub, fontWeight: FontWeight.w500)),
+                                    Text('$shopItemsCount ${l10n.productsLabel}', style: TextStyle(fontSize: 14, color: _kSub, fontWeight: FontWeight.w500)),
                                     const SizedBox(height: 8),
-                                    Container(height: 1, color: Colors.black.withValues(alpha: 0.05)),
+                                    Container(height: 1, color: ThemeService.instance.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
                                     const SizedBox(height: 8),
-                                    Text(subtitle, style: TextStyle(fontSize: 13, color: Colors.grey[800], fontWeight: FontWeight.w500)),
+                                    Text(subtitle, style: TextStyle(fontSize: 13, color: ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : Colors.grey[800], fontWeight: FontWeight.w500)),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Container(
+                                      width: 80,
+                                      height: 80,
+                                      decoration: BoxDecoration(color: _kCardBg, shape: BoxShape.circle, border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 6))]),
+                                      child: shop.logoUrl != null
+                                          ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
+                                          : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey))),
+                                    ),
+                                    const SizedBox(width: 20),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Expanded(
+                                                child: Text(shop.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kText)),
+                                              ),
+                                              IconButton(
+                                                icon: Icon(
+                                                  _pinnedShopIds.contains(shop.id) ? Icons.bookmark : Icons.bookmark_outline,
+                                                  color: _pinnedShopIds.contains(shop.id) ? const Color(0xFFEC4899) : Colors.grey,
+                                                  size: 20,
+                                                ),
+                                                onPressed: () => _togglePinShop(shop.id, shop.name),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 6),
+                                          Text('$shopItemsCount ${l10n.productsLabel}', style: TextStyle(fontSize: 14, color: _kSub, fontWeight: FontWeight.w500)),
+                                          const SizedBox(height: 8),
+                                          Container(height: 1, color: ThemeService.instance.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
+                                          const SizedBox(height: 8),
+                                          Text(subtitle, style: TextStyle(fontSize: 13, color: ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : Colors.grey[800], fontWeight: FontWeight.w500)),
+                                        ],
+                                      ),
+                                    )
                                   ],
                                 ),
-                              )
-                            ],
-                          ),
                         ),
                       );
                     },
@@ -879,7 +1130,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRightPanel() {
+  Widget _buildRightPanel(AppLocalizations l10n) {
     final shop = _shops.firstWhere((s) => s.id == _selectedShopId, orElse: () => _shops.first);
     final shopItemsCount = _allItems[shop.id]?.length ?? 122;
     
@@ -892,7 +1143,12 @@ class _HomeScreenState extends State<HomeScreen> {
       itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
     }
     if (_itemSearch.isNotEmpty) {
-      itemsToShow = itemsToShow.where((i) => i.name.toLowerCase().contains(_itemSearch.toLowerCase())).toList();
+      itemsToShow = itemsToShow.where((i) {
+        final query = _itemSearch.toLowerCase();
+        final nameMatches = i.getLocalizedName(LanguageService.instance.locale.languageCode).toLowerCase().contains(query);
+        final translationsMatch = i.itemTranslations?.any((t) => t['name']?.toString().toLowerCase().contains(query) ?? false) ?? false;
+        return nameMatches || translationsMatch;
+      }).toList();
     }
 
     return Column(
@@ -911,20 +1167,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: Container(
                   width: 40, height: 40,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))]),
-                  child: const Icon(Icons.arrow_back, color: _kText),
+                  decoration: BoxDecoration(color: _kCardBg, borderRadius: BorderRadius.circular(12), border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8, offset: const Offset(0, 2))]),
+                  child: Icon(Icons.arrow_back, color: _kText),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  decoration: BoxDecoration(color: const Color(0xFFFCEDEF), borderRadius: BorderRadius.circular(24)),
+                  decoration: BoxDecoration(
+                    color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFFFCEDEF),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: _kBorder),
+                  ),
                   child: Row(
                     children: [
                       Container(
                         width: 60, height: 60,
-                        decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 6))]),
+                        decoration: BoxDecoration(color: _kCardBg, shape: BoxShape.circle, border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 6))]),
                         child: shop.logoUrl != null
                             ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
                             : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey))),
@@ -934,12 +1194,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(shop.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _kText)),
+                            Text(shop.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _kText)),
                             const SizedBox(height: 4),
-                            Text('$shopItemsCount products', style: const TextStyle(fontSize: 13, color: _kSub, fontWeight: FontWeight.w500)),
+                            Text(l10n.productsCount(shopItemsCount), style: TextStyle(fontSize: 13, color: _kSub, fontWeight: FontWeight.w500)),
                           ],
                         ),
-                      )
+                      ),
+                      if (_shops.isNotEmpty && shop.id != 'dummy1' && shop.id != 'dummy2')
+                        IconButton(
+                          icon: const Icon(Icons.rate_review_outlined),
+                          color: _kGreenDark,
+                          tooltip: l10n.shopReviewsTooltip,
+                          onPressed: () {
+                            context.push('/home/shop/${shop.id}?tab=reviews');
+                          },
+                        ),
                     ],
                   ),
                 ),
@@ -959,22 +1228,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     height: 50,
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(color: const Color(0xFFF5F7F5), borderRadius: BorderRadius.circular(18)),
+                    decoration: BoxDecoration(color: _kInputBg, borderRadius: BorderRadius.circular(18), border: Border.all(color: _kBorder)),
                     child: Row(
                       children: [
                         Expanded(
                           child: TextField(
                             onChanged: (v) => setState(() => _itemSearch = v),
-                            decoration: const InputDecoration(hintText: 'Search items...', hintStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500), border: InputBorder.none),
+                            style: TextStyle(color: _kText, fontWeight: FontWeight.w500),
+                            decoration: InputDecoration(hintText: l10n.searchItemsPlaceholder, hintStyle: TextStyle(color: _kSubLighter, fontWeight: FontWeight.w500), border: InputBorder.none),
                           ),
                         ),
-                        const Icon(Icons.search, color: _kGreen),
+                        Icon(Icons.search, color: _kGreen),
                       ],
                     ),
                   ),
                 ),
-
-
 
                 // Categories
                 Padding(
@@ -982,14 +1250,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Categories', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _kText, letterSpacing: -0.5)),
+                      Text(l10n.categoriesTitle, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _kText, letterSpacing: -0.5)),
                       if (_selectedCategory != null)
                         GestureDetector(
                           onTap: () => setState(() => _selectedCategory = null),
-                          child: const Text('CLEAR', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.redAccent)),
+                          child: Text(l10n.clearLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.redAccent)),
                         )
                       else
-                        const Text('NOV 07', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.grey)),
+                        Text(
+                          DateFormat.MMMd(Localizations.localeOf(context).toString()).format(DateTime.now()).toUpperCase(),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.grey),
+                        ),
                     ],
                   ),
                 ),
@@ -1003,7 +1274,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     separatorBuilder: (_, __) => const SizedBox(width: 16),
                     itemBuilder: (context, index) {
                       final cat = shopCategories[index];
-                      final bgColors = [const Color(0xFFF4F5F7), const Color(0xFFFDF6F0), const Color(0xFFFDF5EB), const Color(0xFFFCEEF0)];
+                      final bgColors = ThemeService.instance.isDarkMode
+                          ? [const Color(0xFF27272A), const Color(0xFF1E293B)]
+                          : [const Color(0xFFF4F5F7), const Color(0xFFFDF6F0), const Color(0xFFFDF5EB), const Color(0xFFFCEEF0)];
                       final isSelected = _selectedCategory == cat.id;
                       return GestureDetector(
                         onTap: () => setState(() => _selectedCategory = isSelected ? null : cat.id),
@@ -1017,7 +1290,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 decoration: BoxDecoration(
                                   color: isSelected ? const Color(0xFFE8F9EC) : bgColors[index % bgColors.length],
                                   borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(color: isSelected ? _kGreen : Colors.transparent, width: 2),
+                                  border: Border.all(color: isSelected ? _kGreen : _kBorder, width: 2),
                                 ),
                                 child: Center(child: Text(_getCatIcon(cat.name), style: const TextStyle(fontSize: 28))),
                               ),
@@ -1033,14 +1306,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 24),
 
                 // Items Grid
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
-                  child: Text('Shop Items', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _kText, letterSpacing: -0.5)),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(_selectedShopId != null ? l10n.shopItemsTitle : l10n.popularTitle, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: _kText, letterSpacing: -0.5)),
                 ),
                 const SizedBox(height: 16),
                 
                 if (itemsToShow.isEmpty)
-                  const Padding(padding: EdgeInsets.all(24), child: Center(child: Text('No items found.', style: TextStyle(color: _kSubLighter))))
+                  Padding(padding: const EdgeInsets.all(24), child: Center(child: Text(l10n.noItemsFound, style: TextStyle(color: _kSubLighter))))
                 else
                   ListenableBuilder(
                     listenable: CartService.instance,
