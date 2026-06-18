@@ -118,14 +118,54 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                     itemBuilder: (context, i) {
                       final u = filtered[i];
                       final role = u['role'] as String? ?? 'customer';
+                      final phone = u['phone'] ?? '';
+                      final verified = u['phone_verified'] as bool? ?? false;
+                      final lastLogin = u['last_login_at'] as String?;
+                      
+                      String loginText = 'Never logged in';
+                      if (lastLogin != null) {
+                        try {
+                          final dt = DateTime.parse(lastLogin).toLocal();
+                          final minutes = dt.minute.toString().padLeft(2, '0');
+                          final month = dt.month.toString().padLeft(2, '0');
+                          final day = dt.day.toString().padLeft(2, '0');
+                          loginText = 'Last login: ${dt.year}-$month-$day ${dt.hour}:$minutes';
+                        } catch (_) {
+                          loginText = 'Last login: $lastLogin';
+                        }
+                      }
+
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: (_roleColor[role] ?? kNeutral400).withAlpha(38), // ~0.15
+                          backgroundColor: (_roleColor[role] ?? kNeutral400).withAlpha(38),
                           child: Text((u['name'] as String? ?? '?')[0].toUpperCase(),
                               style: TextStyle(color: _roleColor[role] ?? kNeutral400, fontWeight: FontWeight.w700)),
                         ),
                         title: Text(u['name'] ?? '—', style: const TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: Text(u['phone'] ?? ''),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(phone, style: const TextStyle(fontWeight: FontWeight.w500)),
+                                  const SizedBox(width: 6),
+                                  Icon(
+                                    verified ? Icons.verified : Icons.error_outline,
+                                    size: 14,
+                                    color: verified ? Colors.green : Colors.grey,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                loginText,
+                                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
                         trailing: Chip(label: Text(role, style: const TextStyle(fontSize: 11))),
                         onTap: () => context.push('/admin/users/${u['id']}'),
                       );

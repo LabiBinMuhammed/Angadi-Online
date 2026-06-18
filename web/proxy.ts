@@ -102,7 +102,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Routes that don't require authentication
-  const publicRoutes = ['/login', '/signup']
+  const publicRoutes = ['/login', '/signup', '/forgot-password']
   const isPublicRoute =
     publicRoutes.some((r) => cleanPathname.startsWith(r)) || cleanPathname === '/'
 
@@ -141,7 +141,7 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Already authenticated → don't allow accessing /login or /signup
+  // Already authenticated → don't allow accessing public auth routes
   if (user && isPublicRoute) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/home`

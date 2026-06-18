@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { User, UserProfile } from '@/types'
-import { Settings, MapPin, Package, Bell, Store, ShieldAlert, ChevronRight, Mail, Calendar, Globe, User as UserIcon, MessageSquare, History, Bookmark } from 'lucide-react'
+import { Settings, MapPin, Package, Bell, Store, ShieldAlert, ChevronRight, Mail, Calendar, Globe, User as UserIcon, MessageSquare, History, Bookmark, Lock } from 'lucide-react'
 import LogoutButton from './LogoutButton'
 import ThemeToggle from './ThemeToggle'
 
@@ -66,8 +66,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
     { href: '/pinned-shops', icon: Bookmark, label: t('profile.pinned_shops'), color: '#ec4899', bg: '#fdf2f8' },
     { href: '/purchase-history', icon: History, label: t('profile.purchase_history'), color: '#8b5cf6', bg: '#f5f3ff' },
     { href: '/profile/feedback', icon: MessageSquare, label: t('profile.platform_feedback'), color: '#10b981', bg: '#ecfdf5' },
+    { href: '/profile/security', icon: Lock, label: 'Security Settings', color: '#10b981', bg: '#ecfdf5' },
     { href: '/settings', icon: Settings, label: t('profile.settings'), color: '#64748b', bg: '#f8fafc' },
   ]
+
 
   return (
     <>
@@ -120,7 +122,10 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
           </div>
           <div>
             <h2 className="profile-name">{u?.name ?? t('profile.guest_user')}</h2>
-            <p className="profile-phone">{u?.phone || t('profile.no_phone')}</p>
+            <p className="profile-phone" style={{ display: 'flex', alignItems: 'center', gap: '.35rem' }}>
+              {u?.phone || t('profile.no_phone')}
+              {u?.phone && <span style={{ fontSize: '.7rem', padding: '1px 6px', borderRadius: '12px', background: '#dcfce7', color: '#15803d', fontWeight: 700, display: 'inline-flex', alignItems: 'center' }}>✓ Verified</span>}
+            </p>
             <span className="role-badge">{role}</span>
           </div>
         </div>

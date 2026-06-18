@@ -146,7 +146,7 @@ export default function LeaveReviewClient({ orderId, shopId, shopName, userId }:
  
        <div className="page-container">
          <div className="header">
-           <Link href={`/orders/${orderId}`} className="back-btn">
+           <Link href={`/${locale}/orders/${orderId}`} className="back-btn">
              <ArrowLeft size={20} />
            </Link>
            <h1 className="title">{t('reviews.title')}</h1>

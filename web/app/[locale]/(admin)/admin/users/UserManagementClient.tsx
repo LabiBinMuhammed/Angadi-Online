@@ -97,7 +97,7 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
       {/* Table */}
       <div className="desktop-only-table" style={{ overflowX: 'auto' }}>
         <table className="data-table">
-          <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Last Login</th><th>Actions</th></tr></thead>
           <tbody>
             {filtered.map(u => {
               const initials = u.name ? u.name[0].toUpperCase() : '?'
@@ -124,7 +124,16 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
                       <span>{u.name ?? '—'}</span>
                     </div>
                   </td>
-                  <td className="text-sm">{u.phone}</td>
+                  <td className="text-sm">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      <span>{u.phone}</span>
+                      {u.phone_verified ? (
+                        <span style={{ fontSize: '.7rem', color: '#166534', fontWeight: 600 }}>✓ Verified</span>
+                      ) : (
+                        <span style={{ fontSize: '.7rem', color: '#991b1b', fontWeight: 600 }}>✗ Unverified</span>
+                      )}
+                    </div>
+                  </td>
                   <td><span className={`badge ${ROLE_BADGE[u.role] ?? 'badge-neutral'}`}>{u.role}</span></td>
                   <td>
                     <button
@@ -137,6 +146,7 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
                     </button>
                   </td>
                   <td className="text-sm text-muted">{new Date(u.created_at!).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                  <td className="text-sm text-muted">{u.last_login_at ? new Date(u.last_login_at).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Never'}</td>
                   <td>
                     <div style={{ display: 'flex', gap: '.5rem' }}>
                       <button

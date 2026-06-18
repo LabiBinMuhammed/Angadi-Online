@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem, OrderAddress } from '@/types'
 import { ArrowLeft, Clock, Package, Truck, CheckCircle2, XCircle, MapPin, CreditCard, ShoppingBag, Receipt, MessageSquare } from 'lucide-react'
 
-type Props = { params: Promise<{ orderId: string }> }
+type Props = { params: Promise<{ locale: string; orderId: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { orderId } = await params
@@ -21,7 +21,7 @@ const STATUS_MAP: Record<string, { bg: string; color: string; label: string; Ico
 }
 
 export default async function OrderDetailPage({ params }: Props) {
-  const { orderId } = await params
+  const { locale, orderId } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -87,7 +87,7 @@ export default async function OrderDetailPage({ params }: Props) {
       <div className="page-container">
         <div className="header">
           <div className="header-left">
-            <Link href="/orders" className="back-btn">
+            <Link href={`/${locale}/orders`} className="back-btn">
               <ArrowLeft size={20} />
             </Link>
             <h1 className="title">{o.order_number ? `#${o.order_number}` : `#${o.id.slice(0, 8).toUpperCase()}`}</h1>
@@ -120,7 +120,7 @@ export default async function OrderDetailPage({ params }: Props) {
                 <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>Share your experience and rate the shop for this order.</p>
               </div>
             </div>
-            <Link href={`/orders/${o.id}/review`} className="submit-btn" style={{ textDecoration: 'none', margin: '8px 0 0', textAlign: 'center' }}>
+            <Link href={`/${locale}/orders/${o.id}/review`} className="submit-btn" style={{ textDecoration: 'none', margin: '8px 0 0', textAlign: 'center' }}>
               Write a Review
             </Link>
           </div>

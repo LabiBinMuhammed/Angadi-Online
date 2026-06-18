@@ -3,6 +3,8 @@ import '../globals.css'
 import SessionListener from '../SessionListener'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { I18nProvider, Locale } from '@/lib/i18n/I18nContext'
+import { AuthProvider } from '@/lib/auth/AuthContext'
+
 
 export const metadata: Metadata = {
   title: { default: 'Village Market', template: '%s | Village Market' },
@@ -48,8 +50,10 @@ export default async function RootLayout({
       <body>
         <I18nProvider initialLocale={activeLocale} messages={messages}>
           <ThemeProvider>
-            <SessionListener />
-            {children}
+            <AuthProvider>
+              <SessionListener />
+              {children}
+            </AuthProvider>
           </ThemeProvider>
         </I18nProvider>
       </body>

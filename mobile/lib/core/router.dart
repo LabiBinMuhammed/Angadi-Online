@@ -4,6 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
+import '../screens/auth/complete_registration_screen.dart';
+import '../screens/auth/otp_verification_screen.dart';
+import '../screens/main/profile/security_screen.dart';
 import '../screens/main/home/home_screen.dart';
 import '../screens/main/search/search_screen.dart';
 import '../screens/main/shop/shop_screen.dart';
@@ -60,7 +64,7 @@ GoRouter buildRouter() {
       final isLoggedIn = session != null;
       final path       = state.matchedLocation;
 
-      final publicPaths = ['/login', '/signup', '/splash'];
+      final publicPaths = ['/login', '/signup', '/splash', '/forgot-password', '/otp-verification'];
       final isPublic    = publicPaths.any((p) => path.startsWith(p));
 
       if (!isLoggedIn && !isPublic) return '/login';
@@ -80,6 +84,25 @@ GoRouter buildRouter() {
       // ── Auth routes (no shell) ────────────────────────────────────────
       GoRoute(path: '/login',  builder: (_, __) => const LoginScreen()),
       GoRoute(path: '/signup', builder: (_, __) => const SignupScreen()),
+      GoRoute(
+        path: '/otp-verification',
+        builder: (_, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+          return OtpVerificationScreen(
+            phone: extra['phone'] as String? ?? '',
+            flow: extra['flow'] as String? ?? 'login',
+            newPhone: extra['newPhone'] as String?,
+          );
+        },
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (_, __) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/complete-registration',
+        builder: (_, __) => const CompleteRegistrationScreen(),
+      ),
 
       // ── Full-screen routes (above shell) ─────────────────────────────
       GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
@@ -232,6 +255,7 @@ GoRouter buildRouter() {
                 builder: (_, state) => AddEditAddressScreen(addressId: state.pathParameters['addressId']),
               ),
               GoRoute(path: 'settings', builder: (_, __) => const SettingsScreen()),
+              GoRoute(path: 'security', builder: (_, __) => const SecurityScreen()),
               GoRoute(path: 'feedback', builder: (_, __) => const FeedbackScreen()),
               GoRoute(path: 'pinned-shops', builder: (_, __) => const PinnedShopsScreen()),
               GoRoute(path: 'recent-purchases', builder: (_, __) => const RecentPurchasesScreen()),

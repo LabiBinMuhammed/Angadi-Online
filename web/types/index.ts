@@ -17,6 +17,8 @@ export interface User {
   phone: string
   role: UserRole
   is_active: boolean
+  phone_verified?: boolean
+  last_login_at?: string
   created_at: string
   updated_at: string
 }

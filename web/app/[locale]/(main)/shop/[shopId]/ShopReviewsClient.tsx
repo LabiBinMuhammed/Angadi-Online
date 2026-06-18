@@ -229,6 +229,27 @@ export default function ShopReviewsClient({ shopId, shopName, ratingSummary, rev
               </div>
             </div>
 
+            {/* Quick Review Prompt Card */}
+            {checkedOrder && (
+              <div className="summary-card" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+                  <MessageSquare size={20} color="var(--wa-green-dark)" style={{ flexShrink: 0 }} />
+                  <div style={{ minWidth: 0 }}>
+                    <h5 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-base)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {unreviewedOrderId ? 'Share Your Experience' : 'Your Orders'}
+                    </h5>
+                    <p style={{ margin: '2px 0 0', fontSize: '12.5px', color: 'var(--text-muted)', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {unreviewedOrderId ? 'Rate your recent order from this shop.' : 'View your orders to write a review.'}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={handleWriteReviewClick} className="empty-btn" style={{ padding: '10px 18px', fontSize: '13px', borderRadius: '12px', flexShrink: 0 }}>
+                  <span>{unreviewedOrderId ? t('reviews.write_first_review') : t('nav.orders')}</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+            )}
+
             {/* Rating Distribution Card */}
             <div className="distribution-card">
               <h4 className="dist-title">{t('reviews.rating_breakdown')}</h4>

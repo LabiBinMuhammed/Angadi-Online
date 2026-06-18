@@ -49,14 +49,42 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
     try {
       final res = await supabase
           .from('orders')
-          .select('shop_id, shops(name)')
+          .select('status, shop_id, shops(name)')
           .eq('id', widget.orderId)
           .single();
+
+      final status = res['status'] as String?;
+      if (status != 'delivered') {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('You can only review delivered orders')),
+          );
+          Navigator.of(context).pop();
+        }
+        return;
+      }
+
+      // Check if already reviewed
+      final existingReview = await supabase
+          .from('shop_reviews')
+          .select('id')
+          .eq('order_id', widget.orderId)
+          .maybeSingle();
+
+      if (existingReview != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('This order has already been reviewed')),
+          );
+          Navigator.of(context).pop();
+        }
+        return;
+      }
 
       if (mounted) {
         setState(() {
           _shopId = res['shop_id'] as String;
-          _shopName = (res['shops'] as Map)['name'] as String? ?? 'Shop';
+          _shopName = (res['shops'] as Map?)?['name'] as String? ?? 'Shop';
           _loading = false;
         });
       }

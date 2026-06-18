@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<_Data> _fetch() async {
     final userId = supabase.auth.currentUser!.id;
     final results = await Future.wait([
-      supabase.from('users').select('name, phone, role').eq('id', userId).single(),
+      supabase.from('users').select('name, phone, role, phone_verified').eq('id', userId).single(),
       supabase.from('user_profiles').select('email, profile_image_url, gender, preferred_language, date_of_birth').eq('user_id', userId).maybeSingle(),
     ]);
     return _Data(
@@ -69,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final name     = d.user['name']  as String? ?? l10n.guestUserLabel;
           final phone    = d.user['phone'] as String? ?? '';
           final role     = d.user['role']  as String? ?? 'customer';
+          final phoneVerified = d.user['phone_verified'] as bool? ?? false;
           final email    = d.profile?['email'] as String?;
           final imageUrl = d.profile?['profile_image_url'] as String?;
           final gender   = d.profile?['gender'] as String?;
@@ -152,13 +153,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              Text(
-                                phone.isEmpty ? l10n.noPhoneNumberLabel : phone,
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFFB5DEB5),
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              Row(
+                                children: [
+                                  Text(
+                                    phone.isEmpty ? l10n.noPhoneNumberLabel : phone,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      color: Color(0xFFB5DEB5),
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  if (phoneVerified) ...[
+                                    const SizedBox(width: 6),
+                                    const Icon(
+                                      Icons.verified,
+                                      size: 16,
+                                      color: Color(0xFF4ADE80),
+                                    ),
+                                  ],
+                                ],
                               ),
                               const SizedBox(height: 12),
                               Container(
@@ -315,6 +328,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           bg: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                           isDark: isDark,
                           onTap: () => context.push('/profile/settings'),
+                        ),
+                        _buildLinkItem(
+                          label: 'Security Settings',
+                          icon: HugeIcons.strokeRoundedSecurityCheck,
+                          color: const Color(0xFFEF4444),
+                          bg: isDark ? const Color(0xFF1E293B) : const Color(0xFFFEF2F2),
+                          isDark: isDark,
+                          onTap: () => context.push('/profile/security'),
                         ),
                         _buildLinkItem(
                           label: l10n.platformFeedbackLabel,

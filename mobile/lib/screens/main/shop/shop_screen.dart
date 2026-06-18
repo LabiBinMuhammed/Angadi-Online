@@ -670,13 +670,34 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                     const SizedBox(height: 28),
 
                     // ── 3. Reviews Header ──
-                    Text(
-                      'Customer Reviews',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? Colors.white : kNeutral900,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Customer Reviews',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? Colors.white : kNeutral900,
+                          ),
+                        ),
+                        if (_checkedOrder)
+                          TextButton.icon(
+                            onPressed: _handleWriteReviewClick,
+                            icon: Icon(
+                              _unreviewedOrderId != null ? Icons.rate_review_rounded : Icons.shopping_bag_outlined,
+                              size: 16,
+                              color: kWaGreenDark,
+                            ),
+                            label: Text(
+                              _unreviewedOrderId != null ? l10n.leaveShopReviewButton : l10n.myOrdersTitle,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: kWaGreenDark,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 16),
 
