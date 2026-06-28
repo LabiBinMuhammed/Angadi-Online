@@ -30,47 +30,10 @@ class _SecurityScreenState extends State<SecurityScreen> {
   }
 
   Future<void> _changePhone() async {
-    if (_loading) return;
-    final newPhone = _phoneCtrl.text.trim();
-    if (newPhone.isEmpty) {
-      setState(() => _error = 'Please enter a new phone number.');
-      return;
-    }
-    if (newPhone == authService.currentUser?.phone) {
-      setState(() => _error = 'Please enter a different phone number.');
-      return;
-    }
-    if (newPhone.length < 8) {
-      setState(() => _error = 'Please enter a valid phone number (including country code).');
-      return;
-    }
-
-    setState(() { _loading = true; _error = null; _successMessage = null; });
-    try {
-      // Supabase: updating phone sends OTP to new phone number
-      await authService.updatePhone(newPhone);
-      
-      if (mounted) {
-        final verified = await context.push<bool>('/otp-verification', extra: {
-          'phone': authService.currentUser?.phone ?? '',
-          'flow': 'changePhone',
-          'newPhone': newPhone,
-        });
-
-        if (verified == true) {
-          setState(() {
-            _successMessage = 'Phone number updated successfully!';
-            _phoneCtrl.text = authService.currentUser?.phone ?? newPhone;
-          });
-        }
-      }
-    } on AuthException catch (e) {
-      setState(() => _error = e.message);
-    } catch (e) {
-      setState(() => _error = e.toString());
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
+    setState(() {
+      _error = 'Updating phone number will be available in a future update.';
+      _successMessage = null;
+    });
   }
 
   Future<void> _changePassword() async {

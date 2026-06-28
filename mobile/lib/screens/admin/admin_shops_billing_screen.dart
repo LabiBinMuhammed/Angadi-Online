@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/theme_service.dart';
 
@@ -292,6 +293,12 @@ class _AdminShopsBillingScreenState extends State<AdminShopsBillingScreen> {
         elevation: 0,
         foregroundColor: kText,
         title: const Text('Shop Billing Data', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
         actions: [
           IconButton(
             icon: _loading 

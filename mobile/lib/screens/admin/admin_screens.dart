@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import 'admin_drawer.dart';
@@ -35,7 +36,17 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/shops'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Shop Management')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('Shop Management'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView.separated(
@@ -90,7 +101,17 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     final filtered = _users.where((u) => _role == 'all' || u['role'] == _role).toList();
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/users'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('User Management')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('User Management'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: Column(
         children: [
           SizedBox(
@@ -214,7 +235,17 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/orders'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('All Orders')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('All Orders'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: Column(
         children: [
           // Status Filter Row

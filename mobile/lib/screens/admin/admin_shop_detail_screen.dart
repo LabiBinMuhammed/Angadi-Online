@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -182,6 +183,12 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
       backgroundColor: isDark ? kNeutral900 : const Color(0xFFFAFAFA),
       appBar: AppBar(
         title: Text(_shop!['name'] ?? 'Shop Detail'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const HugeIcon(icon: HugeIcons.strokeRoundedDelete02, color: kDanger),

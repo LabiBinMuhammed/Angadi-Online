@@ -15,8 +15,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _phoneCtrl    = TextEditingController();
+  final _emailCtrl    = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  bool _useOtp = true;
+  bool _isPhoneMode = true;
   bool _loading = false;
   bool _showPw = false;
   String? _error;
@@ -40,47 +41,49 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_loading) return;
     setState(() { _loading = true; _error = null; });
     try {
-      final rawPhone = _phoneCtrl.text.trim();
-      if (rawPhone.isEmpty) {
-        throw const AuthException('Please enter your phone number.');
-      }
-      final phone = _normalizePhone(rawPhone, _selectedCountryCode);
-
-      if (_useOtp) {
-        // Option 1: Phone + OTP
-        await authService.sendOtp(phone);
-        if (mounted) {
-          context.push('/otp-verification', extra: {
-            'phone': phone,
-            'flow': 'login',
-          });
+      final identifier = _isPhoneMode 
+          ? _normalizePhone(_phoneCtrl.text.trim(), _selectedCountryCode)
+          : _emailCtrl.text.trim();
+      
+      if (_isPhoneMode) {
+        if (_phoneCtrl.text.trim().isEmpty) {
+          throw const AuthException('Please enter your phone number.');
         }
       } else {
-        // Option 2: Phone + Password
-        if (_passwordCtrl.text.isEmpty) {
-          throw const AuthException('Please enter your password.');
+        if (_emailCtrl.text.trim().isEmpty) {
+          throw const AuthException('Please enter your email address.');
         }
-        final res = await authService.loginWithPassword(phone, _passwordCtrl.text);
-        if (mounted) {
-          final userId = res.user?.id;
-          if (userId != null) {
-            final userRecord = await supabase
-                .from('users')
-                .select('id, name')
-                .eq('id', userId)
-                .maybeSingle();
-            final name = userRecord?['name'] as String?;
-            if (userRecord == null || name == null || name == 'User' || name.trim().isEmpty) {
-              context.go('/complete-registration');
-              return;
-            }
+        if (!_emailCtrl.text.contains('@')) {
+          throw const AuthException('Please enter a valid email address.');
+        }
+      }
+
+      if (_passwordCtrl.text.isEmpty) {
+        throw const AuthException('Please enter your password.');
+      }
+
+      final res = await authService.loginWithPassword(identifier, _passwordCtrl.text);
+      if (mounted) {
+        final userId = res.user?.id;
+        if (userId != null) {
+          final userRecord = await supabase
+              .from('users')
+              .select('id, name')
+              .eq('id', userId)
+              .maybeSingle();
+          final name = userRecord?['name'] as String?;
+          if (userRecord == null || name == null || name == 'User' || name.trim().isEmpty) {
+            context.go('/complete-registration');
+            return;
           }
-          context.go('/home');
         }
+        context.go('/home');
       }
     } on AuthException catch (e) {
       if (e.message.contains('Invalid login credentials')) {
-        setState(() => _error = 'Incorrect phone number or password. Please try again.');
+        setState(() => _error = _isPhoneMode 
+            ? 'Incorrect phone number or password. Please try again.'
+            : 'Incorrect email or password. Please try again.');
       } else {
         setState(() => _error = e.message);
       }
@@ -94,6 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void dispose() {
     _phoneCtrl.dispose();
+    _emailCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
@@ -199,8 +203,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   const Text(
-                    'Sign in with your phone number',
+                    'Sign in to your Village Market account',
                     style: TextStyle(
                       fontSize: 14,
                       color: kNeutral500,
@@ -220,21 +225,21 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Expanded(
                           child: InkWell(
-                            onTap: () => setState(() { _useOtp = true; _error = null; }),
+                            onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               alignment: Alignment.center,
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
-                                color: _useOtp ? kWaTeal : Colors.transparent,
+                                color: _isPhoneMode ? kWaTeal : Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'OTP Code',
+                                'Phone Number',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: _useOtp ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                                  color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
                                 ),
                               ),
                             ),
@@ -242,21 +247,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         Expanded(
                           child: InkWell(
-                            onTap: () => setState(() { _useOtp = false; _error = null; }),
+                            onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
                             borderRadius: BorderRadius.circular(8),
                             child: Container(
                               alignment: Alignment.center,
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
-                                color: !_useOtp ? kWaTeal : Colors.transparent,
+                                color: !_isPhoneMode ? kWaTeal : Colors.transparent,
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
-                                'Password',
+                                'Email Address',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
-                                  color: !_useOtp ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                                  color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
                                 ),
                               ),
                             ),
@@ -267,62 +272,71 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // Phone Input
-                  _buildInputField(
-                    label: 'Phone number',
-                    hintText: '98765 43210',
-                    controller: _phoneCtrl,
-                    prefixIcon: Icons.phone_android_outlined,
-                    keyboardType: TextInputType.phone,
-                    textInputAction: _useOtp ? TextInputAction.done : TextInputAction.next,
-                    onSubmitted: _useOtp ? (_) => _handleLogin() : null,
-                    countryCode: _selectedCountryCode,
-                    onCountryCodeChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedCountryCode = val;
-                        });
-                      }
-                    },
-                  ),
+                  if (_isPhoneMode) ...[
+                    // Phone Input
+                    _buildInputField(
+                      label: 'Phone number',
+                      hintText: '98765 43210',
+                      controller: _phoneCtrl,
+                      prefixIcon: Icons.phone_android_outlined,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                      countryCode: _selectedCountryCode,
+                      onCountryCodeChanged: (val) {
+                        if (val != null) {
+                          setState(() {
+                            _selectedCountryCode = val;
+                          });
+                        }
+                      },
+                    ),
+                  ] else ...[
+                    // Email Input
+                    _buildInputField(
+                      label: 'Email address',
+                      hintText: 'you@example.com',
+                      controller: _emailCtrl,
+                      prefixIcon: Icons.mail_outline,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ],
                   const SizedBox(height: 18),
 
-                  // Password Input (if not OTP)
-                  if (!_useOtp) ...[
-                    _buildInputField(
-                      label: 'Password',
-                      hintText: '••••••••',
-                      controller: _passwordCtrl,
-                      prefixIcon: Icons.lock_outline,
-                      obscureText: !_showPw,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _handleLogin(),
-                      suffixIcon: GestureDetector(
-                        onTap: () => setState(() => _showPw = !_showPw),
-                        child: Icon(
-                          _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          size: 20,
-                          color: kNeutral500,
+                  // Password Input
+                  _buildInputField(
+                    label: 'Password',
+                    hintText: '••••••••',
+                    controller: _passwordCtrl,
+                    prefixIcon: Icons.lock_outline,
+                    obscureText: !_showPw,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _handleLogin(),
+                    suffixIcon: GestureDetector(
+                      onTap: () => setState(() => _showPw = !_showPw),
+                      child: Icon(
+                        _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        size: 20,
+                        color: kNeutral500,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: GestureDetector(
+                      onTap: () => context.push('/forgot-password'),
+                      child: Text(
+                        'Forgot Password?',
+                        style: TextStyle(
+                          color: kWaTeal,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () => context.push('/forgot-password'),
-                        child: Text(
-                          'Forgot Password?',
-                          style: TextStyle(
-                            color: kWaTeal,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                  ],
+                  ),
+                  const SizedBox(height: 18),
 
                   // Error Box
                   if (_error != null) ...[
@@ -355,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : Text(_useOtp ? 'Send OTP Code' : 'Sign In'),
+                        : const Text('Sign In'),
                   ),
                   const SizedBox(height: 24),
 

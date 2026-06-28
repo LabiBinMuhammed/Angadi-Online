@@ -37,7 +37,17 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: Text(_user?['name'] ?? 'User Detail')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: Text(_user?['name'] ?? 'User Detail'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(

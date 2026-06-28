@@ -13,9 +13,19 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _phoneCtrl = TextEditingController();
+  final _nameCtrl     = TextEditingController();
+  final _phoneCtrl    = TextEditingController();
+  final _emailCtrl    = TextEditingController();
+  final _passwordCtrl = TextEditingController();
+  
+  bool _isPhoneMode = true;
+  String _selectedLanguage = 'en';
+  String _selectedRole = 'customer';
+  
   bool _loading = false;
+  bool _showPw = false;
   String? _error;
+  String? _successInfo;
   String _selectedCountryCode = '+91';
 
   String _normalizePhone(String phone, String countryCode) {
@@ -32,24 +42,81 @@ class _SignupScreenState extends State<SignupScreen> {
     return countryCode + cleaned;
   }
 
+  bool _validatePassword(String pw) {
+    if (pw.length < 8) return false;
+    if (!pw.contains(RegExp(r'[A-Z]'))) return false;
+    if (!pw.contains(RegExp(r'[a-z]'))) return false;
+    if (!pw.contains(RegExp(r'[0-9]'))) return false;
+    return true;
+  }
+
   Future<void> _handleSignup() async {
     if (_loading) return;
-    final rawPhone = _phoneCtrl.text.trim();
-
-    if (rawPhone.isEmpty) {
-      setState(() => _error = 'Please enter your phone number.');
+    
+    final name = _nameCtrl.text.trim();
+    final password = _passwordCtrl.text;
+    
+    if (name.isEmpty) {
+      setState(() => _error = 'Please enter your full name.');
       return;
     }
-    final phone = _normalizePhone(rawPhone, _selectedCountryCode);
 
-    setState(() { _loading = true; _error = null; });
+    if (_isPhoneMode) {
+      if (_phoneCtrl.text.trim().isEmpty) {
+        setState(() => _error = 'Please enter your phone number.');
+        return;
+      }
+    } else {
+      if (_emailCtrl.text.trim().isEmpty) {
+        setState(() => _error = 'Please enter your email address.');
+        return;
+      }
+      if (!_emailCtrl.text.contains('@')) {
+        setState(() => _error = 'Please enter a valid email address.');
+        return;
+      }
+    }
+
+    if (!_validatePassword(password)) {
+      setState(() => _error = 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.');
+      return;
+    }
+
+    setState(() { _loading = true; _error = null; _successInfo = null; });
     try {
-      await authService.sendOtp(phone);
+      final phoneVal = _isPhoneMode ? _normalizePhone(_phoneCtrl.text.trim(), _selectedCountryCode) : null;
+      final emailVal = _isPhoneMode ? null : _emailCtrl.text.trim();
+
+      final res = await authService.signUp(
+        email: emailVal,
+        phone: phoneVal,
+        password: password,
+        name: name,
+        role: _selectedRole,
+        language: _selectedLanguage,
+      );
+
       if (mounted) {
-        context.push('/otp-verification', extra: {
-          'phone': phone,
-          'flow': 'signup',
-        });
+        var finalSession = res.session;
+        if (finalSession == null) {
+          try {
+            final loginRes = await authService.loginWithPassword(
+              _isPhoneMode ? phoneVal! : emailVal!,
+              password,
+            );
+            finalSession = loginRes.session;
+          } catch (_) {}
+        }
+
+        if (finalSession != null) {
+          context.go('/home');
+        } else {
+          setState(() {
+            _successInfo = _isPhoneMode 
+                ? 'Registration successful! You can now log in.' 
+                : 'Registration successful! Please check your email for a confirmation link.';
+          });
+        }
       }
     } on AuthException catch (e) {
       setState(() => _error = e.message);
@@ -62,12 +129,16 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
+    _nameCtrl.dispose();
     _phoneCtrl.dispose();
+    _emailCtrl.dispose();
+    _passwordCtrl.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = ThemeService.instance.isDarkMode;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SingleChildScrollView(
@@ -76,7 +147,7 @@ class _SignupScreenState extends State<SignupScreen> {
           children: [
             // Brand Hero Banner
             Container(
-              height: 230,
+              height: 200,
               decoration: BoxDecoration(color: kWaTeal),
               child: Stack(
                 children: [
@@ -110,37 +181,21 @@ class _SignupScreenState extends State<SignupScreen> {
                       children: [
                         const SizedBox(height: 20),
                         Container(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(25),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
                           ),
-                          child: Icon(Icons.storefront, size: 36, color: kWaTeal),
+                          child: Icon(Icons.storefront, size: 30, color: kWaTeal),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         const Text(
                           'Village Market',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: 22,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Your community's local marketplace",
-                          style: TextStyle(
-                            color: Colors.white.withAlpha(204),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -167,34 +222,168 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 4),
                   const Text(
-                    "Join Village Market — it's free",
+                    "Join Village Market — enter your details to get started",
                     style: TextStyle(
                       fontSize: 14,
                       color: kNeutral500,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
-                  // Phone Input
+                  // Full Name Input
                   _buildInputField(
-                    label: 'Phone number',
-                    hintText: '98765 43210',
-                    controller: _phoneCtrl,
-                    prefixIcon: Icons.phone_android_outlined,
-                    keyboardType: TextInputType.phone,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _handleSignup(),
-                    countryCode: _selectedCountryCode,
-                    onCountryCodeChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedCountryCode = val;
-                        });
-                      }
+                    label: 'Full Name',
+                    hintText: 'John Doe',
+                    controller: _nameCtrl,
+                    prefixIcon: Icons.person_outline,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.next,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Preferred Language Select
+                  _buildDropdownField(
+                    label: 'Preferred Language',
+                    value: _selectedLanguage,
+                    prefixIcon: Icons.language_outlined,
+                    items: const [
+                      DropdownMenuItem(value: 'en', child: Text('English')),
+                      DropdownMenuItem(value: 'ar', child: Text('العربية (Arabic)')),
+                      DropdownMenuItem(value: 'hi', child: Text('हिंदी (Hindi)')),
+                      DropdownMenuItem(value: 'ml', child: Text('Malayalam')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedLanguage = val);
                     },
                   ),
+                  const SizedBox(height: 16),
+
+                  // Account Type / Role Select
+                  _buildDropdownField(
+                    label: 'Account Type',
+                    value: _selectedRole,
+                    prefixIcon: Icons.group_outlined,
+                    items: const [
+                      DropdownMenuItem(value: 'customer', child: Text('Customer')),
+                      DropdownMenuItem(value: 'shop_owner', child: Text('Shop Owner')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedRole = val);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Method Switcher Toggle
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : kNeutral100,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: _isPhoneMode ? kWaTeal : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Phone Number',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: !_isPhoneMode ? kWaTeal : Colors.transparent,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'Email Address',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  if (_isPhoneMode) ...[
+                    // Phone Input
+                    _buildInputField(
+                      label: 'Phone number',
+                      hintText: '98765 43210',
+                      controller: _phoneCtrl,
+                      prefixIcon: Icons.phone_android_outlined,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.next,
+                      countryCode: _selectedCountryCode,
+                      onCountryCodeChanged: (val) {
+                        if (val != null) setState(() => _selectedCountryCode = val);
+                      },
+                    ),
+                  ] else ...[
+                    // Email Input
+                    _buildInputField(
+                      label: 'Email address',
+                      hintText: 'you@example.com',
+                      controller: _emailCtrl,
+                      prefixIcon: Icons.mail_outline,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ],
+                  const SizedBox(height: 16),
+
+                  // Password Input
+                  _buildInputField(
+                    label: 'Password',
+                    hintText: '••••••••',
+                    controller: _passwordCtrl,
+                    prefixIcon: Icons.lock_outline,
+                    obscureText: !_showPw,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (_) => _handleSignup(),
+                    suffixIcon: GestureDetector(
+                      onTap: () => setState(() => _showPw = !_showPw),
+                      child: Icon(
+                        _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        size: 20,
+                        color: kNeutral500,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 24),
+
+                  // Success Box
+                  if (_successInfo != null) ...[
+                    _buildSuccessAlert(_successInfo!),
+                    const SizedBox(height: 20),
+                  ],
 
                   // Error Box
                   if (_error != null) ...[
@@ -227,7 +416,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text('Send OTP Code'),
+                        : const Text('Register'),
                   ),
                   const SizedBox(height: 24),
 
@@ -355,6 +544,59 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  Widget _buildDropdownField({
+    required String label,
+    required String value,
+    required IconData prefixIcon,
+    required List<DropdownMenuItem<String>> items,
+    required void Function(String?) onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label.toUpperCase(),
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+            color: kNeutral500,
+            letterSpacing: 0.8,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : kNeutral100,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Icon(prefixIcon, size: 18, color: kNeutral500),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: value,
+                    isExpanded: true,
+                    dropdownColor: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    items: items,
+                    onChanged: onChanged,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildErrorAlert(String message) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -373,6 +615,35 @@ class _SignupScreenState extends State<SignupScreen> {
               message,
               style: const TextStyle(
                 color: Color(0xFF991B1B),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuccessAlert(String message) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDCFCE7),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF86EFAC)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.check_circle_outline, color: Color(0xFF166534), size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFF166534),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 height: 1.4,

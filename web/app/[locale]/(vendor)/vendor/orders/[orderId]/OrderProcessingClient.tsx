@@ -196,7 +196,8 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
       <h2 className="vp-title" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>{t('vendor_order_processing.order_items')}</h2>
       <div className="vp-card" style={{ padding: 0, marginBottom: '1.5rem', overflow: 'hidden' }}>
         {order.order_items.map((oi, i) => {
-          const isDynamic = oi.variant_type === 'dynamic' || oi.variant_type === 'portion'
+          const variantTypeLower = oi.variant_type?.toLowerCase()
+          const isDynamic = variantTypeLower === 'dynamic' || variantTypeLower === 'portion'
           
           return (
             <div key={oi.id} style={{ 

@@ -39,9 +39,9 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
 
     final results = await Future.wait([
       supabase.from('items').select('id').eq('shop_id', shopId).isFilter('deleted_at', null),
-      supabase.from('orders').select('id').eq('shop_id', shopId),
-      supabase.from('orders').select('id').eq('shop_id', shopId).eq('status', 'pending'),
-      supabase.from('orders').select('total_final_price').eq('shop_id', shopId).eq('status', 'delivered'),
+      supabase.from('orders').select('id').eq('shop_id', shopId).not('payment_type', 'is', null),
+      supabase.from('orders').select('id').eq('shop_id', shopId).eq('status', 'pending').not('payment_type', 'is', null),
+      supabase.from('orders').select('total_final_price').eq('shop_id', shopId).eq('status', 'delivered').not('payment_type', 'is', null),
     ]);
 
     final deliveredOrders = results[3] as List;

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -124,6 +126,12 @@ class _AdminFeedbacksScreenState extends State<AdminFeedbacksScreen> {
         backgroundColor: kWaTeal,
         foregroundColor: Colors.white,
         title: const Text('Platform Feedbacks'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

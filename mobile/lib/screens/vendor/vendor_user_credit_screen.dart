@@ -98,6 +98,12 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: const Text('User Credit Detail', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)))

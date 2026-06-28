@@ -5,25 +5,13 @@ import type { User, UserProfile } from '@/types'
 import { Settings, MapPin, Package, Bell, Store, ShieldAlert, ChevronRight, Mail, Calendar, Globe, User as UserIcon, MessageSquare, History, Bookmark, Lock } from 'lucide-react'
 import LogoutButton from './LogoutButton'
 import ThemeToggle from './ThemeToggle'
+import { getServerTranslations } from '@/lib/i18n/server'
+import { redirect } from 'next/navigation'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
   const activeLocale = ['en', 'ml', 'hi', 'ar'].includes(locale) ? locale : 'en'
-  let messages = {}
-  try {
-    messages = require(`../../../../messages/${activeLocale}.json`)
-  } catch (e) {
-    messages = require('../../../../messages/en.json')
-  }
-  const t = (key: string) => {
-    const parts = key.split('.')
-    let curr = messages as any
-    for (const part of parts) {
-      if (!curr) return key
-      curr = curr[part]
-    }
-    return typeof curr === 'string' ? curr : key
-  }
+  const t = getServerTranslations(activeLocale)
 
   return { title: t('profile.title') }
 }
@@ -34,20 +22,9 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
   const { data: { user: authUser } } = await supabase.auth.getUser()
 
   const activeLocale = ['en', 'ml', 'hi', 'ar'].includes(locale) ? locale : 'en'
-  let messages = {}
-  try {
-    messages = require(`../../../../messages/${activeLocale}.json`)
-  } catch (e) {
-    messages = require('../../../../messages/en.json')
-  }
-  const t = (key: string) => {
-    const parts = key.split('.')
-    let curr = messages as any
-    for (const part of parts) {
-      if (!curr) return key
-      curr = curr[part]
-    }
-    return typeof curr === 'string' ? curr : key
+  const t = getServerTranslations(activeLocale)
+  if (!authUser) {
+    redirect(`/${activeLocale}/login`)
   }
 
   const [{ data: profile }, { data: userRow }] = await Promise.all([
@@ -66,7 +43,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
     { href: '/pinned-shops', icon: Bookmark, label: t('profile.pinned_shops'), color: '#ec4899', bg: '#fdf2f8' },
     { href: '/purchase-history', icon: History, label: t('profile.purchase_history'), color: '#8b5cf6', bg: '#f5f3ff' },
     { href: '/profile/feedback', icon: MessageSquare, label: t('profile.platform_feedback'), color: '#10b981', bg: '#ecfdf5' },
-    { href: '/profile/security', icon: Lock, label: 'Security Settings', color: '#10b981', bg: '#ecfdf5' },
+    { href: '/profile/security', icon: Lock, label: t('profile.security_settings') || 'Security Settings', color: '#10b981', bg: '#ecfdf5' },
     { href: '/settings', icon: Settings, label: t('profile.settings'), color: '#64748b', bg: '#f8fafc' },
   ]
 

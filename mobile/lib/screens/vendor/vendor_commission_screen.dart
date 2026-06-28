@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
 import 'vendor_drawer.dart';
@@ -90,14 +91,19 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: const Text('Commissions', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : Builder(
+                builder: (context) => IconButton(
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                ),
+              ),
       ),
       body: FutureBuilder<_Data>(
         future: _future,

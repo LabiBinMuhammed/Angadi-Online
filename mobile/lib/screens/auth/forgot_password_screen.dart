@@ -14,87 +14,43 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _phoneCtrl    = TextEditingController();
-  final _passwordCtrl = TextEditingController();
-  final _confirmCtrl  = TextEditingController();
+  final _emailCtrl    = TextEditingController();
   
-  int _step = 1; // 1: Input phone, 2: Reset password (after OTP success)
+  bool _isPhoneMode = false;
   bool _loading = false;
-  bool _showPw = false;
-  bool _showConfirm = false;
   String? _error;
+  String? _info;
+  bool _success = false;
   String _selectedCountryCode = '+91';
 
-  String _normalizePhone(String phone, String countryCode) {
-    String cleaned = phone.replaceAll(RegExp(r'[\s\-\(\)]'), '');
-    if (cleaned.startsWith('+')) return cleaned;
-    if (cleaned.startsWith('00')) return '+' + cleaned.substring(2);
-    if (cleaned.startsWith('0')) {
-      cleaned = cleaned.substring(1);
-    }
-    final codeWithoutPlus = countryCode.replaceAll('+', '');
-    if (cleaned.startsWith(codeWithoutPlus)) {
-      return '+' + cleaned;
-    }
-    return countryCode + cleaned;
-  }
-
-  Future<void> _sendOtp() async {
+  Future<void> _handleReset() async {
     if (_loading) return;
-    final rawPhone = _phoneCtrl.text.trim();
-    if (rawPhone.isEmpty) {
-      setState(() => _error = 'Please enter your phone number.');
+    setState(() { _error = null; _info = null; });
+
+    if (_isPhoneMode) {
+      // Phone Accounts: Show placeholder alert
+      setState(() {
+        _info = 'Phone password reset will be available in a future update.';
+      });
       return;
     }
-    final phone = _normalizePhone(rawPhone, _selectedCountryCode);
 
-    setState(() { _loading = true; _error = null; });
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty) {
+      setState(() => _error = 'Please enter your email address.');
+      return;
+    }
+    if (!email.contains('@')) {
+      setState(() => _error = 'Please enter a valid email address.');
+      return;
+    }
+
+    setState(() { _loading = true; });
     try {
-      await authService.sendOtp(phone);
-      if (mounted) {
-        // Push OTP verification screen and wait for result
-        final verified = await context.push<bool>('/otp-verification', extra: {
-          'phone': phone,
-          'flow': 'reset',
-        });
-        
-        if (verified == true) {
-          setState(() {
-            _step = 2; // Transition to password reset input
-          });
-        }
-      }
-    } on AuthException catch (e) {
-      setState(() => _error = e.message);
-    } catch (e) {
-      setState(() => _error = e.toString());
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _resetPassword() async {
-    if (_loading) return;
-    final password = _passwordCtrl.text;
-    final confirm = _confirmCtrl.text;
-
-    if (password.length < 8) {
-      setState(() => _error = 'Password must be at least 8 characters.');
-      return;
-    }
-    if (password != confirm) {
-      setState(() => _error = 'Passwords do not match.');
-      return;
-    }
-
-    setState(() { _loading = true; _error = null; });
-    try {
-      await authService.updatePassword(password);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password updated successfully!')),
-        );
-        context.go('/home');
-      }
+      await authService.sendPasswordResetEmail(email);
+      setState(() {
+        _success = true;
+      });
     } on AuthException catch (e) {
       setState(() => _error = e.message);
     } catch (e) {
@@ -107,8 +63,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   void dispose() {
     _phoneCtrl.dispose();
-    _passwordCtrl.dispose();
-    _confirmCtrl.dispose();
+    _emailCtrl.dispose();
     super.dispose();
   }
 
@@ -132,7 +87,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           children: [
             const SizedBox(height: 20),
             Text(
-              _step == 1 ? 'Reset Password' : 'Choose New Password',
+              'Reset Password',
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
@@ -142,9 +97,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              _step == 1
-                  ? 'Enter your phone number to receive a verification code'
-                  : 'Enter a strong, new password for your account',
+              !_success
+                  ? 'Enter your details to receive password reset instructions'
+                  : 'Check your inbox for password reset instructions',
               style: const TextStyle(
                 fontSize: 14,
                 color: kNeutral500,
@@ -153,97 +108,159 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 28),
 
-            if (_step == 1) ...[
-              // Step 1: Phone Input
-              _buildInputField(
-                label: 'Phone number',
-                hintText: '98765 43210',
-                controller: _phoneCtrl,
-                prefixIcon: Icons.phone_android_outlined,
-                keyboardType: TextInputType.phone,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _sendOtp(),
-                countryCode: _selectedCountryCode,
-                onCountryCodeChanged: (val) {
-                  if (val != null) {
-                    setState(() {
-                      _selectedCountryCode = val;
-                    });
-                  }
-                },
-              ),
-            ] else ...[
-              // Step 2: New Password Inputs
-              _buildInputField(
-                label: 'New password',
-                hintText: 'Min. 8 characters',
-                controller: _passwordCtrl,
-                prefixIcon: Icons.lock_outline,
-                obscureText: !_showPw,
-                textInputAction: TextInputAction.next,
-                suffixIcon: GestureDetector(
-                  onTap: () => setState(() => _showPw = !_showPw),
-                  child: Icon(
-                    _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    size: 20,
-                    color: kNeutral500,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
-              _buildInputField(
-                label: 'Confirm new password',
-                hintText: 'Repeat password',
-                controller: _confirmCtrl,
-                prefixIcon: Icons.vpn_key_outlined,
-                obscureText: !_showConfirm,
-                textInputAction: TextInputAction.done,
-                onSubmitted: (_) => _resetPassword(),
-                suffixIcon: GestureDetector(
-                  onTap: () => setState(() => _showConfirm = !_showConfirm),
-                  child: Icon(
-                    _showConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                    size: 20,
-                    color: kNeutral500,
-                  ),
-                ),
-              ),
-            ],
-            const SizedBox(height: 24),
-
-            // Error Box
-            if (_error != null) ...[
-              _buildErrorAlert(_error!),
-              const SizedBox(height: 20),
-            ],
-
-            // Submit Button
-            ElevatedButton(
-              onPressed: _loading ? null : (_step == 1 ? _sendOtp : _resetPassword),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kWaTeal,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
+            if (!_success) ...[
+              // Reset Method Toggle
+              Container(
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : kNeutral100,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Inter',
+                padding: const EdgeInsets.all(4),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => setState(() { _isPhoneMode = false; _error = null; _info = null; }),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: !_isPhoneMode ? kWaTeal : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Email Accounts',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => setState(() { _isPhoneMode = true; _error = null; _info = null; }),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _isPhoneMode ? kWaTeal : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            'Phone Accounts',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: _loading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : Text(_step == 1 ? 'Send OTP Code' : 'Update Password'),
-            ),
+              const SizedBox(height: 24),
+
+              if (_isPhoneMode) ...[
+                // Phone Input
+                _buildInputField(
+                  label: 'Phone number',
+                  hintText: '98765 43210',
+                  controller: _phoneCtrl,
+                  prefixIcon: Icons.phone_android_outlined,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _handleReset(),
+                  countryCode: _selectedCountryCode,
+                  onCountryCodeChanged: (val) {
+                    if (val != null) setState(() => _selectedCountryCode = val);
+                  },
+                ),
+              ] else ...[
+                // Email Input
+                _buildInputField(
+                  label: 'Email address',
+                  hintText: 'you@example.com',
+                  controller: _emailCtrl,
+                  prefixIcon: Icons.mail_outline,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _handleReset(),
+                ),
+              ],
+              const SizedBox(height: 24),
+
+              // Info Box
+              if (_info != null) ...[
+                _buildInfoAlert(_info!),
+                const SizedBox(height: 20),
+              ],
+
+              // Error Box
+              if (_error != null) ...[
+                _buildErrorAlert(_error!),
+                const SizedBox(height: 20),
+              ],
+
+              // Submit Button
+              ElevatedButton(
+                onPressed: _loading ? null : _handleReset,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kWaTeal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                child: _loading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : Text(_isPhoneMode ? 'Reset Password' : 'Send Reset Link'),
+              ),
+            ] else ...[
+              // Success Screen
+              const SizedBox(height: 10),
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(12),
+                child: Icon(Icons.check_circle_outline, size: 64, color: kWaTeal),
+              ),
+              const SizedBox(height: 12),
+              _buildSuccessAlert(
+                'A password reset link has been successfully sent to ${_emailCtrl.text.trim()}. Please check your inbox.',
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => context.go('/login'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kWaTeal,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Back to Login'),
+              ),
+            ],
           ],
         ),
       ),
@@ -361,6 +378,64 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               message,
               style: const TextStyle(
                 color: Color(0xFF991B1B),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoAlert(String message) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF3C7),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFFCD34D)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info_outline, color: Color(0xFF92400E), size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFF92400E),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuccessAlert(String message) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDCFCE7),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFF86EFAC)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.check_circle_outline, color: Color(0xFF166534), size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFF166534),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 height: 1.4,

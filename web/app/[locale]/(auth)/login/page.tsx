@@ -22,7 +22,7 @@ export function normalizePhone(phone: string, defaultCountryCode: string = '+91'
 }
 
 export default function LoginPage() {
-  const { user, session, signInWithOtp, verifyOtp, signInWithPassword, completeRegistration } = useAuth()
+  const { user, session, signInWithPassword, completeRegistration } = useAuth()
   const router = useRouter()
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
@@ -30,10 +30,10 @@ export default function LoginPage() {
   // Form states
   const [phone, setPhone] = useState('')
   const [countryCode, setCountryCode] = useState('+91')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [otp, setOtp] = useState('')
-  const [mode, setMode] = useState<'otp' | 'password'>('otp') // login modes
-  const [step, setStep] = useState<'login' | 'otp_verify' | 'complete_registration'>('login')
+  const [mode, setMode] = useState<'phone' | 'email'>('phone') // login modes
+  const [step, setStep] = useState<'login' | 'complete_registration'>('login')
   
   // Registration completion states
   const [fullName, setFullName] = useState('')
@@ -46,15 +46,6 @@ export default function LoginPage() {
   const [showNewPw, setShowNewPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [info, setInfo] = useState('')
-  const [countdown, setCountdown] = useState(0)
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
-      return () => clearTimeout(timer)
-    }
-  }, [countdown])
 
   const hasPasswordSession = (() => {
     if (!session?.access_token) return false
@@ -90,86 +81,57 @@ export default function LoginPage() {
     }
   }
 
-  // Handle Send OTP
-  async function handleSendOtp(e: React.FormEvent) {
-    e.preventDefault()
-    if (loading) return
-    if (!phone.trim()) {
-      setError('Please enter your phone number.')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    setInfo('')
-
-    const { error: authErr } = await signInWithOtp(normalizePhone(phone, countryCode))
-    setLoading(false)
-
-    if (authErr) {
-      setError(authErr.message)
-    } else {
-      setInfo('Verification code sent to your phone.')
-      setStep('otp_verify')
-      setCountdown(60)
-    }
-  }
-
-  // Handle Verify OTP
-  async function handleVerifyOtp(e: React.FormEvent) {
-    e.preventDefault()
-    if (loading) return
-    if (otp.length !== 6) {
-      setError('Please enter the 6-digit OTP code.')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    setInfo('')
-
-    const { data, error: authErr } = await verifyOtp(normalizePhone(phone, countryCode), otp.trim())
-    
-    if (authErr) {
-      setLoading(false)
-      setError(authErr.message)
-    } else if (data.user) {
-      await checkProfileAndRedirect(data.user.id)
-      setLoading(false)
-    } else {
-      setLoading(false)
-      setError('Verification failed. Invalid OTP.')
-    }
-  }
-
-  // Handle Login with Password
+  // Handle Login with Password (supporting Email and Phone)
   async function handlePasswordLogin(e: React.FormEvent) {
     e.preventDefault()
     if (loading) return
-    if (!phone.trim() || !password) {
-      setError('Phone number and password are required.')
-      return
-    }
-
-    setLoading(true)
-    setError('')
-    setInfo('')
-
-    const { data, error: authErr } = await signInWithPassword(normalizePhone(phone, countryCode), password)
     
-    if (authErr) {
-      setLoading(false)
-      if (authErr.message.includes('Invalid login credentials')) {
-        setError('Incorrect phone number or password. Please try again.')
-      } else {
-        setError(authErr.message)
+    setError('')
+
+    if (mode === 'phone') {
+      if (!phone.trim() || !password) {
+        setError('Phone number and password are required.')
+        return
       }
-    } else if (data.user) {
-      await checkProfileAndRedirect(data.user.id)
+      setLoading(true)
+      const { data, error: authErr } = await signInWithPassword(normalizePhone(phone, countryCode), password)
       setLoading(false)
+
+      if (authErr) {
+        if (authErr.message.includes('Invalid login credentials')) {
+          setError('Incorrect phone number or password. Please try again.')
+        } else {
+          setError(authErr.message)
+        }
+      } else if (data.user) {
+        await checkProfileAndRedirect(data.user.id)
+      } else {
+        setError('Login failed. Please try again.')
+      }
     } else {
+      if (!email.trim() || !password) {
+        setError('Email and password are required.')
+        return
+      }
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        setError('Please enter a valid email address.')
+        return
+      }
+      setLoading(true)
+      const { data, error: authErr } = await signInWithPassword(email, password)
       setLoading(false)
-      setError('Login failed. Please try again.')
+
+      if (authErr) {
+        if (authErr.message.includes('Invalid login credentials')) {
+          setError('Incorrect email or password. Please try again.')
+        } else {
+          setError(authErr.message)
+        }
+      } else if (data.user) {
+        await checkProfileAndRedirect(data.user.id)
+      } else {
+        setError('Login failed. Please try again.')
+      }
     }
   }
 
@@ -189,7 +151,6 @@ export default function LoginPage() {
 
     setLoading(true)
     setError('')
-    setInfo('')
 
     const { error: regErr } = await completeRegistration(
       name,
@@ -220,11 +181,11 @@ export default function LoginPage() {
             <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1.25rem' }}>
               <button
                 type="button"
-                className={`btn btn-full ${mode === 'otp' ? 'btn-primary' : 'btn-outline'}`}
-                onClick={() => { setMode('otp'); setError(''); }}
+                className={`btn btn-full ${mode === 'phone' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => { setMode('phone'); setError(''); }}
                 style={{
-                  background: mode === 'otp' ? 'var(--wa-green-dark)' : 'transparent',
-                  color: mode === 'otp' ? '#fff' : 'var(--text-base)',
+                  background: mode === 'phone' ? 'var(--wa-green-dark)' : 'transparent',
+                  color: mode === 'phone' ? '#fff' : 'var(--text-base)',
                   border: '1px solid var(--wa-green-dark)',
                   padding: '.6rem',
                   fontSize: '.9rem',
@@ -232,15 +193,15 @@ export default function LoginPage() {
                   borderRadius: 'var(--radius-md)'
                 }}
               >
-                Continue with OTP
+                Phone Login
               </button>
               <button
                 type="button"
-                className={`btn btn-full ${mode === 'password' ? 'btn-primary' : 'btn-outline'}`}
-                onClick={() => { setMode('password'); setError(''); }}
+                className={`btn btn-full ${mode === 'email' ? 'btn-primary' : 'btn-outline'}`}
+                onClick={() => { setMode('email'); setError(''); }}
                 style={{
-                  background: mode === 'password' ? 'var(--wa-green-dark)' : 'transparent',
-                  color: mode === 'password' ? '#fff' : 'var(--text-base)',
+                  background: mode === 'email' ? 'var(--wa-green-dark)' : 'transparent',
+                  color: mode === 'email' ? '#fff' : 'var(--text-base)',
                   border: '1px solid var(--wa-green-dark)',
                   padding: '.6rem',
                   fontSize: '.9rem',
@@ -248,105 +209,70 @@ export default function LoginPage() {
                   borderRadius: 'var(--radius-md)'
                 }}
               >
-                Login with Password
+                Email Login
               </button>
             </div>
           )}
 
-          {step === 'login' && mode === 'otp' && (
-            <form onSubmit={handleSendOtp} className="auth-form">
-              {/* Phone Input */}
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-phone">Phone number</label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    className="form-input"
-                    style={{ width: '100px', flexShrink: 0, cursor: 'pointer' }}
-                  >
-                    <option value="+91">🇮🇳 +91</option>
-                    <option value="+971">🇦🇪 +971</option>
-                    <option value="+966">🇸🇦 +966</option>
-                    <option value="+968">🇴🇲 +968</option>
-                    <option value="+974">🇶🇦 +974</option>
-                    <option value="+973">🇧🇭 +973</option>
-                    <option value="+965">🇰🇼 +965</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+44">🇬🇧 +44</option>
-                  </select>
-                  <div className="input-icon-wrap" style={{ flex: 1 }}>
-                    <Phone size={16} className="input-icon" />
+          {step === 'login' && (
+            <form onSubmit={handlePasswordLogin} className="auth-form">
+              {mode === 'phone' ? (
+                /* Phone Input */
+                <div className="form-group">
+                  <label className="form-label" htmlFor="login-phone">Phone number</label>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="form-input"
+                      style={{ width: '100px', flexShrink: 0, cursor: 'pointer' }}
+                    >
+                      <option value="+91">🇮🇳 +91</option>
+                      <option value="+971">🇦🇪 +971</option>
+                      <option value="+966">🇸🇦 +966</option>
+                      <option value="+968">🇴🇲 +968</option>
+                      <option value="+974">🇶🇦 +974</option>
+                      <option value="+973">🇧🇭 +973</option>
+                      <option value="+965">🇰🇼 +965</option>
+                      <option value="+1">🇺🇸 +1</option>
+                      <option value="+44">🇬🇧 +44</option>
+                    </select>
+                    <div className="input-icon-wrap" style={{ flex: 1 }}>
+                      <Phone size={16} className="input-icon" />
+                      <input
+                        id="login-phone"
+                        className="form-input input-with-icon"
+                        type="tel"
+                        placeholder="9876543210"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        required
+                        autoComplete="tel"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Email Input */
+                <div className="form-group">
+                  <label className="form-label" htmlFor="login-email">Email Address</label>
+                  <div className="input-icon-wrap">
+                    <Globe size={16} className="input-icon" />
                     <input
-                      id="login-phone"
+                      id="login-email"
                       className="form-input input-with-icon"
-                      type="tel"
-                      placeholder="9876543210"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
-                      autoComplete="tel"
+                      autoComplete="email"
                       autoFocus
                     />
                   </div>
                 </div>
-              </div>
-
-              {error && (
-                <div className="auth-alert auth-alert-error" role="alert"
-                  style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-                  <AlertCircle size={16} style={{ flexShrink: 0 }} /> {error}
-                </div>
               )}
-
-              <button
-                id="btn-login-otp"
-                type="submit"
-                className="btn btn-primary btn-full auth-submit-btn"
-                disabled={loading}
-              >
-                {loading ? <span className="spinner" /> : 'Send OTP'}
-              </button>
-            </form>
-          )}
-
-          {step === 'login' && mode === 'password' && (
-            <form onSubmit={handlePasswordLogin} className="auth-form">
-              {/* Phone Input */}
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-phone">Phone number</label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    className="form-input"
-                    style={{ width: '100px', flexShrink: 0, cursor: 'pointer' }}
-                  >
-                    <option value="+91">🇮🇳 +91</option>
-                    <option value="+971">🇦🇪 +971</option>
-                    <option value="+966">🇸🇦 +966</option>
-                    <option value="+968">🇴🇲 +968</option>
-                    <option value="+974">🇶🇦 +974</option>
-                    <option value="+973">🇧🇭 +973</option>
-                    <option value="+965">🇰🇼 +965</option>
-                    <option value="+1">🇺🇸 +1</option>
-                    <option value="+44">🇬🇧 +44</option>
-                  </select>
-                  <div className="input-icon-wrap" style={{ flex: 1 }}>
-                    <Phone size={16} className="input-icon" />
-                    <input
-                      id="login-phone"
-                      className="form-input input-with-icon"
-                      type="tel"
-                      placeholder="9876543210"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      required
-                      autoComplete="tel"
-                    />
-                  </div>
-                </div>
-              </div>
 
               {/* Password Input */}
               <div className="form-group">
@@ -393,78 +319,6 @@ export default function LoginPage() {
                 disabled={loading}
               >
                 {loading ? <span className="spinner" /> : 'Sign In'}
-              </button>
-            </form>
-          )}
-
-          {step === 'otp_verify' && (
-            <form onSubmit={handleVerifyOtp} className="auth-form">
-              {/* OTP Input */}
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-otp">Verification Code</label>
-                <div className="input-icon-wrap">
-                  <KeyRound size={16} className="input-icon" />
-                  <input
-                    id="login-otp"
-                    className="form-input input-with-icon"
-                    type="text"
-                    pattern="[0-9]*"
-                    maxLength={6}
-                    placeholder="Enter 6-digit code"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    required
-                    autoFocus
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <div className="auth-alert auth-alert-error" role="alert"
-                  style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-                  <AlertCircle size={16} style={{ flexShrink: 0 }} /> {error}
-                </div>
-              )}
-              {info && (
-                <div className="auth-alert auth-alert-info" role="alert"
-                  style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-                  <Info size={16} style={{ flexShrink: 0 }} /> {info}
-                </div>
-              )}
-
-              {/* Countdown / Resend Option */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Didn&apos;t receive code?</span>
-                {countdown > 0 ? (
-                  <span style={{ color: 'var(--wa-teal)', fontWeight: 600 }}>Resend in {countdown}s</span>
-                ) : (
-                  <button
-                    type="button"
-                    className="auth-link-btn"
-                    onClick={handleSendOtp}
-                    disabled={loading}
-                  >
-                    Resend OTP
-                  </button>
-                )}
-              </div>
-
-              <button
-                id="btn-verify-otp"
-                type="submit"
-                className="btn btn-primary btn-full auth-submit-btn"
-                disabled={loading}
-              >
-                {loading ? <span className="spinner" /> : 'Verify Code'}
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-outline btn-full"
-                onClick={() => { setStep('login'); setOtp(''); setError(''); }}
-                style={{ padding: '.85rem', fontSize: '1rem', borderRadius: 'var(--radius-md)', fontWeight: 700 }}
-              >
-                Back
               </button>
             </form>
           )}

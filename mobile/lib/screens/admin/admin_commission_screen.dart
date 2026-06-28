@@ -205,6 +205,12 @@ class _AdminCommissionScreenState extends State<AdminCommissionScreen> with Sing
         elevation: 0,
         foregroundColor: kText,
         title: const Text('Commissions', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
         actions: [
           IconButton(
             icon: const HugeIcon(icon: HugeIcons.strokeRoundedStore01, size: 20),

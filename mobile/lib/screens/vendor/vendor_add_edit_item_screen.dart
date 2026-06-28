@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
 
@@ -1580,6 +1581,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           _isEdit ? 'Edit Product' : 'Add Product',
           style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
         ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)))

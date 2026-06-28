@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Menu, X, ShieldCheck } from 'lucide-react'
+import { Menu, X, ShieldCheck, ArrowLeft } from 'lucide-react'
 import AdminSidebar from './AdminSidebar'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -17,36 +17,58 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         borderBottom: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
+        justifyContent: 'space-between',
         padding: '0 1.5rem',
         position: 'sticky',
         top: 0,
         zIndex: 100
       }}>
-        {/* Toggle Button */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Toggle Button */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              marginRight: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-base)',
+              borderRadius: '8px',
+              transition: 'background 0.2s'
+            }}
+            className="sidebar-toggle-btn"
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          {/* Brand name */}
+          <Link href="/admin/dashboard" style={{ textDecoration: 'none', color: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
+            <ShieldCheck size={20} color="var(--wa-green-dark)" />
+            <span>Admin Console</span>
+          </Link>
+        </div>
+
+        <Link 
+          href="/home" 
+          title="Back to Shop"
           style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '0.5rem',
-            marginRight: '1rem',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
             color: 'var(--text-base)',
-            borderRadius: '8px',
-            transition: 'background 0.2s'
+            transition: 'background 0.2s',
+            textDecoration: 'none'
           }}
-          className="sidebar-toggle-btn"
+          className="hover-bg-muted"
         >
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-
-        {/* Brand name */}
-        <Link href="/admin/dashboard" style={{ textDecoration: 'none', color: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
-          <ShieldCheck size={20} color="var(--wa-green-dark)" />
-          <span>Admin Console</span>
+          <ArrowLeft size={20} />
         </Link>
       </header>
 

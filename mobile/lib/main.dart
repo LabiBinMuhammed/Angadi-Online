@@ -45,7 +45,7 @@ class VillageMarketApp extends StatelessWidget {
             if (isMalayalam) {
               return MediaQuery(
                 data: mediaQuery.copyWith(
-                  textScaler: _MultiplierTextScaler(mediaQuery.textScaler, 0.88),
+                  textScaler: _MultiplierTextScaler(mediaQuery.textScaler, 0.80),
                 ),
                 child: child!,
               );

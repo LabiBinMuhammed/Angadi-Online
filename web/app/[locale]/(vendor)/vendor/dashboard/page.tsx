@@ -6,25 +6,12 @@ import {
   TrendingUp, BarChart3, Users, AlertTriangle
 } from 'lucide-react'
 import VendorDeliveryRuns from './VendorDeliveryRuns'
+import { getServerTranslations } from '@/lib/i18n/server'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
   const activeLocale = ['en', 'ml', 'hi', 'ar'].includes(locale) ? locale : 'en'
-  let messages = {}
-  try {
-    messages = require(`../../../../../messages/${activeLocale}.json`)
-  } catch (e) {
-    messages = require('../../../../../messages/en.json')
-  }
-  const t = (key: string) => {
-    const parts = key.split('.')
-    let curr = messages as any
-    for (const part of parts) {
-      if (!curr) return key
-      curr = curr[part]
-    }
-    return typeof curr === 'string' ? curr : key
-  }
+  const t = getServerTranslations(activeLocale)
   return { title: `${t('vendor_dashboard.vendor_panel_title') || 'Vendor Panel'}` }
 }
 
@@ -34,32 +21,7 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
   const { data: { user } } = await supabase.auth.getUser()
 
   const activeLocale = ['en', 'ml', 'hi', 'ar'].includes(locale) ? locale : 'en'
-  let messages: any = {}
-  try {
-    messages = require(`../../../../../messages/${activeLocale}.json`)
-  } catch (e) {
-    messages = require('../../../../../messages/en.json')
-  }
-  const t = (key: string) => {
-    const parts = key.split('.')
-    let curr = messages
-    for (const part of parts) {
-      if (!curr) return key
-      curr = curr[part]
-    }
-    if (typeof curr === 'string') return curr
-    try {
-      const enMessages = require('../../../../../messages/en.json')
-      let fallback = enMessages
-      for (const part of parts) {
-        if (!fallback) return key
-        fallback = fallback[part]
-      }
-      if (typeof fallback === 'string') return fallback
-    } catch (e) {}
-    return key
-  }
-
+  const t = getServerTranslations(activeLocale)
   // Get all shops owned by this user
   const { data: shopOwners } = await supabase
     .from('shop_owners')
@@ -72,30 +34,32 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
   const shopName = hasMultiple ? (t('vendor_dashboard.your_shops_title') || 'Your Shops') : (firstShopName ?? 'Your Shop')
   const firstShopId = shopIds[0]
 
-  const [itemsRes, ordersRes, pendingRes, subsRes] = await Promise.all([
-    shopIds.length > 0 ? supabase.from('items').select('id', { count: 'exact', head: true }).in('shop_id', shopIds) : Promise.resolve({ count: 0 }),
-    shopIds.length > 0 ? supabase.from('orders').select('id', { count: 'exact', head: true }).in('shop_id', shopIds) : Promise.resolve({ count: 0 }),
-    shopIds.length > 0 ? supabase.from('orders').select('id', { count: 'exact', head: true }).in('shop_id', shopIds).eq('status', 'pending') : Promise.resolve({ count: 0 }),
-    shopIds.length > 0 ? supabase.from('shop_subscription').select('restriction_level').in('shop_id', shopIds) : Promise.resolve({ data: [] })
-  ])
-
-  const maxRestLevel = subsRes?.data?.reduce((max: number, s: any) => Math.max(max, s.restriction_level || 0), 0) || 0
-
-  const stats = [
-    { icon: <Package size={28} color="#60a5fa" />, value: itemsRes.count ?? 0,   label: t('vendor_dashboard.total_items') || 'Total Items' },
-    { icon: <ShoppingBag size={28} color="#c084fc" />, value: ordersRes.count ?? 0,  label: t('vendor_dashboard.total_orders') || 'Total Orders' },
-    { icon: <Clock size={28} color="#fbbf24" />, value: pendingRes.count ?? 0,  label: t('vendor_dashboard.pending_orders') || 'Pending Orders' },
-    { icon: <TrendingUp size={28} color="#34d399" />, value: '0', label: t('vendor_dashboard.total_revenue') || 'Total Revenue' },
-  ]
-
   // Get dates
   const today = new Date()
   const year = today.getFullYear()
   const month = String(today.getMonth() + 1).padStart(2, '0')
   const day = String(today.getDate()).padStart(2, '0')
   const todayStr = `${year}-${month}-${day}`
+    
+  const [itemsRes, ordersRes, pendingRes, subsRes, revenueRes] = await Promise.all([
+      shopIds.length > 0 ? supabase.from('items').select('id', { count: 'exact', head: true }).in('shop_id', shopIds) : Promise.resolve({ count: 0 }),
+      shopIds.length > 0 ? supabase.from('orders').select('id', { count: 'exact', head: true }).in('shop_id', shopIds) : Promise.resolve({ count: 0 }),
+      shopIds.length > 0 ? supabase.from('orders').select('id', { count: 'exact', head: true }).in('shop_id', shopIds).eq('status', 'pending') : Promise.resolve({ count: 0 }),
+      shopIds.length > 0 ? supabase.from('shop_subscription').select('restriction_level').in('shop_id', shopIds) : Promise.resolve({ data: [] }),
+      shopIds.length > 0 ? supabase.from('orders').select('total_final_price').in('shop_id', shopIds).eq('status', 'delivered') : Promise.resolve({ data: [] })
+    ])
 
-  const tomorrow = new Date()
+    const maxRestLevel = subsRes?.data?.reduce((max: number, s: any) => Math.max(max, s.restriction_level || 0), 0) || 0
+    const totalRevenue = (revenueRes?.data || []).reduce((acc: number, order: any) => acc + (order.total_final_price ?? 0), 0)
+
+    const stats = [
+      { icon: <Package size={28} color="#60a5fa" />, value: itemsRes.count ?? 0,   label: t('vendor_dashboard.total_items') || 'Total Items' },
+      { icon: <ShoppingBag size={28} color="#c084fc" />, value: ordersRes.count ?? 0,  label: t('vendor_dashboard.total_orders') || 'Total Orders' },
+      { icon: <Clock size={28} color="#fbbf24" />, value: pendingRes.count ?? 0,  label: t('vendor_dashboard.pending_orders') || 'Pending Orders' },
+      { icon: <TrendingUp size={28} color="#34d399" />, value: totalRevenue.toLocaleString(), label: t('vendor_dashboard.total_revenue') || 'Total Revenue' },
+    ]
+
+    const tomorrow = new Date()
   tomorrow.setDate(today.getDate() + 1)
   const tomYear = tomorrow.getFullYear()
   const tomMonth = String(tomorrow.getMonth() + 1).padStart(2, '0')

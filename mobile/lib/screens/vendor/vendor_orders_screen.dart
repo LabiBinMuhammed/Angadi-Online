@@ -53,7 +53,8 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
     var query = supabase
         .from('orders')
         .select('id, status, created_at, total_final_price, total_estimated_price, users(name, phone), delivery_date, delivery_slot, order_number')
-        .eq('shop_id', shopId);
+        .eq('shop_id', shopId)
+        .not('payment_type', 'is', null);
 
     if (_selectedDate != null) {
       query = query.eq('delivery_date', _selectedDate!);
@@ -100,14 +101,19 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: Text(l10n.vendorManageOrdersTitle, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : Builder(
+                builder: (context) => IconButton(
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                ),
+              ),
       ),
       body: Column(
         children: [

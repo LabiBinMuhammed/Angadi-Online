@@ -8,11 +8,21 @@ import { Package } from 'lucide-react'
 type Props = { params: Promise<{ shopId: string; categoryId: string }> }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { categoryId } = await params
+  const { shopId, categoryId } = await params
   const supabase = await createClient()
-  const { data: cat } = await supabase
-    .from('categories').select('name').eq('id', categoryId).single()
-  return { title: cat?.name ?? 'Category' }
+  const [catRes, shopRes] = await Promise.all([
+    supabase.from('categories').select('name').eq('id', categoryId).single(),
+    supabase.from('shops').select('name').eq('id', shopId).single(),
+  ])
+  
+  const cat = catRes.data
+  const shop = shopRes.data
+  const title = cat && shop ? `${cat.name} at ${shop.name} | Village Market` : cat?.name ?? 'Category'
+  const description = cat && shop 
+    ? `Browse and buy ${cat.name.toLowerCase()} items from ${shop.name} at Village Market. Quality fresh items delivered to your doorstep.` 
+    : 'View shop category items.'
+
+  return { title, description }
 }
 
 export default async function ShopCategoryPage({ params }: Props) {

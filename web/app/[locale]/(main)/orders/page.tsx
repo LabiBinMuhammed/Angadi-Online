@@ -3,13 +3,14 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Order } from '@/types'
 import { ArrowLeft, Package, Clock, Truck, CheckCircle2, XCircle, Store, ShieldCheck, Bell } from 'lucide-react'
+import { getServerTranslations } from '@/lib/i18n/server'
 
 export const metadata: Metadata = { title: 'My Orders' }
 
 const STATUS_MAP: Record<string, { bg: string; color: string; label: string; Icon: any }> = {
   pending:    { bg: 'var(--status-pending-bg)', color: '#f59e0b', label: 'Pending',    Icon: Clock },
   packing:    { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'Packing',    Icon: Package },
-  delivering: { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'On the way', Icon: Truck },
+  delivering: { bg: '#e0e7ff', color: '#4f46e5', label: 'On the way', Icon: Truck },
   delivered:  { bg: 'var(--status-delivered-bg)', color: '#22c55e', label: 'Delivered',  Icon: CheckCircle2 },
   cancelled:  { bg: 'var(--status-cancelled-bg)', color: '#ef4444', label: 'Cancelled',  Icon: XCircle },
 }
@@ -20,22 +21,7 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
   const { data: { user } } = await supabase.auth.getUser()
 
   const activeLocale = ['en', 'ml', 'hi', 'ar'].includes(locale) ? locale : 'en'
-  let messages = {}
-  try {
-    messages = require(`../../../../messages/${activeLocale}.json`)
-  } catch (e) {
-    messages = require('../../../../messages/en.json')
-  }
-  const t = (key: string) => {
-    const parts = key.split('.')
-    let curr = messages as any
-    for (const part of parts) {
-      if (!curr) return key
-      curr = curr[part]
-    }
-    return typeof curr === 'string' ? curr : key
-  }
-
+  const t = getServerTranslations(activeLocale)
   const queryParams = await searchParams
   const filter = queryParams.filter || 'today'
   const slotFilter = queryParams.slot || 'all'

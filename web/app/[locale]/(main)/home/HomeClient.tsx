@@ -122,6 +122,11 @@ export default function HomeClient({
   const { theme } = useTheme()
   const { t } = useTranslation()
   const [shopSearch, setShopSearch] = useState('')
+  const [currentDateStr, setCurrentDateStr] = useState('')
+
+  useEffect(() => {
+    setCurrentDateStr(new Intl.DateTimeFormat('en-US', { month: 'short', day: '2-digit' }).format(new Date()).toUpperCase())
+  }, [])
   const [itemSearch, setItemSearch] = useState('')
   const [pinnedShopIds, setPinnedShopIds] = useState<Set<string>>(new Set(initialPinnedShopIds))
   const [likedItemIds, setLikedItemIds] = useState<Set<string>>(new Set(initialFavoriteItemIds))
@@ -543,15 +548,6 @@ export default function HomeClient({
                   style={{ border: 'none', background: 'transparent', padding: '16px 12px', fontSize: '15px', width: '100%', outline: 'none', color: 'var(--text-base)', fontWeight: 500 }}
                 />
               </div>
-              <button style={{ width: '54px', height: '54px', borderRadius: '18px', background: '#4cd964', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', flexShrink: 0, boxShadow: '0 4px 12px rgba(76,217,100,0.3)' }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-                  <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-                  <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-                  <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-                  <rect x="7" y="7" width="10" height="10" rx="2"></rect>
-                </svg>
-              </button>
             </div>
           </div>
 
@@ -708,7 +704,7 @@ export default function HomeClient({
                 {selectedCategory && (
                   <button onClick={() => setSelectedCategory(null)} style={{ background: 'none', border: 'none', color: '#ff4757', fontWeight: 700, cursor: 'pointer', marginRight: '8px' }}>{t('home.clear')}</button>
                 )}
-                NOV 07
+                {currentDateStr}
               </span>
             </div>
             <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingTop: '8px', paddingBottom: '12px', paddingLeft: '4px', paddingRight: '4px', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>

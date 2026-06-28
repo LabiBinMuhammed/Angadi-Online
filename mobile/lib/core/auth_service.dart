@@ -54,9 +54,57 @@ class AuthService {
     return response;
   }
 
-  Future<AuthResponse> loginWithPassword(String phone, String password) async {
+  Future<AuthResponse> signUp({
+    String? email,
+    String? phone,
+    required String password,
+    required String name,
+    required String role,
+    required String language,
+  }) async {
+    final Map<String, dynamic> data = {
+      'name': name,
+      'full_name': name,
+      'role': role,
+      'preferred_language': language,
+    };
+
+    AuthResponse response;
+
+    if (email != null && email.trim().isNotEmpty) {
+      response = await supabase.auth.signUp(
+        email: email.trim(),
+        password: password,
+        data: data,
+      );
+    } else if (phone != null && phone.trim().isNotEmpty) {
+      response = await supabase.auth.signUp(
+        phone: _normalizePhone(phone),
+        password: password,
+        data: data,
+      );
+    } else {
+      throw AuthException('Either email or phone must be provided');
+    }
+
+    if (response.user != null) {
+      try {
+        await supabase.from('user_profiles').upsert({
+          'user_id': response.user!.id,
+          'preferred_language': language,
+          'email': email?.trim(),
+        });
+      } catch (_) {}
+    }
+
+    return response;
+  }
+
+  Future<AuthResponse> loginWithPassword(String identifier, String password) async {
+    final isEmail = identifier.contains('@');
     final response = await supabase.auth.signInWithPassword(
-      phone: _normalizePhone(phone),
+      email: isEmail ? identifier.trim() : null,
+      phone: isEmail ? null : _normalizePhone(identifier),
       password: password,
     );
     
@@ -66,13 +114,18 @@ class AuthService {
             .from('users')
             .update({
               'last_login_at': DateTime.now().toIso8601String(),
-              'phone_verified': true, // Native password login implies phone was verified or setup
+              'phone_verified': !isEmail,
+              'email_verified': isEmail,
             })
             .eq('id', response.user!.id);
       } catch (_) {}
     }
     
     return response;
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    await supabase.auth.resetPasswordForEmail(email.trim());
   }
 
   Future<void> completeRegistration({

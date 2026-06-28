@@ -206,11 +206,27 @@ class CartService extends ChangeNotifier {
             })
             .eq('id', existingId);
       } else {
+        String dbVariantType;
+        switch (variant.variantType) {
+          case VariantType.manual:
+            dbVariantType = 'Manual';
+            break;
+          case VariantType.packed:
+            dbVariantType = 'Fixed';
+            break;
+          case VariantType.dynamic:
+            dbVariantType = 'Dynamic';
+            break;
+          case VariantType.portion:
+            dbVariantType = 'Portion';
+            break;
+        }
+
         await supabase.from('order_items').insert({
           'order_id': orderId,
           'item_id': item.id,
           'variant_id': variant.id,
-          'variant_type': variant.variantType.toString().split('.').last.toLowerCase(),
+          'variant_type': dbVariantType,
           'requested_value': quantity,
           'estimated_price': unitPrice,
           'final_price': unitPrice * quantity,

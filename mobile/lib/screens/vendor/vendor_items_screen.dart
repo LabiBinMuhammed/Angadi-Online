@@ -148,14 +148,19 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: Text(l10n.manageProductsTitle, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : Builder(
+                builder: (context) => IconButton(
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                ),
+              ),
         actions: [
           IconButton(
             icon: const HugeIcon(icon: HugeIcons.strokeRoundedAddCircle, size: 26, color: Color(0xFF60A5FA)),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hugeicons/hugeicons.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import 'admin_drawer.dart';
@@ -52,7 +54,17 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/categories'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Categories')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('Categories'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: Column(
         children: [
           // Add form
@@ -110,7 +122,17 @@ class AdminLogsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/logs'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Activity Logs')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('Activity Logs'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: const Center(child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -140,7 +162,17 @@ class AdminSettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/settings'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Global Settings')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('Global Settings'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: ListView.separated(
         itemCount: _items.length,
         separatorBuilder: (_, __) => const Divider(height: 1),
@@ -200,7 +232,17 @@ class _AdminCreditScreenState extends State<AdminCreditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AdminDrawer(currentRoute: '/admin/credit'),
-      appBar: AppBar(backgroundColor: kWaTeal, foregroundColor: Colors.white, title: const Text('Credit Monitor')),
+      appBar: AppBar(
+        backgroundColor: kWaTeal,
+        foregroundColor: Colors.white,
+        title: const Text('Credit Monitor'),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
+      ),
       body: Column(
         children: [
           // Summary banner

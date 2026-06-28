@@ -1,8 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Anek+Malayalam:wght@300;400;500;600;700;800&display=swap');
 
 /* Malayalam Font Size Adjustment */
+html[lang="ml"] body {
+  font-family: 'Anek Malayalam', 'Inter', system-ui, -apple-system, sans-serif !important;
+}
 html[lang="ml"] {
-  font-size: 88% !important;
+  font-size: 80% !important;
+  zoom: 0.9;
 }
 
 /* ─── Design Tokens ─────────────────────────────────────────────────────────── */

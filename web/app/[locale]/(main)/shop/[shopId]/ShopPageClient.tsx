@@ -5,7 +5,8 @@ import ShopCatalogClient from './ShopCatalogClient'
 import ShopReviewsClient from './ShopReviewsClient'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import type { Item, Category } from '@/types'
-import { Video, Phone, Search, MoreVertical, MessageSquare } from 'lucide-react'
+import Link from 'next/link'
+import { Video, Phone, Search, MoreVertical, MessageSquare, ArrowLeft } from 'lucide-react'
 
 interface Props {
   items: Item[]
@@ -64,6 +65,10 @@ export default function ShopPageClient({
       {/* ── WA-style Shop Header ─────────────────────────────── */}
       <div className="shop-chat-header">
         <div className="shop-chat-header-left">
+          {/* Back Button */}
+          <Link href="/home" className="shop-chat-icon-btn" style={{ marginRight: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={t('vendor_nav.back_to_marketplace')}>
+            <ArrowLeft size={20} />
+          </Link>
           {/* Avatar */}
           <div className="shop-chat-avatar">
             {logoUrl

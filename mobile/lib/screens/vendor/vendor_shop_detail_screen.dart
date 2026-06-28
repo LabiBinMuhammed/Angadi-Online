@@ -133,10 +133,12 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: const Text('Shop Settings', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: IconButton(
-          icon: const DirectionalHugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, size: 20),
-          onPressed: () => context.pop(),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const DirectionalHugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : null,
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)))

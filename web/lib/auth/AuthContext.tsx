@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
+import { confirmNewUser } from '@/app/actions/auth'
 
 export type UserRole = 'customer' | 'shop_owner' | 'admin'
 
@@ -11,9 +12,10 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   role: UserRole
+  signUp: (params: { email?: string; phone?: string; password: string; name: string; role: string; language: string }) => Promise<{ data: any; error: any }>
   signInWithOtp: (phone: string) => Promise<{ error: any }>
   verifyOtp: (phone: string, token: string) => Promise<{ data: any; error: any }>
-  signInWithPassword: (phone: string, password: string) => Promise<{ data: any; error: any }>
+  signInWithPassword: (phoneOrEmail: string, password: string) => Promise<{ data: any; error: any }>
   completeRegistration: (fullName: string, language: string, role: string, password?: string) => Promise<{ error: any }>
   updatePassword: (password: string) => Promise<{ error: any }>
   updatePhone: (phone: string) => Promise<{ error: any }>
@@ -107,12 +109,76 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { data, error }
   }
 
-  // Phone + Password login
-  async function signInWithPassword(phone: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      phone: normalizePhone(phone),
-      password
-    })
+  // Sign up with Email or Phone and Password (MVP)
+  async function signUp({ email, phone, password, name, role, language }: { email?: string; phone?: string; password: string; name: string; role: string; language: string }) {
+    const signUpParams: any = {
+      password,
+      options: {
+        data: {
+          name,
+          full_name: name,
+          role,
+          preferred_language: language,
+        }
+      }
+    }
+    const identifier = email ? email.trim() : normalizePhone(phone!)
+    if (email) {
+      signUpParams.email = email.trim()
+      if (phone) {
+        signUpParams.options.data.phone = normalizePhone(phone)
+      }
+    } else if (phone) {
+      signUpParams.phone = normalizePhone(phone)
+      if (email) {
+        signUpParams.options.data.email = email.trim()
+      }
+    }
+
+    const { data, error } = await supabase.auth.signUp(signUpParams)
+    
+    if (data?.user && !error) {
+      // 1. Auto-confirm user via Server Action
+      try {
+        await confirmNewUser(data.user.id)
+      } catch (e) {
+        console.error("Auto-confirm failed:", e)
+      }
+
+      // 2. Auto-login using password
+      try {
+        const credentials = email 
+          ? { email: identifier, password }
+          : { phone: identifier, password }
+        const loginRes = await supabase.auth.signInWithPassword(credentials)
+        if (loginRes.data?.session) {
+          data.session = loginRes.data.session
+        }
+      } catch (e) {
+        console.error("Auto-login failed:", e)
+      }
+
+      // 3. Create user profile row
+      try {
+        await supabase
+          .from('user_profiles')
+          .update({ preferred_language: language, email: email || undefined })
+          .eq('user_id', data.user.id)
+      } catch (_) {}
+      
+      await resolveUserRole(data.user.id)
+    }
+    return { data, error }
+  }
+
+  // Phone/Email + Password login
+  async function signInWithPassword(phoneOrEmail: string, password: string) {
+    const isEmail = phoneOrEmail.includes('@')
+    const credentials = isEmail
+      ? { email: phoneOrEmail.trim(), password }
+      : { phone: normalizePhone(phoneOrEmail), password }
+
+    const { data, error } = await supabase.auth.signInWithPassword(credentials)
     return { data, error }
   }
 
@@ -217,6 +283,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         session,
         loading,
         role,
+        signUp,
         signInWithOtp,
         verifyOtp,
         signInWithPassword,

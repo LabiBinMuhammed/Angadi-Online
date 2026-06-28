@@ -121,14 +121,19 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: const Text('Credit Management', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+                onPressed: () => context.pop(),
+              )
+            : Builder(
+                builder: (context) => IconButton(
+                  icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, size: 20),
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                ),
+              ),
       ),
 
       body: Column(

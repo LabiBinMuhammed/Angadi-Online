@@ -9,8 +9,20 @@ type Props = { params: Promise<{ itemId: string }> }
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { itemId } = await params
   const supabase = await createClient()
-  const { data } = await supabase.from('items').select('name').eq('id', itemId).single()
-  return { title: data?.name ?? 'Item' }
+  const { data } = await supabase
+    .from('items')
+    .select('name, description, shops(name)')
+    .eq('id', itemId)
+    .single()
+  
+  const itemName = data?.name ?? 'Item'
+  const shopName = (data?.shops as any)?.name ?? 'Village Market'
+  const description = data?.description || `Buy ${itemName} at ${shopName} on Village Market. Enjoy quality fresh products delivered right to your door.`
+
+  return {
+    title: `${itemName} | ${shopName} | Village Market`,
+    description,
+  }
 }
 
 export default async function ItemPage({ params }: Props) {

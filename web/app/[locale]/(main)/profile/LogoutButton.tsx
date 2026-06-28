@@ -1,6 +1,6 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/lib/auth/AuthContext'
 import { useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
@@ -9,15 +9,14 @@ import { useTranslation } from '@/lib/i18n/I18nContext'
 export default function LogoutButton() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+  const { signOut } = useAuth()
 
   async function handleLogout() {
     try {
       setLoading(true)
-      const supabase = createClient()
-      await supabase.auth.signOut()
-      router.push('/login')
-      router.refresh()
+      await signOut()
+      window.location.href = `/${locale}/login`
     } catch (err) {
       alert(t('auth.err_logout'))
       setLoading(false)

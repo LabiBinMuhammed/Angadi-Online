@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation, Locale } from '@/lib/i18n/I18nContext'
-
+import { useAuth } from '@/lib/auth/AuthContext'
 const LANGUAGES = [
   { code: 'en', label: '🇬🇧 English' },
   { code: 'ar', label: '🇸🇦 العربية' },
@@ -17,7 +17,8 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const router = useRouter()
-  const { setLocale, t } = useTranslation()
+  const { setLocale, t, locale } = useTranslation()
+  const { signOut } = useAuth()
 
   async function saveLang(code: string) {
     setLang(code)
@@ -36,10 +37,8 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
   }
 
   async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+    await signOut()
+    window.location.href = `/${locale}/login`
   }
 
   return (
