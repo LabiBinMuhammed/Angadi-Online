@@ -307,8 +307,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null)
     setRole('customer')
     try {
-      document.cookie = 'sb-access-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-      document.cookie = 'sb-refresh-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      // Clear all cookies starting with sb- or containing auth-token
+      const cookiesList = document.cookie.split(';')
+      for (let i = 0; i < cookiesList.length; i++) {
+        const cookie = cookiesList[i].trim()
+        const eqPos = cookie.indexOf('=')
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
+        if (name.startsWith('sb-') || name.includes('auth-token')) {
+          document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+          document.cookie = name + '=; Path=/; Domain=' + window.location.hostname + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+        }
+      }
       if (typeof window !== 'undefined') {
         const keys = []
         for (let i = 0; i < localStorage.length; i++) {
@@ -334,8 +343,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null)
     setRole('customer')
     try {
-      document.cookie = 'sb-access-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-      document.cookie = 'sb-refresh-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      // Clear all cookies starting with sb- or containing auth-token
+      const cookiesList = document.cookie.split(';')
+      for (let i = 0; i < cookiesList.length; i++) {
+        const cookie = cookiesList[i].trim()
+        const eqPos = cookie.indexOf('=')
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
+        if (name.startsWith('sb-') || name.includes('auth-token')) {
+          document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+          document.cookie = name + '=; Path=/; Domain=' + window.location.hostname + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+        }
+      }
       if (typeof window !== 'undefined') {
         const keys = []
         for (let i = 0; i < localStorage.length; i++) {
