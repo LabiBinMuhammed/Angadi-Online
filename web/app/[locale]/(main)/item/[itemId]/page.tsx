@@ -16,11 +16,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single()
   
   const itemName = data?.name ?? 'Item'
-  const shopName = (data?.shops as any)?.name ?? 'Village Market'
-  const description = data?.description || `Buy ${itemName} at ${shopName} on Village Market. Enjoy quality fresh products delivered right to your door.`
+  const shopName = (data?.shops as any)?.name ?? 'Angadi Online'
+  const description = data?.description || `Buy ${itemName} at ${shopName} on Angadi Online. Enjoy quality fresh products delivered right to your door.`
 
   return {
-    title: `${itemName} | ${shopName} | Village Market`,
+    title: `${itemName} | ${shopName} | Angadi Online`,
     description,
   }
 }

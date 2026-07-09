@@ -89,24 +89,33 @@ export default function SignupPage() {
     const normalizedPhoneNum = mode === 'phone' ? normalizePhone(phone, countryCode) : undefined
     const emailVal = mode === 'email' ? email.trim() : undefined
 
-    const { data, error: authErr } = await signUp({
-      email: emailVal,
-      phone: normalizedPhoneNum,
-      password,
-      name,
-      role,
-      language
-    })
-    setLoading(false)
+    try {
+      const { data, error: authErr } = await signUp({
+        email: emailVal,
+        phone: normalizedPhoneNum,
+        password,
+        name,
+        role,
+        language
+      })
 
-    if (authErr) {
-      setError(authErr.message)
-    } else {
-      if (data?.session) {
-        router.push(`/${locale}/home`)
+      if (authErr) {
+        if (authErr.message.toLowerCase().includes('already registered') || authErr.message.toLowerCase().includes('already been registered')) {
+          setError('This email or phone number is already registered. Please sign in instead.')
+        } else {
+          setError(authErr.message)
+        }
       } else {
-        setInfo('Sign up successful! If you registered via email, please check your inbox for a confirmation link.')
+        if (data?.session) {
+          router.push(`/${locale}/home`)
+        } else {
+          setInfo('Sign up successful! If you registered via email, please check your inbox for a confirmation link.')
+        }
       }
+    } catch (err: any) {
+      setError('A network error occurred. Please check your connection and try again.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -114,7 +123,7 @@ export default function SignupPage() {
     <div className="auth-page-wrap">
       <div className="auth-page-header">
         <h1 className="auth-page-title">Create account</h1>
-        <p className="auth-page-sub">Join Village Market — enter details to get started</p>
+        <p className="auth-page-sub">Join Angadi Online — enter details to get started</p>
       </div>
 
       <form onSubmit={handleSignup} className="auth-form">
@@ -133,6 +142,7 @@ export default function SignupPage() {
               required
               autoFocus
               autoComplete="name"
+              disabled={loading}
             />
           </div>
         </div>
@@ -242,6 +252,7 @@ export default function SignupPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -260,6 +271,7 @@ export default function SignupPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -278,6 +290,7 @@ export default function SignupPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
             <button
               type="button"

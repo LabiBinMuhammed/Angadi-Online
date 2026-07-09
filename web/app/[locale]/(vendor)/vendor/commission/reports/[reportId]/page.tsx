@@ -100,10 +100,10 @@ export default async function BillingReportPage({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
               <ShieldCheck size={28} color="#128c7e" />
-              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#128c7e', letterSpacing: '-0.02em' }}>Village Market</span>
+              <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#128c7e', letterSpacing: '-0.02em' }}>Angadi Online</span>
             </div>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>{t('vendor_report.central_system')}</p>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>support@villagemarket.com</p>
+            <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>support@angadionline.com</p>
           </div>
           <div style={{ textAlign: 'right' }}>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 800, margin: 0, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#0f172a' }}>{t('vendor_report.invoice_title')}</h2>

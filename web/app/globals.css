@@ -146,6 +146,77 @@ input, textarea, select {
   background: none;
 }
 
+/* ─── Focus-Visible Ring (WCAG AA Keyboard A11Y) ────────────────────────────── */
+/*
+  We suppress the default browser outline globally but restore a custom
+  focus-visible ring for keyboard users only via the :focus-visible selector.
+  Mouse/touch interactions will NOT show the ring — only Tab/keyboard.
+*/
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--wa-green-dark);
+  outline-offset: 2px;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--wa-green-dark);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--wa-green-dark);
+  outline-offset: 0;
+  border-radius: var(--radius-md);
+}
+
+/* ─── Responsive Table Wrapper ──────────────────────────────────────────────── */
+.responsive-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-lg);
+}
+.responsive-table-wrap table {
+  min-width: 600px;
+}
+
+/* ─── Global Toast Notification ─────────────────────────────────────────────── */
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+@keyframes toastSlideDown {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to   { opacity: 0; transform: translate(-50%, 16px); }
+}
+.global-toast {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+  z-index: 9999;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  pointer-events: none;
+  max-width: calc(100vw - 48px);
+}
+.global-toast.exiting {
+  animation: toastSlideDown 0.25s ease forwards;
+}
+
+
 /* ─── Typography ────────────────────────────────────────────────────────────── */
 .text-xs    { font-size: .75rem;  line-height: 1rem; }
 .text-sm    { font-size: .875rem; line-height: 1.25rem; }
@@ -225,7 +296,7 @@ input, textarea, select {
 
 /* ─── Form Elements ─────────────────────────────────────────────────────────── */
 .form-group { display: flex; flex-direction: column; gap: .4rem; }
-.form-label { font-size: .83rem; font-weight: 600; color: var(--text-muted); letter-spacing: .02em; text-transform: uppercase; }
+.form-label { font-size: .83rem; font-weight: 600; color: var(--text-base); letter-spacing: .02em; text-transform: uppercase; }
 .form-input {
   width: 100%;
   padding: .7rem 1rem;

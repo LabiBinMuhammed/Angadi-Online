@@ -152,7 +152,7 @@ export default function FavoritesClient({ initialFavorites }: Props) {
                   
                   <div className="details-box">
                     <h3 className="item-name">{item.name}</h3>
-                    <p className="shop-name">{item.shop_name || 'Village Market Shop'}</p>
+                    <p className="shop-name">{item.shop_name || 'Angadi Online Shop'}</p>
                   </div>
 
                   <div className="action-container">

@@ -20,6 +20,7 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
   const [quantity, setQuantity] = useState(1)
   const [added, setAdded] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
 
   const isDynamic = sellConfig?.sell_mode?.toLowerCase() === 'dynamic'
 
@@ -53,6 +54,8 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
   }
 
   async function handleAdd() {
+    if (loading || added) return
+    setAddError(null)
     try {
       setLoading(true)
       
@@ -72,10 +75,10 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
       await addToCart(item.shop_id, item.id, quantity, calculatedPrice, selected.id);
       
       setAdded(true)
-      setTimeout(() => setAdded(false), 2000)
-    } catch (e) {
+      setTimeout(() => setAdded(false), 1500)
+    } catch (e: any) {
       console.error(e)
-      alert("Failed to add item to bag.")
+      setAddError('Could not add to cart. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -768,6 +771,11 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
               )}
             </button>
           </div>
+          {addError && (
+            <p role="alert" style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--danger)', fontWeight: 600, textAlign: 'center' }}>
+              {addError}
+            </p>
+          )}
         </div>
       </div>
 

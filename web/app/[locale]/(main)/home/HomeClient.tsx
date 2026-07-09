@@ -140,6 +140,8 @@ export default function HomeClient({
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({})
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
+  // Track which item IDs are in "just added" success state (prevents rage-clicks)
+  const [cartSuccessItems, setCartSuccessItems] = useState<Set<string>>(new Set())
 
   // Synced cart items state
   const [cartItems, setCartItems] = useState<any[]>(initialCartItems)
@@ -295,7 +297,7 @@ export default function HomeClient({
         try {
           await updateOrderItemQty(currentCartItem.orderId, currentCartItem.id, newQty)
         } catch (err: any) {
-          alert('Failed to update quantity: ' + (err.message || err))
+          showToast('Failed to update quantity. Please try again.')
           setCartItems(initialCartItems)
         }
       })
@@ -316,7 +318,7 @@ export default function HomeClient({
       try {
         await removeOrderItem(orderId, orderItemId)
       } catch (err: any) {
-        alert('Failed to remove item: ' + (err.message || err))
+        showToast('Failed to remove item. Please try again.')
         setCartItems(initialCartItems)
       }
     })
@@ -324,6 +326,7 @@ export default function HomeClient({
 
   // Add item to cart
   const handleAdd = (shopId: string, item: Item, variant: any) => {
+    if (cartSuccessItems.has(item.id)) return // prevent rage-click during success state
     const sellConfig = Array.isArray(item.item_sell_config) ? item.item_sell_config[0] : item.item_sell_config
     const defaultQty = sellConfig?.sell_mode?.toLowerCase() === 'manual' ? (localQtys[item.id] ?? 1.0) : 1.0
     const qty = defaultQty
@@ -332,8 +335,18 @@ export default function HomeClient({
     startTransition(async () => {
       try {
         await addToCart(shopId, item.id, qty, price, variant?.id)
+        showToast(`🛒 ${item.name} added to cart`)
+        // Temporarily mark this item as success to prevent duplicate adds
+        setCartSuccessItems(prev => new Set(prev).add(item.id))
+        setTimeout(() => {
+          setCartSuccessItems(prev => {
+            const next = new Set(prev)
+            next.delete(item.id)
+            return next
+          })
+        }, 1500)
       } catch (err: any) {
-        alert('Failed to add to cart: ' + (err.message || err))
+        showToast('Failed to add to cart. Please try again.')
       }
     })
   }
@@ -350,9 +363,17 @@ export default function HomeClient({
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1f2937; color: #fff; padding: 12px 24px; border-radius: 20px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; animation: toastFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes toastFadeIn { from { opacity: 0; bottom: 80px; } to { opacity: 1; bottom: 100px; } }
 
-        .left-panel, .right-panel { display: flex; flex-direction: column; flex: 1; }
+        .left-panel, .right-panel { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         
+        /* Desktop: left panel has fixed width, right fills rest */
+        @media (min-width: 768px) {
+          .left-panel { flex: 0 0 380px; max-width: 380px; }
+          .right-panel { flex: 1; min-width: 0; }
+        }
+
+        /* Mobile: each panel takes the full width, toggled via hidden-on-mobile */
         @media (max-width: 767px) {
+          .left-panel, .right-panel { flex: 0 0 100%; width: 100%; max-width: 100%; }
           .left-panel.hidden-on-mobile { display: none !important; }
           .right-panel.hidden-on-mobile { display: none !important; }
         }
@@ -592,11 +613,12 @@ export default function HomeClient({
                         <div className="marketplace-shop-details" style={{ flex: 1, minWidth: 0 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--text-base)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{shop.name}</h3>
-                            <button
-                              type="button"
-                              onClick={(e) => handleTogglePinShop(e, shop.id, shop.name)}
-                              style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', color: pinnedShopIds.has(shop.id) ? 'var(--wa-green-dark)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', flexShrink: 0 }}
-                            >
+                      <button
+                          type="button"
+                          onClick={(e) => handleTogglePinShop(e, shop.id, shop.name)}
+                          aria-label={pinnedShopIds.has(shop.id) ? `Unpin ${shop.name}` : `Pin ${shop.name}`}
+                          style={{ border: 'none', background: 'transparent', padding: '4px', cursor: 'pointer', color: pinnedShopIds.has(shop.id) ? 'var(--wa-green-dark)' : 'var(--text-muted)', display: 'flex', alignItems: 'center', flexShrink: 0 }}
+                        >
                               <Bookmark size={18} fill={pinnedShopIds.has(shop.id) ? 'currentColor' : 'none'} />
                             </button>
                           </div>
@@ -799,6 +821,7 @@ export default function HomeClient({
                       <button
                         type="button"
                         onClick={(e) => handleToggleFavoriteItem(e, item.id, item.name)}
+                        aria-label={likedItemIds.has(item.id) ? `Remove ${item.name} from favorites` : `Add ${item.name} to favorites`}
                         style={{
                           position: 'absolute',
                           top: '12px',
@@ -821,8 +844,8 @@ export default function HomeClient({
                         <Heart size={16} fill={likedItemIds.has(item.id) ? '#ff4757' : 'none'} />
                       </button>
 
-                      {/* Image Frame */}
-                      <div style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', width: '100%', position: 'relative' }}>
+                      {/* Image Frame - aspect-ratio for CLS prevention */}
+                      <div style={{ aspectRatio: '1/1', maxHeight: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', width: '100%', position: 'relative' }}>
                         {/* Product Type Badge */}
                         {getSellModeBadge(sellConfig?.sell_mode)}
                         {mainImageUrl ? (
@@ -998,11 +1021,12 @@ export default function HomeClient({
                             </div>
                             <button
                               onClick={() => handleAdd(item.shop_id || '', item, currentVariant)}
-                              disabled={isPending}
+                              disabled={isPending || cartSuccessItems.has(item.id)}
+                              aria-label={cartSuccessItems.has(item.id) ? 'Added to cart' : `Add ${item.name} to cart`}
                               style={{
                                 height: '32px',
                                 padding: '0 12px',
-                                background: 'var(--wa-green)',
+                                background: cartSuccessItems.has(item.id) ? 'var(--wa-green-dark)' : 'var(--wa-green)',
                                 borderRadius: '16px',
                                 border: 'none',
                                 display: 'flex',
@@ -1011,11 +1035,12 @@ export default function HomeClient({
                                 color: '#fff',
                                 fontWeight: 'bold',
                                 fontSize: '12px',
-                                cursor: 'pointer',
-                                flexShrink: 0
+                                cursor: cartSuccessItems.has(item.id) ? 'default' : 'pointer',
+                                flexShrink: 0,
+                                transition: 'background 0.2s ease'
                               }}
                             >
-                              {t('home.add')}
+                              {cartSuccessItems.has(item.id) ? '✓' : t('home.add')}
                             </button>
                           </>
                         ) : (
@@ -1062,7 +1087,7 @@ export default function HomeClient({
                                 flexShrink: 0
                               }}
                             >
-                              {t('home.add')}
+                              {cartSuccessItems.has(item.id) ? '✓' : t('home.add')}
                             </button>
                           </>
                         )}
@@ -1076,7 +1101,7 @@ export default function HomeClient({
 
         </div>
 
-        {toast && <div className="toast">{toast}</div>}
+        {toast && <div className="global-toast">{toast}</div>}
 
       </div>
     </>

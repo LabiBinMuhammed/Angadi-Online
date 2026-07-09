@@ -78,7 +78,7 @@ export default async function FavoritesPage({ params }: { params: Promise<{ loca
             price,
             image_url: primaryImg?.image_url || null,
             shop_id: item.shop_id,
-            shop_name: item.shops?.name || 'Village Market Shop',
+            shop_name: item.shops?.name || 'Angadi Online Shop',
             is_active: item.is_active,
             status: item.status,
             variant_id: variantId

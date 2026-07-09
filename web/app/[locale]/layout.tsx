@@ -7,7 +7,7 @@ import { AuthProvider } from '@/lib/auth/AuthContext'
 
 
 export const metadata: Metadata = {
-  title: { default: 'Village Market', template: '%s | Village Market' },
+  title: { default: 'Angadi Online', template: '%s | Angadi Online' },
   description: 'Your local multi-shop marketplace — fresh items from shops near you.',
 }
 

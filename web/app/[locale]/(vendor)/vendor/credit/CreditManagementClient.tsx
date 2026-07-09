@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { Search, CreditCard, ShieldBan, ShieldCheck, History } from 'lucide-react'
+import { Search, CreditCard, ShieldBan, ShieldCheck, History, Plus, X, UserPlus, AlertCircle } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import { grantCreditAction } from '@/app/actions/credit'
 
 type CreditRow = {
   id: string
@@ -20,6 +21,19 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
   const { t, locale } = useTranslation()
   const [credits, setCredits] = useState(initial)
   const [search, setSearch] = useState('')
+
+  // Inline Editing limit state
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editLimitVal, setEditLimitVal] = useState('')
+
+  // New Credit Registration Panel state
+  const [showGrantPanel, setShowGrantPanel] = useState(false)
+  const [userQuery, setUserQuery] = useState('')
+  const [matchingUsers, setMatchingUsers] = useState<any[]>([])
+  const [selectedUser, setSelectedUser] = useState<any | null>(null)
+  const [newLimit, setNewLimit] = useState('5000')
+  const [grantError, setGrantError] = useState('')
+  const [grantLoading, setGrantLoading] = useState(false)
 
   const filtered = credits.filter(c =>
     !search || c.users?.name?.toLowerCase().includes(search.toLowerCase()) || c.users?.phone?.includes(search)
@@ -47,6 +61,66 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
     setCredits(prev => prev.map(c => c.id === credit.id ? { ...c, credit_limit: val } : c))
   }
 
+  // Search system customers
+  async function searchCustomers(q: string) {
+    setUserQuery(q)
+    if (q.trim().length < 2) {
+      setMatchingUsers([])
+      return
+    }
+
+    const supabase = createClient()
+    const existingUserIds = credits.map(c => c.user_id)
+
+    // Look up customers not already in the credits table
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, name, phone')
+      .eq('role', 'customer')
+      .or(`name.ilike.%${q}%,phone.ilike.%${q}%`)
+      .limit(8)
+
+    if (!error && data) {
+      setMatchingUsers(data.filter(u => !existingUserIds.includes(u.id)))
+    }
+  }
+
+  async function handleGrantCredit() {
+    if (!selectedUser) return
+    setGrantLoading(true)
+    setGrantError('')
+    try {
+      const limitVal = parseFloat(newLimit)
+      if (isNaN(limitVal) || limitVal < 0) {
+        throw new Error('Please enter a valid credit limit')
+      }
+
+      await grantCreditAction(shopId, selectedUser.id, limitVal)
+
+      // Add to local state list
+      const newRow: CreditRow = {
+        id: Math.random().toString(), // client-side placeholder ID
+        user_id: selectedUser.id,
+        is_credit_enabled: true,
+        credit_limit: limitVal,
+        used_amount: 0,
+        is_blocked: false,
+        users: { name: selectedUser.name, phone: selectedUser.phone }
+      }
+      setCredits(prev => [newRow, ...prev])
+
+      // Reset state
+      setSelectedUser(null)
+      setUserQuery('')
+      setMatchingUsers([])
+      setShowGrantPanel(false)
+    } catch (err: any) {
+      setGrantError(err.message)
+    } finally {
+      setGrantLoading(false)
+    }
+  }
+
   return (
     <div className="vp-card">
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -60,7 +134,87 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
             onChange={e => setSearch(e.target.value)} 
           />
         </div>
+        
+        <button 
+          className="vp-btn vp-btn-primary" 
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '99px' }}
+          onClick={() => setShowGrantPanel(!showGrantPanel)}
+        >
+          {showGrantPanel ? <X size={18} /> : <UserPlus size={18} />}
+          {showGrantPanel ? t('common.cancel') : 'Grant Credit'}
+        </button>
       </div>
+
+      {/* Grant Credit Form Panel */}
+      {showGrantPanel && (
+        <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <h3 style={{ margin: '0 0 1rem', color: '#fff', fontSize: '1.1rem', fontWeight: 600 }}>Grant Credit Account to Customer</h3>
+          
+          <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+            {!selectedUser ? (
+              <div style={{ position: 'relative' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>Search Customer (Name or Phone)</label>
+                <input
+                  className="vp-input"
+                  placeholder="Type name or phone number..."
+                  value={userQuery}
+                  onChange={e => searchCustomers(e.target.value)}
+                />
+                
+                {matchingUsers.length > 0 && (
+                  <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: '#0f172a', border: '1px solid #334155', borderRadius: '8px', zIndex: 10, marginTop: '0.25rem', maxHeight: '200px', overflowY: 'auto' }}>
+                    {matchingUsers.map(u => (
+                      <div 
+                        key={u.id} 
+                        style={{ padding: '0.75rem 1rem', cursor: 'pointer', borderBottom: '1px solid #1e293b' }}
+                        onClick={() => setSelectedUser(u)}
+                        className="hover-bg-slate"
+                      >
+                        <p style={{ margin: 0, fontWeight: 600, color: '#fff' }}>{u.name}</p>
+                        <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{u.phone}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ background: '#0f172a', padding: '0.75rem 1rem', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 600, color: '#fff' }}>{selectedUser.name}</p>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{selectedUser.phone}</p>
+                </div>
+                <button className="vp-btn vp-btn-sm vp-btn-outline" style={{ padding: '0.25rem 0.5rem' }} onClick={() => setSelectedUser(null)}>
+                  Change
+                </button>
+              </div>
+            )}
+
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>Credit Limit (₹)</label>
+              <input
+                type="number"
+                className="vp-input"
+                value={newLimit}
+                onChange={e => setNewLimit(e.target.value)}
+              />
+            </div>
+
+            {grantError && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ef4444', fontSize: '0.9rem' }}>
+                <AlertCircle size={16} /> {grantError}
+              </div>
+            )}
+
+            <button 
+              className="vp-btn vp-btn-primary" 
+              onClick={handleGrantCredit} 
+              disabled={grantLoading || !selectedUser}
+            >
+              {grantLoading ? 'Granting...' : 'Grant Credit Account'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {filtered.length === 0 ? (
         <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#64748b' }}>
@@ -93,11 +247,44 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
                     </span>
                   </td>
                   <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      <span style={{ fontWeight: 700, color: c.used_amount && c.credit_limit && c.used_amount > c.credit_limit * 0.8 ? '#f87171' : '#e2e8f0' }}>₹{c.used_amount ?? 0}</span>
-                      <span style={{ color: '#64748b' }}>/</span>
-                      <span style={{ color: '#94a3b8' }}>₹{c.credit_limit ?? '—'}</span>
-                    </div>
+                    {editingId === c.id ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                        <input
+                          type="number"
+                          className="vp-input"
+                          style={{ width: '80px', padding: '0.2rem 0.4rem', fontSize: '0.9rem' }}
+                          value={editLimitVal}
+                          onChange={e => setEditLimitVal(e.target.value)}
+                          autoFocus
+                          onKeyDown={e => {
+                            if (e.key === 'Enter') {
+                              updateLimit(c, editLimitVal)
+                              setEditingId(null)
+                            } else if (e.key === 'Escape') {
+                              setEditingId(null)
+                            }
+                          }}
+                        />
+                        <button className="vp-btn vp-btn-sm vp-btn-primary" style={{ padding: '0.25rem' }} onClick={() => {
+                          updateLimit(c, editLimitVal)
+                          setEditingId(null)
+                        }}>
+                          ✓
+                        </button>
+                        <button className="vp-btn vp-btn-sm vp-btn-outline" style={{ padding: '0.25rem' }} onClick={() => setEditingId(null)}>
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }} onClick={() => {
+                        setEditingId(c.id)
+                        setEditLimitVal(String(c.credit_limit ?? ''))
+                      }} title="Click to edit limit">
+                        <span style={{ fontWeight: 700, color: c.used_amount && c.credit_limit && c.used_amount > c.credit_limit * 0.8 ? '#f87171' : '#e2e8f0' }}>₹{c.used_amount ?? 0}</span>
+                        <span style={{ color: '#64748b' }}>/</span>
+                        <span style={{ color: '#94a3b8', textDecoration: 'underline dashed #475569' }}>₹{c.credit_limit ?? '—'}</span>
+                      </div>
+                    )}
                   </td>
                   <td>
                     <span className={`vp-badge ${c.is_blocked ? 'vp-badge-danger' : 'vp-badge-success'}`}>

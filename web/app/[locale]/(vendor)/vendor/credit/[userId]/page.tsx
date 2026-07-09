@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, User, Phone, CreditCard, Activity, ShieldAlert, Package, ShoppingBag, ArrowRight } from 'lucide-react'
+import RepaymentClient from './RepaymentClient'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params
@@ -65,16 +66,18 @@ export default async function UserCreditPage({ params }: { params: Promise<{ loc
     .from('shop_owners').select('shop_id').eq('user_id', authUser.user!.id).maybeSingle()
   const shopId = (shopOwner as any)?.shop_id
 
-  const [{ data: credit }, { data: userRow }, { data: orders }] = await Promise.all([
+  const [{ data: credit }, { data: userRow }, { data: orders }, { data: repayments }] = await Promise.all([
     supabase.from('shop_user_credit').select('*').eq('shop_id', shopId).eq('user_id', userId).maybeSingle(),
     supabase.from('users').select('name, phone').eq('id', userId).single(),
     supabase.from('orders').select('id, status, created_at, total_final_price').eq('shop_id', shopId).eq('user_id', userId).order('created_at', { ascending: false }),
+    supabase.from('customer_repayment_logs').select('*').eq('shop_id', shopId).eq('user_id', userId).order('recorded_at', { ascending: false })
   ])
 
   if (!userRow) notFound()
 
   const u = userRow as { name: string; phone: string }
   const c = credit as any
+  const repaymentsList = repayments || []
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto' }}>
@@ -185,6 +188,9 @@ export default async function UserCreditPage({ params }: { params: Promise<{ loc
           </div>
         )}
       </div>
+
+      {/* Repayments section */}
+      <RepaymentClient shopId={shopId} userId={userId} initialRepayments={repaymentsList} />
     </div>
   )
 }

@@ -326,7 +326,7 @@ export default function PurchaseHistoryClient({ initialOrders, initialStats }: P
 
                   <div className="order-details">
                     <div className="detail-row">
-                      <span className="shop-name">{order.shops?.name || 'Village Market Shop'}</span>
+                      <span className="shop-name">{order.shops?.name || 'Angadi Online Shop'}</span>
                       <span className={`status-badge ${statusClass}`}>{t('orders.status_' + order.status)}</span>
                     </div>
                     <p className="items-preview">{itemsPreview}</p>

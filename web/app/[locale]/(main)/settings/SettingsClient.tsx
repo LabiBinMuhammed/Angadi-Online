@@ -80,7 +80,7 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
           <span>📱</span>
           <div className="wa-item-body">
             <p className="wa-item-title">App version</p>
-            <p className="wa-item-sub">Village Market 1.0.0</p>
+            <p className="wa-item-sub">Angadi Online 1.0.0</p>
           </div>
         </div>
 

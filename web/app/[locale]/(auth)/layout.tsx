@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Store, Leaf, Zap, MapPin } from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: { default: 'Account', template: '%s | Village Market' },
+  title: { default: 'Account', template: '%s | Angadi Online' },
 }
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <div className="auth-hero-logo">
             <Store size={56} strokeWidth={1.5} />
           </div>
-          <h1 className="auth-hero-title">Village Market</h1>
+          <h1 className="auth-hero-title">Angadi Online</h1>
           <p className="auth-hero-subtitle">
             Your community&apos;s local marketplace — fresh items, trusted shops, fast delivery.
           </p>

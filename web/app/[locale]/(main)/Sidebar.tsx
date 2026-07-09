@@ -63,7 +63,7 @@ export default function Sidebar() {
           <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #4cd964, #32b84a)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
             <Home size={24} />
           </div>
-          <span className="sidebar-text" style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-base)', letterSpacing: '-0.5px', margin: 0 }}>Village Market</span>
+          <span className="sidebar-text" style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-base)', letterSpacing: '-0.5px', margin: 0 }}>Angadi Online</span>
         </div>
 
         <Link href={`/${locale}/home`} className={`sidebar-item ${isActive('/home') ? 'active' : ''}`} style={isActive('/home') ? { color: '#4cd964' } : undefined}>

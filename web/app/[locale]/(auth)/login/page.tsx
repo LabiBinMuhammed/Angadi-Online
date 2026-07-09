@@ -61,23 +61,27 @@ export default function LoginPage() {
 
   // Helper to check profile and redirect or show registration completion
   async function checkProfileAndRedirect(userId: string) {
-    const supabase = createClient()
-    const { data: userRow } = await supabase
-      .from('users')
-      .select('name')
-      .eq('id', userId)
-      .maybeSingle()
-
-    // If name is 'User' or empty, it means registration is incomplete
-    if (!userRow || !userRow.name || userRow.name === 'User') {
-      setStep('complete_registration')
-    } else {
-      // Sync last login
-      await supabase
+    try {
+      const supabase = createClient()
+      const { data: userRow } = await supabase
         .from('users')
-        .update({ last_login_at: new Date().toISOString() })
+        .select('name')
         .eq('id', userId)
-      router.push(`/${locale}/home`)
+        .maybeSingle()
+
+      // If name is 'User' or empty, it means registration is incomplete
+      if (!userRow || !userRow.name || userRow.name === 'User') {
+        setStep('complete_registration')
+      } else {
+        // Sync last login
+        await supabase
+          .from('users')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', userId)
+        router.push(`/${locale}/home`)
+      }
+    } catch (err: any) {
+      setError('Failed to load your profile. Please try again.')
     }
   }
 
@@ -94,19 +98,23 @@ export default function LoginPage() {
         return
       }
       setLoading(true)
-      const { data, error: authErr } = await signInWithPassword(normalizePhone(phone, countryCode), password)
-      setLoading(false)
-
-      if (authErr) {
-        if (authErr.message.includes('Invalid login credentials')) {
-          setError('Incorrect phone number or password. Please try again.')
+      try {
+        const { data, error: authErr } = await signInWithPassword(normalizePhone(phone, countryCode), password)
+        if (authErr) {
+          if (authErr.message.includes('Invalid login credentials')) {
+            setError('Incorrect phone number or password. Please try again.')
+          } else {
+            setError(authErr.message)
+          }
+        } else if (data.user) {
+          await checkProfileAndRedirect(data.user.id)
         } else {
-          setError(authErr.message)
+          setError('Login failed. Please try again.')
         }
-      } else if (data.user) {
-        await checkProfileAndRedirect(data.user.id)
-      } else {
-        setError('Login failed. Please try again.')
+      } catch (err: any) {
+        setError('A network error occurred. Please check your connection and try again.')
+      } finally {
+        setLoading(false)
       }
     } else {
       if (!email.trim() || !password) {
@@ -118,19 +126,23 @@ export default function LoginPage() {
         return
       }
       setLoading(true)
-      const { data, error: authErr } = await signInWithPassword(email, password)
-      setLoading(false)
-
-      if (authErr) {
-        if (authErr.message.includes('Invalid login credentials')) {
-          setError('Incorrect email or password. Please try again.')
+      try {
+        const { data, error: authErr } = await signInWithPassword(email, password)
+        if (authErr) {
+          if (authErr.message.includes('Invalid login credentials')) {
+            setError('Incorrect email or password. Please try again.')
+          } else {
+            setError(authErr.message)
+          }
+        } else if (data.user) {
+          await checkProfileAndRedirect(data.user.id)
         } else {
-          setError(authErr.message)
+          setError('Login failed. Please try again.')
         }
-      } else if (data.user) {
-        await checkProfileAndRedirect(data.user.id)
-      } else {
-        setError('Login failed. Please try again.')
+      } catch (err: any) {
+        setError('A network error occurred. Please check your connection and try again.')
+      } finally {
+        setLoading(false)
       }
     }
   }
@@ -173,7 +185,7 @@ export default function LoginPage() {
         <>
           <div className="auth-page-header">
             <h1 className="auth-page-title">Welcome back</h1>
-            <p className="auth-page-sub">Sign in to your Village Market account</p>
+            <p className="auth-page-sub">Sign in to your Angadi Online account</p>
           </div>
 
           {/* Login Mode Toggle Buttons */}
@@ -239,7 +251,7 @@ export default function LoginPage() {
                     </select>
                     <div className="input-icon-wrap" style={{ flex: 1 }}>
                       <Phone size={16} className="input-icon" />
-                      <input
+                    <input
                         id="login-phone"
                         className="form-input input-with-icon"
                         type="tel"
@@ -249,6 +261,7 @@ export default function LoginPage() {
                         required
                         autoComplete="tel"
                         autoFocus
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -269,6 +282,7 @@ export default function LoginPage() {
                       required
                       autoComplete="email"
                       autoFocus
+                      disabled={loading}
                     />
                   </div>
                 </div>
@@ -293,6 +307,7 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
+                    disabled={loading}
                   />
                   <button
                     type="button"

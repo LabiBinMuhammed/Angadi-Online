@@ -6,8 +6,8 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Village Market — Home',
-  description: 'Browse nearby shops and order fresh items from your local village market.',
+  title: 'Angadi Online — Home',
+  description: 'Browse nearby shops and order fresh items from your local Angadi Online marketplace.',
 }
 
 export default async function HomePage() {
@@ -99,7 +99,7 @@ export default async function HomePage() {
   const itemList = (items ?? []) as Item[]
   const catList  = (categories ?? []) as Category[]
   const unitList = (units ?? []) as Unit[]
-  const locationName = (locationData?.data as any)?.name || 'Village Market'
+  const locationName = (locationData?.data as any)?.name || 'Angadi Online'
 
   // Find pending orders and their items
   let initialCartItems: any[] = []

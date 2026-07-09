@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -21,6 +21,58 @@ function CheckoutForm() {
   // Modal states
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false)
   const [addressView, setAddressView] = useState<'select' | 'add'>('select')
+  const modalContentRef = useRef<HTMLDivElement>(null)
+
+  // Focus trap + Escape key for address modal
+  const handleModalKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setIsAddressModalOpen(false)
+      // Inline form reset (avoids forward reference to resetForm)
+      setFormName('')
+      setFormPhone('')
+      setFormLine1('')
+      setFormLine2('')
+      setFormLandmark('')
+      setSaveToProfile(true)
+      setFormError('')
+      return
+    }
+    if (e.key === 'Tab' && modalContentRef.current) {
+      const focusable = modalContentRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusable.length === 0) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isAddressModalOpen) {
+      document.addEventListener('keydown', handleModalKeyDown)
+      // Move focus into the modal on open
+      setTimeout(() => {
+        const firstFocusable = modalContentRef.current?.querySelector<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled])'
+        )
+        firstFocusable?.focus()
+      }, 50)
+    } else {
+      document.removeEventListener('keydown', handleModalKeyDown)
+    }
+    return () => document.removeEventListener('keydown', handleModalKeyDown)
+  }, [isAddressModalOpen, handleModalKeyDown])
   
   // New address form fields
   const [formName, setFormName] = useState('')
@@ -199,33 +251,36 @@ function CheckoutForm() {
         landmark: ''
       }
 
-      for (const order of pendingOrders) {
-        // Insert order address
-        await supabase.from('order_addresses').insert({
-          order_id: order.id,
-          contact_name: activeAddress.contact_name,
-          contact_phone: activeAddress.contact_phone,
-          address_line_1: activeAddress.address_line_1,
-          address_line_2: activeAddress.address_line_2 || null,
-          landmark: activeAddress.landmark || null
-        })
+      const orderIds = pendingOrders.map(o => o.id)
 
-        // Update order status to placed
-        const { error: updateErr } = await supabase
-          .from('orders')
-          .update({
-            payment_type: paymentType,
-            delivery_date: dateParam || new Date().toISOString().split('T')[0],
-            delivery_slot: modeParam as any
-          })
-          .eq('id', order.id)
+      // Call transaction-safe checkout RPC
+      const { error: rpcErr } = await supabase.rpc('place_checkout_orders', {
+        p_order_ids: orderIds,
+        p_payment_type: paymentType,
+        p_delivery_date: dateParam || new Date().toISOString().split('T')[0],
+        p_delivery_slot: modeParam || 'morning',
+        p_contact_name: activeAddress.contact_name,
+        p_contact_phone: activeAddress.contact_phone,
+        p_address_line_1: activeAddress.address_line_1,
+        p_address_line_2: activeAddress.address_line_2 || null,
+        p_landmark: activeAddress.landmark || null
+      })
 
-        if (updateErr) throw updateErr
-      }
+      if (rpcErr) throw rpcErr
 
       router.push('/orders')
     } catch (err: any) {
-      setError(err.message === 'Not logged in' || err.message === t('checkout.err_not_logged_in') ? t('checkout.err_not_logged_in') : (err.message || t('checkout.err_place_order')))
+      if (paymentType === 'credit' && (
+        err.message.includes('credit') ||
+        err.message.includes('Credit') ||
+        err.message.includes('limit') ||
+        err.message.includes('blocked')
+      )) {
+        setError(err.message + " We have updated your payment method to Cash on Delivery (COD). Click 'Place Order' again to confirm.");
+        setPaymentType('cod')
+      } else {
+        setError(err.message === 'Not logged in' || err.message === t('checkout.err_not_logged_in') ? t('checkout.err_not_logged_in') : (err.message || t('checkout.err_place_order')))
+      }
     } finally {
       setLoading(false)
     }
@@ -681,14 +736,26 @@ function CheckoutForm() {
 
       {/* Address Selection & Creation Modal */}
       {isAddressModalOpen && (
-        <div className="modal-overlay" onClick={() => { setIsAddressModalOpen(false); resetForm(); }}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="modal-overlay" 
+          onClick={() => { setIsAddressModalOpen(false); resetForm(); }}
+          role="presentation"
+        >
+          <div 
+            ref={modalContentRef}
+            className="modal-content" 
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="address-modal-title"
+          >
             <div className="modal-header">
-              <h3 className="modal-title">
+              <h3 className="modal-title" id="address-modal-title">
                 {addressView === 'select' ? t('checkout.select_address') : t('checkout.add_new_address')}
               </h3>
               <button 
                 className="modal-close" 
+                aria-label="Close address modal"
                 onClick={() => { setIsAddressModalOpen(false); resetForm(); }}
               >
                 <X size={20} />
@@ -743,49 +810,57 @@ function CheckoutForm() {
               ) : (
                 // Add Address Form inside Modal
                 <form onSubmit={handleAddAddress} className="modal-form">
-                  {formError && <p className="form-error">{formError}</p>}
+                  {formError && <p className="form-error" role="alert">{formError}</p>}
                   
                   <div className="form-group">
-                    <label className="form-label">{t('checkout.contact_name')} *</label>
+                    <label className="form-label" htmlFor="addr-name">{t('checkout.contact_name')} *</label>
                     <input 
+                      id="addr-name"
                       type="text" 
                       className="form-input" 
                       placeholder={t('checkout.placeholder_fullname')} 
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
+                      autoComplete="name"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">{t('checkout.contact_phone')} *</label>
+                    <label className="form-label" htmlFor="addr-phone">{t('checkout.contact_phone')} *</label>
                     <input 
+                      id="addr-phone"
                       type="tel" 
                       className="form-input" 
                       placeholder={t('checkout.placeholder_phone')} 
                       value={formPhone}
                       onChange={(e) => setFormPhone(e.target.value)}
+                      autoComplete="tel"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">{t('checkout.address_line_1')} *</label>
+                    <label className="form-label" htmlFor="addr-line1">{t('checkout.address_line_1')} *</label>
                     <input 
+                      id="addr-line1"
                       type="text" 
                       className="form-input" 
                       placeholder={t('checkout.placeholder_street')} 
                       value={formLine1}
                       onChange={(e) => setFormLine1(e.target.value)}
+                      autoComplete="address-line1"
                     />
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">{t('checkout.address_line_2_opt')}</label>
+                    <label className="form-label" htmlFor="addr-line2">{t('checkout.address_line_2_opt')}</label>
                     <input 
+                      id="addr-line2"
                       type="text" 
                       className="form-input" 
                       placeholder={t('checkout.placeholder_apt')} 
                       value={formLine2}
                       onChange={(e) => setFormLine2(e.target.value)}
+                      autoComplete="address-line2"
                     />
                   </div>
 

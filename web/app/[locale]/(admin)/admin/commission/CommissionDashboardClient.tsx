@@ -332,7 +332,7 @@ export default function CommissionDashboardClient({
 
       {/* Print Header */}
       <div className="print-only" style={{ marginBottom: '2rem', display: 'none' }}>
-        <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Village Market - Platform Commission Report</h1>
+        <h1 style={{ fontSize: '2rem', fontWeight: 800 }}>Angadi Online - Platform Commission Report</h1>
         <p suppressHydrationWarning>Generated at: {new Date().toLocaleString()}</p>
       </div>
 

@@ -465,39 +465,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final pendingOrders = pendingOrdersRes as List<dynamic>;
       if (pendingOrders.isEmpty) throw Exception('No pending cart found in database');
 
-      String? firstOrderId;
+      final orderIds = pendingOrders.map((o) => o['id'] as String).toList();
+      final firstOrderId = orderIds.first;
 
-      for (final order in pendingOrders) {
-        final orderId = order['id'] as String;
-        firstOrderId ??= orderId;
-
-        // 2. Insert order address
-        await supabase.from('order_addresses').insert({
-          'order_id': orderId,
-          'contact_name': activeAddress['contact_name'],
-          'contact_phone': activeAddress['contact_phone'],
-          'address_line_1': activeAddress['address_line_1'],
-          'address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
-          'landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
-        });
-
-        // 3. Update order status/payment details to transition order to active
-        await supabase.from('orders').update({
-          'payment_type': _paymentType == PaymentType.cod ? 'cod' : 'credit',
-          'delivery_date': cart.selectedDate.toIso8601String().split('T')[0],
-          'delivery_slot': cart.selectedSlot,
-        }).eq('id', orderId);
-      }
+      // 2. Call transaction-safe checkout RPC
+      await supabase.rpc('place_checkout_orders', params: {
+        'p_order_ids': orderIds,
+        'p_payment_type': _paymentType == PaymentType.cod ? 'cod' : 'credit',
+        'p_delivery_date': cart.selectedDate.toIso8601String().split('T')[0],
+        'p_delivery_slot': cart.selectedSlot,
+        'p_contact_name': activeAddress['contact_name'],
+        'p_contact_phone': activeAddress['contact_phone'],
+        'p_address_line_1': activeAddress['address_line_1'],
+        'p_address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
+        'p_landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
+      });
 
       if (mounted) {
         await CartService.instance.clearCart();
-        context.pushReplacement('/cart/checkout/success?orderId=${firstOrderId ?? "demo"}');
+        context.pushReplacement('/cart/checkout/success?orderId=$firstOrderId');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.orderPlacementFailed(e.toString()))),
-        );
+      final errStr = e.toString();
+      if (_paymentType == PaymentType.credit && (
+        errStr.contains('credit') ||
+        errStr.contains('Credit') ||
+        errStr.contains('limit') ||
+        errStr.contains('blocked')
+      )) {
+        if (mounted) {
+          setState(() {
+            _paymentType = PaymentType.cod;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('$e. We have updated your payment method to Cash on Delivery (COD). Please click place order again to confirm.'),
+              backgroundColor: Colors.amber[900],
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.orderPlacementFailed(errStr))),
+          );
+        }
       }
     } finally {
       if (mounted) {

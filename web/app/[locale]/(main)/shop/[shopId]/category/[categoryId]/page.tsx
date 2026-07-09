@@ -17,9 +17,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   
   const cat = catRes.data
   const shop = shopRes.data
-  const title = cat && shop ? `${cat.name} at ${shop.name} | Village Market` : cat?.name ?? 'Category'
+  const title = cat && shop ? `${cat.name} at ${shop.name} | Angadi Online` : cat?.name ?? 'Category'
   const description = cat && shop 
-    ? `Browse and buy ${cat.name.toLowerCase()} items from ${shop.name} at Village Market. Quality fresh items delivered to your doorstep.` 
+    ? `Browse and buy ${cat.name.toLowerCase()} items from ${shop.name} at Angadi Online. Quality fresh items delivered to your doorstep.` 
     : 'View shop category items.'
 
   return { title, description }

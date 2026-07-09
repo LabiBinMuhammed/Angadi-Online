@@ -26,9 +26,9 @@ export default function Footer() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ width: '32px', height: '32px', background: 'linear-gradient(135deg, #4cd964, #32b84a)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '16px', fontWeight: 'bold' }}>
-            M
+            A
           </div>
-          <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-base)', letterSpacing: '-0.5px' }}>Village Market</span>
+          <span style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-base)', letterSpacing: '-0.5px' }}>Angadi Online</span>
         </div>
         
         <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-muted)', maxWidth: '500px', lineHeight: '1.5' }}>
@@ -45,7 +45,7 @@ export default function Footer() {
         <div style={{ width: '100%', height: '1px', background: 'var(--border)', margin: '10px 0' }} />
 
         <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-light)' }}>
-          &copy; {new Date().getFullYear()} Village Market. {t('footer.rights_reserved')}
+          &copy; {new Date().getFullYear()} Angadi Online. {t('footer.rights_reserved')}
         </p>
       </div>
     </footer>
