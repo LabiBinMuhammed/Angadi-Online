@@ -31,25 +31,15 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState('')
   const [language, setLanguage] = useState('en')
   const [role, setRole] = useState('customer')
-  const [password, setPassword] = useState('')
   const [phone, setPhone] = useState('')
   const [countryCode, setCountryCode] = useState('+91')
   const [email, setEmail] = useState('')
   const [mode, setMode] = useState<'phone' | 'email'>('phone')
   
   // UI states
-  const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
-
-  function validatePassword(pw: string): boolean {
-    if (pw.length < 8) return false
-    if (!/[A-Z]/.test(pw)) return false
-    if (!/[a-z]/.test(pw)) return false
-    if (!/[0-9]/.test(pw)) return false
-    return true
-  }
 
   // Handle Signup
   async function handleSignup(e: React.FormEvent) {
@@ -80,10 +70,8 @@ export default function SignupPage() {
       }
     }
 
-    if (!validatePassword(password)) {
-      setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.')
-      return
-    }
+    // Auto-generate a secure random password to satisfy Supabase API requirements
+    const generatedPassword = 'P@ss' + Math.random().toString(36).substring(2, 10) + '1xZ'
 
     setLoading(true)
     const normalizedPhoneNum = mode === 'phone' ? normalizePhone(phone, countryCode) : undefined
@@ -93,7 +81,7 @@ export default function SignupPage() {
       const { data, error: authErr } = await signUp({
         email: emailVal,
         phone: normalizedPhoneNum,
-        password,
+        password: generatedPassword,
         name,
         role,
         language
@@ -167,23 +155,7 @@ export default function SignupPage() {
           </div>
         </div>
 
-        {/* Account Type / Role */}
-        <div className="form-group">
-          <label className="form-label" htmlFor="signup-role">Account Type</label>
-          <div className="input-icon-wrap">
-            <Users size={16} className="input-icon" />
-            <select
-              id="signup-role"
-              className="form-input input-with-icon"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              required
-            >
-              <option value="customer">Customer</option>
-              <option value="shop_owner">Shop Owner</option>
-            </select>
-          </div>
-        </div>
+
 
         {/* Signup Method Toggle */}
         <div style={{ display: 'flex', gap: '.5rem', margin: '1.25rem 0 .75rem 0' }}>
@@ -277,31 +249,7 @@ export default function SignupPage() {
           </div>
         )}
 
-        {/* Password */}
-        <div className="form-group">
-          <label className="form-label" htmlFor="signup-password">Password</label>
-          <div className="input-icon-wrap">
-            <Lock size={16} className="input-icon" />
-            <input
-              id="signup-password"
-              className="form-input input-with-icon"
-              type={showPw ? 'text' : 'password'}
-              placeholder="Min. 8 characters with Upper, Lower & Number"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-            />
-            <button
-              type="button"
-              className="input-eye"
-              onClick={() => setShowPw(!showPw)}
-              aria-label={showPw ? 'Hide password' : 'Show password'}
-            >
-              {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-        </div>
+
 
         {error && (
           <div className="auth-alert auth-alert-error" role="alert"
