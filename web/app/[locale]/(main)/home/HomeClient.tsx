@@ -615,7 +615,8 @@ export default function HomeClient({
                   const shopItems = allItems[shop.id] || []
                   const imgUrl = shop.logo_url
                   const productCount = shopItems.length
-                  const subtitle = i === 0 ? t('home.best_organic') : t('home.great_deals')
+                  const typeKey = shop.type?.toLowerCase() || ''
+                  const subtitle = typeKey ? t(`shops_page.types.${typeKey}`) : ''
                   return (
                     <Link href={`/home?shop=${shop.id}`} key={shop.id} style={{ textDecoration: 'none' }}>
                       <div className="marketplace-shop-card" style={{ background: bg }}>
