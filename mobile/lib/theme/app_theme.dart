@@ -3,12 +3,12 @@ import 'theme_service.dart';
 
 // ─── Color Palette ────────────────────────────────────────────────────────────
 
-const kBrand50  = Color(0xFFF0F9FF);
-const kBrand100 = Color(0xFFE0F2FE);
-const kBrand400 = Color(0xFF38BDF8);
-const kBrand500 = Color(0xFF0EA5E9);
-const kBrand600 = Color(0xFF0284C7);
-const kBrand700 = Color(0xFF0369A1);
+const kBrand50  = Color(0xFFF0FDF4);
+const kBrand100 = Color(0xFFDCFCE7);
+const kBrand400 = Color(0xFF4ADE80);
+const kBrand500 = Color(0xFF128C7E);
+const kBrand600 = Color(0xFF075E54);
+const kBrand700 = Color(0xFF05443D);
 
 const kNeutral50  = Color(0xFFF8FAFC);
 const kNeutral100 = Color(0xFFF1F5F9);

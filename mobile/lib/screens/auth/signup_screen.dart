@@ -152,6 +152,14 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Stack(
                 children: [
                   Positioned(
+                    top: 40,
+                    left: 10,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => context.go('/login'),
+                    ),
+                  ),
+                  Positioned(
                     top: -40,
                     right: -40,
                     child: Container(
