@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { Shop, Item, Category, Unit } from '@/types'
@@ -146,18 +147,20 @@ export default async function HomePage() {
   }
 
   return (
-    <HomeClient
-      shops={shopList}
-      allItems={itemsByShop}
-      categories={catList}
-      units={unitList}
-      initialCartItems={initialCartItems}
-      user={user}
-      role={role}
-      locationName={locationName}
-      addresses={addresses}
-      initialPinnedShopIds={initialPinnedShopIds}
-      initialFavoriteItemIds={initialFavoriteItemIds}
-    />
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeClient
+        shops={shopList}
+        allItems={itemsByShop}
+        categories={catList}
+        units={unitList}
+        initialCartItems={initialCartItems}
+        user={user}
+        role={role}
+        locationName={locationName}
+        addresses={addresses}
+        initialPinnedShopIds={initialPinnedShopIds}
+        initialFavoriteItemIds={initialFavoriteItemIds}
+      />
+    </Suspense>
   )
 }
