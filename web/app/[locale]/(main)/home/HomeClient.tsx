@@ -245,16 +245,13 @@ export default function HomeClient({
     const found = shops.find(s => s.id === selectedShopId)
     if (found) return found
     
-    // 2. If selectedShopId is a dummy ID or invalid, but we have real shops, fallback to first real shop
+    // 2. If selectedShopId is invalid/missing, but we have real shops, fallback to first real shop
     if (shops.length > 0) {
       return shops[0]
     }
     
-    // 3. Fallback to dummy shops if no real shops exist in the database
-    if (selectedShopId === 'dummy2') {
-      return { id: 'dummy2', name: 'Cp Store', logo_url: '' } as any
-    }
-    return { id: 'dummy1', name: 'Vp Store', logo_url: '' } as any
+    // 3. Fallback to null if no shops exist
+    return null
   }, [shops, selectedShopId])
 
   const hasSelectedShop = !!selectedShopId
@@ -604,10 +601,7 @@ export default function HomeClient({
           <div className="marketplace-shops-container">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {(() => {
-                const baseShops = shops.length > 0 ? shops : [
-                  { id: 'dummy1', name: 'Vp Store', logo_url: '' } as any,
-                  { id: 'dummy2', name: 'Cp Store', logo_url: '' } as any
-                ]
+                const baseShops = shops;
                 const filteredShops = baseShops.filter(s => s.name.toLowerCase().includes(shopSearch.toLowerCase()))
                 const sortedShops = [...filteredShops].sort((a, b) => {
                   const aPinned = pinnedShopIds.has(a.id) ? 1 : 0
@@ -616,7 +610,11 @@ export default function HomeClient({
                 })
                 
                 if (sortedShops.length === 0) {
-                  return <p style={{ fontSize: '14px', color: 'var(--text-muted)', textAlign: 'center', padding: '20px 0' }}>{t('home.no_shops_found')}</p>
+                  return (
+                    <p style={{ fontSize: '15px', color: 'var(--text-muted)', textAlign: 'center', padding: '40px 0', fontWeight: 600 }}>
+                      No shops registered on the village
+                    </p>
+                  )
                 }
                 
                 return sortedShops.map((shop, i) => {
@@ -624,7 +622,7 @@ export default function HomeClient({
                   const bg = bgColors[i % bgColors.length]
                   const shopItems = allItems[shop.id] || []
                   const imgUrl = shop.logo_url
-                  const productCount = shops.length > 0 ? shopItems.length : (i === 0 ? 122 : 75)
+                  const productCount = shopItems.length
                   const subtitle = i === 0 ? t('home.best_organic') : t('home.great_deals')
                   return (
                     <Link href={`/home?shop=${shop.id}`} key={shop.id} style={{ textDecoration: 'none' }}>
@@ -685,6 +683,14 @@ export default function HomeClient({
             <div style={{ flex: 1 }}>
               {(() => {
                 const shop = activeShop;
+                if (!shop) {
+                  return (
+                    <div style={{ background: 'var(--bg-muted)', borderRadius: '24px', padding: '30px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light)', border: '1px dashed var(--border)' }}>
+                      <Store size={40} style={{ opacity: 0.4, marginBottom: '8px' }} />
+                      <p style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>No shop selected</p>
+                    </div>
+                  )
+                }
                 const shopItems = shop ? (allItems[shop?.id] || []) : []
                 const imgUrl = shop?.logo_url
                 const productCount = shopItems.length

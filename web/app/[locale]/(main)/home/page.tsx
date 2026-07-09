@@ -88,16 +88,7 @@ export default async function HomePage() {
       .select('*')
   ])
 
-  let resolvedShops = shops || []
-  if (resolvedShops.length === 0) {
-    const { data: fallbackShops } = await supabase
-      .from('shops')
-      .select('id, name, type, location_id, created_at, updated_at, logo_url, shop_owners(users(name)), shop_subscription(restriction_level)')
-    if (fallbackShops) {
-      resolvedShops = fallbackShops
-    }
-  }
-  const activeShops = (resolvedShops as Shop[]).filter(s => !s.type?.endsWith('_inactive'))
+  const activeShops = ((shops ?? []) as Shop[]).filter(s => !s.type?.endsWith('_inactive'))
   const shopList = [...activeShops].sort((a: any, b: any) => {
     const aLevel = (a.shop_subscription as any)?.restriction_level || 0
     const bLevel = (b.shop_subscription as any)?.restriction_level || 0
