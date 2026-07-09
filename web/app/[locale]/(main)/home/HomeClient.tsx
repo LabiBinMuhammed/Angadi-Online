@@ -229,10 +229,24 @@ export default function HomeClient({
   const selectedShopId = searchParams?.get('shop')
 
   const activeShop = useMemo(() => {
-    return shops.find(s => s.id === selectedShopId)
+    // 1. Try to find the shop matching selectedShopId
+    const found = shops.find(s => s.id === selectedShopId)
+    if (found) return found
+    
+    // 2. If selectedShopId is a dummy ID or invalid, but we have real shops, fallback to first real shop
+    if (shops.length > 0) {
+      return shops[0]
+    }
+    
+    // 3. Fallback to dummy shops if no real shops exist in the database
+    if (selectedShopId === 'dummy2') {
+      return { id: 'dummy2', name: 'Cp Store', logo_url: '' } as any
+    }
+    return { id: 'dummy1', name: 'Vp Store', logo_url: '' } as any
   }, [shops, selectedShopId])
 
-  const hasSelectedShop = !!(selectedShopId && activeShop)
+  const hasSelectedShop = !!selectedShopId
+  const effectiveShopId = activeShop?.id || selectedShopId || ''
 
   const userName = user?.user_metadata?.name || 'Yona'
 
@@ -241,7 +255,7 @@ export default function HomeClient({
   }, [allItems])
 
   const availableCategories = useMemo(() => {
-    const items = hasSelectedShop ? (allItems[selectedShopId] || []) : allPopularItems
+    const items = hasSelectedShop ? (allItems[effectiveShopId] || []) : allPopularItems
     const categoryIds = new Set(items.map(i => i.category_id).filter(Boolean))
     let cats = categories.filter(c => categoryIds.has(c.id))
     if (cats.length === 0) cats = categories.slice(0, 4)
@@ -254,7 +268,7 @@ export default function HomeClient({
       ]
     }
     return cats
-  }, [hasSelectedShop, selectedShopId, allItems, allPopularItems, categories])
+  }, [hasSelectedShop, effectiveShopId, allItems, allPopularItems, categories])
 
   const findCartItem = (item: Item, variant: any) => {
     const sellConfig = Array.isArray(item.item_sell_config) ? item.item_sell_config[0] : item.item_sell_config
@@ -658,10 +672,10 @@ export default function HomeClient({
             `}} />
             <div style={{ flex: 1 }}>
               {(() => {
-                const shop = activeShop || (shops.length > 0 ? shops[0] : { id: 'dummy1', name: 'Vp Store', logo_url: '' } as any);
-                const shopItems = allItems[shop.id] || []
-                const imgUrl = shop.logo_url
-                const productCount = shops.length > 0 ? shopItems.length : 122
+                const shop = activeShop;
+                const shopItems = shop ? (allItems[shop.id] || []) : []
+                const imgUrl = shop?.logo_url
+                const productCount = shopItems.length
                 const shopHeaderBg = theme === 'dark' ? 'var(--bg-muted)' : '#fcedef'
                 return (
                   <div style={{ background: shopHeaderBg, borderRadius: '24px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'space-between' }}>
@@ -769,7 +783,7 @@ export default function HomeClient({
             <div className="homepage-item-grid">
               {(() => {
                 let itemsToShow = hasSelectedShop 
-                  ? (allItems[selectedShopId] || []) 
+                  ? (allItems[effectiveShopId] || []) 
                   : allPopularItems;
 
                 if (selectedCategory) {
