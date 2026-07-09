@@ -344,6 +344,45 @@
   border-color: rgba(255, 255, 255, 0.15);
 }
 
+.vp-shop-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.vp-shop-card-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+}
+
+.vp-shop-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.vp-shop-card-status {
+  margin-left: auto;
+}
+
+/* RTL Support */
+[dir="rtl"] .vp-shop-card-status {
+  margin-left: 0;
+  margin-right: auto;
+}
+
 .vp-stat-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -697,6 +736,35 @@
     right: 8px;
     width: 6px;
     height: 6px;
+  }
+
+  .vp-shop-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+  
+  .vp-shop-card-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+    border-radius: 12px;
+  }
+  
+  .vp-shop-card-status {
+    margin-left: 0;
+    width: 100%;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  [dir="rtl"] .vp-shop-card-status {
+    margin-right: 0;
+    justify-content: flex-start;
   }
 }
 

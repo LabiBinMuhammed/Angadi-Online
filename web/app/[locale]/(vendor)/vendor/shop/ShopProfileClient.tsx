@@ -93,38 +93,16 @@ export default function ShopProfileClient({ userId, shops, locations }: Props) {
                 <Link
                   href={`/vendor/shop/${s.id}`}
                   key={s.id}
-                  className="vp-card"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '1.5rem',
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.2)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
+                  className="vp-card vp-shop-card"
                 >
-                  <div style={{
-                    width: 64, height: 64, borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    color: '#fff', fontWeight: 800, fontSize: '1.5rem', flexShrink: 0,
-                    boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
-                  }}>
+                  <div className="vp-shop-card-avatar">
                     {shopInitials}
                   </div>
-                  <div>
+                  <div className="vp-shop-card-info">
                     <p style={{ fontWeight: 800, fontSize: '1.2rem', color: '#fff' }}>
                       {s.name || 'Your Shop Name'}
                     </p>
-                    <p style={{ fontSize: '0.9rem', color: '#cbd5e1', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <p style={{ fontSize: '0.9rem', color: '#cbd5e1', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                       <span className="vp-badge vp-badge-info">
                         {s.type ? (s.type.replace('_inactive', '')).charAt(0).toUpperCase() + (s.type.replace('_inactive', '')).slice(1) : t('vendor_shop.no_type_set')}
                       </span>
@@ -141,7 +119,7 @@ export default function ShopProfileClient({ userId, shops, locations }: Props) {
                       {t('vendor_shop.active_since').replace('{date}', new Date(s.created_at).toLocaleDateString(locale === 'ml' ? 'ml-IN' : locale === 'hi' ? 'hi-IN' : locale === 'ar' ? 'ar-EG' : 'en-IN', { day: 'numeric', month: 'long', year: 'numeric' }))}
                     </p>
                   </div>
-                  <div style={{ [locale === 'ar' ? 'marginRight' : 'marginLeft']: 'auto' }}>
+                  <div className="vp-shop-card-status">
                     {s.type?.endsWith('_inactive') ? (
                       <span className="vp-badge vp-badge-danger" style={{ fontSize: '0.85rem', padding: '0.5rem 1rem', background: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
                         ✕ {t('vendor_shop.inactive_label')}
