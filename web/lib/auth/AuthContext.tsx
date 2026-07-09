@@ -16,7 +16,7 @@ interface AuthContextType {
   signInWithOtp: (phone: string) => Promise<{ error: any }>
   verifyOtp: (phone: string, token: string) => Promise<{ data: any; error: any }>
   signInWithPassword: (phoneOrEmail: string, password: string) => Promise<{ data: any; error: any }>
-  completeRegistration: (fullName: string, language: string, role: string, password?: string) => Promise<{ error: any }>
+  completeRegistration: (fullName: string, language: string, role: string) => Promise<{ error: any }>
   updatePassword: (password: string) => Promise<{ error: any }>
   updatePhone: (phone: string) => Promise<{ error: any }>
   verifyPhoneChange: (phone: string, token: string) => Promise<{ error: any }>
@@ -182,20 +182,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { data, error }
   }
 
-  // Complete new registration
-  async function completeRegistration(fullName: string, language: string, registrationRole: string, password?: string) {
+  async function completeRegistration(fullName: string, language: string, registrationRole: string) {
     if (!user) return { error: new Error('User session not found') }
     
-    // 1. Update Supabase Auth user metadata & password
+    // 1. Update Supabase Auth user metadata
     const updates: any = {
       data: {
         name: fullName,
         full_name: fullName,
         role: registrationRole
       }
-    }
-    if (password) {
-      updates.password = password
     }
 
     const { error: authErr } = await supabase.auth.updateUser(updates)
