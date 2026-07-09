@@ -41,6 +41,8 @@ export default function LoginPage() {
   const [role, setRole] = useState('customer')
   const [regPhone, setRegPhone] = useState('')
   const [regCountryCode, setRegCountryCode] = useState('+91')
+  const [locations, setLocations] = useState<any[]>([])
+  const [selectedLocationId, setSelectedLocationId] = useState('')
   
   // UI states
   const [showPw, setShowPw] = useState(false)
@@ -59,15 +61,40 @@ export default function LoginPage() {
 
   const showPhoneField = !!user?.email && !user?.phone
 
+  // Fetch locations from DB when entering Complete Registration
+  useEffect(() => {
+    if (step === 'complete_registration') {
+      const supabase = createClient()
+      supabase.from('locations').select('id, name').order('name').then(({ data }) => {
+        if (data) {
+          setLocations(data)
+          if (data.length > 0) {
+            setSelectedLocationId(data[0].id)
+          }
+        }
+      })
+    }
+  }, [step])
+
   // Helper to check profile and redirect or show registration completion
   async function checkProfileAndRedirect(userId: string) {
     try {
       const supabase = createClient()
       const { data: userRow } = await supabase
         .from('users')
-        .select('name')
+        .select('name, role')
         .eq('id', userId)
         .maybeSingle()
+
+      // If user is admin, bypass Complete Registration completely
+      if (userRow?.role === 'admin') {
+        await supabase
+          .from('users')
+          .update({ last_login_at: new Date().toISOString() })
+          .eq('id', userId)
+        router.push(`/${locale}/home`)
+        return
+      }
 
       // If name is 'User' or empty, it means registration is incomplete
       if (!userRow || !userRow.name || userRow.name === 'User') {
@@ -171,13 +198,17 @@ export default function LoginPage() {
       name,
       language,
       role,
-      phoneNum
+      phoneNum,
+      selectedLocationId
     )
     setLoading(false)
 
     if (regErr) {
       setError(regErr.message)
     } else {
+      if (selectedLocationId) {
+        document.cookie = `selected_location_id=${selectedLocationId}; path=/; max-age=3153600000;`
+      }
       router.push(`/${locale}/home`)
     }
   }
@@ -389,6 +420,29 @@ export default function LoginPage() {
                   <option value="ar">العربية (Arabic)</option>
                   <option value="hi">हिंदी (Hindi)</option>
                   <option value="ml">Malayalam</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Location Selection */}
+            <div className="form-group">
+              <label className="form-label" htmlFor="reg-location">Village / Location</label>
+              <div className="input-icon-wrap">
+                <Globe size={16} className="input-icon" />
+                <select
+                  id="reg-location"
+                  className="form-input input-with-icon"
+                  value={selectedLocationId}
+                  onChange={(e) => setSelectedLocationId(e.target.value)}
+                  required
+                >
+                  {locations.length === 0 ? (
+                    <option value="" disabled>Loading locations...</option>
+                  ) : (
+                    locations.map(loc => (
+                      <option key={loc.id} value={loc.id}>{loc.name}</option>
+                    ))
+                  )}
                 </select>
               </div>
             </div>

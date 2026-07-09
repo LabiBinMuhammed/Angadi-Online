@@ -16,7 +16,7 @@ interface AuthContextType {
   signInWithOtp: (phone: string) => Promise<{ error: any }>
   verifyOtp: (phone: string, token: string) => Promise<{ data: any; error: any }>
   signInWithPassword: (phoneOrEmail: string, password: string) => Promise<{ data: any; error: any }>
-  completeRegistration: (fullName: string, language: string, role: string, phone?: string) => Promise<{ error: any }>
+  completeRegistration: (fullName: string, language: string, role: string, phone?: string, locationId?: string) => Promise<{ error: any }>
   updatePassword: (password: string) => Promise<{ error: any }>
   updatePhone: (phone: string) => Promise<{ error: any }>
   verifyPhoneChange: (phone: string, token: string) => Promise<{ error: any }>
@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { data, error }
   }
 
-  async function completeRegistration(fullName: string, language: string, registrationRole: string, phone?: string) {
+  async function completeRegistration(fullName: string, language: string, registrationRole: string, phone?: string, locationId?: string) {
     if (!user) return { error: new Error('User session not found') }
     
     // 1. Update Supabase Auth user metadata
@@ -231,6 +231,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .eq('user_id', user.id)
 
     if (profileErr) return { error: profileErr }
+
+    // 4. Create default address with location_id
+    if (locationId) {
+      const { data: existingAddr } = await supabase
+        .from('user_addresses')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_default', true)
+        .maybeSingle()
+
+      if (existingAddr) {
+        await supabase
+          .from('user_addresses')
+          .update({ location_id: locationId })
+          .eq('id', existingAddr.id)
+      } else {
+        await supabase
+          .from('user_addresses')
+          .insert({
+            user_id: user.id,
+            label: 'Home',
+            contact_name: fullName,
+            contact_phone: phone || user.phone || '0000000000',
+            address_line_1: 'Default Address',
+            location_id: locationId,
+            is_default: true,
+            is_active: true
+          })
+      }
+    }
 
     await resolveUserRole(user.id)
     return { error: null }
