@@ -257,7 +257,7 @@ export default function HomeClient({
   const hasSelectedShop = !!selectedShopId
   const effectiveShopId = activeShop?.id || selectedShopId || ''
 
-  const userName = user?.user_metadata?.name || 'Yona'
+  const userName = user?.user_metadata?.name || t('profile.guest_user')
 
   const allPopularItems = useMemo(() => {
     return Object.values(allItems).flat().slice(0, 10)
@@ -268,14 +268,6 @@ export default function HomeClient({
     const categoryIds = new Set(items.map(i => i.category_id).filter(Boolean))
     let cats = categories.filter(c => categoryIds.has(c.id))
     if (cats.length === 0) cats = categories.slice(0, 4)
-    if (cats.length === 0) {
-      cats = [
-        { id: '1', name: 'Fruits', is_active: true, updated_at: '' },
-        { id: '2', name: 'Veggies', is_active: true, updated_at: '' },
-        { id: '3', name: 'Bread', is_active: true, updated_at: '' },
-        { id: '4', name: 'Meat', is_active: true, updated_at: '' }
-      ]
-    }
     return cats
   }, [hasSelectedShop, effectiveShopId, allItems, allPopularItems, categories])
 
@@ -710,7 +702,7 @@ export default function HomeClient({
                         <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>{productCount} {t('home.products')}</p>
                       </div>
                     </div>
-                    {shops.length > 0 && shop?.id !== 'dummy1' && shop?.id !== 'dummy2' && (
+                    {shops.length > 0 && (
                       <Link 
                         href={`/shop/${shop?.id}?tab=reviews`}
                         style={{
