@@ -39,11 +39,9 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('')
   const [language, setLanguage] = useState('en')
   const [role, setRole] = useState('customer')
-  const [newPassword, setNewPassword] = useState('')
   
   // UI states
   const [showPw, setShowPw] = useState(false)
-  const [showNewPw, setShowNewPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -156,10 +154,6 @@ export default function LoginPage() {
       setError('Please enter your full name.')
       return
     }
-    if (newPassword && newPassword.length < 8) {
-      setError('Password must be at least 8 characters.')
-      return
-    }
 
     setLoading(true)
     setError('')
@@ -167,8 +161,7 @@ export default function LoginPage() {
     const { error: regErr } = await completeRegistration(
       name,
       language,
-      role,
-      newPassword || undefined
+      role
     )
     setLoading(false)
 
@@ -408,34 +401,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password (Optional for future password login) */}
-            {!hasPasswordSession && (
-              <div className="form-group">
-                <label className="form-label" htmlFor="reg-password">Password (Optional, for password login)</label>
-                <div className="input-icon-wrap">
-                  <Lock size={16} className="input-icon" />
-                  <input
-                    id="reg-password"
-                    className="form-input input-with-icon"
-                    type={showNewPw ? 'text' : 'password'}
-                    placeholder="Min. 8 characters"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    minLength={8}
-                  />
-                  <button
-                    type="button"
-                    className="input-eye"
-                    onClick={() => setShowNewPw(!showNewPw)}
-                  >
-                    {showNewPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                <p style={{ fontSize: '.75rem', color: 'var(--text-muted)', marginTop: '.25rem' }}>
-                  Setting a password allows you to sign in with your password in the future.
-                </p>
-              </div>
-            )}
+
 
             {error && (
               <div className="auth-alert auth-alert-error" role="alert"
