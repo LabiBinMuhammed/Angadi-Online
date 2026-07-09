@@ -16,7 +16,7 @@ interface AuthContextType {
   signInWithOtp: (phone: string) => Promise<{ error: any }>
   verifyOtp: (phone: string, token: string) => Promise<{ data: any; error: any }>
   signInWithPassword: (phoneOrEmail: string, password: string) => Promise<{ data: any; error: any }>
-  completeRegistration: (fullName: string, language: string, role: string) => Promise<{ error: any }>
+  completeRegistration: (fullName: string, language: string, role: string, phone?: string) => Promise<{ error: any }>
   updatePassword: (password: string) => Promise<{ error: any }>
   updatePhone: (phone: string) => Promise<{ error: any }>
   verifyPhoneChange: (phone: string, token: string) => Promise<{ error: any }>
@@ -182,7 +182,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { data, error }
   }
 
-  async function completeRegistration(fullName: string, language: string, registrationRole: string) {
+  async function completeRegistration(fullName: string, language: string, registrationRole: string, phone?: string) {
     if (!user) return { error: new Error('User session not found') }
     
     // 1. Update Supabase Auth user metadata
@@ -193,19 +193,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: registrationRole
       }
     }
+    if (phone) {
+      updates.phone = normalizePhone(phone)
+      updates.data.phone = normalizePhone(phone)
+    }
 
-    const { error: authErr } = await supabase.auth.updateUser(updates)
-    if (authErr) return { error: authErr }
+    try {
+      await supabase.auth.updateUser(updates)
+    } catch (e: any) {
+      console.warn("Auth updateUser warning:", e.message)
+    }
 
     // 2. Update public.users record
+    const usersUpdate: any = {
+      name: fullName,
+      role: registrationRole,
+      last_login_at: new Date().toISOString()
+    }
+    if (phone) {
+      usersUpdate.phone = normalizePhone(phone)
+      usersUpdate.phone_verified = true
+    }
+
     const { error: usersErr } = await supabase
       .from('users')
-      .update({
-        name: fullName,
-        role: registrationRole,
-        phone_verified: true,
-        last_login_at: new Date().toISOString()
-      })
+      .update(usersUpdate)
       .eq('id', user.id)
 
     if (usersErr) return { error: usersErr }

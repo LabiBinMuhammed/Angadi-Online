@@ -39,6 +39,8 @@ export default function LoginPage() {
   const [fullName, setFullName] = useState('')
   const [language, setLanguage] = useState('en')
   const [role, setRole] = useState('customer')
+  const [regPhone, setRegPhone] = useState('')
+  const [regCountryCode, setRegCountryCode] = useState('+91')
   
   // UI states
   const [showPw, setShowPw] = useState(false)
@@ -55,7 +57,7 @@ export default function LoginPage() {
     }
   })()
 
-
+  const showPhoneField = !!user?.email && !user?.phone
 
   // Helper to check profile and redirect or show registration completion
   async function checkProfileAndRedirect(userId: string) {
@@ -155,13 +157,21 @@ export default function LoginPage() {
       return
     }
 
+    if (showPhoneField && !regPhone.trim()) {
+      setError('Please enter your phone number.')
+      return
+    }
+
     setLoading(true)
     setError('')
+
+    const phoneNum = showPhoneField ? normalizePhone(regPhone, regCountryCode) : undefined
 
     const { error: regErr } = await completeRegistration(
       name,
       language,
-      role
+      role,
+      phoneNum
     )
     setLoading(false)
 
@@ -383,23 +393,43 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Account Type / Role */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="reg-role">Account Type</label>
-              <div className="input-icon-wrap">
-                <Users size={16} className="input-icon" />
-                <select
-                  id="reg-role"
-                  className="form-input input-with-icon"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  required
-                >
-                  <option value="customer">Customer</option>
-                  <option value="shop_owner">Shop Owner</option>
-                </select>
+            {/* Phone Number (Show only if logged in with email and phone is missing) */}
+            {showPhoneField && (
+              <div className="form-group">
+                <label className="form-label" htmlFor="reg-phone">Phone number</label>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select
+                    value={regCountryCode}
+                    onChange={(e) => setRegCountryCode(e.target.value)}
+                    className="form-input"
+                    style={{ width: '100px', flexShrink: 0, cursor: 'pointer', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}
+                  >
+                    <option value="+91">🇮🇳 +91</option>
+                    <option value="+971">🇦🇪 +971</option>
+                    <option value="+966">🇸🇦 +966</option>
+                    <option value="+968">🇴🇲 +968</option>
+                    <option value="+974">🇶🇦 +974</option>
+                    <option value="+973">🇧🇭 +973</option>
+                    <option value="+965">🇰🇼 +965</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+44">🇬🇧 +44</option>
+                  </select>
+                  <div className="input-icon-wrap" style={{ flex: 1 }}>
+                    <Phone size={16} className="input-icon" />
+                    <input
+                      id="reg-phone"
+                      className="form-input input-with-icon"
+                      type="tel"
+                      placeholder="9876543210"
+                      value={regPhone}
+                      onChange={(e) => setRegPhone(e.target.value)}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
 
 
