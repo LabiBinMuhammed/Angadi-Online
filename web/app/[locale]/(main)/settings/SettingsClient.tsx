@@ -37,7 +37,11 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
   }
 
   async function handleLogout() {
-    await signOut()
+    try {
+      await signOut()
+    } catch (err) {
+      console.error("Signout error in settings:", err)
+    }
     window.location.href = `/${locale}/login`
   }
 

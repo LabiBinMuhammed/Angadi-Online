@@ -260,20 +260,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Sign out (local session)
   async function signOut() {
-    const { error } = await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } catch (e) {
+      console.error("Signout error:", e)
+    }
     setUser(null)
     setSession(null)
     setRole('customer')
-    return { error }
+    try {
+      document.cookie = 'sb-access-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      document.cookie = 'sb-refresh-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      if (typeof window !== 'undefined') {
+        const keys = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && (key.includes('supabase') || key.includes('sb-'))) {
+            keys.push(key)
+          }
+        }
+        keys.forEach(k => localStorage.removeItem(k))
+      }
+    } catch (_) {}
+    return { error: null }
   }
 
   // Sign out from all devices
   async function signOutAll() {
-    const { error } = await supabase.auth.signOut({ scope: 'global' })
+    try {
+      await supabase.auth.signOut({ scope: 'global' })
+    } catch (e) {
+      console.error("Signout all error:", e)
+    }
     setUser(null)
     setSession(null)
     setRole('customer')
-    return { error }
+    try {
+      document.cookie = 'sb-access-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      document.cookie = 'sb-refresh-token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      if (typeof window !== 'undefined') {
+        const keys = []
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i)
+          if (key && (key.includes('supabase') || key.includes('sb-'))) {
+            keys.push(key)
+          }
+        }
+        keys.forEach(k => localStorage.removeItem(k))
+      }
+    } catch (_) {}
+    return { error: null }
   }
 
   return (

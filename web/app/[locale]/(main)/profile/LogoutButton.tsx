@@ -13,14 +13,13 @@ export default function LogoutButton() {
   const { signOut } = useAuth()
 
   async function handleLogout() {
+    setLoading(true)
     try {
-      setLoading(true)
       await signOut()
-      window.location.href = `/${locale}/login`
     } catch (err) {
-      alert(t('auth.err_logout'))
-      setLoading(false)
+      console.error("Signout error in button:", err)
     }
+    window.location.href = `/${locale}/login`
   }
 
   return (
