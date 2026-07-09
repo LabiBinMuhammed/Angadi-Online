@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useTransition, useEffect } from 'react'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import {
   Search, Bell, ChevronDown, Heart, Plus, Minus,
@@ -121,7 +121,8 @@ export default function HomeClient({
   initialFavoriteItemIds = []
 }: Props) {
   const { theme } = useTheme()
-  const { t } = useTranslation()
+  const { locale, t } = useTranslation()
+  const router = useRouter()
   const [shopSearch, setShopSearch] = useState('')
   const [currentDateStr, setCurrentDateStr] = useState('')
 
@@ -228,6 +229,16 @@ export default function HomeClient({
 
   const searchParams = useSearchParams()
   const selectedShopId = searchParams?.get('shop')
+
+  // Redirection: If selectedShopId is invalid/dummy but we have real database shops, redirect the URL
+  useEffect(() => {
+    if (selectedShopId && shops.length > 0) {
+      const exists = shops.some(s => s.id === selectedShopId)
+      if (!exists) {
+        router.replace(`/${locale}/home?shop=${shops[0].id}`)
+      }
+    }
+  }, [selectedShopId, shops, locale, router])
 
   const activeShop = useMemo(() => {
     // 1. Try to find the shop matching selectedShopId
