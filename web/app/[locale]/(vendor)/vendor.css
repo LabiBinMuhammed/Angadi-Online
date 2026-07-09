@@ -123,7 +123,8 @@
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 64px;
   height: calc(100dvh - 64px);
   overflow-y: auto;
@@ -237,7 +238,8 @@
   flex: 1;
   padding: 2.5rem 3rem;
   overflow-y: auto;
-  transition: padding 0.3s ease;
+  margin-left: 280px;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
 }
 
 /* Collapsed state styles for desktop */
@@ -276,6 +278,10 @@
   padding: 1.5rem 0;
   justify-content: center;
   width: 100%;
+}
+
+.sidebar-collapsed .vp-main {
+  margin-left: 80px;
 }
 
 
@@ -340,7 +346,7 @@
 
 .vp-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.5rem;
   margin-bottom: 2.5rem;
 }
@@ -396,7 +402,7 @@
 /* Quick Actions */
 .vp-quick-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 1.25rem;
 }
 
@@ -646,10 +652,21 @@
   .vp-main {
     padding: 1.5rem;
     width: 100%;
+    margin-left: 0;
   }
 
   .vp-title {
     font-size: 1.8rem;
+  }
+
+  .vp-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .vp-quick-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 }
 
