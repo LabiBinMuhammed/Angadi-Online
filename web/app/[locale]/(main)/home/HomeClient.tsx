@@ -18,7 +18,8 @@ import { useTheme } from '@/components/ThemeProvider'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 // Helpers
-function initials(name: string) {
+function initials(name?: string) {
+  if (!name) return 'S'
   const parts = name.trim().split(' ')
   if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
   return name.substring(0, Math.min(name.length, 2)).toUpperCase()
@@ -673,7 +674,7 @@ export default function HomeClient({
             <div style={{ flex: 1 }}>
               {(() => {
                 const shop = activeShop;
-                const shopItems = shop ? (allItems[shop.id] || []) : []
+                const shopItems = shop ? (allItems[shop?.id] || []) : []
                 const imgUrl = shop?.logo_url
                 const productCount = shopItems.length
                 const shopHeaderBg = theme === 'dark' ? 'var(--bg-muted)' : '#fcedef'
@@ -682,19 +683,19 @@ export default function HomeClient({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, flex: 1 }}>
                       <div style={{ width: '60px', height: '60px', background: 'var(--bg-surface)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 12px rgba(0,0,0,0.1)', overflow: 'hidden', flexShrink: 0 }}>
                         {imgUrl ? (
-                          <img src={imgUrl} alt={shop.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={imgUrl} alt={shop?.name || ''} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
-                          <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-light)' }}>{initials(shop.name)}</span>
+                          <span style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-light)' }}>{initials(shop?.name)}</span>
                         )}
                       </div>
                       <div style={{ minWidth: 0 }}>
-                        <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px 0', color: 'var(--text-base)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shop.name}</h3>
+                        <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 4px 0', color: 'var(--text-base)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shop?.name || ''}</h3>
                         <p style={{ fontSize: '13px', color: 'var(--text-muted)', margin: 0, fontWeight: 500 }}>{productCount} {t('home.products')}</p>
                       </div>
                     </div>
-                    {shops.length > 0 && shop.id !== 'dummy1' && shop.id !== 'dummy2' && (
+                    {shops.length > 0 && shop?.id !== 'dummy1' && shop?.id !== 'dummy2' && (
                       <Link 
-                        href={`/shop/${shop.id}?tab=reviews`}
+                        href={`/shop/${shop?.id}?tab=reviews`}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
