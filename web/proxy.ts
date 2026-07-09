@@ -88,9 +88,8 @@ export async function proxy(request: NextRequest) {
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const user = session?.user
+    data: { user },
+  } = await supabase.auth.getUser()
 
   // Helper to preserve cookies on redirects
   const redirect = (url: URL) => {
