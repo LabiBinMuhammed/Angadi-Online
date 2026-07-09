@@ -15,21 +15,24 @@ export default async function HomePage() {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/login')
+  }
+
   let role: string | undefined
   let addresses: any[] = []
-  if (user) {
-    const { data } = await supabase.from('users').select('role').eq('id', user.id).single()
-    role = (data as any)?.role || user.user_metadata?.role
+  
+  const { data } = await supabase.from('users').select('role').eq('id', user.id).single()
+  role = (data as any)?.role || user.user_metadata?.role
 
-    const { data: addrs } = await supabase
-      .from('user_addresses')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('is_default', { ascending: false })
-      .order('created_at', { ascending: false })
+  const { data: addrs } = await supabase
+    .from('user_addresses')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('is_default', { ascending: false })
+    .order('created_at', { ascending: false })
       
-    if (addrs) addresses = addrs
-  }
+  if (addrs) addresses = addrs
 
   const cookieStore = await cookies()
   let locationId = cookieStore.get('selected_location_id')?.value
