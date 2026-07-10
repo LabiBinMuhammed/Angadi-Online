@@ -6,6 +6,7 @@ import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
 import '../../../widgets/directional_huge_icon.dart';
+import '../../../core/location_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,15 +23,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _future = _fetch();
     ThemeService.instance.addListener(_onThemeChanged);
+    LocationService.instance.addListener(_onLocationChanged);
   }
 
   @override
   void dispose() {
     ThemeService.instance.removeListener(_onThemeChanged);
+    LocationService.instance.removeListener(_onLocationChanged);
     super.dispose();
   }
 
   void _onThemeChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _onLocationChanged() {
     if (mounted) {
       setState(() {});
     }
@@ -322,6 +331,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () => context.push('/profile/purchase-history'),
                         ),
                         _buildLinkItem(
+                          label: 'Change Location',
+                          subtitle: LocationService.instance.selectedLocationName ?? 'All Locations',
+                          icon: HugeIcons.strokeRoundedLocation01,
+                          color: const Color(0xFF0EA5E9),
+                          bg: isDark ? const Color(0xFF1E293B) : const Color(0xFFE0F2FE),
+                          isDark: isDark,
+                          onTap: () => context.push('/profile/location'),
+                        ),
+                        _buildLinkItem(
                           label: l10n.settingsTitle,
                           icon: HugeIcons.strokeRoundedSettings01,
                           color: const Color(0xFF64748B),
@@ -520,6 +538,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildLinkItem({
     required String label,
+    String? subtitle,
     required dynamic icon,
     required Color color,
     required Color bg,
@@ -550,6 +569,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: isDark ? Colors.white : kNeutral900,
         ),
       ),
+      subtitle: subtitle != null
+          ? Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? kNeutral400 : kNeutral500,
+              ),
+            )
+          : null,
       trailing: const DirectionalHugeIcon(
         icon: HugeIcons.strokeRoundedArrowRight01,
         color: Color(0xFFCCCCCC),

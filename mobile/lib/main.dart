@@ -4,6 +4,7 @@ import 'l10n/app_localizations.dart';
 import 'core/language_service.dart';
 import 'core/router.dart';
 import 'core/supabase_client.dart';
+import 'core/location_service.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_service.dart';
 
@@ -17,6 +18,7 @@ Future<void> main() async {
 
   await ThemeService.instance.init();
   await LanguageService.instance.initialize();
+  await LocationService.instance.init();
 
   runApp(const VillageMarketApp());
 }

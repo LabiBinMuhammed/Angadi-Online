@@ -56,6 +56,7 @@ import '../screens/main/profile/pinned_shops_screen.dart';
 import '../screens/main/profile/recent_purchases_screen.dart';
 import '../screens/main/profile/purchase_history_screen.dart';
 import '../screens/main/profile/favorites_screen.dart';
+import '../screens/main/profile/select_location_screen.dart';
 
 final _rootNavigatorKey  = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -278,6 +279,7 @@ GoRouter buildRouter() {
               GoRoute(path: 'recent-purchases', builder: (_, __) => const RecentPurchasesScreen()),
               GoRoute(path: 'purchase-history', builder: (_, __) => const PurchaseHistoryScreen()),
               GoRoute(path: 'favorites', builder: (_, __) => const FavoritesScreen()),
+              GoRoute(path: 'location', builder: (_, __) => const SelectLocationScreen()),
             ],
           ),
         ],

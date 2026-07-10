@@ -6,6 +6,7 @@ import '../../../models/models.dart';
 import '../../../core/cart_service.dart';
 import '../../../theme/theme_service.dart';
 import '../../../core/language_service.dart';
+import '../../../core/location_service.dart';
 import '../../../l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
@@ -75,14 +76,20 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadData();
+    LocationService.instance.addListener(_onLocationChanged);
   }
 
   @override
   void dispose() {
+    LocationService.instance.removeListener(_onLocationChanged);
     for (var controller in _qtyControllers.values) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void _onLocationChanged() {
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadData() async {
@@ -99,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final res = await Future.wait([
-        supabase.from('shops').select('id, name, type').order('name'),
+        supabase.from('shops').select('id, name, type, location_id').order('name'),
         supabase.from('items').select('*, item_translations(*), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*, variant_translations(*)), item_images(*)').eq('is_active', true).isFilter('deleted_at', null).order('name'),
         supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
         supabase.from('units').select('*'),
@@ -804,7 +811,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildLeftPanel(AppLocalizations l10n) {
-    final filteredShops = _shops.where((s) => s.name.toLowerCase().contains(_shopSearch.toLowerCase())).toList();
+    final selectedLocId = LocationService.instance.selectedLocationId;
+    final filteredShops = _shops.where((s) {
+      final matchesSearch = s.name.toLowerCase().contains(_shopSearch.toLowerCase());
+      final matchesLocation = selectedLocId == null || s.locationId == selectedLocId;
+      return matchesSearch && matchesLocation;
+    }).toList();
     filteredShops.sort((a, b) {
       final aPinned = _pinnedShopIds.contains(a.id) ? 1 : 0;
       final bPinned = _pinnedShopIds.contains(b.id) ? 1 : 0;
@@ -967,6 +979,31 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(l10n.findGroceriesSubtitle, style: TextStyle(fontSize: 15, color: _kSubLighter, fontWeight: FontWeight.w500)),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: () => context.push('/profile/location'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: _kGreenDark.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: _kGreenDark.withValues(alpha: 0.2)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.location_on, color: _kGreenDark, size: 14),
+                                const SizedBox(width: 4),
+                                Text(
+                                  LocationService.instance.selectedLocationName ?? 'All Locations',
+                                  style: const TextStyle(fontSize: 12, color: _kGreenDark, fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(width: 2),
+                                const Icon(Icons.arrow_drop_down, color: _kGreenDark, size: 16),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
