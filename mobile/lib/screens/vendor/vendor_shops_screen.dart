@@ -234,7 +234,7 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
                                   alignment: Alignment.center,
                                   child: Text(
                                     initialsStr,
-                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 24, color: Colors.white),
+                                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 24, color: kVendorText),
                                   ),
                                 ),
                                 const SizedBox(width: 16),

@@ -149,6 +149,8 @@ export interface DemoVariant {
   unit_id?: string
   value?: number
   price?: number
+  min_value?: number
+  max_value?: number
   is_default: boolean
   is_active: boolean
 }

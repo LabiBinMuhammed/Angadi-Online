@@ -48,7 +48,7 @@ export default async function PinnedShopsPage({ params }: { params: Promise<{ lo
       id: item.shop.id,
       name: item.shop.name,
       type: item.shop.type,
-      logo_url: item.shop.logo_url || null,
+      logo_url: null,
     }
   }))
 

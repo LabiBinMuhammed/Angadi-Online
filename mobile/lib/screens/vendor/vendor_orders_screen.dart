@@ -132,7 +132,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                 children: [
                   Text(
                     'Viewing: $_selectedDate',
-                    style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: kVendorText, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -185,10 +185,10 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.03),
+                        color: isSelected ? Color(0xFF3B82F6) : kVendorTransparentBg,
                         borderRadius: BorderRadius.circular(99),
                         border: Border.all(
-                          color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.08),
+                          color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
                         ),
                         boxShadow: isSelected
                             ? [
@@ -228,10 +228,10 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     margin: const EdgeInsets.only(right: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.03),
+                      color: isSelected ? Color(0xFF3B82F6) : kVendorTransparentBg,
                       borderRadius: BorderRadius.circular(99),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.08),
+                        color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
                       ),
                       boxShadow: isSelected
                           ? [
@@ -283,10 +283,10 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.03),
+                      color: isSelected ? Color(0xFF3B82F6) : kVendorTransparentBg,
                       borderRadius: BorderRadius.circular(99),
                       border: Border.all(
-                        color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withOpacity(0.08),
+                        color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
                       ),
                       boxShadow: isSelected
                           ? [
@@ -397,13 +397,13 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                                       (o['users'] as Map?)?['name'] ?? 'Guest Customer',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 15),
+                                      style: TextStyle(fontWeight: FontWeight.w700, color: kVendorText, fontSize: 15),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     '₹ ${(o['total_final_price'] ?? o['total_estimated_price'] ?? 0.0).toStringAsFixed(0)}',
-                                    style: const TextStyle(fontWeight: FontWeight.w800, color: Colors.white, fontSize: 15),
+                                    style: TextStyle(fontWeight: FontWeight.w800, color: kVendorText, fontSize: 15),
                                   ),
                                 ],
                               ),

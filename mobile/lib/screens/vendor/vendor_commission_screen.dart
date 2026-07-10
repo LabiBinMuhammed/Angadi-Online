@@ -251,14 +251,14 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
                               dropdownColor: kVendorBg,
                               icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                               items: [
-                                const DropdownMenuItem<int?>(
+                                DropdownMenuItem<int?>(
                                   value: null,
-                                  child: Text('All Months', style: TextStyle(color: Colors.white, fontSize: 13)),
+                                  child: Text('All Months', style: TextStyle(color: kVendorText, fontSize: 13)),
                                 ),
                                 ...List.generate(12, (index) {
                                   return DropdownMenuItem<int?>(
                                     value: index + 1,
-                                    child: Text(_monthNames[index], style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                    child: Text(_monthNames[index], style: TextStyle(color: kVendorText, fontSize: 13)),
                                   );
                                 }),
                               ],
@@ -286,15 +286,15 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
                               dropdownColor: kVendorBg,
                               icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
                               items: [
-                                const DropdownMenuItem<int?>(
+                                DropdownMenuItem<int?>(
                                   value: null,
-                                  child: Text('All Years', style: TextStyle(color: Colors.white, fontSize: 13)),
+                                  child: Text('All Years', style: TextStyle(color: kVendorText, fontSize: 13)),
                                 ),
                                 ...List.generate(6, (index) {
                                   final year = 2025 + index;
                                   return DropdownMenuItem<int?>(
                                     value: year,
-                                    child: Text(year.toString(), style: const TextStyle(color: Colors.white, fontSize: 13)),
+                                    child: Text(year.toString(), style: TextStyle(color: kVendorText, fontSize: 13)),
                                   );
                                 }),
                               ],
@@ -352,7 +352,7 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
                                 const SizedBox(height: 8),
                                 Text(
                                   'Days remaining: $daysRemaining days · Ends: ${DateTime.parse(sub['trial_end_date']).toLocal().toString().split(' ')[0]}',
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white70),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kVendorSubText),
                                 ),
                               ],
                             ),
@@ -439,7 +439,7 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
                       ),
                       _buildStatCard(
                         icon: HugeIcons.strokeRoundedAlertCircle,
-                        iconColor: outstandingBalance > 0 ? const Color(0xFFEF4444) : kVendorSubText,
+                        iconColor: outstandingBalance > 0 ? Color(0xFFEF4444) : kVendorSubText,
                         value: '₹${outstandingBalance.toStringAsFixed(0)}',
                         label: 'Outstanding Due',
                         textColor: outstandingBalance > 0 ? const Color(0xFFEF4444) : Colors.white,
@@ -526,7 +526,7 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
                                   style: TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.bold,
-                                    color: (r['balance_due'] ?? 0) > 0 ? const Color(0xFFEF4444) : kVendorSubText,
+                                    color: (r['balance_due'] ?? 0) > 0 ? Color(0xFFEF4444) : kVendorSubText,
                                   ),
                                 )
                               ],

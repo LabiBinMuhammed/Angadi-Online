@@ -174,7 +174,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                           alignment: Alignment.center,
                           child: Text(
                             initialsStr,
-                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 32, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 32, color: kVendorText),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -303,7 +303,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.02),
+                                  color: kVendorTransparentBg,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(color: kVendorCardBorder),
                                 ),
@@ -449,10 +449,10 @@ class _OpCard extends StatelessWidget {
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFFE2E8F0),
+                color: kVendorText,
               ),
             ),
           ],

@@ -68,7 +68,7 @@ export default async function HomePage() {
   const [{ data: shops }, { data: items }, { data: categories }, locationData, { data: units }] = await Promise.all([
     supabase
       .from('shops')
-      .select('id, name, type, location_id, created_at, updated_at, logo_url, shop_owners(users(name)), shop_subscription(restriction_level)')
+      .select('id, name, type, location_id, created_at, updated_at, shop_owners(users(name)), shop_subscription(restriction_level)')
       .eq('location_id', locationId),
     supabase
       .from('items')
@@ -80,7 +80,7 @@ export default async function HomePage() {
       .from('categories')
       .select('id, name, description, is_active, updated_at')
       .eq('is_active', true)
-      .order('name'),
+      .order('display_order', { ascending: true }),
     supabase
       .from('locations')
       .select('name')

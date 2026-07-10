@@ -199,7 +199,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                       children: [
                         Text(
                           (o['users'] as Map?)?['name'] ?? 'Guest Customer',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kVendorText),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -234,7 +234,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                         children: [
                           Text(
                             '${o['delivery_slot'] == 'morning' ? "Morning" : "Evening"} Delivery Slot',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: kVendorText),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -259,7 +259,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 children: [
                   Text(
                     l10n.orderTimelineTitle,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kVendorText),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -272,7 +272,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                               height: 6,
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
-                                color: done ? const Color(0xFF4ADE80) : Colors.white.withValues(alpha: 0.08),
+                                color: done ? Color(0xFF4ADE80) : kVendorTransparentBorder,
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),
@@ -281,7 +281,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                               e.value.toUpperCase(),
                               style: TextStyle(
                                 fontSize: 9,
-                                color: done ? const Color(0xFF4ADE80) : kVendorSubText,
+                                color: done ? Color(0xFF4ADE80) : kVendorSubText,
                                 fontWeight: e.key == currentIdx ? FontWeight.bold : FontWeight.normal,
                               ),
                             ),
@@ -304,7 +304,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 children: [
                   Text(
                     l10n.orderedItemsTitle,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white, letterSpacing: -0.5),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kVendorText, letterSpacing: -0.5),
                   ),
                   const SizedBox(height: 12),
                   ...((o['order_items'] as List?) ?? []).map((oi) {
@@ -343,7 +343,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                     : Container(
                                         width: 56,
                                         height: 56,
-                                        color: Colors.white.withOpacity(0.05),
+                                        color: kVendorTransparentBg,
                                         child: Center(child: HugeIcon(icon: HugeIcons.strokeRoundedPackage, color: kVendorSubText, size: 24)),
                                       ),
                               ),
@@ -355,7 +355,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                   children: [
                                     Text(
                                       variantLabel.isNotEmpty ? '$name ($variantLabel)' : name,
-                                      style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 14),
+                                      style: TextStyle(fontWeight: FontWeight.w700, color: kVendorText, fontSize: 14),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
@@ -410,12 +410,12 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                         child: TextFormField(
                                           initialValue: _actualValues[oi['id']] ?? '',
                                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                          style: const TextStyle(color: Colors.white, fontSize: 13),
+                                          style: TextStyle(color: kVendorText, fontSize: 13),
                                           decoration: InputDecoration(
                                             hintText: 'Actual weight (e.g. 0.6)',
                                             hintStyle: TextStyle(color: kVendorSubText.withOpacity(0.5), fontSize: 12),
                                             filled: true,
-                                            fillColor: Colors.white.withOpacity(0.05),
+                                            fillColor: kVendorTransparentBg,
                                             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                             border: OutlineInputBorder(
                                               borderRadius: BorderRadius.circular(8),
@@ -500,9 +500,9 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                       ),
                     );
                   }),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.0),
-                    child: Divider(color: Color(0x1AFFFFFF)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Divider(color: kVendorDivider),
                   ),
                   
                   // Total Display
@@ -511,7 +511,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                     children: [
                       Text(
                         l10n.totalFinalPriceTitle,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kVendorText),
                       ),
                       Text(
                         '₹${o['total_final_price'] ?? o['total_estimated_price'] ?? '—'}',

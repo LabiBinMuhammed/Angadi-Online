@@ -69,6 +69,33 @@ function renderCategoryIcon(name: string, size = 40) {
   return <Package size={size} />
 }
 
+function parseManualUnitAndPrice(unitText: string, priceText: string, unitsList: Unit[]) {
+  const cleanUnit = (unitText || '').trim()
+  const cleanPrice = Number(priceText || 0)
+  if (isNaN(cleanPrice) || cleanPrice <= 0) return null
+
+  const match = cleanUnit.match(/^\s*([\d.]+)?\s*([a-zA-Z&]+)\s*$/)
+  if (!match) return null
+
+  const value = match[1] ? Number(match[1]) : 1
+  const symbol = match[2].toLowerCase()
+
+  let targetSymbol = symbol
+  if (symbol === 'piece') targetSymbol = 'pcs'
+
+  const matchedUnit = unitsList.find(u => u.symbol.toLowerCase() === targetSymbol)
+  if (!matchedUnit) return null
+
+  const pricePerBaseUnit = value > 0 ? cleanPrice / value : 0
+
+  return {
+    base_unit_id: matchedUnit.id,
+    price_per_base_unit: pricePerBaseUnit,
+    value: value,
+    symbol: matchedUnit.symbol
+  }
+}
+
 export default function ItemFormClient({
   item,
   shopId,
@@ -85,12 +112,34 @@ export default function ItemFormClient({
   const BackIcon = isRtl ? ArrowRight : ArrowLeft
   const NextIcon = isRtl ? ArrowLeft : ArrowRight
 
-  // Steps: 1=Category, 2=Selling Style/Demo, 3=Details, 4=Variants, 5=Preview
-  const [step, setStep] = useState(isEdit ? 3 : 1)
-
   const resolvedSellConfig = item?.item_sell_config 
     ? (Array.isArray(item.item_sell_config) ? item.item_sell_config[0] : item.item_sell_config)
     : null
+
+  // Steps: 1=Category, 2=Selling Style/Demo, 3=Details, 4=Variants, 5=Preview
+  const [step, setStep] = useState(isEdit ? 3 : 1)
+
+  // Manual mode state
+  const [manualUnitText, setManualUnitText] = useState(() => {
+    if (item && resolvedSellConfig?.price_per_base_unit && resolvedSellConfig?.base_unit_id) {
+      const unit = units.find(u => u.id === resolvedSellConfig.base_unit_id)
+      if (unit) {
+        return `1${unit.symbol}`
+      }
+    }
+    return '1kg'
+  })
+  
+  const [manualPriceVal, setManualPriceVal] = useState(() => {
+    if (item && resolvedSellConfig?.price_per_base_unit) {
+      return resolvedSellConfig.price_per_base_unit.toString()
+    }
+    return ''
+  })
+
+  // Fixed mode state for new option
+  const [newOptMeasure, setNewOptMeasure] = useState('')
+  const [newOptPrice, setNewOptPrice] = useState('')
 
   const [form, setForm] = useState({
     name: item?.name ?? '',
@@ -112,6 +161,8 @@ export default function ItemFormClient({
         unit_id: v.unit_id ?? '',
         value: v.value ?? '',
         price: v.price ?? '',
+        min_value: v.min_value ?? null,
+        max_value: v.max_value ?? null,
         is_default: v.is_default,
         is_active: v.is_active,
         image_url: v.image_url ?? ''
@@ -161,24 +212,36 @@ export default function ItemFormClient({
     if (config) {
       set('base_unit_id', config.base_unit_id || demo.unit_id || '')
       set('price_per_base_unit', config.price_per_base_unit || '')
+      if (demo.sell_mode === 'Manual') {
+        const u = units.find(unit => unit.id === (config.base_unit_id || demo.unit_id))
+        setManualUnitText(u ? `1${u.symbol}` : '1kg')
+        setManualPriceVal(config.price_per_base_unit ? config.price_per_base_unit.toString() : '')
+      }
     } else {
       set('base_unit_id', demo.unit_id || '')
+      if (demo.sell_mode === 'Manual') {
+        const u = units.find(unit => unit.id === demo.unit_id)
+        setManualUnitText(u ? `1${u.symbol}` : '1kg')
+        setManualPriceVal('')
+      }
     }
 
     if (vars.length > 0) {
-      setVariants(vars.map(v => ({
-        variant_type: demo.sell_mode,
-        label: v.label,
-        unit_id: v.unit_id || demo.unit_id || '',
-        value: v.value || '',
-        price: v.price || '',
-        is_default: v.is_default,
-        is_active: v.is_active,
-        image_url: ''
-      })))
-    } else {
-      setVariants([])
-    }
+       setVariants(vars.map(v => ({
+         variant_type: demo.sell_mode,
+         label: v.label,
+         unit_id: v.unit_id || demo.unit_id || '',
+         value: v.value || '',
+         price: v.price || '',
+         min_value: v.min_value ?? null,
+         max_value: v.max_value ?? null,
+         is_default: v.is_default,
+         is_active: v.is_active,
+         image_url: ''
+       })))
+     } else {
+       setVariants([])
+     }
 
     if (demo.default_image) setImages([demo.default_image])
     setStep(3)
@@ -187,6 +250,74 @@ export default function ItemFormClient({
   function skipDemo() {
     set('demo_item_id', '')
     setStep(3)
+  }
+
+  function handleManualUnitChange(val: string) {
+    setManualUnitText(val)
+    updateManualPricing(val, manualPriceVal)
+  }
+
+  function handleManualPriceChange(val: string) {
+    setManualPriceVal(val)
+    updateManualPricing(manualUnitText, val)
+  }
+
+  function updateManualPricing(unitText: string, priceText: string) {
+    const parsed = parseManualUnitAndPrice(unitText, priceText, units)
+    if (parsed) {
+      set('base_unit_id', parsed.base_unit_id)
+      set('price_per_base_unit', parsed.price_per_base_unit.toString())
+
+      // If sellMode is Dynamic or Portion, recalculate variants' prices!
+      if (['Dynamic', 'Portion'].includes(form.sell_mode)) {
+        const basePrice = parsed.price_per_base_unit
+        const newVars = [...variants].map(v => {
+          const varUnit = units.find(u => u.id === v.unit_id)
+          const baseUnit = units.find(u => u.id === parsed.base_unit_id)
+          if (varUnit && baseUnit) {
+            const ratio = Number(varUnit.base_multiplier) / Number(baseUnit.base_multiplier)
+            const calc = Number(v.value) * ratio * basePrice
+            v.price = calc.toFixed(2)
+          }
+          return v
+        })
+        setVariants(newVars)
+      }
+    } else {
+      set('base_unit_id', '')
+      set('price_per_base_unit', '')
+    }
+  }
+
+  function handleAddFixedOption() {
+    if (!newOptMeasure.trim()) {
+      setError('Please enter the measure of pack (e.g. 250g).')
+      return
+    }
+    if (!newOptPrice || isNaN(Number(newOptPrice)) || Number(newOptPrice) < 0) {
+      setError('Please enter a valid price.')
+      return
+    }
+
+    const parsed = parseManualUnitAndPrice(newOptMeasure, newOptPrice, units)
+    const unitId = parsed ? parsed.base_unit_id : null
+    const val = parsed ? parsed.value : 1
+
+    const newVar = {
+      variant_type: 'Fixed',
+      label: newOptMeasure.trim(),
+      unit_id: unitId,
+      value: val,
+      price: Number(newOptPrice),
+      is_default: variants.length === 0,
+      is_active: true,
+      image_url: ''
+    }
+
+    setVariants([...variants, newVar])
+    setNewOptMeasure('')
+    setNewOptPrice('')
+    setError(null)
   }
 
   // Variant Modal functions
@@ -401,8 +532,8 @@ export default function ItemFormClient({
             unit_id: v.unit_id || null,
             value: v.value ? Number(v.value) : 1,
             price: v.price ? Number(v.price) : 0,
-            min_value: null,
-            max_value: null,
+            min_value: v.min_value !== undefined ? v.min_value : null,
+            max_value: v.max_value !== undefined ? v.max_value : null,
             is_default: v.is_default,
             is_active: v.is_active,
             image_url: v.image_url || null
@@ -438,8 +569,8 @@ export default function ItemFormClient({
             unit_id: v.unit_id || null,
             value: v.value ? Number(v.value) : 1,
             price: v.price ? Number(v.price) : 0,
-            min_value: null,
-            max_value: null,
+            min_value: v.min_value !== undefined ? v.min_value : null,
+            max_value: v.max_value !== undefined ? v.max_value : null,
             is_default: v.is_default,
             is_active: v.is_active,
             image_url: v.image_url || null
@@ -703,16 +834,71 @@ export default function ItemFormClient({
               style={{ resize: 'vertical', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '0.85rem 1rem' }} />
           </div>
 
+          {['Manual', 'Dynamic', 'Portion'].includes(form.sell_mode) && (
+            <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <h3 style={{ fontWeight: 700, fontSize: '1.05rem', color: '#fff', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', margin: 0 }}>
+                Pricing & Unit
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="vp-form-group">
+                  <label className="vp-label">Unit/Measure (e.g. 101g, 1kg, 250ml) *</label>
+                  <input 
+                    className="vp-input" 
+                    value={manualUnitText} 
+                    onChange={e => handleManualUnitChange(e.target.value)} 
+                    placeholder="e.g. 101g"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '0.85rem 1rem' }}
+                  />
+                </div>
+                <div className="vp-form-group">
+                  <label className="vp-label">Price (₹) *</label>
+                  <input 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    className="vp-input" 
+                    value={manualPriceVal} 
+                    onChange={e => handleManualPriceChange(e.target.value)} 
+                    placeholder="0.00"
+                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '0.85rem 1rem' }}
+                  />
+                </div>
+              </div>
+              {manualUnitText && manualPriceVal && parseManualUnitAndPrice(manualUnitText, manualPriceVal, units) && (
+                <p style={{ fontSize: '0.8rem', color: '#4ade80', margin: 0, fontWeight: 500 }}>
+                  Active setting: ₹{Number(manualPriceVal).toFixed(2)} per {manualUnitText} (calculated as ₹{parseManualUnitAndPrice(manualUnitText, manualPriceVal, units)?.price_per_base_unit.toFixed(4)} per base unit).
+                </p>
+              )}
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: '1rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.06)', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
             <button type="button" className="vp-btn vp-btn-outline" onClick={() => router.back()} style={{ flex: 1 }}>{t('vendor_items.cancel_button')}</button>
             <button type="button" onClick={() => {
-              if (form.name.trim()) {
-                setStep(4)
-              } else {
+              if (!form.name.trim()) {
                 setError(t('vendor_items.err_name_required'))
+                return
+              }
+              if (['Manual', 'Dynamic', 'Portion'].includes(form.sell_mode)) {
+                const parsed = parseManualUnitAndPrice(manualUnitText, manualPriceVal, units)
+                if (!parsed) {
+                  setError("Please enter a valid unit/measure (e.g. 101g, 1kg) and a valid positive price.")
+                  return
+                }
+              }
+              if (form.sell_mode === 'Manual') {
+                setStep(5)
+                setError(null)
+              } else {
+                setStep(4)
+                setError(null)
               }
             }} className="vp-btn vp-btn-primary" style={{ flex: 1.5, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-              {t('vendor_items.next_variants_pricing')} <NextIcon size={18} />
+              {form.sell_mode === 'Manual' ? (
+                <>Next: Preview <NextIcon size={18} /></>
+              ) : (
+                <>{t('vendor_items.next_variants_pricing')} <NextIcon size={18} /></>
+              )}
             </button>
           </div>
         </div>
@@ -726,127 +912,190 @@ export default function ItemFormClient({
               <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', margin: '0 0 0.25rem 0' }}>
                 {t('vendor_items.pricing_variants_title')}
               </h2>
-              <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.95rem' }}>{t('vendor_items.pricing_variants_desc')}</p>
+              <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.95rem' }}>
+                {form.sell_mode === 'Fixed' ? 'Configure pack sizes and prices.' : 'View pre-defined option configurations.'}
+              </p>
             </div>
             <button type="button" onClick={() => setStep(3)} className="vp-btn vp-btn-outline vp-btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><BackIcon size={16}/> {t('vendor_items.back_button')}</button>
           </div>
 
-          {form.sell_mode !== 'Fixed' && (
-            <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <h3 style={{ fontWeight: 700, fontSize: '1.05rem', color: '#fff', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem' }}>
-                {t('vendor_items.base_price_section')}
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div className="vp-form-group">
-                  <label className="vp-label">{t('vendor_items.base_unit_label')}</label>
-                  <select className="vp-select" value={form.base_unit_id} onChange={e => handleBaseUnitChange(e.target.value)}
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px' }}>
-                    <option value="">{t('vendor_items.select_unit_placeholder')}</option>
-                    {units.map(u => <option key={u.id} value={u.id}>{u.name} ({u.symbol})</option>)}
-                  </select>
-                </div>
-                <div className="vp-form-group">
-                  <label className="vp-label">{t('vendor_items.price_per_unit_label')}</label>
-                  <input type="number" step="0.01" min="0" className="vp-input" value={form.price_per_base_unit} onChange={e => handleBasePriceChange(e.target.value)} placeholder="0.00"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '0.85rem 1rem' }} />
-                </div>
+          {form.sell_mode === 'Fixed' ? (
+            <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                <h3 style={{ fontWeight: 700, fontSize: '1.05rem', color: '#fff', margin: 0 }}>
+                  Pre-Packed Options / Variants
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>
+                  {variants.length} / 5 Options Configured
+                </span>
               </div>
-              <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '0.75rem', marginInlineStart: '0.25rem' }}>
-                {t('vendor_items.base_price_example_desc')}
-              </p>
-            </div>
-          )}
 
-          <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-              <h3 style={{ fontWeight: 700, fontSize: '1.05rem', color: '#fff', margin: 0 }}>
-                {t('vendor_items.product_variants_section')}
-              </h3>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>
-                {t('vendor_items.max_variants_limit').replace('{count}', variants.length.toString()).replace('{max}', '5')}
-              </span>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
-              {variants.map((v, idx) => (
-                <div key={idx} style={{
-                  background: 'rgba(255, 255, 255, 0.02)',
-                  border: `2px solid ${v.is_default ? '#3b82f6' : 'rgba(255, 255, 255, 0.06)'}`,
-                  borderRadius: '20px',
-                  padding: '1rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.75rem',
-                  position: 'relative'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                    <span className="vp-badge" style={{
-                      background: v.is_default ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.05)',
-                      color: v.is_default ? '#60a5fa' : '#94a3b8',
-                      fontSize: '0.65rem',
-                      fontWeight: 700,
-                      border: v.is_default ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(255,255,255,0.05)'
-                    }}>{v.is_default ? t('vendor_items.default_badge') : t('vendor_items.variant_badge')}</span>
-
-                    <div style={{ display: 'flex', gap: '0.25rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                      <button type="button" onClick={() => openEditVariantModal(idx)} className="vp-btn vp-btn-outline vp-btn-sm" style={{ padding: '0.35rem', borderRadius: '8px', border: 'none' }} title={t('common.edit')}>
-                        <Edit size={14} />
-                      </button>
-                      <button type="button" onClick={() => removeVariant(idx)} className="vp-btn vp-btn-danger vp-btn-sm" style={{ padding: '0.35rem', borderRadius: '8px', border: 'none' }} title={t('common.delete')}>
-                        <Trash2 size={14} />
-                      </button>
+              {/* Options List */}
+              {variants.length === 0 ? (
+                <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                  <p style={{ color: '#94a3b8', margin: 0 }}>No options added yet. Add at least one option below.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {variants.map((v, idx) => (
+                    <div key={idx} style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: `1.5px solid ${v.is_default ? '#3b82f6' : 'rgba(255, 255, 255, 0.06)'}`,
+                      borderRadius: '16px',
+                      padding: '0.85rem 1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexDirection: isRtl ? 'row-reverse' : 'row'
+                    }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                        <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
+                          <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem' }}>{v.label}</span>
+                          {v.is_default && (
+                            <span style={{ marginInlineStart: '0.5rem', fontSize: '0.65rem', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                              Default
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                        <span style={{ fontWeight: 800, color: '#4ade80' }}>₹{Number(v.price).toFixed(2)}</span>
+                        
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          {!v.is_default && (
+                            <button type="button" onClick={() => {
+                              const newVars = [...variants].map((item, i) => ({ ...item, is_default: i === idx }))
+                              setVariants(newVars)
+                            }} className="vp-btn vp-btn-outline vp-btn-sm" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                              Set Default
+                            </button>
+                          )}
+                          <button type="button" onClick={() => removeVariant(idx)} style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#f87171', padding: '6px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Remove">
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ))}
+                </div>
+              )}
 
-                  <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-                    <div style={{ width: 44, height: 44, background: '#1e293b', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {v.image_url ? (
-                        <img src={v.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <Package size={20} style={{ color: '#64748b' }} />
-                      )}
+              {/* Inline Add Option Form */}
+              {variants.length < 5 && (
+                <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '16px', padding: '1.25rem' }}>
+                  <h4 style={{ margin: '0 0 0.75rem 0', fontSize: '0.9rem', color: '#fff', fontWeight: 700 }}>Add New Option</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.75rem', alignItems: 'end' }}>
+                    <div className="vp-form-group" style={{ marginBottom: 0 }}>
+                      <label className="vp-label" style={{ fontSize: '0.75rem', marginBottom: '0.35rem' }}>Measure of Pack (e.g. 250g, 500ml, 12pcs) *</label>
+                      <input 
+                        className="vp-input" 
+                        value={newOptMeasure} 
+                        onChange={e => setNewOptMeasure(e.target.value)} 
+                        placeholder="e.g. 250g"
+                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.65rem 0.85rem', fontSize: '0.9rem' }}
+                      />
                     </div>
-                    <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
-                      <h4 style={{ fontWeight: 700, margin: 0, color: '#fff', fontSize: '0.95rem' }}>{v.label}</h4>
-                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#60a5fa', fontWeight: 700 }}>₹{v.price || '0.00'}</p>
+                    <div className="vp-form-group" style={{ marginBottom: 0 }}>
+                      <label className="vp-label" style={{ fontSize: '0.75rem', marginBottom: '0.35rem' }}>Price (₹) *</label>
+                      <input 
+                        type="number" 
+                        step="0.01" 
+                        min="0" 
+                        className="vp-input" 
+                        value={newOptPrice} 
+                        onChange={e => setNewOptPrice(e.target.value)} 
+                        placeholder="0.00"
+                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px', padding: '0.65rem 0.85rem', fontSize: '0.9rem' }}
+                      />
                     </div>
+                    <button 
+                      type="button" 
+                      onClick={handleAddFixedOption} 
+                      className="vp-btn vp-btn-primary" 
+                      style={{ padding: '0.65rem 1.25rem', borderRadius: '10px', height: '39px', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                    >
+                      <Plus size={16} /> Add
+                    </button>
                   </div>
                 </div>
-              ))}
-
-              {variants.length < 5 && (
-                <button type="button" onClick={openAddVariantModal} style={{
-                  border: '2px dashed rgba(255,255,255,0.12)',
-                  borderRadius: '20px',
-                  background: 'rgba(0,0,0,0.1)',
-                  height: '116px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.5rem',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  color: '#94a3b8',
-                  outline: 'none'
-                }}
-                  onMouseOver={(e) => e.currentTarget.style.borderColor = 'rgba(59,130,246,0.4)'}
-                  onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)'}
-                >
-                  <Plus size={20} />
-                  <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{t('vendor_items.add_variant_option')}</span>
-                </button>
               )}
             </div>
-          </div>
+          ) : (
+            // Dynamic or Portion mode: display demo options with Remove button and Set Default button
+            <div style={{ background: 'rgba(0,0,0,0.15)', borderRadius: '24px', padding: '1.5rem', border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                <h3 style={{ fontWeight: 700, fontSize: '1.05rem', color: '#fff', margin: 0 }}>
+                  Demo Options
+                </h3>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontWeight: 600 }}>
+                  {variants.length} Options Config
+                </span>
+              </div>
+              
+              {variants.length === 0 ? (
+                <div style={{ padding: '2rem', textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px' }}>
+                  <p style={{ color: '#94a3b8', margin: 0 }}>No options remaining. At least one option is required.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {variants.map((v, idx) => (
+                    <div key={idx} style={{
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: `1.5px solid ${v.is_default ? '#3b82f6' : 'rgba(255, 255, 255, 0.06)'}`,
+                      borderRadius: '16px',
+                      padding: '0.85rem 1rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      flexDirection: isRtl ? 'row-reverse' : 'row'
+                    }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                        <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
+                          <span style={{ fontWeight: 700, color: '#fff', fontSize: '0.95rem' }}>{v.label}</span>
+                          {v.is_default && (
+                            <span style={{ marginInlineStart: '0.5rem', fontSize: '0.65rem', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                              Default
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+                        <span style={{ color: '#4ade80', fontWeight: 800 }}>
+                          {v.price && Number(v.price) > 0 ? `₹${Number(v.price).toFixed(2)}` : 'Pricing dynamic'}
+                        </span>
+                        
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                          {!v.is_default && (
+                            <button type="button" onClick={() => {
+                              const newVars = [...variants].map((item, i) => ({ ...item, is_default: i === idx }))
+                              setVariants(newVars)
+                            }} className="vp-btn vp-btn-outline vp-btn-sm" style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}>
+                              Set Default
+                            </button>
+                          )}
+                          <button type="button" onClick={() => {
+                            const filtered = variants.filter((_, i) => i !== idx);
+                            if (v.is_default && filtered.length > 0) {
+                              filtered[0].is_default = true;
+                            }
+                            setVariants(filtered);
+                          }} style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', color: '#f87171', padding: '6px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} title="Remove">
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: '1rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.06)', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
             <button type="button" onClick={() => setStep(3)} className="vp-btn vp-btn-outline" style={{ flex: 1 }}>{t('vendor_items.back_button')}</button>
             <button type="button" onClick={() => {
-              if (variants.length === 0 && form.sell_mode === 'Fixed') {
-                setError(t('vendor_items.err_fixed_mode_variant'))
-              } else if (variants.length === 0 && (!form.base_unit_id || !form.price_per_base_unit)) {
-                setError(t('vendor_items.err_price_invalid'))
+              if (variants.length === 0) {
+                setError("Please ensure there is at least one option/variant configured.")
               } else {
                 setStep(5)
                 setError(null)
@@ -868,7 +1117,7 @@ export default function ItemFormClient({
               </h2>
               <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.95rem' }}>{t('vendor_items.preview_desc')}</p>
             </div>
-            <button type="button" onClick={() => setStep(4)} className="vp-btn vp-btn-outline vp-btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><BackIcon size={16}/> {t('vendor_items.back_button')}</button>
+            <button type="button" onClick={() => setStep(form.sell_mode === 'Manual' ? 3 : 4)} className="vp-btn vp-btn-outline vp-btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><BackIcon size={16}/> {t('vendor_items.back_button')}</button>
           </div>
 
           {/* Smartphone Mockup */}

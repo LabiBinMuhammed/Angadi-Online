@@ -264,7 +264,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                           const SizedBox(width: 8),
                           Text(
                             '${isMorning ? "Morning" : "Evening"} Run ($dateLabel • $formattedDate)',
-                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: Colors.white),
+                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kVendorText),
                           ),
                         ],
                       ),
@@ -290,7 +290,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('$count', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
+                              Text('$count', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kVendorText)),
                               Text(l10n.ordersCountLabel, style: TextStyle(fontSize: 11, color: kVendorSubText)),
                             ],
                           ),
@@ -298,7 +298,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('₹ ${val.toStringAsFixed(0)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white)),
+                              Text('₹ ${val.toStringAsFixed(0)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: kVendorText)),
                               Text(l10n.runValueLabel, style: TextStyle(fontSize: 11, color: kVendorSubText)),
                             ],
                           ),
@@ -552,10 +552,10 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
-                  color: Colors.white,
+                  color: kVendorText,
                   letterSpacing: -1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -601,10 +601,10 @@ class _ActionCard extends StatelessWidget {
             Text(
               label,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFFE2E8F0),
+                color: kVendorText,
               ),
             ),
           ],

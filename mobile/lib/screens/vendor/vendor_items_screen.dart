@@ -79,7 +79,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(nextStatus == 'published' ? l10n.itemMarkedLive : l10n.itemMarkedHidden),
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: kVendorDialogBg,
       ),
     );
     _load();
@@ -90,8 +90,8 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: Text(l10n.deleteProductDialogTitle, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: kVendorDialogBg,
+        title: Text(l10n.deleteProductDialogTitle, style: TextStyle(color: kVendorText, fontWeight: FontWeight.bold)),
         content: Text(l10n.deleteProductDialogMessage(item['name'] ?? ''), style: TextStyle(color: kVendorSubText)),
         actions: [
           TextButton(
@@ -112,7 +112,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
       }).eq('id', item['id']);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.productDeletedSuccess), backgroundColor: const Color(0xFF1E293B)),
+        SnackBar(content: Text(l10n.productDeletedSuccess), backgroundColor: kVendorDialogBg),
       );
       _load();
     }
@@ -179,7 +179,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                 // Search Input Field
                 TextField(
                   controller: _searchCtrl,
-                  style: const TextStyle(color: Colors.white, fontSize: 15),
+                  style: TextStyle(color: kVendorText, fontSize: 15),
                   decoration: vendorInputDecoration(
                     hintText: l10n.searchProductsPlaceholder,
                     prefixIcon: HugeIcon(icon: HugeIcons.strokeRoundedSearch01, color: kVendorSubText),
@@ -294,7 +294,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                       : Container(
                                           width: 48,
                                           height: 48,
-                                          color: Colors.white.withValues(alpha: 0.05),
+                                          color: kVendorTransparentBg,
                                           child: Center(
                                             child: HugeIcon(icon: HugeIcons.strokeRoundedPackage, color: kVendorSubText, size: 22),
                                           ),
@@ -311,10 +311,10 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                         item['name'] ?? '—',
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontWeight: FontWeight.w600,
                                           fontSize: 15,
-                                          color: Colors.white,
+                                          color: kVendorText,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -323,7 +323,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: Colors.white.withValues(alpha: 0.05),
+                                              color: kVendorTransparentBg,
                                               borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
@@ -347,7 +347,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                     // Power Toggle
                                     _ActionButton(
                                       icon: HugeIcons.strokeRoundedShutDown,
-                                      color: status == 'published' ? const Color(0xFF60A5FA) : kVendorSubText,
+                                      color: status == 'published' ? Color(0xFF60A5FA) : kVendorSubText,
                                       onPressed: () => _toggleActive(item),
                                       tooltip: status == 'published' ? l10n.deactivateTooltip : l10n.goLiveTooltip,
                                     ),
@@ -355,7 +355,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                     // Edit
                                     _ActionButton(
                                       icon: HugeIcons.strokeRoundedPencilEdit02,
-                                      color: Colors.white.withValues(alpha: 0.7),
+                                      color: kVendorText.withValues(alpha: 0.7),
                                       onPressed: () => context.push('/vendor/items/${item['id']}').then((_) => _load()),
                                       tooltip: 'Edit',
                                     ),
@@ -403,10 +403,10 @@ class _FilterButton extends StatelessWidget {
         margin: const EdgeInsets.only(right: 8),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.03),
+          color: selected ? Color(0xFF3B82F6) : kVendorTransparentBg,
           borderRadius: BorderRadius.circular(99),
           border: Border.all(
-            color: selected ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.08),
+            color: selected ? Color(0xFF3B82F6) : kVendorTransparentBorder,
           ),
           boxShadow: selected
               ? [
@@ -460,9 +460,9 @@ class _ActionButton extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: bgColor ?? Colors.white.withValues(alpha: 0.03),
+            color: bgColor ?? kVendorTransparentBg,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: borderColor ?? Colors.white.withValues(alpha: 0.12)),
+            border: Border.all(color: borderColor ?? kVendorTransparentBorder),
           ),
           child: Center(
             child: HugeIcon(icon: icon, color: color, size: 16),

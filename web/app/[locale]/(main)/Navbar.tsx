@@ -27,7 +27,7 @@ export default async function Navbar() {
   return (
     <header className="wa-sidebar-top" style={{ 
       display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-      padding: '16px 20px', background: 'var(--bg-base)', position: 'sticky', top: 0, zIndex: 100, width: '100%', boxSizing: 'border-box'
+      padding: '16px 20px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 100, width: '100%', boxSizing: 'border-box'
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: '8px 16px', borderRadius: '24px', fontSize: '14px', fontWeight: 600, color: 'var(--text-base)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
         <span>Home</span>

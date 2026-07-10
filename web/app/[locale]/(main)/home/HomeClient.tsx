@@ -534,7 +534,7 @@ export default function HomeClient({
         }}>
           
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 10px', background: 'var(--bg-base)', position: 'sticky', top: 0, zIndex: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: '8px 16px', borderRadius: '24px', fontSize: '14px', fontWeight: 600, color: 'var(--text-base)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
               <span>{t('nav.home')}</span>
               <ChevronDown size={16} color="var(--text-base)" style={{ marginLeft: '4px' }} />

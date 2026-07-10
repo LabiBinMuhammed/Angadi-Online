@@ -55,7 +55,7 @@ class VendorDrawer extends StatelessWidget {
               ),
             ),
             
-            const Divider(color: Color(0x14FFFFFF), height: 1),
+            Divider(color: kVendorDivider, height: 1),
             const SizedBox(height: 16),
             
             // Drawer Navigation Links
@@ -114,7 +114,7 @@ class VendorDrawer extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               child: Column(
                 children: [
-                  const Divider(color: Color(0x14FFFFFF), height: 1),
+                  Divider(color: kVendorDivider, height: 1),
                   const SizedBox(height: 12),
                   // Theme Toggle
                   ListTile(

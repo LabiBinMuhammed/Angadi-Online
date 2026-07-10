@@ -9,6 +9,11 @@ Color get kVendorSubText => ThemeService.instance.isDarkMode ? const Color(0xFF9
 Color get kVendorCardBg => ThemeService.instance.isDarkMode ? const Color(0x06FFFFFF) : Colors.white;      // ~2% white / solid white
 Color get kVendorCardBorder => ThemeService.instance.isDarkMode ? const Color(0x14FFFFFF) : const Color(0xFFE2E8F0);  // ~8% white / light border
 Color get kVendorInputBg => ThemeService.instance.isDarkMode ? const Color(0x0DFFFFFF) : const Color(0xFFF1F5F9);     // ~5% white / light grey
+Color get kVendorDivider => ThemeService.instance.isDarkMode ? const Color(0x14FFFFFF) : const Color(0xFFE2E8F0);
+Color get kVendorDialogBg => ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white;
+Color get kVendorFocusedBorder => ThemeService.instance.isDarkMode ? const Color(0x33FFFFFF) : const Color(0x33000000);
+Color get kVendorTransparentBg => ThemeService.instance.isDarkMode ? const Color(0x0AFFFFFF) : const Color(0x0A000000);
+Color get kVendorTransparentBorder => ThemeService.instance.isDarkMode ? const Color(0x14FFFFFF) : const Color(0x14000000);
 
 BoxDecoration vendorCardDecoration({double radius = 24}) {
   return BoxDecoration(

@@ -130,7 +130,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                             children: [
                               Text(
                                 name,
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kVendorText),
                               ),
                               if (phone.isNotEmpty) ...[
                                 const SizedBox(height: 2),
@@ -176,9 +176,9 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                   const SizedBox(height: 28),
 
                   // Order History List
-                  const Text(
+                  Text(
                     'Order History',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white, letterSpacing: -0.5),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: kVendorText, letterSpacing: -0.5),
                   ),
                   const SizedBox(height: 12),
 
@@ -217,7 +217,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white.withValues(alpha: 0.04),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                              border: Border.all(color: kVendorTransparentBorder),
                             ),
                             child: HugeIcon(icon: HugeIcons.strokeRoundedReceiptText, color: kVendorSubText, size: 18),
                           ),
@@ -226,9 +226,9 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
                             children: [
                               Text(
                                 '#${orderId.substring(0, 8).toUpperCase()}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                                  color: kVendorText,
                                   fontSize: 14,
                                   fontFamily: 'monospace',
                                 ),

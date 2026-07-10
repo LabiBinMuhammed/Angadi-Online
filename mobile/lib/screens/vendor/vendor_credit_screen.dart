@@ -88,7 +88,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
             content: Text(field == 'is_credit_enabled'
                 ? 'Credit account ${next ? 'enabled' : 'disabled'}'
                 : 'Customer account ${next ? 'blocked' : 'unblocked'}'),
-            backgroundColor: const Color(0xFF1E293B),
+            backgroundColor: kVendorDialogBg,
           ),
         );
       }
@@ -143,7 +143,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: TextField(
               controller: _searchCtrl,
-              style: const TextStyle(color: Colors.white, fontSize: 15),
+              style: TextStyle(color: kVendorText, fontSize: 15),
               decoration: vendorInputDecoration(
                 hintText: 'Search customer by name or phone...',
                 prefixIcon: HugeIcon(icon: HugeIcons.strokeRoundedSearch01, color: kVendorSubText),
@@ -225,7 +225,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                     children: [
                                       Text(
                                         name,
-                                        style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 15),
+                                        style: TextStyle(fontWeight: FontWeight.w700, color: kVendorText, fontSize: 15),
                                       ),
                                       if (phone.isNotEmpty) ...[
                                         const SizedBox(height: 2),
@@ -282,7 +282,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                         // Enable/Disable toggle
                                         _MiniActionButton(
                                           icon: HugeIcons.strokeRoundedShutDown,
-                                          color: isEnabled ? const Color(0xFF4ADE80) : kVendorSubText,
+                                          color: isEnabled ? Color(0xFF4ADE80) : kVendorSubText,
                                           onPressed: () => _toggle(c, 'is_credit_enabled'),
                                           tooltip: isEnabled ? 'Disable Credit' : 'Enable Credit',
                                         ),
@@ -290,7 +290,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
                                         // Block/Unblock toggle
                                         _MiniActionButton(
                                           icon: isBlocked ? HugeIcons.strokeRoundedShield01 : HugeIcons.strokeRoundedUnavailable,
-                                          color: isBlocked ? const Color(0xFFF87171) : kVendorSubText,
+                                          color: isBlocked ? Color(0xFFF87171) : kVendorSubText,
                                           onPressed: () => _toggle(c, 'is_blocked'),
                                           tooltip: isBlocked ? 'Unblock Customer' : 'Block Customer',
                                         ),
@@ -342,7 +342,7 @@ class _MiniActionButton extends StatelessWidget {
           width: 30,
           height: 30,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.02),
+            color: kVendorTransparentBg,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),

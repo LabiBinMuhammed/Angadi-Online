@@ -16,7 +16,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ itemI
   const [{ data: item }, { data: shopOwner }, { data: categories }] = await Promise.all([
     supabase.from('items').select('*, item_images(*), item_variants(*), item_sell_config(*)').eq('id', itemId).single(),
     supabase.from('shop_owners').select('shop_id').eq('user_id', user!.id).maybeSingle(),
-    supabase.from('categories').select('id, name').eq('is_active', true),
+    supabase.from('categories').select('id, name').eq('is_active', true).order('display_order', { ascending: true }),
   ])
 
   if (!item) notFound()

@@ -1026,8 +1026,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           ? [const Color(0xFF1E293B), const Color(0xFF27272A)] 
                           : [const Color(0xFFFCEDEF), const Color(0xFFF4E9F9)];
                       final bg = bgColors[index % bgColors.length];
-                      final shopItemsCount = _allItems[shop.id]?.length ?? (index == 0 ? 122 : 75);
-                      final subtitle = index == 0 ? l10n.bestOrganic : l10n.greatDeals;
+                      final shopItemsCount = _allItems[shop.id]?.length ?? 0;
+                      final shopType = (shop.type ?? '').toLowerCase();
+                      final subtitle = shopType == 'general'
+                          ? l10n.greatDeals
+                          : shopType == 'organic'
+                              ? l10n.bestOrganic
+                              : shopType.isNotEmpty
+                                  ? shopType[0].toUpperCase() + shopType.substring(1)
+                                  : '';
 
                       final isNarrow = MediaQuery.of(context).size.width < 380;
 
@@ -1132,7 +1139,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildRightPanel(AppLocalizations l10n) {
     final shop = _shops.firstWhere((s) => s.id == _selectedShopId, orElse: () => _shops.first);
-    final shopItemsCount = _allItems[shop.id]?.length ?? 122;
+    final shopItemsCount = _allItems[shop.id]?.length ?? 0;
     
     final shopItems = _allItems[shop.id] ?? [];
     final activeCategoryIds = shopItems.map((item) => item.categoryId).toSet();

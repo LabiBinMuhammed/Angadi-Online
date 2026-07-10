@@ -16,8 +16,8 @@ export default async function AddItemPage() {
   const shopId = (shopOwner as any)?.shop_id ?? ''
 
   const [categoriesRes, demoItemsRes, unitsRes, demoConfigsRes, demoVariantsRes] = await Promise.all([
-    supabase.from('categories').select('id, name').eq('is_active', true),
-    supabase.from('demo_items').select('*'),
+    supabase.from('categories').select('id, name').eq('is_active', true).order('display_order', { ascending: true }),
+    supabase.from('demo_items').select('*').order('display_order', { ascending: true }),
     supabase.from('units').select('*'),
     supabase.from('demo_sell_config').select('*'),
     supabase.from('demo_variants').select('*')

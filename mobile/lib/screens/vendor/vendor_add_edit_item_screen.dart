@@ -23,6 +23,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
+  final _manualUnitCtrl = TextEditingController(text: '1kg');
+  final _manualPriceCtrl = TextEditingController();
+  final _newOptMeasureCtrl = TextEditingController();
+  final _newOptPriceCtrl = TextEditingController();
 
   bool _isActive = true;
   bool _loading = false;
@@ -54,12 +58,17 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
     
     if (!nameOk || !catOk || !imgOk) return false;
     
-    if (_sellMode != 'Fixed') {
+    if (_sellMode == 'Manual') {
+      final hasBaseConfig = _baseUnitId != null && 
+          _pricePerBaseUnit.trim().isNotEmpty && 
+          (double.tryParse(_pricePerBaseUnit) ?? 0) > 0;
+      return hasBaseConfig;
+    } else if (_sellMode == 'Dynamic' || _sellMode == 'Portion') {
       final hasVars = _variants.isNotEmpty;
       final hasBaseConfig = _baseUnitId != null && 
           _pricePerBaseUnit.trim().isNotEmpty && 
           (double.tryParse(_pricePerBaseUnit) ?? 0) > 0;
-      return hasVars || hasBaseConfig;
+      return hasVars && hasBaseConfig;
     } else {
       return _variants.isNotEmpty;
     }
@@ -75,6 +84,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   void dispose() {
     _nameCtrl.dispose();
     _descCtrl.dispose();
+    _manualUnitCtrl.dispose();
+    _manualPriceCtrl.dispose();
+    _newOptMeasureCtrl.dispose();
+    _newOptPriceCtrl.dispose();
     super.dispose();
   }
 
@@ -131,6 +144,14 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           _sellMode = configRes['sell_mode'] ?? 'Manual';
           _baseUnitId = configRes['base_unit_id'];
           _pricePerBaseUnit = configRes['price_per_base_unit']?.toString() ?? '';
+
+          if (_sellMode == 'Manual' || _sellMode == 'Dynamic' || _sellMode == 'Portion') {
+            final unit = _units.firstWhere((u) => u['id'] == _baseUnitId, orElse: () => {});
+            if (unit.isNotEmpty) {
+              _manualUnitCtrl.text = '1${unit['symbol']}';
+            }
+            _manualPriceCtrl.text = _pricePerBaseUnit;
+          }
         }
 
         final varsRes = await supabase
@@ -145,6 +166,8 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
             'unit_id': v['unit_id'],
             'value': v['value']?.toString() ?? '',
             'price': v['price']?.toString() ?? '',
+            'min_value': v['min_value'],
+            'max_value': v['max_value'],
             'is_default': v['is_default'] ?? false,
             'is_active': v['is_active'] ?? true,
             'image_url': v['image_url'],
@@ -249,6 +272,16 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
         _pricePerBaseUnit = '';
       }
 
+      if (_sellMode == 'Manual' || _sellMode == 'Dynamic' || _sellMode == 'Portion') {
+        final unit = _units.firstWhere((u) => u['id'] == _baseUnitId, orElse: () => {});
+        if (unit.isNotEmpty) {
+          _manualUnitCtrl.text = '1${unit['symbol']}';
+        } else {
+          _manualUnitCtrl.text = '1kg';
+        }
+        _manualPriceCtrl.text = _pricePerBaseUnit;
+      }
+
       if (vars.isNotEmpty) {
         _variants = vars.map((v) => {
           'variant_type': demo['sell_mode'],
@@ -256,6 +289,8 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           'unit_id': v['unit_id'] ?? demo['unit_id'],
           'value': v['value']?.toString() ?? '',
           'price': v['price']?.toString() ?? '',
+          'min_value': v['min_value'],
+          'max_value': v['max_value'],
           'is_default': v['is_default'] ?? false,
           'is_active': v['is_active'] ?? true,
           'image_url': '',
@@ -351,10 +386,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           if (v['label'] == '250g') v['price'] = (basePrice * 0.25).toStringAsFixed(2);
           if (v['label'] == '500g') v['price'] = (basePrice * 0.50).toStringAsFixed(2);
           if (v['label'] == '1kg') v['price'] = basePrice.toStringAsFixed(2);
-        } else if (_sellMode == 'Dynamic') {
-          final weight = double.tryParse(v['value']?.toString() ?? '') ?? 0.0;
-          if (weight > 0) {
-            v['price'] = (weight * basePrice).toStringAsFixed(2);
+        } else if (_sellMode == 'Dynamic' || _sellMode == 'Portion') {
+          final val = double.tryParse(v['value']?.toString() ?? '') ?? 0.0;
+          if (val > 0) {
+            v['price'] = (val * basePrice).toStringAsFixed(2);
           }
         }
         return v;
@@ -381,6 +416,89 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
       final symbol = unit['symbol'] ?? '';
       
       v['label'] = '$size (est. ${weight.toStringAsFixed(weight.truncateToDouble() == weight ? 0 : 1)}$symbol)';
+    });
+  }
+
+  Map<String, dynamic>? parseManualUnitAndPrice(String unitText, String priceText, List<Map<String, dynamic>> unitsList) {
+    final cleanUnit = unitText.trim();
+    final cleanPrice = double.tryParse(priceText.trim()) ?? 0.0;
+    if (cleanPrice <= 0) return null;
+
+    final regExp = RegExp(r'^\s*([\d.]+)?\s*([a-zA-Z&]+)\s*$');
+    final match = regExp.firstMatch(cleanUnit);
+    if (match == null) return null;
+
+    final valStr = match.group(1);
+    final double value = valStr != null ? (double.tryParse(valStr) ?? 1.0) : 1.0;
+    final symbol = match.group(2)!.toLowerCase();
+
+    String targetSymbol = symbol;
+    if (symbol == 'piece') targetSymbol = 'pcs';
+
+    final matchedUnit = unitsList.firstWhere(
+      (u) => (u['symbol'] as String).toLowerCase() == targetSymbol,
+      orElse: () => {},
+    );
+    if (matchedUnit.isEmpty) return null;
+
+    final pricePerBaseUnit = value > 0 ? cleanPrice / value : 0.0;
+
+    return {
+      'base_unit_id': matchedUnit['id'],
+      'price_per_base_unit': pricePerBaseUnit,
+      'value': value,
+      'symbol': matchedUnit['symbol']
+    };
+  }
+
+  void _updateManualPricing() {
+    final parsed = parseManualUnitAndPrice(_manualUnitCtrl.text, _manualPriceCtrl.text, _units);
+    if (parsed != null) {
+      _baseUnitId = parsed['base_unit_id'] as String?;
+      _pricePerBaseUnit = parsed['price_per_base_unit'].toString();
+      _recalculatePrices();
+    } else {
+      _baseUnitId = null;
+      _pricePerBaseUnit = '';
+    }
+  }
+
+  void _handleAddFixedOption() {
+    final measure = _newOptMeasureCtrl.text.trim();
+    final priceStr = _newOptPriceCtrl.text.trim();
+
+    if (measure.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter measure of pack (e.g. 250g)'), backgroundColor: Color(0xFFEF4444)),
+      );
+      return;
+    }
+    final price = double.tryParse(priceStr) ?? 0.0;
+    if (price <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid price'), backgroundColor: Color(0xFFEF4444)),
+      );
+      return;
+    }
+
+    final parsed = parseManualUnitAndPrice(measure, priceStr, _units);
+    final String? unitId = parsed?['base_unit_id'] as String?;
+    final String val = parsed?['value']?.toString() ?? '1.0';
+
+    setState(() {
+      _variants.add({
+        'variant_type': 'Fixed',
+        'label': measure,
+        'unit_id': unitId,
+        'value': val,
+        'price': price.toString(),
+        'is_default': _variants.isEmpty,
+        'is_active': true,
+        'image_url': '',
+        'image_source': null,
+      });
+      _newOptMeasureCtrl.clear();
+      _newOptPriceCtrl.clear();
     });
   }
 
@@ -470,8 +588,8 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               'price': price,
               'is_default': v['is_default'] ?? false,
               'is_active': v['is_active'] ?? true,
-              'min_value': null,
-              'max_value': null,
+              'min_value': v['min_value'],
+              'max_value': v['max_value'],
               'image_url': (v['image_url'] as String?).notFoundOrEmpty ? null : v['image_url'],
             };
           }).toList();
@@ -519,8 +637,8 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               'price': price,
               'is_default': v['is_default'] ?? false,
               'is_active': v['is_active'] ?? true,
-              'min_value': null,
-              'max_value': null,
+              'min_value': v['min_value'],
+              'max_value': v['max_value'],
               'image_url': (v['image_url'] as String?).notFoundOrEmpty ? null : v['image_url'],
             };
           }).toList(),
@@ -568,7 +686,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               ),
               height: 4,
               decoration: BoxDecoration(
-                color: active ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.1),
+                color: active ? const Color(0xFF3B82F6) : kVendorText.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -582,9 +700,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           '1. Choose a Category',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorText),
         ),
         const SizedBox(height: 16),
         GridView.builder(
@@ -610,14 +728,14 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.02),
+                  color: kVendorTransparentBg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  border: Border.all(color: kVendorTransparentBorder),
                 ),
                 alignment: Alignment.centerLeft,
                 child: Text(
                   cat['name'] as String,
-                  style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white, fontSize: 13),
+                  style: TextStyle(fontWeight: FontWeight.w600, color: kVendorText, fontSize: 13),
                 ),
               ),
             );
@@ -636,9 +754,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               '2. Select Base Item',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorText),
             ),
             VendorOutlineButton(
               height: 36,
@@ -646,7 +764,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.arrow_back, size: 14, color: Colors.white),
+                  Icon(Icons.arrow_back, size: 14),
                   SizedBox(width: 4),
                   Text('Back', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ],
@@ -705,7 +823,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
             style: TextStyle(color: kVendorSubText, fontSize: 14),
           ),
         const SizedBox(height: 24),
-        const Divider(color: Colors.white12),
+        Divider(color: kVendorDivider),
         const SizedBox(height: 16),
         VendorOutlineButton(
           width: double.infinity,
@@ -755,10 +873,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                     width: 100,
                     margin: const EdgeInsets.only(right: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.02),
+                      color: kVendorTransparentBg,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: kVendorTransparentBorder,
                         style: BorderStyle.solid,
                       ),
                     ),
@@ -897,10 +1015,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0x1F3B82F6) : Colors.black.withValues(alpha: 0.2),
+                  color: isSelected ? const Color(0x1F3B82F6) : kVendorTransparentBg,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.1),
+                    color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
                     width: isSelected ? 1.5 : 1,
                   ),
                 ),
@@ -913,7 +1031,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
-                        color: isSelected ? const Color(0xFF60A5FA) : Colors.white,
+                        color: isSelected ? const Color(0xFF60A5FA) : kVendorText,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -943,16 +1061,16 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.2),
+        color: kVendorTransparentBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        border: Border.all(color: kVendorTransparentBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Health Validation',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+            style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 14),
           ),
           const SizedBox(height: 12),
           Row(
@@ -1018,7 +1136,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   }
 
   Widget _buildStep3Actions() {
-    final showDirectPublish = _sellMode == 'Manual' && !_isEdit;
+    final showDirectPublish = _sellMode == 'Manual';
     
     return Row(
       children: [
@@ -1040,6 +1158,15 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                 );
                 return;
               }
+              if (_sellMode == 'Manual' || _sellMode == 'Dynamic' || _sellMode == 'Portion') {
+                final parsed = parseManualUnitAndPrice(_manualUnitCtrl.text, _manualPriceCtrl.text, _units);
+                if (parsed == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a valid unit (e.g. 101g, 1kg) and a valid price'), backgroundColor: Color(0xFFEF4444)),
+                  );
+                  return;
+                }
+              }
               if (showDirectPublish) {
                 _save(intendedStatus: 'published');
               } else {
@@ -1050,9 +1177,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  showDirectPublish
-                      ? 'Publish Item'
-                      : (_isEdit ? 'Update Item' : 'Next: Variants & Pricing'),
+                  _isEdit 
+                      ? 'Update Item' 
+                      : (showDirectPublish ? 'Publish Item' : 'Next: Variants & Pricing'),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 if (!showDirectPublish) ...[
@@ -1079,7 +1206,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
             children: [
               Text(
                 _isEdit ? 'Edit Item Details' : '3. Item Details',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -0.5),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kVendorText, letterSpacing: -0.5),
               ),
               if (!_isEdit)
                 VendorOutlineButton(
@@ -1088,7 +1215,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.arrow_back, size: 14, color: Colors.white),
+                      Icon(Icons.arrow_back, size: 14),
                       SizedBox(width: 4),
                       Text('Back', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     ],
@@ -1103,7 +1230,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
 
           TextFormField(
             controller: _nameCtrl,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: kVendorText),
             textInputAction: TextInputAction.next,
             onChanged: (val) {
               setState(() {});
@@ -1118,7 +1245,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           TextFormField(
             controller: _descCtrl,
             maxLines: 3,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: kVendorText),
             textInputAction: TextInputAction.newline,
             decoration: vendorInputDecoration(
               labelText: 'Description',
@@ -1126,6 +1253,63 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
             ),
           ),
           const SizedBox(height: 20),
+
+          if (_sellMode == 'Manual' || _sellMode == 'Dynamic' || _sellMode == 'Portion') ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: kVendorTransparentBg,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: kVendorTransparentBorder),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Pricing & Unit',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 14),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _manualUnitCtrl,
+                          style: TextStyle(color: kVendorText),
+                          onChanged: (val) => setState(() => _updateManualPricing()),
+                          decoration: vendorInputDecoration(
+                            labelText: 'Unit/Measure (e.g. 101g, 1kg)',
+                            hintText: 'e.g. 101g',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _manualPriceCtrl,
+                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          style: TextStyle(color: kVendorText),
+                          onChanged: (val) => setState(() => _updateManualPricing()),
+                          decoration: vendorInputDecoration(
+                            labelText: 'Price (₹) *',
+                            hintText: '0.00',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_manualUnitCtrl.text.isNotEmpty && _manualPriceCtrl.text.isNotEmpty && parseManualUnitAndPrice(_manualUnitCtrl.text, _manualPriceCtrl.text, _units) != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      'This means ₹${double.tryParse(_manualPriceCtrl.text)?.toStringAsFixed(2)} per ${_manualUnitCtrl.text}.',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF34D399), fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
 
           if (_demoItemId == null && !_isEdit) ...[
             _buildSellModeSelection(),
@@ -1188,7 +1372,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                   children: [
                     Text(
                       _nameCtrl.text.isNotEmpty ? _nameCtrl.text : 'Item Name',
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 15),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 15),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1206,12 +1390,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                               margin: const EdgeInsets.only(right: 6),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: isDefault ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.1),
+                                color: isDefault ? const Color(0xFF3B82F6) : kVendorTransparentBg,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
                                 '${v['label']}$priceText',
-                                style: const TextStyle(color: Colors.white, fontSize: 11),
+                                style: TextStyle(color: isDefault ? Colors.white : kVendorText, fontSize: 11),
                               ),
                             );
                           }),
@@ -1219,12 +1403,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.1),
+                                color: kVendorTransparentBg,
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Text(
                                 '₹$_pricePerBaseUnit',
-                                style: const TextStyle(color: Colors.white, fontSize: 11),
+                                style: TextStyle(color: kVendorText, fontSize: 11),
                               ),
                             ),
                         ],
@@ -1241,6 +1425,8 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   }
 
   Widget _buildStep4() {
+    final isFixed = _sellMode == 'Fixed';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1253,9 +1439,9 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     '4. Pricing & Variants',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -0.5),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: kVendorText, letterSpacing: -0.5),
                   ),
                   VendorOutlineButton(
                     height: 36,
@@ -1273,82 +1459,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
               ),
               const SizedBox(height: 20),
 
-              if (_sellMode != 'Fixed') ...[
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Base Value Setup',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                canvasColor: const Color(0xFF1E293B),
-                              ),
-                              child: DropdownButtonFormField<String>(
-                                dropdownColor: const Color(0xFF1E293B),
-                                value: _baseUnitId,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: vendorInputDecoration(
-                                  labelText: 'Base Unit',
-                                ),
-                                items: [
-                                  DropdownMenuItem(value: null, child: Text('— Select Unit —', style: TextStyle(color: kVendorSubText))),
-                                  ..._units.map((u) => DropdownMenuItem(
-                                        value: u['id'] as String,
-                                        child: Text('${u['name']} (${u['symbol']})', style: const TextStyle(color: Colors.white)),
-                                      )),
-                                ],
-                                onChanged: _handleBaseUnitChange,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              initialValue: _pricePerBaseUnit,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              style: const TextStyle(color: Colors.white),
-                              onChanged: (val) {
-                                _pricePerBaseUnit = val;
-                                _recalculatePrices();
-                              },
-                              decoration: vendorInputDecoration(
-                                labelText: 'Price per Base Unit',
-                                hintText: '0.00',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'e.g. Set 1kg = ₹25. This sets the baseline calculation.',
-                        style: TextStyle(fontSize: 10, color: kVendorSubText.withValues(alpha: 0.8)),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: kVendorTransparentBg,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                  border: Border.all(color: kVendorTransparentBg),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1356,168 +1472,164 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Item Variants',
-                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
-                        ),
                         Text(
-                          '${_variants.length} / 5 Max',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: _variants.length >= 5 ? const Color(0xFFF87171) : kVendorSubText,
-                          ),
+                          isFixed ? 'Pre-Packed Options / Variants' : 'Demo Options',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 14),
                         ),
+                        if (isFixed)
+                          Text(
+                            '${_variants.length} / 5 Max',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: _variants.length >= 5 ? Color(0xFFF87171) : kVendorSubText,
+                            ),
+                          ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    ...List.generate(_variants.length, (index) {
-                      final v = _variants[index];
-                      final isDynamic = _sellMode == 'Dynamic';
+                    if (_variants.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            'No options configured yet.',
+                            style: TextStyle(color: kVendorSubText, fontSize: 13),
+                          ),
+                        ),
+                      )
+                    else
+                      ...List.generate(_variants.length, (index) {
+                        final v = _variants[index];
+                        final isDefault = v['is_default'] ?? false;
 
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            GestureDetector(
-                              onTap: () => _pickVariantImage(index),
-                              child: Container(
-                                width: 48,
-                                height: 48,
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.03),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                                  color: kVendorTransparentBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: kVendorTransparentBorder),
                                 ),
                                 clipBehavior: Clip.antiAlias,
                                 child: _buildVariantImagePreview(v),
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            if (isDynamic) ...[
+                              const SizedBox(width: 12),
                               Expanded(
-                                flex: 2,
-                                child: Theme(
-                                  data: Theme.of(context).copyWith(
-                                    canvasColor: const Color(0xFF1E293B),
-                                  ),
-                                  child: DropdownButtonFormField<String>(
-                                    dropdownColor: const Color(0xFF1E293B),
-                                    value: (v['size'] as String?).notFoundOrEmpty ? null : v['size'],
-                                    style: const TextStyle(color: Colors.white),
-                                    decoration: vendorInputDecoration(
-                                      labelText: 'Size',
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          v['label'] ?? '',
+                                          style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 14),
+                                        ),
+                                        if (isDefault) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF3B82F6).withOpacity(0.15),
+                                              borderRadius: BorderRadius.circular(4),
+                                              border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3)),
+                                            ),
+                                            child: const Text(
+                                              'DEFAULT',
+                                              style: TextStyle(color: Color(0xFF60A5FA), fontSize: 8, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
-                                    items: [
-                                      DropdownMenuItem(value: null, child: Text('Size', style: TextStyle(color: kVendorSubText, fontSize: 11))),
-                                      const DropdownMenuItem(value: 'Small', child: Text('Small', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                      const DropdownMenuItem(value: 'Medium', child: Text('Medium', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                      const DropdownMenuItem(value: 'Large', child: Text('Large', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                      const DropdownMenuItem(value: 'Extra Large', child: Text('Extra Large', style: TextStyle(color: Colors.white, fontSize: 11))),
-                                    ],
-                                    onChanged: (val) => _handleDynamicVariantChange(index, 'size', val ?? ''),
-                                  ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      v['price'] != null && v['price'].toString().isNotEmpty
+                                          ? '₹${v['price']}'
+                                          : 'Pricing dynamic',
+                                      style: const TextStyle(color: Color(0xFF34D399), fontSize: 13, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                flex: 2,
-                                child: TextFormField(
-                                  initialValue: v['value']?.toString() ?? '',
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  style: const TextStyle(color: Colors.white),
-                                  onChanged: (val) => _handleDynamicVariantChange(index, 'value', val),
-                                  decoration: vendorInputDecoration(
-                                    labelText: 'Est. Weight',
-                                    hintText: 'e.g. 1.5',
+                              if (isFixed || _sellMode == 'Dynamic' || _sellMode == 'Portion') ...[
+                                if (!isDefault)
+                                  VendorOutlineButton(
+                                    height: 30,
+                                    onPressed: () {
+                                      setState(() {
+                                        for (int i = 0; i < _variants.length; i++) {
+                                          _variants[i]['is_default'] = (i == index);
+                                        }
+                                      });
+                                    },
+                                    child: const Text('Set Default', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                                   ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  onPressed: () => _removeVariant(index),
+                                  icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
+                                  constraints: const BoxConstraints(),
+                                  padding: EdgeInsets.zero,
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                flex: 2,
-                                child: Container(
-                                  height: 48,
-                                  alignment: Alignment.centerLeft,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.05),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    v['price'] != null && v['price'].toString().isNotEmpty
-                                        ? '₹${v['price']}'
-                                        : '—',
-                                    style: TextStyle(color: kVendorSubText, fontSize: 13),
-                                  ),
-                                ),
-                              ),
-                            ] else ...[
-                              Expanded(
-                                flex: 3,
-                                child: TextFormField(
-                                  initialValue: v['label'] ?? '',
-                                  style: const TextStyle(color: Colors.white),
-                                  onChanged: (val) {
-                                    setState(() {
-                                      v['label'] = val;
-                                    });
-                                  },
-                                  decoration: vendorInputDecoration(
-                                    labelText: 'Label',
-                                    hintText: 'e.g. 500g, Large',
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                flex: 2,
-                                child: TextFormField(
-                                  initialValue: v['price']?.toString() ?? '',
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  style: const TextStyle(color: Colors.white),
-                                  onChanged: (val) {
-                                    setState(() {
-                                      v['price'] = val;
-                                    });
-                                  },
-                                  decoration: vendorInputDecoration(
-                                    labelText: 'Price',
-                                    hintText: '0.00',
-                                  ),
-                                ),
-                              ),
+                              ],
                             ],
-                            const SizedBox(width: 8),
-                            IconButton(
-                              onPressed: () => _removeVariant(index),
-                              icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
-                              padding: const EdgeInsets.only(top: 10),
+                          ),
+                        );
+                      }),
+                    if (isFixed && _variants.length < 5) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: kVendorDialogBg,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: kVendorTransparentBorder),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Add New Option',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 13),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _newOptMeasureCtrl,
+                                    style: TextStyle(color: kVendorText),
+                                    decoration: vendorInputDecoration(
+                                      labelText: 'Measure (e.g. 250g)',
+                                      hintText: 'e.g. 250g',
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _newOptPriceCtrl,
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                    style: TextStyle(color: kVendorText),
+                                    decoration: vendorInputDecoration(
+                                      labelText: 'Price (₹)',
+                                      hintText: '0.00',
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                VendorGradientButton(
+                                  height: 48,
+                                  onPressed: _handleAddFixedOption,
+                                  child: const Text('Add', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
                             ),
                           ],
-                        ),
-                      );
-                    }),
-                    if (_variants.length < 5) ...[
-                      const SizedBox(height: 8),
-                      InkWell(
-                        onTap: _addVariant,
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white24, style: BorderStyle.solid),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.add, size: 16, color: Colors.white),
-                              SizedBox(width: 4),
-                              Text('Add Variant', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                            ],
-                          ),
                         ),
                       ),
                     ],
