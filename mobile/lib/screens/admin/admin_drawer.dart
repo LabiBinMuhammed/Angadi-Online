@@ -91,7 +91,6 @@ class AdminDrawer extends StatelessWidget {
                     route: '/admin/units',
                     kText: kText,
                     kSubText: kSubText,
-                    isImplemented: false,
                   ),
                   _buildDrawerItem(
                     context: context,
