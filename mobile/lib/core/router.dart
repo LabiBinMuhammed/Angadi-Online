@@ -36,6 +36,7 @@ import '../screens/vendor/vendor_shop_detail_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/admin_screens.dart';
 import '../screens/admin/admin_user_detail_screen.dart';
+import '../screens/admin/admin_shop_detail_screen.dart';
 import '../screens/admin/admin_order_detail_screen.dart';
 import '../screens/admin/admin_categories_screen.dart';
 import '../screens/admin/admin_units_screen.dart';
@@ -147,6 +148,10 @@ GoRouter buildRouter() {
       // ── Admin routes ──────────────────────────────────────────────────
       GoRoute(path: '/admin/dashboard',   builder: (_, __) => const AdminDashboardScreen()),
       GoRoute(path: '/admin/shops',       builder: (_, __) => const AdminShopsScreen()),
+      GoRoute(
+        path: '/admin/shops/:shopId',
+        builder: (_, state) => AdminShopDetailScreen(shopId: state.pathParameters['shopId']!),
+      ),
       GoRoute(path: '/admin/users',       builder: (_, __) => const AdminUsersScreen()),
       GoRoute(
         path: '/admin/users/:userId',

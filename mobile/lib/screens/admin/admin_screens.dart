@@ -5,6 +5,10 @@ import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import 'admin_drawer.dart';
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN SHOPS SCREEN
+// ═══════════════════════════════════════════════════════════════════════════════
+
 class AdminShopsScreen extends StatefulWidget {
   const AdminShopsScreen({super.key});
   @override
@@ -13,28 +17,245 @@ class AdminShopsScreen extends StatefulWidget {
 
 class _AdminShopsScreenState extends State<AdminShopsScreen> {
   List<Map<String, dynamic>> _shops = [];
+  List<Map<String, dynamic>> _allUsers = [];
+  List<Map<String, dynamic>> _locations = [];
   bool _loading = true;
+  String _search = '';
+  String _statusFilter = 'all'; // all | active | inactive
+  String _locationFilter = 'all';
+
+  static const _shopTypes = [
+    'grocery','dairy','meat','bakery','fruit','spice','oil','general'
+  ];
 
   @override
   void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
-    final res = await supabase.from('shops').select('*, shop_owners(users(name, phone))').order('created_at', ascending: false);
-    if (mounted) setState(() { _shops = (res as List).cast(); _loading = false; });
+    final results = await Future.wait([
+      supabase.from('shops').select('*, shop_owners(users(name, phone)), locations(name)').order('created_at', ascending: false),
+      supabase.from('users').select('id, name, phone, role').order('name'),
+      supabase.from('locations').select('id, name').order('name'),
+    ]);
+    if (mounted) {
+      setState(() {
+        _shops = (results[0] as List).cast();
+        _allUsers = (results[1] as List).cast();
+        _locations = (results[2] as List).cast();
+        _loading = false;
+      });
+    }
   }
 
-  Future<void> _toggle(Map<String, dynamic> shop) async {
-    final next = !(shop['is_active'] as bool? ?? true);
-    await supabase.from('shops').update({'is_active': next}).eq('id', shop['id']);
+  Future<void> _toggleShopActive(Map<String, dynamic> shop) async {
+    final type = shop['type'] as String? ?? 'general';
+    final isActive = !(type.endsWith('_inactive'));
+    final newType = isActive
+        ? '${type}_inactive'
+        : type.replaceAll('_inactive', '');
+    await supabase.from('shops').update({'type': newType}).eq('id', shop['id']);
     setState(() {
       final idx = _shops.indexWhere((s) => s['id'] == shop['id']);
-      if (idx >= 0) _shops[idx] = {..._shops[idx], 'is_active': next};
+      if (idx >= 0) _shops[idx] = {..._shops[idx], 'type': newType};
     });
+  }
+
+  Future<void> _deleteShop(Map<String, dynamic> shop) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Shop'),
+        content: Text('Delete "${shop['name']}"? This cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: kDanger, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await supabase.from('shops').delete().eq('id', shop['id']);
+    setState(() => _shops.removeWhere((s) => s['id'] == shop['id']));
+  }
+
+  void _showCreateSheet() {
+    final nameCtrl = TextEditingController();
+    String? selUserId;
+    String? selType;
+    String? selLocationId;
+    String err = '';
+    bool saving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, ss) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 8, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              const Text('Create New Shop', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+
+              _InputLabel('Shop Name *'),
+              _StyledInput(
+                controller: nameCtrl,
+                hint: 'e.g. Village Grocery',
+                icon: HugeIcons.strokeRoundedStore01,
+              ),
+              const SizedBox(height: 12),
+
+              _InputLabel('Assign Owner *'),
+              _StyledDropdown<String>(
+                value: selUserId,
+                hint: 'Select a user…',
+                icon: HugeIcons.strokeRoundedUser,
+                items: _allUsers.map((u) => DropdownMenuItem(
+                  value: u['id'] as String,
+                  child: Text('${u['name']} (${u['phone']})'),
+                )).toList(),
+                onChanged: (v) => ss(() => selUserId = v),
+              ),
+              const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _InputLabel('Shop Type'),
+                        _StyledDropdown<String>(
+                          value: selType,
+                          hint: 'Select type…',
+                          icon: HugeIcons.strokeRoundedTag01,
+                          items: _shopTypes.map((t) => DropdownMenuItem(
+                            value: t, child: Text(t),
+                          )).toList(),
+                          onChanged: (v) => ss(() => selType = v),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _InputLabel('Location'),
+                        _StyledDropdown<String>(
+                          value: selLocationId,
+                          hint: 'Select…',
+                          icon: HugeIcons.strokeRoundedMaps,
+                          items: _locations.map((l) => DropdownMenuItem(
+                            value: l['id'] as String,
+                            child: Text(l['name']),
+                          )).toList(),
+                          onChanged: (v) => ss(() => selLocationId = v),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              if (err.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(err, style: const TextStyle(color: kDanger, fontSize: 13)),
+              ],
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: saving ? null : () async {
+                        if (nameCtrl.text.trim().isEmpty || selUserId == null) {
+                          ss(() => err = 'Name and Owner are required.');
+                          return;
+                        }
+                        ss(() { saving = true; err = ''; });
+                        try {
+                          final res = await supabase.from('shops').insert({
+                            'name': nameCtrl.text.trim(),
+                            'type': selType ?? 'general',
+                            'location_id': selLocationId,
+                          }).select('*').single();
+                          await supabase.from('shop_owners').insert({
+                            'shop_id': res['id'],
+                            'user_id': selUserId,
+                            'is_primary': true,
+                          });
+                          final user = _allUsers.firstWhere((u) => u['id'] == selUserId, orElse: () => {});
+                          setState(() => _shops.insert(0, {
+                            ...res,
+                            'shop_owners': [{'users': {'name': user['name'], 'phone': user['phone']}}],
+                            'locations': selLocationId != null
+                                ? {'name': _locations.firstWhere((l) => l['id'] == selLocationId, orElse: () => {})['name']}
+                                : null,
+                          }));
+                          if (mounted) Navigator.pop(ctx);
+                        } catch (e) {
+                          ss(() { saving = false; err = e.toString(); });
+                        }
+                      },
+                      child: saving
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Text('Create Shop'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final filtered = _shops.where((s) {
+      final type = s['type'] as String? ?? 'general';
+      final isActive = !type.endsWith('_inactive');
+      final name = (s['name'] as String? ?? '').toLowerCase();
+      final matchSearch = _search.isEmpty || name.contains(_search.toLowerCase());
+      final matchStatus = _statusFilter == 'all'
+          ? true
+          : _statusFilter == 'active' ? isActive : !isActive;
+      final matchLoc = _locationFilter == 'all'
+          ? true
+          : s['location_id'] == _locationFilter;
+      return matchSearch && matchStatus && matchLoc;
+    }).toList();
+
     return Scaffold(
+      backgroundColor: kNeutral50,
       drawer: const AdminDrawer(currentRoute: '/admin/shops'),
       appBar: AppBar(
         backgroundColor: kWaTeal,
@@ -45,33 +266,238 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
                 icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
                 onPressed: () => context.pop(),
               )
-            : null,
+            : Builder(builder: (c) => IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, color: Colors.white, size: 22),
+                onPressed: () => Scaffold.of(c).openDrawer(),
+              )),
+        actions: [
+          TextButton.icon(
+            onPressed: _showCreateSheet,
+            icon: const Icon(Icons.add, color: Colors.white, size: 20),
+            label: const Text('New', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.separated(
-              itemCount: _shops.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, i) {
-                final shop = _shops[i];
-                final isActive = shop['is_active'] != false;
-                final owners = (shop['shop_owners'] as List?) ?? [];
-                final owner = owners.isNotEmpty ? (owners[0]['users'] as Map?) : null;
-                return ListTile(
-                  leading: const CircleAvatar(backgroundColor: kBrand100, child: Text('🏪')),
-                  title: Text(shop['name'] ?? '—', style: const TextStyle(fontWeight: FontWeight.w600)),
-                  subtitle: Text(owner?['name'] ?? 'No owner'),
-                  trailing: Switch(
-                    value: isActive,
-                    activeThumbColor: kWaGreen,
-                    onChanged: (_) => _toggle(shop),
+      body: Column(
+        children: [
+          // ─── Filter Bar ──────────────────────────────────────────────────
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+            child: Column(
+              children: [
+                // Search
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: kNeutral100,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: kNeutral200),
                   ),
-                );
-              },
+                  child: TextField(
+                    onChanged: (v) => setState(() => _search = v),
+                    style: const TextStyle(fontSize: 14),
+                    decoration: const InputDecoration(
+                      hintText: 'Search shops…',
+                      prefixIcon: Icon(Icons.search, size: 18, color: Colors.grey),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 11),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    // Status chips
+                    _FilterChips(
+                      options: const ['all', 'active', 'inactive'],
+                      selected: _statusFilter,
+                      onTap: (v) => setState(() => _statusFilter = v),
+                      labels: const {'all': 'All', 'active': 'Active', 'inactive': 'Inactive'},
+                    ),
+                    const SizedBox(width: 8),
+                    // Location dropdown
+                    if (_locations.isNotEmpty)
+                      Expanded(
+                        child: Container(
+                          height: 32,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: kNeutral200),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: _locationFilter,
+                              isDense: true,
+                              style: const TextStyle(fontSize: 12, color: Colors.black87),
+                              items: [
+                                const DropdownMenuItem(value: 'all', child: Text('All Locations')),
+                                ..._locations.map((l) => DropdownMenuItem(
+                                  value: l['id'] as String,
+                                  child: Text(l['name'] as String? ?? ''),
+                                )),
+                              ],
+                              onChanged: (v) => setState(() => _locationFilter = v ?? 'all'),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
             ),
+          ),
+          const Divider(height: 1),
+
+          // ─── List ────────────────────────────────────────────────────────
+          _loading
+              ? const Expanded(child: Center(child: CircularProgressIndicator()))
+              : filtered.isEmpty
+                  ? const Expanded(
+                      child: Center(
+                        child: Text('No shops found.', style: TextStyle(color: Colors.grey)),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, i) {
+                          final shop = filtered[i];
+                          final type = shop['type'] as String? ?? 'general';
+                          final isActive = !type.endsWith('_inactive');
+                          final owners = (shop['shop_owners'] as List?) ?? [];
+                          final owner = owners.isNotEmpty ? (owners[0]['users'] as Map?) : null;
+                          final locName = (shop['locations'] as Map?)?['name'] as String?;
+                          final displayType = type.replaceAll('_inactive', '');
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: kNeutral200),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4, offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      // Shop avatar
+                                      Container(
+                                        width: 44, height: 44,
+                                        decoration: BoxDecoration(
+                                          color: kBrand100,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: const Center(child: Text('🏪', style: TextStyle(fontSize: 22))),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              shop['name'] ?? '—',
+                                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              owner?['name'] ?? 'No owner',
+                                              style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Status badge (tappable)
+                                      GestureDetector(
+                                        onTap: () => _toggleShopActive(shop),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                          decoration: BoxDecoration(
+                                            color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            isActive ? 'Active' : 'Inactive',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  // Meta row
+                                  Row(
+                                    children: [
+                                      if (displayType.isNotEmpty) ...[
+                                        _SmallBadge(displayType, color: kNeutral100, textColor: kNeutral600),
+                                        const SizedBox(width: 6),
+                                      ],
+                                      if (locName != null) ...[
+                                        const Icon(Icons.location_on, size: 12, color: Colors.grey),
+                                        const SizedBox(width: 2),
+                                        Text(locName, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                                      ],
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  // Action buttons row
+                                  Row(
+                                    children: [
+                                      // Delete
+                                      _ActionBtn(
+                                        label: 'Delete',
+                                        icon: Icons.delete_outline,
+                                        color: kDanger,
+                                        bgColor: const Color(0xFFFEE2E2),
+                                        onTap: () => _deleteShop(shop),
+                                      ),
+                                      const Spacer(),
+                                      // Details
+                                      _ActionBtn(
+                                        label: 'Details →',
+                                        icon: Icons.arrow_forward,
+                                        color: kBrand500,
+                                        bgColor: kBrand100,
+                                        onTap: () => context.push('/admin/shops/${shop['id']}'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showCreateSheet,
+        backgroundColor: kBrand500,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Create Shop'),
+      ),
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN USERS SCREEN
+// ═══════════════════════════════════════════════════════════════════════════════
 
 class AdminUsersScreen extends StatefulWidget {
   const AdminUsersScreen({super.key});
@@ -82,10 +508,13 @@ class AdminUsersScreen extends StatefulWidget {
 class _AdminUsersScreenState extends State<AdminUsersScreen> {
   List<Map<String, dynamic>> _users = [];
   bool _loading = true;
+  String _search = '';
   String _role = 'all';
 
-  static const _roleColor = {
-    'customer': Color(0xFF94A3B8), 'shop_owner': Color(0xFF3B82F6), 'admin': Color(0xFFF59E0B),
+  static const _roleColors = {
+    'customer': Color(0xFF64748B),
+    'shop_owner': Color(0xFF3B82F6),
+    'admin': Color(0xFFF59E0B),
   };
 
   @override
@@ -96,10 +525,156 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     if (mounted) setState(() { _users = (res as List).cast(); _loading = false; });
   }
 
+  Future<void> _toggleUser(Map<String, dynamic> user) async {
+    final next = !(user['is_active'] as bool? ?? true);
+    await supabase.from('users').update({'is_active': next}).eq('id', user['id']);
+    setState(() {
+      final idx = _users.indexWhere((u) => u['id'] == user['id']);
+      if (idx >= 0) _users[idx] = {..._users[idx], 'is_active': next};
+    });
+  }
+
+  Future<void> _deleteUser(Map<String, dynamic> user) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete User'),
+        content: Text('Delete "${user['name']}"? This cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: kDanger, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    await supabase.from('users').delete().eq('id', user['id']);
+    setState(() => _users.removeWhere((u) => u['id'] == user['id']));
+  }
+
+  void _showCreateSheet() {
+    final nameCtrl  = TextEditingController();
+    final phoneCtrl = TextEditingController();
+    String selRole = 'customer';
+    String err = '';
+    bool saving = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, ss) => Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 8, 20, MediaQuery.of(ctx).viewInsets.bottom + 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40, height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2)),
+                ),
+              ),
+              const Text('Add New User', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 16),
+
+              _InputLabel('Full Name *'),
+              _StyledInput(controller: nameCtrl, hint: 'e.g. Arjun Kumar', icon: HugeIcons.strokeRoundedUser),
+              const SizedBox(height: 12),
+
+              _InputLabel('Phone Number *'),
+              _StyledInput(
+                controller: phoneCtrl,
+                hint: '+91 98765 43210',
+                icon: HugeIcons.strokeRoundedCall,
+                keyboardType: TextInputType.phone,
+              ),
+              const SizedBox(height: 12),
+
+              _InputLabel('Role'),
+              _StyledDropdown<String>(
+                value: selRole,
+                hint: 'Select role…',
+                icon: HugeIcons.strokeRoundedShield01,
+                items: ['customer', 'shop_owner', 'admin'].map((r) => DropdownMenuItem(
+                  value: r, child: Text(r.replaceAll('_', ' ')),
+                )).toList(),
+                onChanged: (v) => ss(() => selRole = v ?? 'customer'),
+              ),
+
+              if (err.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(err, style: const TextStyle(color: kDanger, fontSize: 13)),
+              ],
+              const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Cancel'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: saving ? null : () async {
+                        if (nameCtrl.text.trim().isEmpty || phoneCtrl.text.trim().isEmpty) {
+                          ss(() => err = 'Name and phone are required.');
+                          return;
+                        }
+                        ss(() { saving = true; err = ''; });
+                        try {
+                          final res = await supabase.from('users').insert({
+                            'name': nameCtrl.text.trim(),
+                            'phone': phoneCtrl.text.trim(),
+                            'role': selRole,
+                            'is_active': true,
+                          }).select('*').single();
+                          setState(() => _users.insert(0, res as Map<String, dynamic>));
+                          if (mounted) Navigator.pop(ctx);
+                        } catch (e) {
+                          ss(() { saving = false; err = e.toString(); });
+                        }
+                      },
+                      child: saving
+                          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Text('Create User'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final filtered = _users.where((u) => _role == 'all' || u['role'] == _role).toList();
+    final filtered = _users.where((u) {
+      final name  = (u['name']  as String? ?? '').toLowerCase();
+      final phone = (u['phone'] as String? ?? '').toLowerCase();
+      final matchSearch = _search.isEmpty
+          || name.contains(_search.toLowerCase())
+          || phone.contains(_search.toLowerCase());
+      final matchRole = _role == 'all' || u['role'] == _role;
+      return matchSearch && matchRole;
+    }).toList();
+
     return Scaffold(
+      backgroundColor: kNeutral50,
       drawer: const AdminDrawer(currentRoute: '/admin/users'),
       appBar: AppBar(
         backgroundColor: kWaTeal,
@@ -110,94 +685,209 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                 icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
                 onPressed: () => context.pop(),
               )
-            : null,
+            : Builder(builder: (c) => IconButton(
+                icon: const HugeIcon(icon: HugeIcons.strokeRoundedMenu01, color: Colors.white, size: 22),
+                onPressed: () => Scaffold.of(c).openDrawer(),
+              )),
+        actions: [
+          TextButton.icon(
+            onPressed: _showCreateSheet,
+            icon: const Icon(Icons.add, color: Colors.white, size: 20),
+            label: const Text('New', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
       body: Column(
         children: [
-          SizedBox(
-            height: 50,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              children: ['all', 'customer', 'shop_owner', 'admin'].map((r) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  label: Text(r.replaceAll('_', ' ')),
-                  selected: _role == r,
-                  selectedColor: kWaGreen,
-                  onSelected: (_) => setState(() => _role = r),
+          // ─── Filter Bar ──────────────────────────────────────────────────
+          Container(
+            color: Colors.white,
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+            child: Column(
+              children: [
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: kNeutral100,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: kNeutral200),
+                  ),
+                  child: TextField(
+                    onChanged: (v) => setState(() => _search = v),
+                    style: const TextStyle(fontSize: 14),
+                    decoration: const InputDecoration(
+                      hintText: 'Search by name or phone…',
+                      prefixIcon: Icon(Icons.search, size: 18, color: Colors.grey),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 11),
+                    ),
+                  ),
                 ),
-              )).toList(),
+                const SizedBox(height: 8),
+                _FilterChips(
+                  options: const ['all', 'customer', 'shop_owner', 'admin'],
+                  selected: _role,
+                  onTap: (v) => setState(() => _role = v),
+                  labels: const {
+                    'all': 'All',
+                    'customer': 'Customer',
+                    'shop_owner': 'Shop Owner',
+                    'admin': 'Admin',
+                  },
+                ),
+              ],
             ),
           ),
+          const Divider(height: 1),
+
+          // ─── List ────────────────────────────────────────────────────────
           _loading
               ? const Expanded(child: Center(child: CircularProgressIndicator()))
-              : Expanded(
-                  child: ListView.separated(
-                    itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, i) {
-                      final u = filtered[i];
-                      final role = u['role'] as String? ?? 'customer';
-                      final phone = u['phone'] ?? '';
-                      final verified = u['phone_verified'] as bool? ?? false;
-                      final lastLogin = u['last_login_at'] as String?;
-                      
-                      String loginText = 'Never logged in';
-                      if (lastLogin != null) {
-                        try {
-                          final dt = DateTime.parse(lastLogin).toLocal();
-                          final minutes = dt.minute.toString().padLeft(2, '0');
-                          final month = dt.month.toString().padLeft(2, '0');
-                          final day = dt.day.toString().padLeft(2, '0');
-                          loginText = 'Last login: ${dt.year}-$month-$day ${dt.hour}:$minutes';
-                        } catch (_) {
-                          loginText = 'Last login: $lastLogin';
-                        }
-                      }
+              : filtered.isEmpty
+                  ? const Expanded(
+                      child: Center(
+                        child: Text('No users found.', style: TextStyle(color: Colors.grey)),
+                      ),
+                    )
+                  : Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: filtered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                        itemBuilder: (context, i) {
+                          final user = filtered[i];
+                          final role = user['role'] as String? ?? 'customer';
+                          final roleColor = _roleColors[role] ?? kNeutral400;
+                          final isActive = user['is_active'] as bool? ?? true;
+                          final phone = user['phone'] as String? ?? '';
+                          final verified = user['phone_verified'] as bool? ?? false;
+                          final initial = (user['name'] as String? ?? '?')[0].toUpperCase();
 
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: (_roleColor[role] ?? kNeutral400).withAlpha(38),
-                          child: Text((u['name'] as String? ?? '?')[0].toUpperCase(),
-                              style: TextStyle(color: _roleColor[role] ?? kNeutral400, fontWeight: FontWeight.w700)),
-                        ),
-                        title: Text(u['name'] ?? '—', style: const TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: kNeutral200),
+                              boxShadow: [
+                                BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4, offset: const Offset(0, 2)),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(phone, style: const TextStyle(fontWeight: FontWeight.w500)),
-                                  const SizedBox(width: 6),
-                                  Icon(
-                                    verified ? Icons.verified : Icons.error_outline,
-                                    size: 14,
-                                    color: verified ? Colors.green : Colors.grey,
+                                  Row(
+                                    children: [
+                                      // Avatar with role color
+                                      Container(
+                                        width: 44, height: 44,
+                                        decoration: BoxDecoration(
+                                          color: roleColor.withAlpha(28),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: roleColor.withAlpha(60), width: 1.5),
+                                        ),
+                                        child: Center(
+                                          child: Text(initial, style: TextStyle(color: roleColor, fontWeight: FontWeight.w700, fontSize: 18)),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              user['name'] ?? '—',
+                                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Row(
+                                              children: [
+                                                Text(phone, style: const TextStyle(fontSize: 13, color: Colors.grey)),
+                                                const SizedBox(width: 4),
+                                                Icon(
+                                                  verified ? Icons.verified : Icons.error_outline,
+                                                  size: 13,
+                                                  color: verified ? Colors.green : Colors.grey,
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      // Role badge
+                                      _SmallBadge(
+                                        role.replaceAll('_', ' '),
+                                        color: roleColor.withAlpha(22),
+                                        textColor: roleColor,
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 10),
+                                  // Action buttons
+                                  Row(
+                                    children: [
+                                      // Status toggle
+                                      GestureDetector(
+                                        onTap: () => _toggleUser(user),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                          decoration: BoxDecoration(
+                                            color: isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                                            borderRadius: BorderRadius.circular(20),
+                                          ),
+                                          child: Text(
+                                            isActive ? 'Active' : 'Inactive',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      _ActionBtn(
+                                        label: 'Delete',
+                                        icon: Icons.delete_outline,
+                                        color: kDanger,
+                                        bgColor: const Color(0xFFFEE2E2),
+                                        onTap: () => _deleteUser(user),
+                                      ),
+                                      const Spacer(),
+                                      _ActionBtn(
+                                        label: 'Details →',
+                                        icon: Icons.arrow_forward,
+                                        color: kBrand500,
+                                        bgColor: kBrand100,
+                                        onTap: () => context.push('/admin/users/${user['id']}'),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 2),
-                              Text(
-                                loginText,
-                                style: const TextStyle(fontSize: 11, color: Colors.grey),
-                              ),
-                            ],
-                          ),
-                        ),
-                        trailing: Chip(label: Text(role, style: const TextStyle(fontSize: 11))),
-                        onTap: () => context.push('/admin/users/${u['id']}'),
-                      );
-                    },
-                  ),
-                ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showCreateSheet,
+        backgroundColor: kBrand500,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Add User'),
       ),
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN ORDERS SCREEN
+// ═══════════════════════════════════════════════════════════════════════════════
 
 class AdminOrdersScreen extends StatefulWidget {
   const AdminOrdersScreen({super.key});
@@ -306,9 +996,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       firstDate: DateTime.now().subtract(const Duration(days: 30)),
                       lastDate: DateTime.now().add(const Duration(days: 30)),
                     );
-                    if (picked != null) {
-                      setState(() => _dateFilter = picked);
-                    }
+                    if (picked != null) setState(() => _dateFilter = picked);
                   },
                 ),
               ],
@@ -393,3 +1081,212 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     );
   }
 }
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SHARED WIDGETS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/// Small horizontal filter chip row
+class _FilterChips extends StatelessWidget {
+  final List<String> options;
+  final String selected;
+  final void Function(String) onTap;
+  final Map<String, String> labels;
+
+  const _FilterChips({
+    required this.options,
+    required this.selected,
+    required this.onTap,
+    required this.labels,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: options.map((o) {
+        final isSelected = selected == o;
+        return Padding(
+          padding: const EdgeInsets.only(right: 6),
+          child: GestureDetector(
+            onTap: () => onTap(o),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: isSelected ? kBrand500 : kNeutral100,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isSelected ? kBrand500 : kNeutral200,
+                ),
+              ),
+              child: Text(
+                labels[o] ?? o,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected ? Colors.white : kNeutral600,
+                ),
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+}
+
+/// Small pill badge
+class _SmallBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color textColor;
+  const _SmallBadge(this.label, {required this.color, required this.textColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6)),
+      child: Text(label, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: textColor)),
+    );
+  }
+}
+
+/// Icon action button
+class _ActionBtn extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final Color bgColor;
+  final VoidCallback onTap;
+  const _ActionBtn({required this.label, required this.icon, required this.color, required this.bgColor, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(8)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 13, color: color),
+            const SizedBox(width: 4),
+            Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Form label
+class _InputLabel extends StatelessWidget {
+  final String text;
+  const _InputLabel(this.text);
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF374151))),
+    );
+  }
+}
+
+/// Styled outlined text input
+class _StyledInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final List<List<dynamic>> icon;
+  final TextInputType keyboardType;
+
+  const _StyledInput({
+    required this.controller,
+    required this.hint,
+    required this.icon,
+    this.keyboardType = TextInputType.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: kNeutral200),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: HugeIcon(icon: icon, size: 18, color: kNeutral400),
+          ),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              keyboardType: keyboardType,
+              style: const TextStyle(fontSize: 14),
+              decoration: InputDecoration(
+                hintText: hint,
+                hintStyle: const TextStyle(color: Colors.grey, fontSize: 14),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 13),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Styled outlined dropdown
+class _StyledDropdown<T> extends StatelessWidget {
+  final T? value;
+  final String hint;
+  final List<List<dynamic>> icon;
+  final List<DropdownMenuItem<T>> items;
+  final void Function(T?) onChanged;
+
+  const _StyledDropdown({
+    required this.value,
+    required this.hint,
+    required this.icon,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: kNeutral200),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: HugeIcon(icon: icon, size: 18, color: kNeutral400),
+          ),
+          Expanded(
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<T>(
+                value: value,
+                hint: Text(hint, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+                isExpanded: true,
+                isDense: true,
+                style: const TextStyle(fontSize: 14, color: Colors.black87),
+                padding: const EdgeInsets.only(left: 8, right: 12),
+                items: items,
+                onChanged: onChanged,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
