@@ -40,7 +40,7 @@ class AdminDisputesScreen extends StatelessWidget {
               const SizedBox(height: 8),
               const Text(
                 'Customer complaints and disputes will appear here',
-                textAlign: Center,
+                textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ],
