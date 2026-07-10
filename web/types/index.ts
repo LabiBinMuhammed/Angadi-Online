@@ -100,6 +100,7 @@ export interface Category {
   name: string
   description?: string
   is_active: boolean
+  display_order?: number
   updated_at: string
 }
 

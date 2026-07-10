@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Category Management' }
 
 export default async function CategoriesPage() {
   const supabase = await createClient()
-  const { data } = await supabase.from('categories').select('*').order('name')
+  const { data } = await supabase.from('categories').select('*').order('display_order', { ascending: true })
 
   return (
     <>

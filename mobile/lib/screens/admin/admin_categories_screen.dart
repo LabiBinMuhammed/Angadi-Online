@@ -16,6 +16,8 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
   List<Map<String, dynamic>> _categories = [];
   final _nameCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
+  final _orderCtrl = TextEditingController();
+  bool _newIsActive = true;
   bool _loading = true;
   bool _saving  = false;
 
@@ -23,21 +25,47 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
   void initState() { super.initState(); _load(); }
 
   Future<void> _load() async {
-    final res = await supabase.from('categories').select('*').order('name');
-    if (mounted) setState(() { _categories = (res as List).cast(); _loading = false; });
+    try {
+      final res = await supabase.from('categories').select('*').order('display_order', ascending: true);
+      if (mounted) {
+        setState(() {
+          _categories = (res as List).cast<Map<String, dynamic>>();
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading categories: $e');
+      if (mounted) setState(() => _loading = false);
+    }
   }
 
   Future<void> _add() async {
-    if (_nameCtrl.text.isEmpty) return;
+    if (_nameCtrl.text.trim().isEmpty) return;
     setState(() => _saving = true);
-    final res = await supabase.from('categories').insert({
-      'name': _nameCtrl.text.trim(),
-      'description': _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
-      'is_active': true,
-    }).select('*').single();
-    if (mounted) {
-      setState(() { _categories.add(res); _saving = false; });
-      _nameCtrl.clear(); _descCtrl.clear();
+    try {
+      final int? orderVal = int.tryParse(_orderCtrl.text.trim());
+      final res = await supabase.from('categories').insert({
+        'name': _nameCtrl.text.trim(),
+        'description': _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+        'display_order': orderVal,
+        'is_active': _newIsActive,
+      }).select('*').single();
+      
+      if (mounted) {
+        setState(() {
+          _categories.add(res);
+          _categories.sort((a, b) => ((a['display_order'] as num?)?.toInt() ?? 999)
+              .compareTo(((b['display_order'] as num?)?.toInt() ?? 999)));
+          _saving = false;
+        });
+        _nameCtrl.clear();
+        _descCtrl.clear();
+        _orderCtrl.clear();
+        _newIsActive = true;
+      }
+    } catch (e) {
+      debugPrint('Error adding category: $e');
+      if (mounted) setState(() => _saving = false);
     }
   }
 
@@ -48,6 +76,142 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
       final idx = _categories.indexWhere((c) => c['id'] == cat['id']);
       if (idx >= 0) _categories[idx] = {..._categories[idx], 'is_active': next};
     });
+  }
+
+  void _showEditDialog(Map<String, dynamic> cat) {
+    final nameEdit = TextEditingController(text: cat['name']);
+    final descEdit = TextEditingController(text: cat['description'] ?? '');
+    final orderEdit = TextEditingController(text: cat['display_order']?.toString() ?? '');
+    bool statusEdit = cat['is_active'] as bool? ?? true;
+    bool savingEdit = false;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Edit Category'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: nameEdit,
+                      decoration: const InputDecoration(labelText: 'Name *'),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: descEdit,
+                      decoration: const InputDecoration(labelText: 'Description (optional)'),
+                    ),
+                    const SizedBox(height: 8),
+                    TextField(
+                      controller: orderEdit,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Display Order (optional)'),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Active Status'),
+                        Switch(
+                          value: statusEdit,
+                          activeThumbColor: kWaGreen,
+                          onChanged: (val) {
+                            setDialogState(() => statusEdit = val);
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: kWaTeal, foregroundColor: Colors.white),
+                  onPressed: savingEdit ? null : () async {
+                    if (nameEdit.text.trim().isEmpty) return;
+                    setDialogState(() => savingEdit = true);
+                    try {
+                      final int? orderVal = int.tryParse(orderEdit.text.trim());
+                      await supabase.from('categories').update({
+                        'name': nameEdit.text.trim(),
+                        'description': descEdit.text.trim().isEmpty ? null : descEdit.text.trim(),
+                        'display_order': orderVal,
+                        'is_active': statusEdit,
+                      }).eq('id', cat['id']);
+                      
+                      if (mounted) {
+                        setState(() {
+                          final idx = _categories.indexWhere((c) => c['id'] == cat['id']);
+                          if (idx >= 0) {
+                            _categories[idx] = {
+                              ..._categories[idx],
+                              'name': nameEdit.text.trim(),
+                              'description': descEdit.text.trim().isEmpty ? null : descEdit.text.trim(),
+                              'display_order': orderVal,
+                              'is_active': statusEdit,
+                            };
+                            _categories.sort((a, b) => ((a['display_order'] as num?)?.toInt() ?? 999)
+                                .compareTo(((b['display_order'] as num?)?.toInt() ?? 999)));
+                          }
+                        });
+                        Navigator.pop(context);
+                      }
+                    } catch (e) {
+                      debugPrint('Error updating category: $e');
+                      setDialogState(() => savingEdit = false);
+                    }
+                  },
+                  child: savingEdit ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteDialog(Map<String, dynamic> cat) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Delete Category'),
+          content: Text('Are you sure you want to delete "${cat['name']}"? Items using this category will lose their category association.'),
+          actions: [
+             TextButton(
+               onPressed: () => Navigator.pop(context),
+               child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+             ),
+             ElevatedButton(
+               style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+               onPressed: () async {
+                 try {
+                   await supabase.from('categories').delete().eq('id', cat['id']);
+                   if (mounted) {
+                     setState(() {
+                       _categories.removeWhere((c) => c['id'] == cat['id']);
+                     });
+                     Navigator.pop(context);
+                   }
+                 } catch (e) {
+                   debugPrint('Error deleting category: $e');
+                 }
+               },
+               child: const Text('Delete'),
+             ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -68,24 +232,95 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
       body: Column(
         children: [
           // Add form
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(children: [
-              Expanded(child: TextField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: 'Name', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
-              )),
-              const SizedBox(width: 8),
-              Expanded(child: TextField(
-                controller: _descCtrl,
-                decoration: const InputDecoration(labelText: 'Description', isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
-              )),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: _saving ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.add_circle, color: Color(0xFF075E54), size: 32),
-                onPressed: _saving ? null : _add,
+          Card(
+            margin: const EdgeInsets.all(12),
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Add New Category',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _nameCtrl,
+                          decoration: const InputDecoration(
+                            labelText: 'Category Name *',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        width: 110,
+                        child: TextField(
+                          controller: _orderCtrl,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: 'Display Order',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: _descCtrl,
+                    decoration: const InputDecoration(
+                      labelText: 'Description (optional)',
+                      border: OutlineInputBorder(),
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Text('Active Status: ', style: TextStyle(fontSize: 13)),
+                          Switch(
+                            value: _newIsActive,
+                            activeThumbColor: kWaGreen,
+                            onChanged: (val) {
+                              setState(() => _newIsActive = val);
+                            },
+                          ),
+                        ],
+                      ),
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kWaTeal,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        ),
+                        onPressed: _saving ? null : _add,
+                        icon: _saving
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Icon(Icons.add, size: 16),
+                        label: Text(_saving ? 'Adding...' : 'Add Category'),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            ]),
+            ),
           ),
           const Divider(height: 1),
           _loading
@@ -98,12 +333,45 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                       final cat = _categories[i];
                       final isActive = cat['is_active'] as bool? ?? true;
                       return ListTile(
-                        title: Text(cat['name'] ?? '—', style: const TextStyle(fontWeight: FontWeight.w600)),
+                        title: Row(
+                          children: [
+                            Text(
+                              cat['name'] ?? '—',
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                            if (cat['display_order'] != null) ...[
+                              const SizedBox(width: 8),
+                              Chip(
+                                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
+                                label: Text(
+                                  'Order: ${cat['display_order']}',
+                                  style: const TextStyle(fontSize: 10, color: Color(0xFF075E54)),
+                                ),
+                                backgroundColor: const Color(0xFFE0F2FE),
+                              ),
+                            ],
+                          ],
+                        ),
                         subtitle: cat['description'] != null ? Text(cat['description']) : null,
-                        trailing: Switch(
-                          value: isActive,
-                          activeThumbColor: kWaGreen,
-                          onChanged: (_) => _toggle(cat),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue, size: 20),
+                              onPressed: () => _showEditDialog(cat),
+                              tooltip: 'Rename/Edit',
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                              onPressed: () => _showDeleteDialog(cat),
+                              tooltip: 'Delete',
+                            ),
+                            Switch(
+                              value: isActive,
+                              activeThumbColor: kWaGreen,
+                              onChanged: (_) => _toggle(cat),
+                            ),
+                          ],
                         ),
                       );
                     },
