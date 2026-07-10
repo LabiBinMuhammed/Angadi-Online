@@ -39,6 +39,11 @@ import '../screens/admin/admin_user_detail_screen.dart';
 import '../screens/admin/admin_order_detail_screen.dart';
 import '../screens/admin/admin_categories_screen.dart';
 import '../screens/admin/admin_units_screen.dart';
+import '../screens/admin/admin_category_units_screen.dart';
+import '../screens/admin/admin_demos_screen.dart';
+import '../screens/admin/admin_locations_screen.dart';
+import '../screens/admin/admin_disputes_screen.dart';
+import '../screens/admin/admin_notifications_screen.dart';
 import '../screens/admin/admin_commission_screen.dart';
 import '../screens/admin/admin_shops_billing_screen.dart';
 import '../shell/main_shell.dart';
@@ -154,6 +159,11 @@ GoRouter buildRouter() {
       ),
       GoRoute(path: '/admin/categories',  builder: (_, __) => const AdminCategoriesScreen()),
       GoRoute(path: '/admin/units',       builder: (_, __) => const AdminUnitsScreen()),
+      GoRoute(path: '/admin/category-units', builder: (_, __) => const AdminCategoryUnitsScreen()),
+      GoRoute(path: '/admin/demos',       builder: (_, __) => const AdminDemosScreen()),
+      GoRoute(path: '/admin/locations',   builder: (_, __) => const AdminLocationsScreen()),
+      GoRoute(path: '/admin/disputes',    builder: (_, __) => const AdminDisputesScreen()),
+      GoRoute(path: '/admin/notifications', builder: (_, __) => const AdminNotificationsScreen()),
       GoRoute(path: '/admin/commission',  builder: (_, __) => const AdminCommissionScreen()),
       GoRoute(path: '/admin/commission/shops', builder: (_, __) => const AdminShopsBillingScreen()),
       GoRoute(path: '/admin/logs',        builder: (_, __) => const AdminLogsScreen()),

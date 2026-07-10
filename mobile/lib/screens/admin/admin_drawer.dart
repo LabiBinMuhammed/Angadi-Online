@@ -99,7 +99,6 @@ class AdminDrawer extends StatelessWidget {
                     route: '/admin/category-units',
                     kText: kText,
                     kSubText: kSubText,
-                    isImplemented: false,
                   ),
                   _buildDrawerItem(
                     context: context,
@@ -108,7 +107,6 @@ class AdminDrawer extends StatelessWidget {
                     route: '/admin/demos',
                     kText: kText,
                     kSubText: kSubText,
-                    isImplemented: false,
                   ),
                   
                   _buildSectionHeader('Marketplace', kSubText),
@@ -127,7 +125,6 @@ class AdminDrawer extends StatelessWidget {
                     route: '/admin/locations',
                     kText: kText,
                     kSubText: kSubText,
-                    isImplemented: false,
                   ),
                   _buildDrawerItem(
                     context: context,
@@ -189,7 +186,6 @@ class AdminDrawer extends StatelessWidget {
                     route: '/admin/disputes',
                     kText: kText,
                     kSubText: kSubText,
-                    isImplemented: false,
                   ),
                   _buildDrawerItem(
                     context: context,
@@ -206,7 +202,6 @@ class AdminDrawer extends StatelessWidget {
                     route: '/admin/notifications',
                     kText: kText,
                     kSubText: kSubText,
-                    isImplemented: false,
                   ),
                 ],
               ),
