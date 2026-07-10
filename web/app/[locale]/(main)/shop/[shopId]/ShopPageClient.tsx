@@ -24,6 +24,7 @@ interface Props {
   logoUrl?: string | null
   initials?: string
   distance?: string | null
+  initialCartItems: any[]
 }
 
 export default function ShopPageClient({
@@ -37,7 +38,8 @@ export default function ShopPageClient({
   reviews,
   logoUrl,
   initials,
-  distance
+  distance,
+  initialCartItems
 }: Props) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'catalog' | 'reviews'>('catalog')
@@ -154,6 +156,7 @@ export default function ShopPageClient({
             shopName={shopName}
             units={units}
             restrictionLevel={restrictionLevel}
+            initialCartItems={initialCartItems}
           />
         ) : (
           <ShopReviewsClient

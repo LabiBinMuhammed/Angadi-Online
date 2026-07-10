@@ -1,9 +1,11 @@
 'use client'
 
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useTransition } from 'react'
+import Link from 'next/link'
 import { ShoppingCart, Send, Plus, Minus, ChevronDown, X, Heart, Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Package, Smile, Paperclip, Scale, RefreshCw, Scissors } from 'lucide-react'
 import type { Item, Category, Unit, ItemVariant, ItemSellConfig } from '@/types'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import { addToCart as dbAddToCart, removeOrderItem as dbRemoveOrderItem, updateOrderItemQty as dbUpdateOrderItemQty } from '../../cart/actions'
 
 interface Props {
   items: Item[]
@@ -12,6 +14,7 @@ interface Props {
   shopName: string
   units: Unit[]
   restrictionLevel?: number
+  initialCartItems?: any[]
 }
 
 interface CartItem {
@@ -34,12 +37,37 @@ interface Selection {
   maxPrice?: number
 }
 
-export default function ShopCatalogClient({ items, categories, shopId, shopName, units, restrictionLevel = 0 }: Props) {
-  const { t } = useTranslation()
+export default function ShopCatalogClient({ items, categories, shopId, shopName, units, restrictionLevel = 0, initialCartItems = [] }: Props) {
+  const { locale, t } = useTranslation()
   const [activeCat, setActiveCat] = useState<string>('all')
   const [cart, setCart]         = useState<CartItem[]>([])
   const [selections, setSelections] = useState<Record<string, Selection>>({})
   const [wishlist, setWishlist] = useState<Set<string>>(new Set())
+  const [isPending, startTransition] = useTransition()
+
+  // Sync with initialCartItems from the server
+  useEffect(() => {
+    if (initialCartItems) {
+      const mapped: CartItem[] = initialCartItems
+        .filter((ci: any) => ci.items?.shop_id === shopId || ci.shop_id === shopId)
+        .map((ci: any) => {
+          const item = items.find(i => i.id === ci.item_id)
+          const variant = item?.item_variants?.find(v => v.id === ci.variant_id)
+          return {
+            itemId: ci.item_id,
+            name: item?.name || ci.name || 'Item',
+            price: ci.final_price ?? ci.estimated_price ?? 0,
+            qty: ci.requested_value,
+            variantLabel: variant?.label,
+            variantId: ci.variant_id,
+            customWeight: item?.item_sell_config?.[0]?.sell_mode?.toLowerCase() === 'manual' ? ci.requested_value : undefined,
+            minPrice: ci.min_price,
+            maxPrice: ci.max_price
+          }
+        })
+      setCart(mapped)
+    }
+  }, [initialCartItems, items, shopId])
 
   const toggleWishlist = (e: React.MouseEvent, itemId: string) => {
     e.preventDefault()
@@ -132,55 +160,25 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
     const config = Array.isArray(item.item_sell_config) ? item.item_sell_config[0] : item.item_sell_config
     const isManualOrDynamic = config?.sell_mode?.toLowerCase() === 'manual' || config?.sell_mode?.toLowerCase() === 'dynamic'
     
-    setCart(prev => {
-      const existingIndex = prev.findIndex(c => 
-        c.itemId === item.id && 
-        (isManualOrDynamic ? true : c.variantId === selection.variantId)
-      )
+    const variant = item.item_variants?.find(v => v.id === selection.variantId)
+    let price = 0
+    
+    if (config?.sell_mode?.toLowerCase() === 'manual') {
+      price = (config.price_per_base_unit ?? 0) * selection.qty
+    } else if (variant) {
+      price = variant.price ?? 0
+    } else {
+      price = item.price ?? 0
+    }
 
-      if (existingIndex > -1) {
-        const newCart = [...prev]
-        const existing = { ...newCart[existingIndex] }
+    const qty = config?.sell_mode?.toLowerCase() === 'manual' ? selection.qty : 1
 
-        if (config?.sell_mode?.toLowerCase() === 'manual') {
-          // If incrementing via card button, add 1. Otherwise use modal's selection.
-          existing.qty = isIncrement ? existing.qty + 1 : selection.qty
-          existing.price = (config.price_per_base_unit ?? 0) * existing.qty
-          existing.customWeight = existing.qty
-        } else if (config?.sell_mode?.toLowerCase() === 'dynamic') {
-          existing.minPrice = selection.minPrice
-          existing.maxPrice = selection.maxPrice
-          existing.qty = isIncrement ? existing.qty + 1 : selection.qty
-        } else {
-          // Packed / Portion
-          existing.qty += 1
-        }
-        
-        newCart[existingIndex] = existing
-        return newCart
+    startTransition(async () => {
+      try {
+        await dbAddToCart(shopId, item.id, isIncrement ? 1 : qty, price, selection.variantId)
+      } catch (err) {
+        console.error('Failed to add to cart:', err)
       }
-
-      // Add new item
-      const variant = item.item_variants?.find(v => v.id === selection.variantId)
-      let price = 0
-      
-      if (config?.sell_mode?.toLowerCase() === 'manual') {
-        price = (config.price_per_base_unit ?? 0) * selection.qty
-      } else if (variant) {
-        price = variant.price ?? 0
-      }
-
-      return [...prev, { 
-        itemId: item.id, 
-        name: item.name, 
-        price, 
-        qty: selection.qty || 1, 
-        variantLabel: variant?.label,
-        variantId: selection.variantId,
-        customWeight: config?.sell_mode?.toLowerCase() === 'manual' ? selection.qty : undefined,
-        minPrice: selection.minPrice,
-        maxPrice: selection.maxPrice
-      }]
     })
   }
 
@@ -189,38 +187,45 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
     const config = Array.isArray(item.item_sell_config) ? item.item_sell_config[0] : item.item_sell_config
     const isManualOrDynamic = config?.sell_mode?.toLowerCase() === 'manual' || config?.sell_mode?.toLowerCase() === 'dynamic'
 
-    setCart(prev => {
-      const existingIndex = prev.findIndex(c => 
-        c.itemId === item.id && 
-        (isManualOrDynamic ? true : c.variantId === selection.variantId)
-      )
-      
-      if (existingIndex === -1) return prev
+    const existingIndex = cart.findIndex(c => 
+      c.itemId === item.id && 
+      (isManualOrDynamic ? true : c.variantId === selection.variantId)
+    )
+    
+    if (existingIndex === -1) return
 
-      const existing = prev[existingIndex]
-      
-      if (config?.sell_mode?.toLowerCase() === 'manual') {
-        if (isDecrement) {
-          const newQty = existing.qty - 1
-          if (newQty <= 0) return prev.filter((_, i) => i !== existingIndex)
-          const newCart = [...prev]
-          newCart[existingIndex] = { 
-            ...existing, 
-            qty: newQty, 
-            customWeight: newQty, 
-            price: (config.price_per_base_unit ?? 0) * newQty 
+    const existing = cart[existingIndex]
+    const dbItem = initialCartItems?.find((ci: any) => 
+      ci.item_id === item.id && 
+      (isManualOrDynamic ? true : ci.variant_id === selection.variantId)
+    )
+
+    if (!dbItem) return
+
+    startTransition(async () => {
+      try {
+        if (config?.sell_mode?.toLowerCase() === 'manual') {
+          if (isDecrement) {
+            const newQty = existing.qty - 1
+            if (newQty <= 0) {
+              await dbRemoveOrderItem(dbItem.orderId, dbItem.id)
+            } else {
+              await dbUpdateOrderItemQty(dbItem.orderId, dbItem.id, newQty)
+            }
+          } else {
+            await dbRemoveOrderItem(dbItem.orderId, dbItem.id)
           }
-          return newCart
+        } else {
+          // Packed / Portion / Dynamic
+          if (existing.qty <= 1) {
+            await dbRemoveOrderItem(dbItem.orderId, dbItem.id)
+          } else {
+            await dbUpdateOrderItemQty(dbItem.orderId, dbItem.id, existing.qty - 1)
+          }
         }
-        return prev.filter((_, i) => i !== existingIndex)
+      } catch (err) {
+        console.error('Failed to remove from cart:', err)
       }
-
-      // Packed / Portion / Dynamic
-      if (existing.qty <= 1) return prev.filter((_, i) => i !== existingIndex)
-      
-      const newCart = [...prev]
-      newCart[existingIndex] = { ...existing, qty: existing.qty - 1 }
-      return newCart
     })
   }
 
@@ -695,20 +700,50 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
 
                   {/* Action CTA or Quantity Stepper */}
                   <div onClick={e => e.stopPropagation()}>
-                    <button 
-                      type="button"
-                      className="premium-cta-btn" 
-                      disabled={restrictionLevel >= 3}
-                      style={restrictionLevel >= 3 ? { opacity: 0.5, cursor: 'not-allowed', backgroundColor: '#94a3b8' } : undefined}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (restrictionLevel >= 3) return;
-                        addToCart(item);
-                      }}
-                    >
-                      <Plus size={16} />
-                      <span>{t('catalog.add_to_cart')}</span>
-                    </button>
+                    {cartItem ? (
+                      <div className="premium-stepper" style={isPending ? { opacity: 0.7, pointerEvents: 'none' } : undefined}>
+                        <button 
+                          type="button" 
+                          className="stepper-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeFromCart(item, true);
+                          }}
+                        >
+                          <Minus size={16} />
+                        </button>
+                        <span className="stepper-val">
+                          {config?.sell_mode?.toLowerCase() === 'manual'
+                            ? `${cartItem.qty} ${getUnit(config.base_unit_id)?.symbol || ''}`
+                            : cartItem.qty}
+                        </span>
+                        <button 
+                          type="button" 
+                          className="stepper-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToCart(item, true);
+                          }}
+                        >
+                          <Plus size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button 
+                        type="button"
+                        className="premium-cta-btn" 
+                        disabled={restrictionLevel >= 3 || isPending}
+                        style={restrictionLevel >= 3 ? { opacity: 0.5, cursor: 'not-allowed', backgroundColor: '#94a3b8' } : undefined}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (restrictionLevel >= 3) return;
+                          addToCart(item);
+                        }}
+                      >
+                        <Plus size={16} />
+                        <span>{t('catalog.add_to_cart')}</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -737,16 +772,16 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
         </div>
 
         {totalItems > 0 ? (
-          <button 
+          <Link 
+            href={`/${locale}/cart`}
             className="cart-summary-btn" 
             id="catalog-cart-btn"
-            disabled={restrictionLevel >= 3}
-            style={restrictionLevel >= 3 ? { opacity: 0.5, cursor: 'not-allowed', backgroundColor: '#94a3b8', boxShadow: 'none' } : undefined}
+            style={restrictionLevel >= 3 ? { opacity: 0.5, pointerEvents: 'none', backgroundColor: '#94a3b8', boxShadow: 'none' } : undefined}
           >
             <ShoppingCart size={16} />
             <span>{totalItems} {totalItems === 1 ? 'Item' : 'Items'} ₹{totalPrice.toFixed(0)}</span>
             <Send size={16} />
-          </button>
+          </Link>
         ) : (
           <button 
             className="send-fab" 

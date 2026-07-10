@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ShopPage({ params }: Props) {
   const { shopId } = await params
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
   const [
     { data: shop },
@@ -32,7 +33,8 @@ export default async function ShopPage({ params }: Props) {
     { data: units },
     { data: subscription },
     { data: ratingSummary },
-    { data: reviews }
+    { data: reviews },
+    pendingOrdersRes
   ] = await Promise.all([
     supabase.from('shops').select('*').eq('id', shopId).single(),
     supabase.from('items')
@@ -42,7 +44,8 @@ export default async function ShopPage({ params }: Props) {
     supabase.from('units').select('*'),
     supabase.from('shop_subscription').select('restriction_level').eq('shop_id', shopId).maybeSingle(),
     supabase.from('shop_rating_summary').select('*').eq('shop_id', shopId).maybeSingle(),
-    supabase.from('shop_reviews').select('*, users(name)').eq('shop_id', shopId).order('created_at', { ascending: false })
+    supabase.from('shop_reviews').select('*, users(name)').eq('shop_id', shopId).order('created_at', { ascending: false }),
+    user ? supabase.from('orders').select('id, order_items(*)').eq('user_id', user.id).eq('status', 'pending') : Promise.resolve({ data: null })
   ])
 
   if (!shop || shop.type?.endsWith('_inactive')) notFound()
@@ -58,6 +61,16 @@ export default async function ShopPage({ params }: Props) {
   const reviewList = (reviews ?? []) as any[]
   const initials  = shopData.name.split(' ').slice(0, 2).map((w: string) => w[0]).join('').toUpperCase()
 
+  let initialCartItems: any[] = []
+  if (pendingOrdersRes.data) {
+    initialCartItems = pendingOrdersRes.data.flatMap((o: any) => 
+      o.order_items?.map((item: any) => ({ 
+        ...item, 
+        orderId: o.id 
+      })) || []
+    )
+  }
+
   return (
     <div className="shop-page-wrapper">
       <ShopPageClient
@@ -72,6 +85,7 @@ export default async function ShopPage({ params }: Props) {
         logoUrl={shopData.logo_url}
         initials={initials}
         distance={shopData.distance}
+        initialCartItems={initialCartItems}
       />
     </div>
   )
