@@ -27,6 +27,7 @@ ON CONFLICT (symbol) DO NOTHING;
 DELETE FROM public.demo_variants WHERE id IS NOT NULL;
 DELETE FROM public.demo_sell_config WHERE id IS NOT NULL;
 DELETE FROM public.demo_items WHERE id IS NOT NULL;
+DELETE FROM public.category_unit_groups WHERE id IS NOT NULL;
 
 -- 4. Function block to dynamically seed demo items and map IDs
 DO $$
@@ -49,6 +50,12 @@ DECLARE
   u_pcs UUID := (SELECT id FROM public.units WHERE symbol = 'pcs');
   u_pck UUID := (SELECT id FROM public.units WHERE symbol = 'pack');
   u_btl UUID := (SELECT id FROM public.units WHERE symbol = 'bottle');
+
+  -- Unit Group IDs
+  g_wei UUID := (SELECT id FROM public.unit_groups WHERE name = 'Weight');
+  g_vol UUID := (SELECT id FROM public.unit_groups WHERE name = 'Volume');
+  g_cnt UUID := (SELECT id FROM public.unit_groups WHERE name = 'Count');
+  g_len UUID := (SELECT id FROM public.unit_groups WHERE name = 'Length');
 
   -- Temporary holders for inserted item IDs
   item_id UUID;
@@ -322,6 +329,53 @@ BEGIN
     (item_id, 'Fixed', 'Pack of 10', u_pcs, 10, 0, false, true, 4),
     (item_id, 'Fixed', 'Pack of 12', u_pcs, 12, 0, false, true, 5),
     (item_id, 'Fixed', 'Pack of 24', u_pcs, 24, 0, false, true, 6);
+
+  -- =======================================================================
+  -- 🔗 CATEGORY → UNIT GROUP MAPPINGS
+  -- =======================================================================
+  -- Map each category to one or more unit groups that make sense for it
+
+  -- Vegetables → Weight (kg / g)
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_veg, g_wei) ON CONFLICT DO NOTHING;
+
+  -- Fruits → Weight
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_fru, g_wei) ON CONFLICT DO NOTHING;
+
+  -- Grocery → Weight + Count (can be sold in kg or in packs)
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_gro, g_wei) ON CONFLICT DO NOTHING;
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_gro, g_cnt) ON CONFLICT DO NOTHING;
+
+  -- Dairy & Beverages → Volume + Count
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_dai, g_vol) ON CONFLICT DO NOTHING;
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_dai, g_cnt) ON CONFLICT DO NOTHING;
+
+  -- Meat & Fish → Weight
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_met, g_wei) ON CONFLICT DO NOTHING;
+
+  -- Bakery → Count + Weight
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_bak, g_cnt) ON CONFLICT DO NOTHING;
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_bak, g_wei) ON CONFLICT DO NOTHING;
+
+  -- Household Essentials → Count + Weight + Volume
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_hou, g_cnt) ON CONFLICT DO NOTHING;
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_hou, g_wei) ON CONFLICT DO NOTHING;
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_hou, g_vol) ON CONFLICT DO NOTHING;
+
+  -- Stationery → Count
+  INSERT INTO public.category_unit_groups (category_id, unit_group_id)
+  VALUES (v_sta, g_cnt) ON CONFLICT DO NOTHING;
 
 END $$;
 
