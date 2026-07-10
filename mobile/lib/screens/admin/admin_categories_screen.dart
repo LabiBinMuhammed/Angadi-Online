@@ -333,24 +333,9 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                       final cat = _categories[i];
                       final isActive = cat['is_active'] as bool? ?? true;
                       return ListTile(
-                        title: Row(
-                          children: [
-                            Text(
-                              cat['name'] ?? '—',
-                              style: const TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                            if (cat['display_order'] != null) ...[
-                              const SizedBox(width: 8),
-                              Chip(
-                                labelPadding: const EdgeInsets.symmetric(horizontal: 4),
-                                label: Text(
-                                  'Order: ${cat['display_order']}',
-                                  style: const TextStyle(fontSize: 10, color: Color(0xFF075E54)),
-                                ),
-                                backgroundColor: const Color(0xFFE0F2FE),
-                              ),
-                            ],
-                          ],
+                        title: Text(
+                          cat['name'] ?? '—',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                         subtitle: cat['description'] != null ? Text(cat['description']) : null,
                         trailing: Row(
