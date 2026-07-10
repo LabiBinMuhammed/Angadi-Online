@@ -32,7 +32,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
       enabledBorder: const OutlineInputBorder(
         borderSide: BorderSide(color: Color(0xFF333333), width: 1.5),
       ),
-      focusedBorder: const OutlineInputBorder(
+      focusedBorder: OutlineInputBorder(
         borderSide: BorderSide(color: kWaTeal, width: 2.0),
       ),
       border: const OutlineInputBorder(),
