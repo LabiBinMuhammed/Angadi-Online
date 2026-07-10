@@ -77,9 +77,20 @@ export async function updateOrderItemQty(orderId: string, orderItemId: string, n
     return removeOrderItem(orderId, orderItemId)
   }
 
+  const { data: itemData } = await supabase
+    .from('order_items')
+    .select('estimated_price')
+    .eq('id', orderItemId)
+    .single()
+
+  const unitPrice = itemData?.estimated_price || 0
+
   const { error } = await supabase
     .from('order_items')
-    .update({ requested_value: newQty })
+    .update({ 
+      requested_value: newQty,
+      final_price: unitPrice * newQty
+    })
     .eq('id', orderItemId)
     .eq('order_id', orderId)
 
@@ -194,15 +205,20 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
   // Upsert item in order
   const { data: existingItem } = await supabase
     .from('order_items')
-    .select('id, requested_value')
+    .select('id, requested_value, estimated_price')
     .eq('order_id', order.id)
     .eq('item_id', itemId)
     .single()
 
   if (existingItem) {
+    const newQty = existingItem.requested_value + qty
+    const unitPrice = existingItem.estimated_price || price
     await supabase
       .from('order_items')
-      .update({ requested_value: existingItem.requested_value + qty })
+      .update({ 
+        requested_value: newQty,
+        final_price: unitPrice * newQty
+      })
       .eq('id', existingItem.id)
   } else {
     const { error: itemError } = await supabase

@@ -524,20 +524,38 @@ export default function ItemFormClient({
 
         // 4. Sync item_variants (delete existing, insert new)
         await supabase.from('item_variants').delete().eq('item_id', item!.id)
-        if (variants.length > 0) {
-          const varPayload = variants.map(v => ({
+        
+        let varPayload = variants.map(v => ({
+          item_id: item!.id,
+          variant_type: form.sell_mode as any,
+          label: v.label,
+          unit_id: v.unit_id || null,
+          value: v.value ? Number(v.value) : 1,
+          price: v.price ? Number(v.price) : 0,
+          min_value: v.min_value !== undefined ? v.min_value : null,
+          max_value: v.max_value !== undefined ? v.max_value : null,
+          is_default: v.is_default,
+          is_active: v.is_active,
+          image_url: v.image_url || null
+        }))
+
+        if (form.sell_mode === 'Manual' && varPayload.length === 0) {
+          varPayload = [{
             item_id: item!.id,
-            variant_type: form.sell_mode as any,
-            label: v.label,
-            unit_id: v.unit_id || null,
-            value: v.value ? Number(v.value) : 1,
-            price: v.price ? Number(v.price) : 0,
-            min_value: v.min_value !== undefined ? v.min_value : null,
-            max_value: v.max_value !== undefined ? v.max_value : null,
-            is_default: v.is_default,
-            is_active: v.is_active,
-            image_url: v.image_url || null
-          }))
+            variant_type: 'Manual' as any,
+            label: 'Default',
+            unit_id: form.base_unit_id || null,
+            value: 1,
+            price: 0,
+            min_value: null,
+            max_value: null,
+            is_default: true,
+            is_active: true,
+            image_url: null
+          }]
+        }
+
+        if (varPayload.length > 0) {
           const { error: varError } = await supabase.from('item_variants').insert(varPayload)
           if (varError) throw varError
         }
@@ -563,7 +581,7 @@ export default function ItemFormClient({
             max_price_increase_percent: config ? config.max_price_increase_percent : 15,
             max_price_limit: config ? config.max_price_limit : 0
           },
-          variants: variants.map(v => ({
+          variants: variants.length > 0 ? variants.map(v => ({
             variant_type: v.variant_type,
             label: v.label,
             unit_id: v.unit_id || null,
@@ -574,7 +592,18 @@ export default function ItemFormClient({
             is_default: v.is_default,
             is_active: v.is_active,
             image_url: v.image_url || null
-          }))
+          })) : (form.sell_mode === 'Manual' ? [{
+            variant_type: 'Manual',
+            label: 'Default',
+            unit_id: form.base_unit_id || null,
+            value: 1,
+            price: 0,
+            min_value: null,
+            max_value: null,
+            is_default: true,
+            is_active: true,
+            image_url: null
+          }] : [])
         }
 
         const { data: rpcData, error: rpcError } = await supabase.rpc('create_shop_item_transaction', { payload: rpcPayload })
