@@ -83,6 +83,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       final shops = (res[1] as List).map((j) => Shop.fromJson(j)).toList();
       final items = (res[2] as List).map((j) => Item.fromJson(j)).toList();
       
+      final activeCategoryIds = cats.map((c) => c.id).toSet();
+      final filteredItems = items.where((item) =>
+        item.categoryId == null || activeCategoryIds.contains(item.categoryId)
+      ).toList();
+
       final Map<String, double> prices = {};
       for (var v in (res[3] as List)) {
         final itemId = v['item_id'] as String;
@@ -94,7 +99,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         setState(() {
           _categories = cats;
           _shops = shops;
-          _items = items;
+          _items = filteredItems;
           _itemPrices = prices;
           _loading = false;
         });

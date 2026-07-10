@@ -48,8 +48,11 @@ export default async function ShopPage({ params }: Props) {
   if (!shop || shop.type?.endsWith('_inactive')) notFound()
 
   const shopData  = shop as Shop
-  const itemList  = (items ?? []) as Item[]
   const catList   = (categories ?? []) as Category[]
+  const activeCategoryIds = new Set(catList.map(c => c.id))
+  const itemList  = ((items ?? []) as Item[]).filter(item => 
+    !item.category_id || activeCategoryIds.has(item.category_id)
+  )
   const unitList  = (units ?? []) as any[]
   const summary   = (ratingSummary ?? { average_rating: 0, total_reviews: 0, stars: 0 }) as any
   const reviewList = (reviews ?? []) as any[]

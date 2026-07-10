@@ -100,8 +100,11 @@ export default async function HomePage() {
     if (aLevel < 2 && bLevel >= 2) return -1
     return a.name.localeCompare(b.name)
   })
-  const itemList = (items ?? []) as Item[]
   const catList  = (categories ?? []) as Category[]
+  const activeCategoryIds = new Set(catList.map(c => c.id))
+  const itemList = ((items ?? []) as Item[]).filter(item => 
+    !item.category_id || activeCategoryIds.has(item.category_id)
+  )
   const unitList = (units ?? []) as Unit[]
   const locationName = (locationData?.data as any)?.name || 'Angadi Online'
 

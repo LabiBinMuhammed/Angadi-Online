@@ -128,12 +128,17 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
 
+      final activeCategoryIds = cats.map((c) => c.id).toSet();
+      final filteredItemsList = itemsList.where((item) =>
+        item.categoryId == null || activeCategoryIds.contains(item.categoryId)
+      ).toList();
+
       Map<String, List<Item>> itemsMap = {};
-      for (var item in itemsList) {
+      for (var item in filteredItemsList) {
         itemsMap[item.shopId] = (itemsMap[item.shopId] ?? [])..add(item);
       }
 
-      for (var item in itemsList) {
+      for (var item in filteredItemsList) {
         if (item.itemVariants.isNotEmpty) {
           final defaultVariant = item.itemVariants.firstWhere(
             (v) => v.isDefault,

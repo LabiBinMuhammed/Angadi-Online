@@ -210,6 +210,8 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
                onPressed: () async {
                  try {
+                   await supabase.from('items').update({'category_id': null}).eq('category_id', cat['id']);
+                   await supabase.from('demo_items').update({'category_id': null}).eq('category_id', cat['id']);
                    await supabase.from('categories').delete().eq('id', cat['id']);
                    if (mounted) {
                      setState(() {

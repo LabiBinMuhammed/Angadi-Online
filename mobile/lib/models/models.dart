@@ -69,13 +69,15 @@ class Shop {
 class Category {
   final String id;
   final String name;
+  final bool isActive;
   final List<Map<String, dynamic>>? categoryTranslations;
 
-  const Category({required this.id, required this.name, this.categoryTranslations});
+  const Category({required this.id, required this.name, this.isActive = true, this.categoryTranslations});
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
         id: json['id'] as String,
         name: json['name'] as String,
+        isActive: json['is_active'] as bool? ?? true,
         categoryTranslations: (json['category_translations'] as List?)
             ?.map((e) => Map<String, dynamic>.from(e as Map))
             .toList(),

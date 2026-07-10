@@ -25,7 +25,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
 
   Future<_Data> _fetch() async {
     final results = await Future.wait([
-      supabase.from('categories').select('id, name, category_translations(*)').eq('id', widget.categoryId).single(),
+      supabase.from('categories').select('id, name, is_active, category_translations(*)').eq('id', widget.categoryId).single(),
       supabase
           .from('items')
           .select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*), item_translations(*)')
@@ -35,9 +35,12 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
           .isFilter('deleted_at', null)
           .order('name'),
     ]);
+    final category = Category.fromJson(results[0] as Map<String, dynamic>);
+    final itemsList = (results[1] as List).map((j) => Item.fromJson(j)).toList();
+    final filteredItems = category.isActive ? itemsList : <Item>[];
     return _Data(
-      category: Category.fromJson(results[0] as Map<String, dynamic>),
-      items:    (results[1] as List).map((j) => Item.fromJson(j)).toList(),
+      category: category,
+      items:    filteredItems,
     );
   }
 

@@ -96,8 +96,19 @@ export default function CategoriesClient({ categories: initial }: { categories: 
   async function deleteCategory(id: string) {
     if (!window.confirm('Delete this category? Items using it will lose their category.')) return
     const supabase = createClient()
-    const { error } = await supabase.from('categories').delete().eq('id', id)
-    if (!error) setCategories(prev => prev.filter(c => c.id !== id))
+    try {
+      await supabase.from('items').update({ category_id: null }).eq('category_id', id)
+      await supabase.from('demo_items').update({ category_id: null }).eq('category_id', id)
+      
+      const { error } = await supabase.from('categories').delete().eq('id', id)
+      if (!error) {
+        setCategories(prev => prev.filter(c => c.id !== id))
+      } else {
+        alert('Error deleting category: ' + error.message)
+      }
+    } catch (e: any) {
+      alert('Error deleting category: ' + (e.message || e))
+    }
   }
 
   return (

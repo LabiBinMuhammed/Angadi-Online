@@ -57,10 +57,17 @@ class _ShopScreenState extends State<ShopScreen> {
             updatedAt: DateTime.now(),
           );
 
+    final cats = (results[2] as List).map((j) => Category.fromJson(j)).toList();
+    final activeCategoryIds = cats.map((c) => c.id).toSet();
+    final itemsList = (results[1] as List).map((j) => Item.fromJson(j)).toList();
+    final filteredItems = itemsList.where((item) =>
+      item.categoryId == null || activeCategoryIds.contains(item.categoryId)
+    ).toList();
+
     return _ShopData(
       shop:       Shop.fromJson(results[0] as Map<String, dynamic>),
-      items:      (results[1] as List).map((j) => Item.fromJson(j)).toList(),
-      categories: (results[2] as List).map((j) => Category.fromJson(j)).toList(),
+      items:      filteredItems,
+      categories: cats,
       summary:    ratingSummary,
     );
   }
