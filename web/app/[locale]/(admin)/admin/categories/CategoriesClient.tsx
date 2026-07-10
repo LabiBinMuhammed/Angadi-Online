@@ -103,6 +103,18 @@ export default function CategoriesClient({ categories: initial }: { categories: 
   return (
     <>
       <style>{`
+        .form-input {
+          border: 1.5px solid var(--text-base) !important;
+          border-radius: 0.375rem;
+          background-color: var(--bg-surface) !important;
+          color: var(--text-base) !important;
+          transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .form-input:focus {
+          border-color: var(--wa-green-dark) !important;
+          box-shadow: 0 0 0 3px rgba(7, 94, 84, 0.25) !important;
+          outline: none !important;
+        }
         @media (max-width: 640px) {
           .hide-sm {
             display: none !important;

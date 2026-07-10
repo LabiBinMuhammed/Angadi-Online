@@ -24,6 +24,21 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
   @override
   void initState() { super.initState(); _load(); }
 
+  InputDecoration _inputDeco(String label) {
+    return InputDecoration(
+      labelText: label,
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Color(0xFF333333), width: 1.5),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: kWaTeal, width: 2.0),
+      ),
+      border: const OutlineInputBorder(),
+    );
+  }
+
   Future<void> _load() async {
     try {
       final res = await supabase.from('categories').select('*').order('display_order', ascending: true);
@@ -98,18 +113,18 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                   children: [
                     TextField(
                       controller: nameEdit,
-                      decoration: const InputDecoration(labelText: 'Name *'),
+                      decoration: _inputDeco('Name *'),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: descEdit,
-                      decoration: const InputDecoration(labelText: 'Description (optional)'),
+                      decoration: _inputDeco('Description (optional)'),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     TextField(
                       controller: orderEdit,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Display Order (optional)'),
+                      decoration: _inputDeco('Display Order (optional)'),
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -250,12 +265,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                       Expanded(
                         child: TextField(
                           controller: _nameCtrl,
-                          decoration: const InputDecoration(
-                            labelText: 'Category Name *',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          ),
+                          decoration: _inputDeco('Category Name *'),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -264,12 +274,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                         child: TextField(
                           controller: _orderCtrl,
                           keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Display Order',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          ),
+                          decoration: _inputDeco('Display Order'),
                         ),
                       ),
                     ],
@@ -277,12 +282,7 @@ class _AdminCategoriesScreenState extends State<AdminCategoriesScreen> {
                   const SizedBox(height: 8),
                   TextField(
                     controller: _descCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Description (optional)',
-                      border: OutlineInputBorder(),
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                    ),
+                    decoration: _inputDeco('Description (optional)'),
                   ),
                   const SizedBox(height: 8),
                   Row(
