@@ -222,6 +222,12 @@ class AppLocalizationsHi extends AppLocalizations {
   String get noAddressesFound => 'कोई पता नहीं मिला।';
 
   @override
+  String get addressLabel => 'पते का नाम *';
+
+  @override
+  String get addressLabelPlaceholder => 'घर, छात्रावास, कार्यालय, आदि';
+
+  @override
   String get contactNameLabel => 'संपर्क नाम *';
 
   @override
@@ -1103,4 +1109,303 @@ class AppLocalizationsHi extends AppLocalizations {
   String failedToLoadReviews(String error) {
     return 'समीक्षाएं लोड करने में विफल: $error';
   }
+
+  @override
+  String get waitingUserConfirmation =>
+      'उपयोगकर्ता पुष्टि की प्रतीक्षा की जा रही है';
+
+  @override
+  String get authWelcomeBack => 'वापसी पर आपका स्वागत है';
+
+  @override
+  String get authSignInSubtitle => 'अपने विलेज मार्केट खाते में साइन इन करें';
+
+  @override
+  String get authPhoneLogin => 'फ़ोन लॉगिन';
+
+  @override
+  String get authEmailLogin => 'ईमेल लॉगिन';
+
+  @override
+  String get authForgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get authSignIn => 'साइन इन करें';
+
+  @override
+  String get authCreateAccount => 'खाता बनाएं';
+
+  @override
+  String get authJoinSubtitle =>
+      'विलेज मार्केट से जुड़ें — शुरू करने के लिए विवरण दर्ज करें';
+
+  @override
+  String get authUsePhone => 'फ़ोन नंबर का उपयोग करें';
+
+  @override
+  String get authUseEmail => 'ईमेल पते का उपयोग करें';
+
+  @override
+  String get authRegister => 'पंजीकरण करें';
+
+  @override
+  String get authResetPassword => 'पासवर्ड रीसेट करें';
+
+  @override
+  String get authResetPwInstructions =>
+      'पासवर्ड रीसेट करने के निर्देश प्राप्त करने के लिए अपना विवरण दर्ज करें';
+
+  @override
+  String get authCheckInboxReset => 'रीसेट लिंक के लिए अपना इनबॉक्स देखें';
+
+  @override
+  String get authEmailAccounts => 'ईमेल खाते';
+
+  @override
+  String get authPhoneAccounts => 'फ़ोन खाते';
+
+  @override
+  String get authSendResetLink => 'रीसेट लिंक भेजें';
+
+  @override
+  String get authGoToLogin => 'लॉगिन पर जाएं';
+
+  @override
+  String get authRememberPw => 'अपना पासवर्ड याद है?';
+
+  @override
+  String get authSignInLink => 'साइन इन करें';
+
+  @override
+  String authResetLinkSentTo(String email) {
+    return 'एक पासवर्ड रीसेट लिंक सफलतापूर्वक $email पर भेज दिया गया है। कृपया अपना इनबॉक्स और स्पैम फ़ोल्डर देखें।';
+  }
+
+  @override
+  String get authCompleteRegistration => 'पंजीकरण पूरा करें';
+
+  @override
+  String get authFewDetailsSetup => 'अपना खाता सेट करने के लिए बस कुछ विवरण';
+
+  @override
+  String get authPreferredLanguage => 'पसंदीदा भाषा';
+
+  @override
+  String get authVillageLocation => 'गाँव / स्थान';
+
+  @override
+  String get authCompleteSetup => 'सेटअप पूरा करें';
+
+  @override
+  String get authLoadingLocations => 'स्थान लोड किए जा रहे हैं...';
+
+  @override
+  String get authFullName => 'पूरा नाम';
+
+  @override
+  String get authEmail => 'ईमेल';
+
+  @override
+  String get authPhone => 'फ़ोन नंबर';
+
+  @override
+  String get authPassword => 'पासवर्ड';
+
+  @override
+  String get securityTitle => 'सुरक्षा सेटिंग्स';
+
+  @override
+  String get securityChangePhone => 'फ़ोन नंबर बदलें';
+
+  @override
+  String get securityPhoneSuccess => 'फ़ोन नंबर सफलतापूर्वक अपडेट किया गया!';
+
+  @override
+  String get securityActivePhone => 'सक्रिय फ़ोन नंबर';
+
+  @override
+  String get securityRequestPhoneChange => 'फ़ोन बदलने का अनुरोध करें';
+
+  @override
+  String get securitySending => 'भेजा जा रहा है...';
+
+  @override
+  String securityEnterVerificationCode(String phone) {
+    return '$phone पर भेजा गया सत्यापन कोड दर्ज करें';
+  }
+
+  @override
+  String get securityDidntReceiveCode => 'कोड प्राप्त नहीं हुआ?';
+
+  @override
+  String securityResendIn(String countdown) {
+    return '$countdown सेकंड में पुनः भेजें';
+  }
+
+  @override
+  String get securityResendOtp => 'ओटीपी पुनः भेजें';
+
+  @override
+  String get securityCancel => 'रद्द करें';
+
+  @override
+  String get securityVerifyChange => 'सत्यापित करें और बदलें';
+
+  @override
+  String get securityVerifying => 'सत्यापित किया जा रहा है...';
+
+  @override
+  String get securityChangePassword => 'खाता पासवर्ड बदलें';
+
+  @override
+  String get securityPasswordSuccess => 'पासवर्ड सफलतापूर्वक अपडेट किया गया!';
+
+  @override
+  String get securityNewPassword => 'नया पासवर्ड';
+
+  @override
+  String get securityConfirmNewPassword => 'नए पासवर्ड की पुष्टि करें';
+
+  @override
+  String get securityUpdatePassword => 'पासवर्ड अपडेट करें';
+
+  @override
+  String get securitySaving => 'सहेजा जा रहा है...';
+
+  @override
+  String get securityDangerZone => 'खतरे का क्षेत्र';
+
+  @override
+  String get securityDangerZoneDesc =>
+      'सभी उपकरणों से लॉग आउट करने से वेब ब्राउज़र, मोबाइल ऐप और अन्य सक्रिय सत्र समाप्त हो जाएंगे।';
+
+  @override
+  String get securitySignOutAll => 'सभी उपकरणों से साइन आउट करें';
+
+  @override
+  String get securityLoggingOut => 'लॉग आउट किया जा रहा है...';
+
+  @override
+  String get securityConfirmSignOutAll =>
+      'क्या आप निश्चित रूप से सभी उपकरणों से साइन आउट करना चाहते हैं? आपको अपने सभी सक्रिय उपकरणों पर फिर से लॉग इन करना होगा।';
+
+  @override
+  String get authNoAccountPrompt => 'क्या आपके पास खाता नहीं है? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'पहले से ही एक खाता है? ';
+
+  @override
+  String get authAccountType => 'खाते का प्रकार';
+
+  @override
+  String get authCustomerRole => 'ग्राहक';
+
+  @override
+  String get authShopOwnerRole => 'दुकान का मालिक';
+
+  @override
+  String get authVerifyPhone => 'फ़ोन नंबर सत्यापित करें';
+
+  @override
+  String get authVerifyCode => 'कोड सत्यापित करें';
+
+  @override
+  String get authVerificationCodeResent => 'सत्यापन कोड पुनः भेजा गया!';
+
+  @override
+  String get selectLocationTitle => 'स्थान चुनें';
+
+  @override
+  String get searchLocationsHint => 'स्थान खोजें…';
+
+  @override
+  String get allLocationsOption => 'सभी स्थान';
+
+  @override
+  String failedToLoadLocations(String error) {
+    return 'स्थान लोड करने में विफल: $error';
+  }
+
+  @override
+  String get noLocationsMatch => 'आपकी खोज से कोई स्थान मेल नहीं खाता।';
+
+  @override
+  String get vendorFooterDashboard => 'डैशबोर्ड';
+
+  @override
+  String get vendorFooterOrders => 'ऑर्डर';
+
+  @override
+  String get vendorFooterProducts => 'उत्पाद';
+
+  @override
+  String get vendorFooterCredit => 'क्रेडिट';
+
+  @override
+  String get vendorFooterExit => 'बाहर निकलें';
+
+  @override
+  String get vendorEditProduct => 'उत्पाद संपादित करें';
+
+  @override
+  String get vendorUserCreditDetail => 'उपयोगकर्ता क्रेडिट विवरण';
+
+  @override
+  String get tutorialSkip => 'छोड़ें';
+
+  @override
+  String get tutorialNext => 'अगला';
+
+  @override
+  String get tutorialFinish => 'समाप्त';
+
+  @override
+  String get tutorialHomeLocationTitle => 'स्थान चुनें';
+
+  @override
+  String get tutorialHomeLocationDesc =>
+      'अपने गांव या बाजार का स्थान बदलने के लिए यहां टैप करें।';
+
+  @override
+  String get tutorialHomeSearchTitle => 'दुकानें खोजें';
+
+  @override
+  String get tutorialHomeSearchDesc =>
+      'यहां टाइप करके अपनी पसंदीदा स्थानीय दुकानें खोजें।';
+
+  @override
+  String get tutorialHomeCategoryTitle => 'श्रेणियां';
+
+  @override
+  String get tutorialHomeCategoryDesc =>
+      'श्रेणी के अनुसार ताजा किराने का सामान फ़िल्टर करें।';
+
+  @override
+  String get tutorialHomeShopCardTitle => 'दुकानों का अन्वेषण करें';
+
+  @override
+  String get tutorialHomeShopCardDesc =>
+      'उपलब्ध सामान देखने के लिए किसी भी दुकान पर टैप करें।';
+
+  @override
+  String get tutorialShopFilterTitle => 'श्रेणी के अनुसार फ़िल्टर करें';
+
+  @override
+  String get tutorialShopFilterDesc =>
+      'विशिष्ट वस्तुओं को शीघ्रता से फ़िल्टर करने और खोजने के लिए किसी श्रेणी पर टैप करें।';
+
+  @override
+  String get tutorialShopProductTitle => 'उत्पाद देखें';
+
+  @override
+  String get tutorialShopProductDesc =>
+      'सभी उपलब्ध वस्तुओं की कीमतें, चित्र और विवरण देखें।';
+
+  @override
+  String get tutorialShopOpenTitle => 'उत्पाद खोलें';
+
+  @override
+  String get tutorialShopOpenDesc =>
+      'अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।';
 }

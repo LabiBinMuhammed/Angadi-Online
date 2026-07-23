@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../theme/theme_service.dart';
 
 class VendorFooter extends StatelessWidget {
@@ -10,17 +11,18 @@ class VendorFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     final activeColor = isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B82F6);
     final inactiveColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
     final bgColor = isDark ? const Color(0xFF101012) : const Color(0xFFFFFFFF);
     final borderColor = isDark ? const Color(0x14FFFFFF) : const Color(0xFFE2E8F0);
 
     final items = [
-      _FooterItem(icon: HugeIcons.strokeRoundedDashboardSquare01, label: 'Dashboard', route: '/vendor/dashboard'),
-      _FooterItem(icon: HugeIcons.strokeRoundedReceiptText, label: 'Orders', route: '/vendor/orders'),
-      _FooterItem(icon: HugeIcons.strokeRoundedPackage, label: 'Products', route: '/vendor/items'),
-      _FooterItem(icon: HugeIcons.strokeRoundedMoney03, label: 'Credit', route: '/vendor/credit'),
-      _FooterItem(icon: HugeIcons.strokeRoundedLogout01, label: 'Exit', route: '/profile'),
+      _FooterItem(icon: HugeIcons.strokeRoundedDashboardSquare01, label: l10n.vendorFooterDashboard, route: '/vendor/dashboard'),
+      _FooterItem(icon: HugeIcons.strokeRoundedReceiptText, label: l10n.vendorFooterOrders, route: '/vendor/orders'),
+      _FooterItem(icon: HugeIcons.strokeRoundedPackage, label: l10n.vendorFooterProducts, route: '/vendor/items'),
+      _FooterItem(icon: HugeIcons.strokeRoundedMoney03, label: l10n.vendorFooterCredit, route: '/vendor/credit'),
+      _FooterItem(icon: HugeIcons.strokeRoundedLogout01, label: l10n.vendorFooterExit, route: '/profile'),
     ];
 
     return Container(

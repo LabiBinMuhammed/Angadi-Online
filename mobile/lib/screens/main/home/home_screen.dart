@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +11,8 @@ import '../../../theme/theme_service.dart';
 import '../../../core/language_service.dart';
 import '../../../core/location_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
+import '../../../widgets/tutorial/tutorial_step.dart';
 import 'package:intl/intl.dart';
 
 // ── Colors ────────────────────────────────────────────────────────────────────
@@ -66,26 +71,110 @@ class _HomeScreenState extends State<HomeScreen> {
   String _itemSearch = '';
   String? _selectedCategory;
   
+  List<Item> _itemSearchResults = [];
+  bool _searchingItems = false;
+  Timer? _itemSearchDebounce;
+  
   final Set<String> _likedItems = {};
   Set<String> _pinnedShopIds = {};
   final Map<String, String> _selectedVariantIds = {};
   final Map<String, double> _localQtys = {};
   final Map<String, TextEditingController> _qtyControllers = {};
 
+  final GlobalKey _locationKey = GlobalKey();
+  final GlobalKey _searchKey = GlobalKey();
+  final GlobalKey _shopCardKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
     _loadData();
     LocationService.instance.addListener(_onLocationChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startHomeTutorial();
+    });
+  }
+
+  void _startHomeTutorial() {
+    TutorialManager.instance.start(
+      context,
+      'home_tutorial',
+      [
+        TutorialStep(
+          targetKey: _locationKey,
+          title: (l10n) => l10n.tutorialHomeLocationTitle,
+          description: (l10n) => l10n.tutorialHomeLocationDesc,
+          arrowPosition: TutorialArrowPosition.top,
+        ),
+        TutorialStep(
+          targetKey: _searchKey,
+          title: (l10n) => l10n.tutorialHomeSearchTitle,
+          description: (l10n) => l10n.tutorialHomeSearchDesc,
+          arrowPosition: TutorialArrowPosition.top,
+        ),
+        TutorialStep(
+          targetKey: _shopCardKey,
+          title: (l10n) => l10n.tutorialHomeShopCardTitle,
+          description: (l10n) => l10n.tutorialHomeShopCardDesc,
+          arrowPosition: TutorialArrowPosition.bottom,
+        ),
+      ],
+    );
   }
 
   @override
   void dispose() {
+    _itemSearchDebounce?.cancel();
     LocationService.instance.removeListener(_onLocationChanged);
     for (var controller in _qtyControllers.values) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  void _onItemSearchChanged(String query) {
+    setState(() {
+      _itemSearch = query;
+    });
+
+    if (_itemSearchDebounce?.isActive ?? false) _itemSearchDebounce!.cancel();
+
+    if (query.trim().isEmpty) {
+      setState(() {
+        _itemSearchResults = [];
+        _searchingItems = false;
+      });
+      return;
+    }
+
+    _itemSearchDebounce = Timer(const Duration(milliseconds: 300), () async {
+      setState(() => _searchingItems = true);
+      
+      final lang = LanguageService.instance.locale.languageCode;
+      final base = 'http://192.168.18.176:3000';
+      var urlStr = '$base/api/search?q=${Uri.encodeComponent(query.trim())}&lang=$lang';
+      if (_selectedShopId != null) {
+        urlStr += '&shopId=$_selectedShopId';
+      }
+      
+      try {
+        final response = await http.get(Uri.parse(urlStr));
+        if (response.statusCode == 200) {
+          final List<dynamic> data = jsonDecode(response.body);
+          if (mounted) {
+            setState(() {
+              _itemSearchResults = data.map((json) => Item.fromJson(Map<String, dynamic>.from(json))).toList();
+              _searchingItems = false;
+            });
+          }
+        } else {
+          if (mounted) setState(() => _searchingItems = false);
+        }
+      } catch (e) {
+        print('Search error: $e');
+        if (mounted) setState(() => _searchingItems = false);
+      }
+    });
   }
 
   void _onLocationChanged() {
@@ -356,6 +445,8 @@ class _HomeScreenState extends State<HomeScreen> {
       price = (config?.pricePerBaseUnit ?? 0.0) * qty;
       final unitSymbol = _units.firstWhere((u) => u.id == config?.baseUnitId, orElse: () => const Unit(id: '', name: '', symbol: 'kg', unitGroupId: '', baseMultiplier: 1.0)).symbol;
       priceUnit = ' / $unitSymbol';
+    } else if (config?.sellMode == SellMode.dynamic) {
+      price = (config?.pricePerBaseUnit ?? 0.0) * (selectedVariant.value ?? 1.0);
     } else {
       price = selectedVariant.price ?? 0.0;
     }
@@ -387,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Stack(
         children: [
           GestureDetector(
-            onTap: () => context.push('/home/item/${item.id}'),
+            onTap: () => context.push('/home/shop/${item.shopId}'),
             behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 52),
@@ -831,20 +922,29 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: _kCardBg,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
-                  border: Border.all(color: _kBorder),
-                ),
-                child: Row(
-                  children: [
-                    Text(l10n.navHome, style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: _kText)),
-                    const SizedBox(width: 4),
-                    HugeIcon(icon: HugeIcons.strokeRoundedArrowDown01, size: 16, color: _kText),
-                  ],
+              GestureDetector(
+                onTap: () => context.push('/profile/location'),
+                child: Container(
+                  key: _locationKey,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _kCardBg,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 8, offset: const Offset(0, 2))],
+                    border: Border.all(color: _kBorder),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.location_on, color: _kGreenDark, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        LocationService.instance.selectedLocationName ?? 'All Locations',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: _kText),
+                      ),
+                      const SizedBox(width: 4),
+                      HugeIcon(icon: HugeIcons.strokeRoundedArrowDown01, size: 16, color: _kText),
+                    ],
+                  ),
                 ),
               ),
               Row(
@@ -979,31 +1079,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 6),
                         Text(l10n.findGroceriesSubtitle, style: TextStyle(fontSize: 15, color: _kSubLighter, fontWeight: FontWeight.w500)),
-                        const SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: () => context.push('/profile/location'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: _kGreenDark.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: _kGreenDark.withValues(alpha: 0.2)),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.location_on, color: _kGreenDark, size: 14),
-                                const SizedBox(width: 4),
-                                Text(
-                                  LocationService.instance.selectedLocationName ?? 'All Locations',
-                                  style: const TextStyle(fontSize: 12, color: _kGreenDark, fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 2),
-                                const Icon(Icons.arrow_drop_down, color: _kGreenDark, size: 16),
-                              ],
-                            ),
-                          ),
-                        ),
+
                       ],
                     ),
                   ),
@@ -1016,6 +1092,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Expanded(
                         child: Container(
+                          key: _searchKey,
                           height: 54,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           decoration: BoxDecoration(color: _kInputBg, borderRadius: BorderRadius.circular(18), border: Border.all(color: _kBorder)),
@@ -1088,6 +1165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           });
                         },
                         child: Container(
+                          key: index == 0 ? _shopCardKey : null,
                           padding: EdgeInsets.all(isNarrow ? 16 : 20),
                           decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(24), border: Border.all(color: _kBorder)),
                           child: isNarrow
@@ -1187,17 +1265,14 @@ class _HomeScreenState extends State<HomeScreen> {
     final activeCategoryIds = shopItems.map((item) => item.categoryId).toSet();
     final shopCategories = _categories.where((cat) => activeCategoryIds.contains(cat.id)).toList();
 
-    List<Item> itemsToShow = List.from(shopItems);
-    if (_selectedCategory != null) {
-      itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
-    }
+    List<Item> itemsToShow;
     if (_itemSearch.isNotEmpty) {
-      itemsToShow = itemsToShow.where((i) {
-        final query = _itemSearch.toLowerCase();
-        final nameMatches = i.getLocalizedName(LanguageService.instance.locale.languageCode).toLowerCase().contains(query);
-        final translationsMatch = i.itemTranslations?.any((t) => t['name']?.toString().toLowerCase().contains(query) ?? false) ?? false;
-        return nameMatches || translationsMatch;
-      }).toList();
+      itemsToShow = _itemSearchResults;
+    } else {
+      itemsToShow = List.from(shopItems);
+      if (_selectedCategory != null) {
+        itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
+      }
     }
 
     return Column(
@@ -1282,7 +1357,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Expanded(
                           child: TextField(
-                            onChanged: (v) => setState(() => _itemSearch = v),
+                            onChanged: _onItemSearchChanged,
                             style: TextStyle(color: _kText, fontWeight: FontWeight.w500),
                             decoration: InputDecoration(hintText: l10n.searchItemsPlaceholder, hintStyle: TextStyle(color: _kSubLighter, fontWeight: FontWeight.w500), border: InputBorder.none),
                           ),
@@ -1361,7 +1436,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
                 
-                if (itemsToShow.isEmpty)
+                if (_searchingItems)
+                  const Padding(
+                    padding: EdgeInsets.all(48),
+                    child: Center(
+                      child: CircularProgressIndicator(color: _kGreen),
+                    ),
+                  )
+                else if (itemsToShow.isEmpty)
                   Padding(padding: const EdgeInsets.all(24), child: Center(child: Text(l10n.noItemsFound, style: TextStyle(color: _kSubLighter))))
                 else
                   ListenableBuilder(

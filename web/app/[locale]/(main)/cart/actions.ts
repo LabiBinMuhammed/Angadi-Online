@@ -230,7 +230,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
         variant_type: variantType,
         requested_value: qty,
         estimated_price: price,
-        final_price: price,
+        final_price: price * qty,
         status: 'pending'
       })
     if (itemError) throw new Error(itemError.message)

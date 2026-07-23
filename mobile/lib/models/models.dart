@@ -511,6 +511,8 @@ class CartItem {
   double get subtotal {
     if (sellConfig?.sellMode == SellMode.manual) {
       return (sellConfig?.pricePerBaseUnit ?? 0.0) * quantity;
+    } else if (sellConfig?.sellMode == SellMode.dynamic) {
+      return (sellConfig?.pricePerBaseUnit ?? 0.0) * (variant.value ?? 1.0) * quantity;
     }
     return (variant.price ?? 0.0) * quantity;
   }

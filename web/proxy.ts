@@ -103,7 +103,10 @@ export async function proxy(request: NextRequest) {
   // Routes that don't require authentication
   const publicRoutes = ['/login', '/signup', '/forgot-password']
   const isPublicRoute =
-    publicRoutes.some((r) => cleanPathname.startsWith(r)) || cleanPathname === '/'
+    publicRoutes.some((r) => cleanPathname.startsWith(r)) ||
+    cleanPathname === '/' ||
+    pathname === '/api/search' ||
+    pathname.startsWith('/api/search')
 
   // Unauthenticated user → redirect to login
   if (!user && !isPublicRoute) {

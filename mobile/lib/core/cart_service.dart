@@ -189,9 +189,14 @@ class CartService extends ChangeNotifier {
           .eq('item_id', item.id)
           .maybeSingle();
 
-      final unitPrice = isManualOrDynamic 
-          ? (sellConfig?.pricePerBaseUnit ?? 0.0)
-          : (variant.price ?? 0.0);
+      double unitPrice;
+      if (sellConfig?.sellMode == SellMode.manual) {
+        unitPrice = sellConfig?.pricePerBaseUnit ?? 0.0;
+      } else if (sellConfig?.sellMode == SellMode.dynamic) {
+        unitPrice = (sellConfig?.pricePerBaseUnit ?? 0.0) * (variant.value ?? 1.0);
+      } else {
+        unitPrice = variant.price ?? 0.0;
+      }
 
       if (existingItemRes != null) {
         final existingId = existingItemRes['id'] as String;

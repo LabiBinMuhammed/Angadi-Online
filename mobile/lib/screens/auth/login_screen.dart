@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../core/auth_service.dart';
 import '../../core/supabase_client.dart';
 import '../../theme/app_theme.dart';
@@ -80,15 +81,19 @@ class _LoginScreenState extends State<LoginScreen> {
         context.go('/home');
       }
     } on AuthException catch (e) {
-      if (e.message.contains('Invalid login credentials')) {
-        setState(() => _error = _isPhoneMode 
-            ? 'Incorrect phone number or password. Please try again.'
-            : 'Incorrect email or password. Please try again.');
-      } else {
-        setState(() => _error = e.message);
+      if (mounted) {
+        if (e.message.contains('Invalid login credentials')) {
+          setState(() => _error = _isPhoneMode 
+              ? 'Incorrect phone number or password. Please try again.'
+              : 'Incorrect email or password. Please try again.');
+        } else {
+          setState(() => _error = e.message);
+        }
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      if (mounted) {
+        setState(() => _error = e.toString());
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -105,301 +110,293 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Brand Hero Banner
-            Container(
-              height: 230,
-              decoration: BoxDecoration(color: kWaTeal),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: -40,
-                    right: -40,
-                    child: Container(
-                      width: 160,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(20),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -30,
-                    left: 20,
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(20),
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(25),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
-                          ),
-                          child: Icon(Icons.storefront, size: 36, color: kWaTeal),
-                        ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'Village Market',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Your community's local marketplace",
-                          style: TextStyle(
-                            color: Colors.white.withAlpha(204),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Form Content
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Welcome back',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: kWaTeal,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Sign in to your Village Market account',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: kNeutral500,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Login Method Toggle
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : kNeutral100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: _isPhoneMode ? kWaTeal : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Phone Number',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: !_isPhoneMode ? kWaTeal : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Email Address',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  if (_isPhoneMode) ...[
-                    // Phone Input
-                    _buildInputField(
-                      label: 'Phone number',
-                      hintText: '98765 43210',
-                      controller: _phoneCtrl,
-                      prefixIcon: Icons.phone_android_outlined,
-                      keyboardType: TextInputType.phone,
-                      textInputAction: TextInputAction.next,
-                      countryCode: _selectedCountryCode,
-                      onCountryCodeChanged: (val) {
-                        if (val != null) {
-                          setState(() {
-                            _selectedCountryCode = val;
-                          });
-                        }
-                      },
-                    ),
-                  ] else ...[
-                    // Email Input
-                    _buildInputField(
-                      label: 'Email address',
-                      hintText: 'you@example.com',
-                      controller: _emailCtrl,
-                      prefixIcon: Icons.mail_outline,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-
-                  // Password Input
-                  _buildInputField(
-                    label: 'Password',
-                    hintText: '••••••••',
-                    controller: _passwordCtrl,
-                    prefixIcon: Icons.lock_outline,
-                    obscureText: !_showPw,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _handleLogin(),
-                    suffixIcon: GestureDetector(
-                      onTap: () => setState(() => _showPw = !_showPw),
-                      child: Icon(
-                        _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        size: 20,
-                        color: kNeutral500,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: GestureDetector(
-                      onTap: () => context.push('/forgot-password'),
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: kWaTeal,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-
-                  // Error Box
-                  if (_error != null) ...[
-                    _buildErrorAlert(_error!),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // Submit Button
-                  ElevatedButton(
-                    onPressed: _loading ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kWaTeal,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    child: _loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
+      backgroundColor: kWaTeal,
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Top Header Section (Hello! Greeting + Storefront Logo)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Hello!',
+                            style: TextStyle(
                               color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -1.0,
                             ),
-                          )
-                        : const Text('Sign In'),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Footer Redirection
-                  Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      const Text(
-                        "Don't have an account? ",
-                        style: TextStyle(color: kNeutral500, fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                      GestureDetector(
-                        onTap: () => context.push('/signup'),
-                        child: Text(
-                          'Create one',
-                          style: TextStyle(
-                            color: kWaTeal,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
                           ),
+                          const SizedBox(height: 6),
+                          Text(
+                            l10n.findGroceriesSubtitle,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Storefront Logo Container
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1.5,
                         ),
+                      ),
+                      child: const Icon(
+                        Icons.storefront_rounded,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Bottom Sheet Form Card Container
+              Container(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 200,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, -8),
+                    )
+                  ],
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      l10n.authWelcomeBack,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: kWaTeal,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.authSignInSubtitle,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: kNeutral500,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.all(4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
+                              borderRadius: BorderRadius.circular(12),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _isPhoneMode ? kWaTeal : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  l10n.authPhoneLogin,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
+                              borderRadius: BorderRadius.circular(12),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: !_isPhoneMode ? kWaTeal : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  l10n.authEmailLogin,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    if (_isPhoneMode) ...[
+                      _buildInputField(
+                        label: l10n.authPhone,
+                        hintText: '98765 43210',
+                        controller: _phoneCtrl,
+                        prefixIcon: Icons.phone_android_outlined,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        countryCode: _selectedCountryCode,
+                        onCountryCodeChanged: (val) {
+                          if (val != null) {
+                            setState(() {
+                              _selectedCountryCode = val;
+                            });
+                          }
+                        },
+                      ),
+                    ] else ...[
+                      _buildInputField(
+                        label: l10n.authEmail,
+                        hintText: 'you@example.com',
+                        controller: _emailCtrl,
+                        prefixIcon: Icons.mail_outline,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                       ),
                     ],
-                  ),
-                ],
+                    const SizedBox(height: 18),
+
+                    _buildInputField(
+                      label: l10n.authPassword,
+                      hintText: '••••••••',
+                      controller: _passwordCtrl,
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: !_showPw,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _handleLogin(),
+                      suffixIcon: GestureDetector(
+                        onTap: () => setState(() => _showPw = !_showPw),
+                        child: Icon(
+                          _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          size: 20,
+                          color: kNeutral500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () => context.push('/forgot-password'),
+                        child: Text(
+                          l10n.authForgotPassword,
+                          style: TextStyle(
+                            color: kWaTeal,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    if (_error != null) ...[
+                      _buildErrorAlert(_error!),
+                      const SizedBox(height: 20),
+                    ],
+
+                    ElevatedButton(
+                      onPressed: _loading ? null : _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kWaTeal,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(l10n.authSignIn),
+                    ),
+                    const SizedBox(height: 24),
+
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          l10n.authNoAccountPrompt,
+                          style: const TextStyle(color: kNeutral500, fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.push('/signup'),
+                          child: Text(
+                            l10n.authCreateAccount,
+                            style: TextStyle(
+                              color: kWaTeal,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -418,23 +415,34 @@ class _LoginScreenState extends State<LoginScreen> {
     String? countryCode,
     void Function(String?)? onCountryCodeChanged,
   }) {
+    final isDark = ThemeService.instance.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: kNeutral500,
-            letterSpacing: 0.8,
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white70 : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : kNeutral100,
-            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ]
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -443,10 +451,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: countryCode,
-                    dropdownColor: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                     style: TextStyle(
                       fontSize: 15,
-                      color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                       fontWeight: FontWeight.w600,
                     ),
                     items: const [
@@ -467,11 +475,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   width: 1,
                   height: 20,
-                  color: kNeutral300,
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                 ),
                 const SizedBox(width: 8),
               ] else ...[
-                Icon(prefixIcon, size: 18, color: kNeutral500),
+                Icon(prefixIcon, size: 18, color: isDark ? Colors.white60 : const Color(0xFF64748B)),
                 const SizedBox(width: 12),
               ],
               Expanded(
@@ -481,10 +489,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: keyboardType,
                   textInputAction: textInputAction,
                   onSubmitted: onSubmitted,
-                  style: TextStyle(fontSize: 15, color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    fontWeight: FontWeight.w500,
+                  ),
                   decoration: InputDecoration(
                     hintText: hintText,
-                    hintStyle: const TextStyle(color: kNeutral400, fontWeight: FontWeight.w400),
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                      fontWeight: FontWeight.w400,
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   ),

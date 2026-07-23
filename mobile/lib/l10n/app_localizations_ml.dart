@@ -223,6 +223,12 @@ class AppLocalizationsMl extends AppLocalizations {
   String get noAddressesFound => 'വിലാസങ്ങളൊന്നും കണ്ടെത്തിയില്ല.';
 
   @override
+  String get addressLabel => 'വിലാസത്തിന്റെ പേര് *';
+
+  @override
+  String get addressLabelPlaceholder => 'വീട്, ഹോസ്റ്റൽ, ഓഫീസ്, മുതലായവ';
+
+  @override
   String get contactNameLabel => 'ബന്ധപ്പെടേണ്ട വ്യക്തിയുടെ പേര് *';
 
   @override
@@ -1112,4 +1118,310 @@ class AppLocalizationsMl extends AppLocalizations {
   String failedToLoadReviews(String error) {
     return 'അഭിപ്രായങ്ങൾ ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു: $error';
   }
+
+  @override
+  String get waitingUserConfirmation =>
+      'ഉപഭോക്താവിന്റെ സ്ഥിരീകരണത്തിനായി കാത്തിരിക്കുന്നു';
+
+  @override
+  String get authWelcomeBack => 'വീണ്ടും സ്വാഗതം';
+
+  @override
+  String get authSignInSubtitle =>
+      'നിങ്ങളുടെ വില്ലേജ് മാർക്കറ്റ് അക്കൗണ്ടിലേക്ക് സൈൻ ഇൻ ചെയ്യുക';
+
+  @override
+  String get authPhoneLogin => 'ഫോൺ ലോഗിൻ';
+
+  @override
+  String get authEmailLogin => 'ഇമെയിൽ ലോഗിൻ';
+
+  @override
+  String get authForgotPassword => 'പാസ്‌വേഡ് മറന്നോ?';
+
+  @override
+  String get authSignIn => 'സൈൻ ഇൻ ചെയ്യുക';
+
+  @override
+  String get authCreateAccount => 'അക്കൗണ്ട് സൃഷ്ടിക്കുക';
+
+  @override
+  String get authJoinSubtitle =>
+      'വില്ലേജ് മാർക്കറ്റിൽ ചേരുക — ആരംഭിക്കുന്നതിന് വിവരങ്ങൾ നൽകുക';
+
+  @override
+  String get authUsePhone => 'ഫോൺ നമ്പർ ഉപയോഗിക്കുക';
+
+  @override
+  String get authUseEmail => 'ഇമെയിൽ വിലാസം ഉപയോഗിക്കുക';
+
+  @override
+  String get authRegister => 'രജിസ്റ്റർ ചെയ്യുക';
+
+  @override
+  String get authResetPassword => 'പാസ്‌വേഡ് റീസെറ്റ് ചെയ്യുക';
+
+  @override
+  String get authResetPwInstructions =>
+      'പാസ്‌വേഡ് റീസെറ്റ് ചെയ്യുന്നതിനുള്ള നിർദ്ദേശങ്ങൾ ലഭിക്കുന്നതിന് നിങ്ങളുടെ വിവരങ്ങൾ നൽകുക';
+
+  @override
+  String get authCheckInboxReset =>
+      'റീസെറ്റ് ലിങ്കിനായി നിങ്ങളുടെ ഇൻബോക്സ് പരിശോധിക്കുക';
+
+  @override
+  String get authEmailAccounts => 'ഇമെയിൽ അക്കൗണ്ടുകൾ';
+
+  @override
+  String get authPhoneAccounts => 'ഫോൺ അക്കൗണ്ടുകൾ';
+
+  @override
+  String get authSendResetLink => 'റീസെറ്റ് ലിങ്ക് അയക്കുക';
+
+  @override
+  String get authGoToLogin => 'ലോഗിനിലേക്ക് പോവുക';
+
+  @override
+  String get authRememberPw => 'നിങ്ങളുടെ പാസ്‌വേഡ് ഓർമ്മയുണ്ടോ?';
+
+  @override
+  String get authSignInLink => 'സൈൻ ഇൻ ചെയ്യുക';
+
+  @override
+  String authResetLinkSentTo(String email) {
+    return 'ഒരു പാസ്‌വേഡ് റീസെറ്റ് ലിങ്ക് $email-ലേക്ക് വിജയകരമായി അയച്ചു. ദയവായി നിങ്ങളുടെ ഇൻബോക്സും സ്പാം ഫോൾഡറുകളും പരിശോധിക്കുക.';
+  }
+
+  @override
+  String get authCompleteRegistration => 'രജിസ്ട്രേഷൻ പൂർത്തിയാക്കുക';
+
+  @override
+  String get authFewDetailsSetup =>
+      'നിങ്ങളുടെ അക്കൗണ്ട് സജ്ജീകരിക്കുന്നതിന് ചില വിവരങ്ങൾ മാത്രം';
+
+  @override
+  String get authPreferredLanguage => 'തിരഞ്ഞെടുത്ത ഭാഷ';
+
+  @override
+  String get authVillageLocation => 'ഗ്രാമം / ലൊക്കേഷൻ';
+
+  @override
+  String get authCompleteSetup => 'സജ്ജീകരണം പൂർത്തിയാക്കുക';
+
+  @override
+  String get authLoadingLocations => 'ലൊക്കേഷനുകൾ ലോഡ് ചെയ്യുന്നു...';
+
+  @override
+  String get authFullName => 'പൂർണ്ണ നാമം';
+
+  @override
+  String get authEmail => 'ഇമെയിൽ';
+
+  @override
+  String get authPhone => 'ഫോൺ നമ്പർ';
+
+  @override
+  String get authPassword => 'പാസ്‌വേഡ്';
+
+  @override
+  String get securityTitle => 'സുരക്ഷാ ക്രമീകരണങ്ങൾ';
+
+  @override
+  String get securityChangePhone => 'ഫോൺ നമ്പർ മാറ്റുക';
+
+  @override
+  String get securityPhoneSuccess => 'ഫോൺ നമ്പർ വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!';
+
+  @override
+  String get securityActivePhone => 'സജീവമായ ഫോൺ നമ്പർ';
+
+  @override
+  String get securityRequestPhoneChange => 'ഫോൺ മാറ്റാൻ അഭ്യർത്ഥിക്കുക';
+
+  @override
+  String get securitySending => 'അയയ്ക്കുന്നു...';
+
+  @override
+  String securityEnterVerificationCode(String phone) {
+    return '$phone-ലേക്ക് അയച്ച സ്ഥിരീകരണ കോഡ് നൽകുക';
+  }
+
+  @override
+  String get securityDidntReceiveCode => 'കോഡ് ലഭിച്ചില്ലേ?';
+
+  @override
+  String securityResendIn(String countdown) {
+    return '$countdown സെക്കൻഡിനുള്ളിൽ വീണ്ടും അയയ്ക്കുക';
+  }
+
+  @override
+  String get securityResendOtp => 'OTP വീണ്ടും അയയ്ക്കുക';
+
+  @override
+  String get securityCancel => 'റദ്ദാക്കുക';
+
+  @override
+  String get securityVerifyChange => 'സ്ഥിരീകരിച്ച് മാറ്റുക';
+
+  @override
+  String get securityVerifying => 'സ്ഥിരീകരിക്കുന്നു...';
+
+  @override
+  String get securityChangePassword => 'അക്കൗണ്ട് പാസ്‌വേഡ് മാറ്റുക';
+
+  @override
+  String get securityPasswordSuccess =>
+      'പാസ്‌വേഡ് വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!';
+
+  @override
+  String get securityNewPassword => 'പുതിയ പാസ്‌വേഡ്';
+
+  @override
+  String get securityConfirmNewPassword => 'പുതിയ പാസ്‌വേഡ് സ്ഥിരീകരിക്കുക';
+
+  @override
+  String get securityUpdatePassword => 'പാസ്‌വേഡ് അപ്‌ഡേറ്റ് ചെയ്യുക';
+
+  @override
+  String get securitySaving => 'സംരക്ഷിക്കുന്നു...';
+
+  @override
+  String get securityDangerZone => 'അപകട മേഖല';
+
+  @override
+  String get securityDangerZoneDesc =>
+      'എല്ലാ ഉപകരണങ്ങളിൽ നിന്നും ലോഗ് ഔട്ട് ചെയ്യുന്നത് വെബ് ബ്രൗസറുകളിലും മൊബൈൽ ആപ്പുകളിലും മറ്റ് ലോഗിൻ ചെയ്ത ക്ലയന്റുകളിലുമുള്ള നിങ്ങളുടെ എല്ലാ സജീവ സെഷനുകളും അവസാനിപ്പിക്കും.';
+
+  @override
+  String get securitySignOutAll =>
+      'എല്ലാ ഉപകരണങ്ങളിൽ നിന്നും സൈൻ ഔട്ട് ചെയ്യുക';
+
+  @override
+  String get securityLoggingOut => 'ലോഗ് ഔട്ട് ചെയ്യുന്നു...';
+
+  @override
+  String get securityConfirmSignOutAll =>
+      'എല്ലാ ഉപകരണങ്ങളിൽ നിന്നും സൈൻ ഔട്ട് ചെയ്യണമെന്ന് നിങ്ങൾക്ക് ഉറപ്പാണോ? നിങ്ങളുടെ എല്ലാ സജീവ ഉപകരണങ്ങളിലും വീണ്ടും ലോഗിൻ ചെയ്യേണ്ടതുണ്ട്.';
+
+  @override
+  String get authNoAccountPrompt => 'ഒരു അക്കൗണ്ട് ഇല്ലേ? ';
+
+  @override
+  String get authAlreadyHaveAccount =>
+      'നിങ്ങൾക്ക് നിലവിൽ ഒരു അക്കൗണ്ട് ഉണ്ടോ? ';
+
+  @override
+  String get authAccountType => 'അക്കൗണ്ട് തരം';
+
+  @override
+  String get authCustomerRole => 'ഉപഭോക്താവ്';
+
+  @override
+  String get authShopOwnerRole => 'കടയുടമ';
+
+  @override
+  String get authVerifyPhone => 'ഫോൺ നമ്പർ സ്ഥിരീകരിക്കുക';
+
+  @override
+  String get authVerifyCode => 'കോഡ് പരിശോധിക്കുക';
+
+  @override
+  String get authVerificationCodeResent => 'സ്ഥിരീകരണ കോഡ് വീണ്ടും അയച്ചു!';
+
+  @override
+  String get selectLocationTitle => 'ലൊക്കേഷൻ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get searchLocationsHint => 'ലൊക്കേഷനുകൾ തിരയുക…';
+
+  @override
+  String get allLocationsOption => 'എല്ലാ ലൊക്കേഷനുകളും';
+
+  @override
+  String failedToLoadLocations(String error) {
+    return 'ലൊക്കേഷനുകൾ ലോഡ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു: $error';
+  }
+
+  @override
+  String get noLocationsMatch =>
+      'നിങ്ങൾ തിരഞ്ഞ ലൊക്കേഷനുകൾ ഒന്നും കണ്ടെത്തിയില്ല.';
+
+  @override
+  String get vendorFooterDashboard => 'ഡാഷ്‌ബോർഡ്';
+
+  @override
+  String get vendorFooterOrders => 'ഓർഡറുകൾ';
+
+  @override
+  String get vendorFooterProducts => 'ഉൽപ്പന്നങ്ങൾ';
+
+  @override
+  String get vendorFooterCredit => 'ക്രെഡിറ്റ്';
+
+  @override
+  String get vendorFooterExit => 'പുറത്തുകടക്കുക';
+
+  @override
+  String get vendorEditProduct => 'ഉൽപ്പന്നം എഡിറ്റ് ചെയ്യുക';
+
+  @override
+  String get vendorUserCreditDetail => 'ഉപയോക്തൃ ക്രെഡിറ്റ് വിവരങ്ങൾ';
+
+  @override
+  String get tutorialSkip => 'ഒഴിവാക്കുക';
+
+  @override
+  String get tutorialNext => 'അടുത്തത്';
+
+  @override
+  String get tutorialFinish => 'പൂർത്തിയാക്കുക';
+
+  @override
+  String get tutorialHomeLocationTitle => 'ലൊക്കേഷൻ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get tutorialHomeLocationDesc =>
+      'നിങ്ങളുടെ ഗ്രാമമോ മാർക്കറ്റോ മാറ്റാൻ ഇവിടെ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutorialHomeSearchTitle => 'കടകൾ തിരയുക';
+
+  @override
+  String get tutorialHomeSearchDesc =>
+      'ഇവിടെ ടൈപ്പ് ചെയ്ത് പ്രിയപ്പെട്ട പ്രാദേശിക കടകൾ കണ്ടെത്തുക.';
+
+  @override
+  String get tutorialHomeCategoryTitle => 'വിഭാഗങ്ങൾ';
+
+  @override
+  String get tutorialHomeCategoryDesc =>
+      'സാധനങ്ങൾ വിഭാഗമനുസരിച്ച് തരംതിരിച്ചു കാണുക.';
+
+  @override
+  String get tutorialHomeShopCardTitle => 'കടകൾ കാണുക';
+
+  @override
+  String get tutorialHomeShopCardDesc =>
+      'ലഭ്യമായ സാധനങ്ങൾ കാണാൻ ഏതെങ്കിലും കടയിൽ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutorialShopFilterTitle => 'വിഭാഗമനുസരിച്ച് കാണുക';
+
+  @override
+  String get tutorialShopFilterDesc =>
+      'നിങ്ങൾക്ക് ആവശ്യമായ സാധനങ്ങൾ വേഗത്തിൽ കണ്ടെത്താൻ കാറ്റഗറിയിൽ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get tutorialShopProductTitle => 'ഉൽപ്പന്നങ്ങൾ കാണുക';
+
+  @override
+  String get tutorialShopProductDesc =>
+      'ലഭ്യമായ എല്ലാ സാധനങ്ങളുടെയും വിലയും ചിത്രങ്ങളും ഇവിടെ കാണാം.';
+
+  @override
+  String get tutorialShopOpenTitle => 'വിവരങ്ങൾ അറിയുക';
+
+  @override
+  String get tutorialShopOpenDesc =>
+      'സാധനങ്ങളുടെ കൂടുതൽ വിവരങ്ങൾ കാണാനും ബാഗിലേക്ക് ചേർക്കാനും ഇതിൽ ടാപ്പ് ചെയ്യുക.';
 }

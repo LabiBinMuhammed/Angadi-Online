@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
+import 'package:hugeicons/hugeicons.dart';
+import '../../core/supabase_client.dart';
+import '../../theme/app_theme.dart';
+import '../../theme/theme_service.dart';
 import 'vendor_theme_helper.dart';
 import 'vendor_drawer.dart';
 
@@ -83,6 +87,7 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kVendorBg,
       drawer: const VendorDrawer(currentRoute: '/vendor/commission'),
@@ -90,7 +95,7 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
-        title: const Text('Commissions', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        title: Text(l10n.vendorDrawerCommissions, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),

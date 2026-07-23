@@ -42,7 +42,7 @@ export default async function ItemPage({ params }: Props) {
       .eq('item_id', itemId)
       .eq('is_active', true)
       .order('is_default', { ascending: false }),
-    supabase.from('item_sell_config').select('*').eq('item_id', itemId).single(),
+    supabase.from('item_sell_config').select('*').eq('item_id', itemId).maybeSingle(),
     supabase.from('units').select('*'),
   ])
 

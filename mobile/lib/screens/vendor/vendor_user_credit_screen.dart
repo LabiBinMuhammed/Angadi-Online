@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
 
@@ -74,6 +75,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final name = _user?['name'] ?? 'Credit Detail';
     final phone = _user?['phone'] ?? '';
     final limit = _credit?['credit_limit'];
@@ -97,7 +99,7 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
-        title: const Text('User Credit Detail', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        title: Text(l10n.vendorUserCreditDetail, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),

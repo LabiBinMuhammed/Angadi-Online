@@ -96,6 +96,8 @@
   "changeAddressLabel": "Change Address",
   "addNewAddressLabel": "Add New Address",
   "noAddressesFound": "No addresses found.",
+  "addressLabel": "Address Name *",
+  "addressLabelPlaceholder": "Home, Hostel, Office, etc.",
   "contactNameLabel": "Contact Name *",
   "fullNamePlaceholder": "Full Name",
   "contactPhoneLabel": "Contact Phone *",
@@ -559,5 +561,126 @@
         "type": "String"
       }
     }
-  }
+  },
+  "waitingUserConfirmation": "Waiting for user confirmation",
+  "authWelcomeBack": "Welcome back",
+  "authSignInSubtitle": "Sign in to your Village Market account",
+  "authPhoneLogin": "Phone Login",
+  "authEmailLogin": "Email Login",
+  "authForgotPassword": "Forgot Password?",
+  "authSignIn": "Sign In",
+  "authCreateAccount": "Create account",
+  "authJoinSubtitle": "Join Village Market — enter details to get started",
+  "authUsePhone": "Use Phone Number",
+  "authUseEmail": "Use Email Address",
+  "authRegister": "Register",
+  "authResetPassword": "Reset password",
+  "authResetPwInstructions": "Enter your details to receive password reset instructions",
+  "authCheckInboxReset": "Check your inbox for a reset link",
+  "authEmailAccounts": "Email Accounts",
+  "authPhoneAccounts": "Phone Accounts",
+  "authSendResetLink": "Send Reset Link",
+  "authGoToLogin": "Go to Login",
+  "authRememberPw": "Remember your password?",
+  "authSignInLink": "Sign in",
+  "authResetLinkSentTo": "A password reset link has been successfully sent to {email}. Please check your inbox and spam folders.",
+  "@authResetLinkSentTo": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authCompleteRegistration": "Complete registration",
+  "authFewDetailsSetup": "Just a few details to set up your account",
+  "authPreferredLanguage": "Preferred Language",
+  "authVillageLocation": "Village / Location",
+  "authCompleteSetup": "Complete Setup",
+  "authLoadingLocations": "Loading locations...",
+  "authFullName": "Full Name",
+  "authEmail": "Email",
+  "authPhone": "Phone number",
+  "authPassword": "Password",
+  "securityTitle": "Security Settings",
+  "securityChangePhone": "Change Phone Number",
+  "securityPhoneSuccess": "Phone number updated successfully!",
+  "securityActivePhone": "Active Phone Number",
+  "securityRequestPhoneChange": "Request Phone Change",
+  "securitySending": "Sending...",
+  "securityEnterVerificationCode": "Enter Verification Code sent to {phone}",
+  "@securityEnterVerificationCode": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "securityDidntReceiveCode": "Didn't receive code?",
+  "securityResendIn": "Resend in {countdown}s",
+  "@securityResendIn": {
+    "placeholders": {
+      "countdown": {
+        "type": "String"
+      }
+    }
+  },
+  "securityResendOtp": "Resend OTP",
+  "securityCancel": "Cancel",
+  "securityVerifyChange": "Verify & Change",
+  "securityVerifying": "Verifying...",
+  "securityChangePassword": "Change Account Password",
+  "securityPasswordSuccess": "Password updated successfully!",
+  "securityNewPassword": "New Password",
+  "securityConfirmNewPassword": "Confirm New Password",
+  "securityUpdatePassword": "Update Password",
+  "securitySaving": "Saving...",
+  "securityDangerZone": "Danger Zone",
+  "securityDangerZoneDesc": "Logging out from all devices will terminate all your active sessions across web browsers, mobile apps, and other logged-in clients.",
+  "securitySignOutAll": "Sign Out From All Devices",
+  "securityLoggingOut": "Logging out...",
+  "securityConfirmSignOutAll": "Are you sure you want to sign out from all devices? You will need to log in again on all your active devices.",
+  "authNoAccountPrompt": "Don't have an account? ",
+  "authAlreadyHaveAccount": "Already have an account? ",
+  "authAccountType": "Account Type",
+  "authCustomerRole": "Customer",
+  "authShopOwnerRole": "Shop Owner",
+  "authVerifyPhone": "Verify Phone Number",
+  "authVerifyCode": "Verify Code",
+  "authVerificationCodeResent": "Verification code resent!",
+  "selectLocationTitle": "Select Location",
+  "searchLocationsHint": "Search locations…",
+  "allLocationsOption": "All Locations",
+  "failedToLoadLocations": "Failed to load locations: {error}",
+  "@failedToLoadLocations": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noLocationsMatch": "No locations match your search.",
+  "vendorFooterDashboard": "Dashboard",
+  "vendorFooterOrders": "Orders",
+  "vendorFooterProducts": "Products",
+  "vendorFooterCredit": "Credit",
+  "vendorFooterExit": "Exit",
+  "vendorEditProduct": "Edit Product",
+  "vendorUserCreditDetail": "User Credit Detail",
+  "tutorialSkip": "Skip",
+  "tutorialNext": "Next",
+  "tutorialFinish": "Finish",
+  "tutorialHomeLocationTitle": "Select Location",
+  "tutorialHomeLocationDesc": "Tap here to change your village or marketplace location.",
+  "tutorialHomeSearchTitle": "Search Shops",
+  "tutorialHomeSearchDesc": "Find your favorite local shops by typing here.",
+  "tutorialHomeCategoryTitle": "Categories",
+  "tutorialHomeCategoryDesc": "Filter fresh groceries and items by category.",
+  "tutorialHomeShopCardTitle": "Explore Shops",
+  "tutorialHomeShopCardDesc": "Tap on any shop to see its available items.",
+  "tutorialShopFilterTitle": "Filter by Category",
+  "tutorialShopFilterDesc": "Tap a category to quickly filter and find specific items.",
+  "tutorialShopProductTitle": "View Products",
+  "tutorialShopProductDesc": "See prices, images, and details of all available items.",
+  "tutorialShopOpenTitle": "Open Product",
+  "tutorialShopOpenDesc": "Tap on any item card to see more details and add it to your bag."
 }

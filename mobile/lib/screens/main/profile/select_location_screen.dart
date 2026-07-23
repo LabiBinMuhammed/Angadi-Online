@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../../core/location_service.dart';
 import '../../../theme/app_theme.dart';
@@ -36,8 +37,9 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _loading = false);
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load locations: $e')),
+          SnackBar(content: Text(l10n.failedToLoadLocations(e.toString()))),
         );
       }
     }
@@ -45,6 +47,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isDark = ThemeService.instance.isDarkMode;
     final scaffoldBg = isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA);
     final cardBg = isDark ? kNeutral800 : Colors.white;
@@ -64,7 +67,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
       appBar: AppBar(
         backgroundColor: kWaTeal,
         foregroundColor: Colors.white,
-        title: const Text('Select Location'),
+        title: Text(l10n.selectLocationTitle),
         leading: IconButton(
           icon: const HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: Colors.white, size: 20),
           onPressed: () => context.pop(),
@@ -87,7 +90,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                 onChanged: (v) => setState(() => _searchQuery = v),
                 style: TextStyle(fontSize: 14, color: textMain),
                 decoration: InputDecoration(
-                  hintText: 'Search locations…',
+                  hintText: l10n.searchLocationsHint,
                   hintStyle: TextStyle(color: textMuted, fontSize: 14),
                   prefixIcon: Icon(Icons.search, size: 20, color: textMuted),
                   border: InputBorder.none,
@@ -109,7 +112,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                       if (_searchQuery.isEmpty) ...[
                         _buildLocationTile(
                           id: null,
-                          name: 'All Locations',
+                          name: l10n.allLocationsOption,
                           type: 'global',
                           isSelected: selectedId == null,
                           isDark: isDark,
@@ -149,7 +152,7 @@ class _SelectLocationScreenState extends State<SelectLocationScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(32),
                             child: Text(
-                              'No locations match your search.',
+                              l10n.noLocationsMatch,
                               style: TextStyle(color: textMuted),
                             ),
                           ),

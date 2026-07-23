@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
 import { Search, Package, ArrowRight } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import { useProductSearch, Item } from '@/lib/hooks/useProductSearch'
 
 interface TranslationRow {
   language_code: string
@@ -17,52 +17,17 @@ interface ItemImage {
   is_primary: boolean
 }
 
-interface Item {
-  id: string
-  name: string
-  description?: string
-  image_url?: string
-  price?: number
-  item_translations?: TranslationRow[]
-  item_images?: ItemImage[]
-}
-
 export default function SearchClient() {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<Item[]>([])
-  const [loading, setLoading] = useState(false)
+  const { locale, t } = useTranslation()
+  const { query, setQuery, results, loading } = useProductSearch('', locale)
   const [recent, setRecent] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
-  
-  const { locale, t } = useTranslation()
 
   useEffect(() => {
     inputRef.current?.focus()
     const stored = localStorage.getItem('vm_recent_searches')
     if (stored) setRecent(JSON.parse(stored))
   }, [])
-
-  useEffect(() => {
-    if (!query.trim()) { setResults([]); return }
-    const timer = setTimeout(async () => {
-      setLoading(true)
-      const supabase = createClient()
-      
-      // Query multilingual search RPC joining translations and images
-      const { data, error } = await supabase
-        .rpc('search_items_multilingual', { search_query: query.trim() })
-        .select('*, item_translations(language_code, name, description), item_images(image_url, is_primary)')
-        .limit(20)
-
-      if (error) {
-        console.error('Multilingual search failed:', error.message)
-      } else {
-        setResults((data || []) as Item[])
-      }
-      setLoading(false)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [query])
 
   function saveRecent(term: string) {
     const updated = [term, ...recent.filter(r => r !== term)].slice(0, 6)
@@ -148,7 +113,7 @@ export default function SearchClient() {
               return (
                 <Link
                   key={item.id}
-                  href={`/${locale}/item/${item.id}`}
+                  href={`/${locale}/shop/${item.shop_id}`}
                   className="wa-list-item"
                   id={`search-result-${item.id}`}
                   onClick={() => saveRecent(query)}

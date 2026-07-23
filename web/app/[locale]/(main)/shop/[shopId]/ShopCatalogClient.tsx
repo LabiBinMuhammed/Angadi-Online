@@ -164,7 +164,9 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
     let price = 0
     
     if (config?.sell_mode?.toLowerCase() === 'manual') {
-      price = (config.price_per_base_unit ?? 0) * selection.qty
+      price = config.price_per_base_unit ?? 0
+    } else if (config?.sell_mode?.toLowerCase() === 'dynamic' && variant) {
+      price = (config.price_per_base_unit ?? 0) * (variant.value ?? 1.0)
     } else if (variant) {
       price = variant.price ?? 0
     } else {

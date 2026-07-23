@@ -6,6 +6,8 @@ import '../../../models/models.dart';
 import '../../../core/language_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
+import '../../../widgets/tutorial/tutorial_step.dart';
 
 class ShopScreen extends StatefulWidget {
   final String shopId;
@@ -18,11 +20,35 @@ class ShopScreen extends StatefulWidget {
 
 class _ShopScreenState extends State<ShopScreen> {
   late Future<_ShopData> _dataFuture;
+  bool _tutorialStarted = false;
+  final GlobalKey _filterKey = GlobalKey();
+  final GlobalKey _productCardKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _dataFuture = _fetch();
+  }
+
+  void _startShopTutorial() {
+    TutorialManager.instance.start(
+      context,
+      'shop_tutorial',
+      [
+        TutorialStep(
+          targetKey: _filterKey,
+          title: (l10n) => l10n.tutorialShopFilterTitle,
+          description: (l10n) => l10n.tutorialShopFilterDesc,
+          arrowPosition: TutorialArrowPosition.bottom,
+        ),
+        TutorialStep(
+          targetKey: _productCardKey,
+          title: (l10n) => l10n.tutorialShopProductTitle,
+          description: (l10n) => l10n.tutorialShopProductDesc,
+          arrowPosition: TutorialArrowPosition.top,
+        ),
+      ],
+    );
   }
 
   Future<_ShopData> _fetch() async {
@@ -84,6 +110,12 @@ class _ShopScreenState extends State<ShopScreen> {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         final d = snapshot.data!;
+        if (!_tutorialStarted) {
+          _tutorialStarted = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _startShopTutorial();
+          });
+        }
         final activeCategoryIds = d.items.map((item) => item.categoryId).toSet();
         final filteredCategories = d.categories.where((cat) => activeCategoryIds.contains(cat.id)).toList();
 
@@ -140,6 +172,7 @@ class _ShopScreenState extends State<ShopScreen> {
                           itemBuilder: (_, i) {
                             final cat = filteredCategories[i];
                             return OutlinedButton(
+                              key: i == 0 ? _filterKey : null,
                               onPressed: () =>
                                   context.push('/home/shop/${widget.shopId}/category/${cat.id}'),
                               style: OutlinedButton.styleFrom(
@@ -167,7 +200,10 @@ class _ShopScreenState extends State<ShopScreen> {
                                 childAspectRatio: .85,
                               ),
                               itemCount: d.items.length,
-                              itemBuilder: (_, i) => _ItemCard(item: d.items[i]),
+                              itemBuilder: (_, i) => Container(
+                                  key: i == 0 ? _productCardKey : null,
+                                  child: _ItemCard(item: d.items[i]),
+                                ),
                             ),
                     ),
                   ],
@@ -190,9 +226,8 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
-      onTap: () => context.push('/home/item/${item.id}'),
+      onTap: null,
       child: Card(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -300,8 +335,9 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
 
         if (ordersRes is List) {
           for (final o in ordersRes) {
-            final reviewsList = o['shop_reviews'] as List?;
-            if (reviewsList == null || reviewsList.isEmpty) {
+            final reviewData = o['shop_reviews'];
+            final hasReview = reviewData != null && (reviewData is List ? reviewData.isNotEmpty : true);
+            if (!hasReview) {
               unreviewedId = o['id'] as String;
               break;
             }
@@ -406,7 +442,7 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
               child: LinearProgressIndicator(
                 value: val / 5.0,
                 backgroundColor: isDark ? kNeutral700 : kNeutral200,
-                valueColor: AlwaysStoppedAnimation<Color>(kWaGreenDark),
+                valueColor: AlwaysStoppedAnimation<Color>(kWaGreen),
                 minHeight: 6,
               ),
             ),
@@ -525,7 +561,7 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                             style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: kWaGreenDark,
+                            backgroundColor: kWaGreen,
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -689,21 +725,47 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                           ),
                         ),
                         if (_checkedOrder)
-                          TextButton.icon(
-                            onPressed: _handleWriteReviewClick,
-                            icon: Icon(
-                              _unreviewedOrderId != null ? Icons.rate_review_rounded : Icons.shopping_bag_outlined,
-                              size: 16,
-                              color: kWaGreenDark,
-                            ),
-                            label: Text(
-                              _unreviewedOrderId != null ? l10n.leaveShopReviewButton : l10n.myOrdersTitle,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: kWaGreenDark,
-                              ),
-                            ),
-                          ),
+                          _unreviewedOrderId != null
+                              ? ElevatedButton.icon(
+                                  onPressed: _handleWriteReviewClick,
+                                  icon: const Icon(
+                                    Icons.rate_review_rounded,
+                                    size: 15,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    l10n.leaveShopReviewButton,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: kWaGreen,
+                                    shadowColor: kWaGreen.withValues(alpha: 0.3),
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  ),
+                                )
+                              : TextButton.icon(
+                                  onPressed: _handleWriteReviewClick,
+                                  icon: Icon(
+                                    Icons.shopping_bag_outlined,
+                                    size: 16,
+                                    color: kWaGreen,
+                                  ),
+                                  label: Text(
+                                    l10n.myOrdersTitle,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: kWaGreen,
+                                    ),
+                                  ),
+                                ),
                       ],
                     ),
                     const SizedBox(height: 16),
@@ -748,20 +810,20 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: kWaGreenDark.withValues(alpha: 0.08),
+                                            color: kWaGreen.withValues(alpha: 0.08),
                                             borderRadius: BorderRadius.circular(6),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(Icons.check_circle_rounded, color: kWaGreenDark, size: 10),
+                                              Icon(Icons.check_circle_rounded, color: kWaGreen, size: 10),
                                               const SizedBox(width: 4),
                                               Text(
                                                 l10n.verifiedPurchaseBadge,
                                                 style: TextStyle(
                                                   fontSize: 9,
                                                   fontWeight: FontWeight.w800,
-                                                  color: kWaGreenDark,
+                                                  color: kWaGreen,
                                                 ),
                                               ),
                                             ],

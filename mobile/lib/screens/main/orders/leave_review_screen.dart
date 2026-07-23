@@ -14,16 +14,18 @@ class LeaveReviewScreen extends StatefulWidget {
 
 class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _pageController = PageController();
+  int _activeStep = 0;
 
   String? _shopId;
   String _shopName = 'Shop';
   bool _loading = true;
   bool _submitting = false;
 
-  int _quality = 5;
-  int _delivery = 5;
-  int _accuracy = 5;
-  int _overall = 5;
+  int _quality = 0;
+  int _delivery = 0;
+  int _accuracy = 0;
+  int _overall = 0;
 
   final _qualityDescController = TextEditingController();
   final _deliveryDescController = TextEditingController();
@@ -38,6 +40,7 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
 
   @override
   void dispose() {
+    _pageController.dispose();
     _qualityDescController.dispose();
     _deliveryDescController.dispose();
     _accuracyDescController.dispose();
@@ -157,7 +160,26 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
     }
   }
 
-  Widget _buildRatingSelector({
+  Map<String, dynamic>? _getSentiment(int rating) {
+    if (rating == 0) return null;
+    switch (rating) {
+      case 1:
+        return {'label': 'Poor', 'emoji': '😞', 'color': Colors.redAccent};
+      case 2:
+        return {'label': 'Fair', 'emoji': '😐', 'color': Colors.orangeAccent};
+      case 3:
+        return {'label': 'Good', 'emoji': '🙂', 'color': Colors.amber};
+      case 4:
+        return {'label': 'Very Good', 'emoji': '😊', 'color': Colors.lightGreen};
+      case 5:
+        return {'label': 'Excellent', 'emoji': '🤩', 'color': Colors.green};
+      default:
+        return null;
+    }
+  }
+
+  Widget _buildStepRating({
+    required int stepIndex,
     required String label,
     required String subtitle,
     required int currentValue,
@@ -168,81 +190,382 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
     final isDark = ThemeService.instance.isDarkMode;
     final kCardBg = isDark ? kNeutral800 : Colors.white;
     final kBorder = isDark ? kNeutral700 : kNeutral200;
+    final textBase = isDark ? Colors.white : kNeutral900;
+    final textMuted = isDark ? kNeutral400 : kNeutral600;  
+    final sentiment = _getSentiment(currentValue);
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: kCardBg,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kBorder),
-      ),
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'Step ${stepIndex + 1} of 5: $label',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: textMuted,
+              letterSpacing: 1.0,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: textBase,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: TextStyle(
+              fontSize: 14,
+              color: textMuted,
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // Stars selection block
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : kNeutral900,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(5, (index) {
+              final starVal = index + 1;
+              final isSel = starVal <= currentValue;
+              return TweenAnimationBuilder<double>(
+                duration: const Duration(milliseconds: 150),
+                tween: Tween(begin: 1.0, end: isSel ? 1.15 : 1.0),
+                builder: (context, scale, child) {
+                  return Transform.scale(
+                    scale: scale,
+                    child: IconButton(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        isSel ? Icons.star_rounded : Icons.star_outline_rounded,
+                        color: isSel ? const Color(0xFFF59E0B) : kNeutral400,
+                        size: 42,
                       ),
+                      onPressed: () => onChanged(starVal),
                     ),
-                    const SizedBox(height: 2),
+                  );
+                },
+              );
+            }),
+          ),
+          const SizedBox(height: 16),
+
+          // Sentiment Badge
+          if (sentiment != null)
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: (sentiment['color'] as Color).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(sentiment['emoji'] as String, style: const TextStyle(fontSize: 18)),
+                    const SizedBox(width: 8),
                     Text(
-                      subtitle,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: kNeutral500,
+                      sentiment['label'] as String,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: sentiment['color'] as Color,
                       ),
                     ),
                   ],
                 ),
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(5, (index) {
-                  final starVal = index + 1;
-                  return IconButton(
-                    padding: const EdgeInsets.symmetric(horizontal: 2),
-                    constraints: const BoxConstraints(),
-                    icon: Icon(
-                      starVal <= currentValue ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: const Color(0xFFF59E0B),
-                      size: 28,
+            ),
+          const SizedBox(height: 32),
+
+          Text(
+            'Write a comment (Optional)',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: textBase,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: kCardBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: kBorder),
+            ),
+            child: TextFormField(
+              controller: controller,
+              maxLines: 4,
+              decoration: InputDecoration(
+                hintText: placeholder,
+                hintStyle: const TextStyle(fontSize: 13, color: kNeutral500),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(16),
+              ),
+              style: TextStyle(fontSize: 14, color: textBase),
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // Navigation buttons
+          Row(
+            children: [
+              if (stepIndex > 0)
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: kWaGreen,
+                      side: BorderSide(color: kBorder),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
-                    onPressed: () => onChanged(starVal),
-                  );
-                }),
+                    child: const Text('Back', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                )
+              else
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: kNeutral500,
+                      side: BorderSide(color: kBorder),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: currentValue > 0
+                      ? () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kWaGreen,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: kBorder,
+                    disabledForegroundColor: kNeutral500,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Continue', style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(width: 8),
+                      Icon(Icons.arrow_forward_rounded, size: 16),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: controller,
-            maxLines: null,
-            decoration: InputDecoration(
-              hintText: placeholder,
-              hintStyle: const TextStyle(fontSize: 13, color: kNeutral500),
-              isDense: true,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: kBorder),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSummaryStep() {
+    final isDark = ThemeService.instance.isDarkMode;
+    final kCardBg = isDark ? kNeutral800 : Colors.white;
+    final kBorder = isDark ? kNeutral700 : kNeutral200;
+    final textBase = isDark ? Colors.white : kNeutral900;
+    final textMuted = isDark ? kNeutral400 : kNeutral600;  
+    final double avg = (_quality + _delivery + _accuracy + _overall) / 4.0;
+    final l10n = AppLocalizations.of(context)!;
+
+    final categories = [
+      {'label': l10n.productQualityRatingLabel, 'val': _quality, 'cmt': _qualityDescController.text.trim()},
+      {'label': l10n.deliveryTimelinessRatingLabel, 'val': _delivery, 'cmt': _deliveryDescController.text.trim()},
+      {'label': l10n.orderAccuracyRatingLabel, 'val': _accuracy, 'cmt': _accuracyDescController.text.trim()},
+      {'label': l10n.overallExperienceRatingLabel, 'val': _overall, 'cmt': _overallDescController.text.trim()},
+    ];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Step 5 of 5: Summary',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              color: textMuted,
+              letterSpacing: 1.0,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Review Summary',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: textBase,
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // Ring layout of Average Rating
+          Center(
+            child: Container(
+              width: 130,
+              height: 130,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: kCardBg,
+                border: Border.all(color: kBorder, width: 4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: kBorder),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      avg.toStringAsFixed(2),
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        color: kWaGreen,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Avg Score',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: textMuted,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-            style: TextStyle(fontSize: 14, color: isDark ? Colors.white : kNeutral900),
+          ),
+          const SizedBox(height: 32),
+
+          // Categories Breakdown List
+          ...categories.map((c) {
+            final ratingVal = c['val'] as int;
+            final sentiment = _getSentiment(ratingVal);
+            final comment = c['cmt'] as String;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: kCardBg,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: kBorder),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          c['label'] as String,
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: textBase),
+                        ),
+                        if (comment.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            '"$comment"',
+                            style: TextStyle(fontSize: 12, color: textMuted, fontStyle: FontStyle.italic),
+                          ),
+                        ]
+                      ],
+                    ),
+                  ),
+                  if (sentiment != null) ...[
+                    Text('${sentiment['emoji']} ', style: const TextStyle(fontSize: 16)),
+                    Text(
+                      '$ratingVal ★',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: sentiment['color'] as Color),
+                    ),
+                  ],
+                ],
+              ),
+            );
+          }),
+          const SizedBox(height: 24),
+
+          // Navigation buttons
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: kNeutral500,
+                    side: BorderSide(color: kBorder),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text('Edit Ratings', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: _submitting ? null : _submitReview,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kWaGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: _submitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(l10n.submitReviewButton, style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -259,135 +582,78 @@ class _LeaveReviewScreenState extends State<LeaveReviewScreen> {
       appBar: AppBar(
         backgroundColor: kWaTeal,
         foregroundColor: Colors.white,
-        title: Text(AppLocalizations.of(context)!.reviewShopTitle(_shopName)),
+        title: Text(l10n.reviewShopTitle(_shopName)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(4),
+          child: AnimatedBuilder(
+            animation: _pageController,
+            builder: (context, _) {
+              double page = 0.0;
+              if (_pageController.hasClients) {
+                page = _pageController.page ?? 0.0;
+              } else {
+                page = _activeStep.toDouble();
+              }
+              return LinearProgressIndicator(
+                value: (page + 1) / 5.0,
+                backgroundColor: isDark ? kNeutral700 : kNeutral200,
+                valueColor: AlwaysStoppedAnimation<Color>(kWaGreen),
+              );
+            },
+          ),
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      AppLocalizations.of(context)!.rateYourExperienceTitle,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: isDark ? Colors.white : kNeutral900,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      AppLocalizations.of(context)!.rateExperienceSubtitle(_shopName),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDark ? kNeutral400 : kNeutral600,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    _buildRatingSelector(
-                      label: AppLocalizations.of(context)!.productQualityRatingLabel,
-                      subtitle: AppLocalizations.of(context)!.productQualityRatingSub,
-                      currentValue: _quality,
-                      onChanged: (val) => setState(() => _quality = val),
-                      controller: _qualityDescController,
-                      placeholder: AppLocalizations.of(context)!.productQualityRatingHint,
-                    ),
-                    _buildRatingSelector(
-                      label: AppLocalizations.of(context)!.deliveryTimelinessRatingLabel,
-                      subtitle: AppLocalizations.of(context)!.deliveryTimelinessRatingSub,
-                      currentValue: _delivery,
-                      onChanged: (val) => setState(() => _delivery = val),
-                      controller: _deliveryDescController,
-                      placeholder: AppLocalizations.of(context)!.deliveryTimelinessRatingHint,
-                    ),
-                    _buildRatingSelector(
-                      label: AppLocalizations.of(context)!.orderAccuracyRatingLabel,
-                      subtitle: AppLocalizations.of(context)!.orderAccuracyRatingSub,
-                      currentValue: _accuracy,
-                      onChanged: (val) => setState(() => _accuracy = val),
-                      controller: _accuracyDescController,
-                      placeholder: AppLocalizations.of(context)!.orderAccuracyRatingHint,
-                    ),
-                    _buildRatingSelector(
-                      label: AppLocalizations.of(context)!.overallExperienceRatingLabel,
-                      subtitle: AppLocalizations.of(context)!.overallExperienceRatingSub,
-                      currentValue: _overall,
-                      onChanged: (val) => setState(() => _overall = val),
-                      controller: _overallDescController,
-                      placeholder: AppLocalizations.of(context)!.overallExperienceRatingHint,
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Summary average card
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      decoration: BoxDecoration(
-                        color: isDark ? kNeutral800 : Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isDark ? kNeutral700 : kNeutral200),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            AppLocalizations.of(context)!.calculatedAverageLabel,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: isDark ? Colors.white : kNeutral900,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: kWaGreenDark.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              ((_quality + _delivery + _accuracy + _overall) / 4.0).toStringAsFixed(2),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                                color: kWaGreenDark,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-
-                    // Submit button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: _submitting ? null : _submitReview,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kWaGreenDark,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: _submitting
-                            ? const CircularProgressIndicator(color: Colors.white)
-                            : Text(
-                                l10n.submitReviewButton,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                    ),
-                  ],
-                ),
+          : Form(
+              key: _formKey,
+              child: PageView(
+                controller: _pageController,
+                physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (val) {
+                  setState(() {
+                    _activeStep = val;
+                  });
+                },
+                children: [
+                  _buildStepRating(
+                    stepIndex: 0,
+                    label: l10n.productQualityRatingLabel,
+                    subtitle: l10n.productQualityRatingSub,
+                    currentValue: _quality,
+                    onChanged: (val) => setState(() => _quality = val),
+                    controller: _qualityDescController,
+                    placeholder: l10n.productQualityRatingHint,
+                  ),
+                  _buildStepRating(
+                    stepIndex: 1,
+                    label: l10n.deliveryTimelinessRatingLabel,
+                    subtitle: l10n.deliveryTimelinessRatingSub,
+                    currentValue: _delivery,
+                    onChanged: (val) => setState(() => _delivery = val),
+                    controller: _deliveryDescController,
+                    placeholder: l10n.deliveryTimelinessRatingHint,
+                  ),
+                  _buildStepRating(
+                    stepIndex: 2,
+                    label: l10n.orderAccuracyRatingLabel,
+                    subtitle: l10n.orderAccuracyRatingSub,
+                    currentValue: _accuracy,
+                    onChanged: (val) => setState(() => _accuracy = val),
+                    controller: _accuracyDescController,
+                    placeholder: l10n.orderAccuracyRatingHint,
+                  ),
+                  _buildStepRating(
+                    stepIndex: 3,
+                    label: l10n.overallExperienceRatingLabel,
+                    subtitle: l10n.overallExperienceRatingSub,
+                    currentValue: _overall,
+                    onChanged: (val) => setState(() => _overall = val),
+                    controller: _overallDescController,
+                    placeholder: l10n.overallExperienceRatingHint,
+                  ),
+                  _buildSummaryStep(),
+                ],
               ),
             ),
     );

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../core/auth_service.dart';
 import '../../core/supabase_client.dart';
 import '../../theme/app_theme.dart';
@@ -57,8 +58,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
       await authService.sendOtp(targetPhone);
       _startCountdown();
       if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verification code resent!')),
+          SnackBar(content: Text(l10n.authVerificationCodeResent)),
         );
       }
     } catch (e) {
@@ -136,6 +138,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     final displayPhone = widget.flow == 'changePhone' ? widget.newPhone! : widget.phone;
 
     return Scaffold(
@@ -155,7 +158,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           children: [
             const SizedBox(height: 20),
             Text(
-              'Verify Phone Number',
+              l10n.authVerifyPhone,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.w800,
@@ -165,7 +168,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Enter the 6-digit verification code sent to $displayPhone',
+              l10n.securityEnterVerificationCode(displayPhone),
               style: const TextStyle(
                 fontSize: 14,
                 color: kNeutral500,
@@ -261,7 +264,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         color: Colors.white,
                       ),
                     )
-                  : const Text('Verify Code'),
+                  : Text(l10n.authVerifyCode),
             ),
             const SizedBox(height: 24),
 
@@ -269,7 +272,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             Center(
               child: _countdown > 0
                   ? Text(
-                      'Resend code in ${_countdown}s',
+                      l10n.securityResendIn(_countdown.toString()),
                       style: const TextStyle(
                         fontSize: 14,
                         color: kNeutral500,
@@ -279,7 +282,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   : GestureDetector(
                       onTap: _resendOtp,
                       child: Text(
-                        'Resend Verification Code',
+                        l10n.securityResendOtp,
                         style: TextStyle(
                           color: kWaTeal,
                           fontSize: 14,

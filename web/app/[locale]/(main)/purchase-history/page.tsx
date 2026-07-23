@@ -48,6 +48,7 @@ export default async function PurchaseHistoryPage({ params }: { params: Promise<
       created_at,
       payment_type,
       shops(name),
+      shop_reviews(id),
       order_items(
         id,
         requested_value,
@@ -69,6 +70,7 @@ export default async function PurchaseHistoryPage({ params }: { params: Promise<
     created_at: o.created_at,
     payment_type: o.payment_type,
     shops: o.shops,
+    has_review: o.shop_reviews && o.shop_reviews.length > 0,
     order_items: (o.order_items || []).map((oi: any) => ({
       id: oi.id,
       requested_value: Number(oi.requested_value || 0),

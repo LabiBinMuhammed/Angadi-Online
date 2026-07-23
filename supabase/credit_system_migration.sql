@@ -175,6 +175,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ─── 5. Transaction-Safe Checkout Placing Function ───────────────────────────
+-- NOTE: order_addresses.order_id must have a UNIQUE constraint.
+-- Run this first if not yet applied:
+--   ALTER TABLE order_addresses ADD CONSTRAINT order_addresses_order_id_key UNIQUE (order_id);
+-- Also add label column if not present:
+--   ALTER TABLE order_addresses ADD COLUMN IF NOT EXISTS label TEXT DEFAULT 'Home';
 CREATE OR REPLACE FUNCTION place_checkout_orders(
     p_order_ids UUID[],
     p_payment_type TEXT,
@@ -183,26 +188,36 @@ CREATE OR REPLACE FUNCTION place_checkout_orders(
     p_contact_name TEXT,
     p_contact_phone TEXT,
     p_address_line_1 TEXT,
-    p_address_line_2 TEXT,
-    p_landmark TEXT
+    p_address_line_2 TEXT DEFAULT NULL,
+    p_landmark TEXT DEFAULT NULL,
+    p_label TEXT DEFAULT 'Home'
 )
 RETURNS JSONB
 SECURITY DEFINER
 AS $$
 DECLARE
     v_order_id UUID;
-    v_slot TEXT;
+    v_slot delivery_slot_enum;
 BEGIN
-    IF p_delivery_slot IS NOT NULL THEN
-        v_slot := p_delivery_slot;
-    ELSE
-        v_slot := 'morning';
-    END IF;
+    -- Cast text to enum (fallback to 'morning' if invalid)
+    BEGIN
+        IF p_delivery_slot IS NOT NULL THEN
+            v_slot := p_delivery_slot::delivery_slot_enum;
+        ELSE
+            v_slot := 'morning'::delivery_slot_enum;
+        END IF;
+    EXCEPTION WHEN invalid_text_representation THEN
+        v_slot := 'morning'::delivery_slot_enum;
+    END;
 
     FOREACH v_order_id IN ARRAY p_order_ids LOOP
-        -- Insert or update order address
+        -- Delete any existing address for this order to avoid constraint issues
+        DELETE FROM order_addresses WHERE order_id = v_order_id;
+
+        -- Insert fresh address record
         INSERT INTO order_addresses (
             order_id,
+            label,
             contact_name,
             contact_phone,
             address_line_1,
@@ -211,24 +226,20 @@ BEGIN
         )
         VALUES (
             v_order_id,
+            COALESCE(p_label, 'Home'),
             p_contact_name,
             p_contact_phone,
             p_address_line_1,
             p_address_line_2,
             p_landmark
-        )
-        ON CONFLICT (order_id) DO UPDATE SET
-            contact_name = EXCLUDED.contact_name,
-            contact_phone = EXCLUDED.contact_phone,
-            address_line_1 = EXCLUDED.address_line_1,
-            address_line_2 = EXCLUDED.address_line_2,
-            landmark = EXCLUDED.landmark;
+        );
 
-        -- Update order status to placed (setting status is handled in DB or client? Client sets payment_type which triggers triggers)
+        -- Update order: set payment & delivery info, keep status as 'pending'
         UPDATE orders
-        SET payment_type = p_payment_type,
+        SET payment_type  = p_payment_type,
             delivery_date = p_delivery_date,
-            delivery_slot = v_slot
+            delivery_slot = v_slot,
+            status        = 'pending'::order_status
         WHERE id = v_order_id;
     END LOOP;
 

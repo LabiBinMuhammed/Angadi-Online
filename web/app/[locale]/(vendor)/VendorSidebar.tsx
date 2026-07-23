@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard, Package, PackagePlus, ShoppingBag,
-  CreditCard, ArrowLeft, Store, Shield, Sun, Moon, X
+  CreditCard, ArrowLeft, Store, Shield, Sun, Moon, X, MessageSquare
 } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { useTranslation } from '@/lib/i18n/I18nContext'
@@ -21,6 +21,7 @@ const NAV = [
   ]},
   { sectionKey: 'vendor_nav.sec_sales', items: [
     { href: '/vendor/orders',    icon: ShoppingBag, labelKey: 'vendor_nav.orders', defaultLabel: 'Orders' },
+    { href: '/vendor/replacements', icon: MessageSquare, labelKey: 'vendor_nav.replacements', defaultLabel: 'Replacements' },
   ]},
   { sectionKey: 'vendor_nav.sec_finance', items: [
     { href: '/vendor/credit',    icon: CreditCard,  labelKey: 'vendor_nav.customer_credit', defaultLabel: 'Customer Credit' },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
 import 'vendor_drawer.dart';
@@ -107,6 +108,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final filtered = _credits.where((c) {
       final name = ((c['users'] as Map?)?['name'] as String? ?? '').toLowerCase();
       final phone = (c['users'] as Map?)?['phone'] as String? ?? '';
@@ -120,7 +122,7 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
-        title: const Text('Credit Management', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        title: Text(l10n.customerCreditAction, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),

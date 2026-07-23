@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Package, User, Phone, CheckCircle, Clock, Truck, Box, XCircle, ChevronRight, Edit2, Check, X, CreditCard } from 'lucide-react'
+import { Package, User, Phone, CheckCircle, Clock, Truck, Box, XCircle, ChevronRight, Edit2, Check, X, CreditCard, AlertCircle } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 type OrderItem = {
@@ -39,10 +39,42 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
   delivered: <CheckCircle size={16} />,
 }
 
+function checkProcessingAllowed(deliveryDateStr: string | null, deliverySlot: string | null): { allowed: boolean; reason?: string } {
+  if (!deliveryDateStr) return { allowed: true };
+  
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const localTodayStr = `${year}-${month}-${day}`;
+  
+  const cleanedDeliveryDate = deliveryDateStr.split('T')[0];
+  
+  if (cleanedDeliveryDate !== localTodayStr) {
+    return { 
+      allowed: false, 
+      reason: `This order is scheduled for delivery on ${new Date(cleanedDeliveryDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}. Updates are only allowed on the scheduled date.` 
+    };
+  }
+  
+  if (deliverySlot?.toLowerCase() === 'evening') {
+    const currentHour = today.getHours();
+    if (currentHour < 12) {
+      return { 
+        allowed: false, 
+        reason: "Evening slot orders cannot be processed before 12:00 PM." 
+      };
+    }
+  }
+  
+  return { allowed: true };
+}
+
 export default function OrderProcessingClient({ order: initial }: { order: Order }) {
   const { t, locale } = useTranslation()
   const [order, setOrder] = useState(initial)
   const [updating, setUpdating] = useState(false)
+  const { allowed: isAllowed, reason: disallowedReason } = checkProcessingAllowed(order.delivery_date || null, order.delivery_slot || null)
   const [actualValues, setActualValues] = useState<Record<string, string>>({})
   const router = useRouter()
 
@@ -116,6 +148,26 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
+      {!isAllowed && disallowedReason && (
+        <div style={{ 
+          padding: '1rem', 
+          background: 'rgba(239, 68, 68, 0.1)', 
+          border: '1px solid rgba(239, 68, 68, 0.2)', 
+          borderRadius: '16px', 
+          color: '#fca5a5', 
+          marginBottom: '1.5rem',
+          textAlign: 'center',
+          fontSize: '0.95rem',
+          fontWeight: 600,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem'
+        }}>
+          <AlertCircle size={20} style={{ flexShrink: 0 }} />
+          <span>{disallowedReason}</span>
+        </div>
+      )}
       {/* Customer */}
       <div className="vp-card" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
@@ -232,10 +284,22 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                     <span style={{ fontWeight: 700, color: '#10b981', fontSize: '1.1rem' }}>₹{oi.final_price}</span>
                   </>
                 )}
-                
                 <div style={{ marginTop: '0.5rem' }}>
                   {order.status === 'pending' ? (
                     oi.status === 'pending' ? (
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button onClick={() => updateItemStatus(oi, 'approved')} disabled={updating || !isAllowed} className="vp-btn vp-btn-success vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><Check size={14} /> {t('vendor_order_processing.approve')}</button>
+                        <button onClick={() => updateItemStatus(oi, 'rejected')} disabled={updating || !isAllowed} className="vp-btn vp-btn-danger vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><X size={14} /> {t('vendor_order_processing.reject')}</button>
+                      </div>
+                    ) : (
+                      <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : oi.status === 'adjusted' ? 'warning' : 'success'}`}>
+                        {getStatusLabel(oi.status).toUpperCase()}
+                      </span>
+                    )
+                  ) : ['accepted', 'packing'].includes(order.status) ? (
+                    oi.status === 'rejected' ? (
+                      <span className="vp-badge vp-badge-danger">REJECTED</span>
+                    ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
                         {isDynamic && (
                           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -246,10 +310,11 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                               placeholder={t('vendor_order_processing.actual_qty_placeholder')}
                               value={actualValues[oi.id] ?? ''}
                               onChange={e => setActualValues({ ...actualValues, [oi.id]: e.target.value })}
+                              disabled={!isAllowed}
                             />
                             <button 
                               onClick={() => updateItemStatus(oi, 'adjusted')} 
-                              disabled={updating || !actualValues[oi.id]}
+                              disabled={updating || !actualValues[oi.id] || !isAllowed}
                               className="vp-btn vp-btn-primary vp-btn-sm" 
                               style={{ padding: '0.3rem 0.6rem' }}
                               title={t('vendor_order_processing.adjust_price_tooltip')}
@@ -258,15 +323,10 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                             </button>
                           </div>
                         )}
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button onClick={() => updateItemStatus(oi, 'approved')} disabled={updating} className="vp-btn vp-btn-success vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><Check size={14} /> {t('vendor_order_processing.approve')}</button>
-                          <button onClick={() => updateItemStatus(oi, 'rejected')} disabled={updating} className="vp-btn vp-btn-danger vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><X size={14} /> {t('vendor_order_processing.reject')}</button>
-                        </div>
+                        <span className={`vp-badge vp-badge-${oi.status === 'adjusted' ? 'warning' : 'success'}`}>
+                          {getStatusLabel(oi.status).toUpperCase()}
+                        </span>
                       </div>
-                    ) : (
-                      <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : oi.status === 'adjusted' ? 'warning' : 'success'}`}>
-                        {getStatusLabel(oi.status).toUpperCase()}
-                      </span>
                     )
                   ) : (
                     <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : 'success'}`}>
@@ -304,7 +364,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button
               onClick={() => updatePaymentType('cod')}
-              disabled={updating}
+              disabled={updating || !isAllowed}
               className={`vp-btn ${order.payment_type === 'cod' || !order.payment_type ? 'vp-btn-success' : 'vp-btn-outline'}`}
               style={{ flex: 1, padding: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
             >
@@ -313,7 +373,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
             </button>
             <button
               onClick={() => updatePaymentType('credit')}
-              disabled={updating}
+              disabled={updating || !isAllowed}
               className={`vp-btn ${order.payment_type === 'credit' ? 'vp-btn-primary' : 'vp-btn-outline'}`}
               style={{ flex: 1, padding: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
             >
@@ -343,7 +403,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
               className="vp-btn vp-btn-primary"
               style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
               onClick={() => updateOrderStatus(nextStatus)}
-              disabled={updating || (order.status === 'pending' && !allItemsProcessed)}
+              disabled={updating || (order.status === 'pending' && !allItemsProcessed) || !isAllowed}
             >
               {updating ? t('vendor_order_processing.updating') : order.status === 'pending' ? t('vendor_order_processing.accept_order_start_packing') : t('vendor_order_processing.mark_as').replace('{status}', getStatusLabel(nextStatus))}
               {!updating && <ChevronRight size={20} />}
@@ -351,9 +411,15 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
           )
         )}
 
-        {order.status === 'pending' && (
+        {order.status !== 'cancelled' && order.status !== 'delivered' && (
           <button id="cancel-order-btn" className="vp-btn vp-btn-danger" style={{ width: '100%', padding: '1rem' }}
-            onClick={() => updateOrderStatus('cancelled')} disabled={updating}>
+            onClick={() => {
+              if (confirm('Are you sure you want to cancel this order?')) {
+                updateOrderStatus('cancelled');
+              }
+            }} 
+            disabled={updating || !isAllowed}
+          >
             <XCircle size={18} /> {t('vendor_order_processing.cancel_order')}
           </button>
         )}

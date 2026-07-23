@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { Shop, Item, Category } from '@/types'
 import ShopPageClient from './ShopPageClient'
-import { Video, Phone, Search, MoreVertical } from 'lucide-react'
 
 type Props = { params: Promise<{ shopId: string }> }
 

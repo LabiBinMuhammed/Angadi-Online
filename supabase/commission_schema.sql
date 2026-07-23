@@ -127,7 +127,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE OR REPLACE TRIGGER trg_create_shop_subscription
     AFTER INSERT ON shops
@@ -223,7 +223,7 @@ BEGIN
     
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE OR REPLACE TRIGGER trg_calculate_order_commission
     AFTER UPDATE OF status ON orders

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:village_market/l10n/app_localizations.dart';
-import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
 import '../../../core/language_service.dart';
@@ -67,7 +66,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
                   itemBuilder: (_, i) {
                     final item = d.items[i];
                     return GestureDetector(
-                      onTap: () => context.push('/home/item/${item.id}'),
+                      onTap: null,
                       child: Card(
                         child: Column(children: [
                           Expanded(

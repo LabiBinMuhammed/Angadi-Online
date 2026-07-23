@@ -221,6 +221,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noAddressesFound => 'No addresses found.';
 
   @override
+  String get addressLabel => 'Address Name *';
+
+  @override
+  String get addressLabelPlaceholder => 'Home, Hostel, Office, etc.';
+
+  @override
   String get contactNameLabel => 'Contact Name *';
 
   @override
@@ -1096,4 +1102,302 @@ class AppLocalizationsEn extends AppLocalizations {
   String failedToLoadReviews(String error) {
     return 'Failed to load reviews: $error';
   }
+
+  @override
+  String get waitingUserConfirmation => 'Waiting for user confirmation';
+
+  @override
+  String get authWelcomeBack => 'Welcome back';
+
+  @override
+  String get authSignInSubtitle => 'Sign in to your Village Market account';
+
+  @override
+  String get authPhoneLogin => 'Phone Login';
+
+  @override
+  String get authEmailLogin => 'Email Login';
+
+  @override
+  String get authForgotPassword => 'Forgot Password?';
+
+  @override
+  String get authSignIn => 'Sign In';
+
+  @override
+  String get authCreateAccount => 'Create account';
+
+  @override
+  String get authJoinSubtitle =>
+      'Join Village Market — enter details to get started';
+
+  @override
+  String get authUsePhone => 'Use Phone Number';
+
+  @override
+  String get authUseEmail => 'Use Email Address';
+
+  @override
+  String get authRegister => 'Register';
+
+  @override
+  String get authResetPassword => 'Reset password';
+
+  @override
+  String get authResetPwInstructions =>
+      'Enter your details to receive password reset instructions';
+
+  @override
+  String get authCheckInboxReset => 'Check your inbox for a reset link';
+
+  @override
+  String get authEmailAccounts => 'Email Accounts';
+
+  @override
+  String get authPhoneAccounts => 'Phone Accounts';
+
+  @override
+  String get authSendResetLink => 'Send Reset Link';
+
+  @override
+  String get authGoToLogin => 'Go to Login';
+
+  @override
+  String get authRememberPw => 'Remember your password?';
+
+  @override
+  String get authSignInLink => 'Sign in';
+
+  @override
+  String authResetLinkSentTo(String email) {
+    return 'A password reset link has been successfully sent to $email. Please check your inbox and spam folders.';
+  }
+
+  @override
+  String get authCompleteRegistration => 'Complete registration';
+
+  @override
+  String get authFewDetailsSetup => 'Just a few details to set up your account';
+
+  @override
+  String get authPreferredLanguage => 'Preferred Language';
+
+  @override
+  String get authVillageLocation => 'Village / Location';
+
+  @override
+  String get authCompleteSetup => 'Complete Setup';
+
+  @override
+  String get authLoadingLocations => 'Loading locations...';
+
+  @override
+  String get authFullName => 'Full Name';
+
+  @override
+  String get authEmail => 'Email';
+
+  @override
+  String get authPhone => 'Phone number';
+
+  @override
+  String get authPassword => 'Password';
+
+  @override
+  String get securityTitle => 'Security Settings';
+
+  @override
+  String get securityChangePhone => 'Change Phone Number';
+
+  @override
+  String get securityPhoneSuccess => 'Phone number updated successfully!';
+
+  @override
+  String get securityActivePhone => 'Active Phone Number';
+
+  @override
+  String get securityRequestPhoneChange => 'Request Phone Change';
+
+  @override
+  String get securitySending => 'Sending...';
+
+  @override
+  String securityEnterVerificationCode(String phone) {
+    return 'Enter Verification Code sent to $phone';
+  }
+
+  @override
+  String get securityDidntReceiveCode => 'Didn\'t receive code?';
+
+  @override
+  String securityResendIn(String countdown) {
+    return 'Resend in ${countdown}s';
+  }
+
+  @override
+  String get securityResendOtp => 'Resend OTP';
+
+  @override
+  String get securityCancel => 'Cancel';
+
+  @override
+  String get securityVerifyChange => 'Verify & Change';
+
+  @override
+  String get securityVerifying => 'Verifying...';
+
+  @override
+  String get securityChangePassword => 'Change Account Password';
+
+  @override
+  String get securityPasswordSuccess => 'Password updated successfully!';
+
+  @override
+  String get securityNewPassword => 'New Password';
+
+  @override
+  String get securityConfirmNewPassword => 'Confirm New Password';
+
+  @override
+  String get securityUpdatePassword => 'Update Password';
+
+  @override
+  String get securitySaving => 'Saving...';
+
+  @override
+  String get securityDangerZone => 'Danger Zone';
+
+  @override
+  String get securityDangerZoneDesc =>
+      'Logging out from all devices will terminate all your active sessions across web browsers, mobile apps, and other logged-in clients.';
+
+  @override
+  String get securitySignOutAll => 'Sign Out From All Devices';
+
+  @override
+  String get securityLoggingOut => 'Logging out...';
+
+  @override
+  String get securityConfirmSignOutAll =>
+      'Are you sure you want to sign out from all devices? You will need to log in again on all your active devices.';
+
+  @override
+  String get authNoAccountPrompt => 'Don\'t have an account? ';
+
+  @override
+  String get authAlreadyHaveAccount => 'Already have an account? ';
+
+  @override
+  String get authAccountType => 'Account Type';
+
+  @override
+  String get authCustomerRole => 'Customer';
+
+  @override
+  String get authShopOwnerRole => 'Shop Owner';
+
+  @override
+  String get authVerifyPhone => 'Verify Phone Number';
+
+  @override
+  String get authVerifyCode => 'Verify Code';
+
+  @override
+  String get authVerificationCodeResent => 'Verification code resent!';
+
+  @override
+  String get selectLocationTitle => 'Select Location';
+
+  @override
+  String get searchLocationsHint => 'Search locations…';
+
+  @override
+  String get allLocationsOption => 'All Locations';
+
+  @override
+  String failedToLoadLocations(String error) {
+    return 'Failed to load locations: $error';
+  }
+
+  @override
+  String get noLocationsMatch => 'No locations match your search.';
+
+  @override
+  String get vendorFooterDashboard => 'Dashboard';
+
+  @override
+  String get vendorFooterOrders => 'Orders';
+
+  @override
+  String get vendorFooterProducts => 'Products';
+
+  @override
+  String get vendorFooterCredit => 'Credit';
+
+  @override
+  String get vendorFooterExit => 'Exit';
+
+  @override
+  String get vendorEditProduct => 'Edit Product';
+
+  @override
+  String get vendorUserCreditDetail => 'User Credit Detail';
+
+  @override
+  String get tutorialSkip => 'Skip';
+
+  @override
+  String get tutorialNext => 'Next';
+
+  @override
+  String get tutorialFinish => 'Finish';
+
+  @override
+  String get tutorialHomeLocationTitle => 'Select Location';
+
+  @override
+  String get tutorialHomeLocationDesc =>
+      'Tap here to change your village or marketplace location.';
+
+  @override
+  String get tutorialHomeSearchTitle => 'Search Shops';
+
+  @override
+  String get tutorialHomeSearchDesc =>
+      'Find your favorite local shops by typing here.';
+
+  @override
+  String get tutorialHomeCategoryTitle => 'Categories';
+
+  @override
+  String get tutorialHomeCategoryDesc =>
+      'Filter fresh groceries and items by category.';
+
+  @override
+  String get tutorialHomeShopCardTitle => 'Explore Shops';
+
+  @override
+  String get tutorialHomeShopCardDesc =>
+      'Tap on any shop to see its available items.';
+
+  @override
+  String get tutorialShopFilterTitle => 'Filter by Category';
+
+  @override
+  String get tutorialShopFilterDesc =>
+      'Tap a category to quickly filter and find specific items.';
+
+  @override
+  String get tutorialShopProductTitle => 'View Products';
+
+  @override
+  String get tutorialShopProductDesc =>
+      'See prices, images, and details of all available items.';
+
+  @override
+  String get tutorialShopOpenTitle => 'Open Product';
+
+  @override
+  String get tutorialShopOpenDesc =>
+      'Tap on any item card to see more details and add it to your bag.';
 }

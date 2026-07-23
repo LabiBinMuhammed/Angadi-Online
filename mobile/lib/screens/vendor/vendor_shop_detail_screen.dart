@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../widgets/directional_huge_icon.dart';
 import 'vendor_theme_helper.dart';
@@ -122,6 +123,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final name = _nameController.text.trim();
     final initialsStr = name.isNotEmpty ? _initials(name) : '?';
     final locName = _locations.firstWhere((l) => l['id'] == _selectedLocationId, orElse: () => {'name': ''})['name'] as String?;
@@ -132,7 +134,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: kVendorText,
-        title: const Text('Shop Settings', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        title: Text(l10n.vendorShopsTitle, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
         leading: Navigator.canPop(context)
             ? IconButton(
                 icon: const DirectionalHugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, size: 20),

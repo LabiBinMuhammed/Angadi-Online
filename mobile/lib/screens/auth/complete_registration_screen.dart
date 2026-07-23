@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../core/auth_service.dart';
 import '../../core/supabase_client.dart';
 import '../../theme/app_theme.dart';
@@ -102,6 +103,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -112,7 +114,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
             children: [
               const SizedBox(height: 20),
               Text(
-                'Complete Registration',
+                l10n.authCompleteRegistration,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
@@ -121,9 +123,9 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Just a few more details to set up your profile',
-                style: TextStyle(
+              Text(
+                l10n.authFewDetailsSetup,
+                style: const TextStyle(
                   fontSize: 14,
                   color: kNeutral500,
                   fontWeight: FontWeight.w500,
@@ -133,7 +135,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
 
               // Full Name
               _buildInputField(
-                label: 'Full name',
+                label: l10n.authFullName,
                 hintText: 'Your full name',
                 controller: _nameCtrl,
                 prefixIcon: Icons.person_outline,
@@ -144,12 +146,12 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
 
               // Account Type
               _buildDropdownField(
-                label: 'Account type',
+                label: l10n.authAccountType,
                 value: _role,
                 prefixIcon: Icons.people_outline,
-                items: const [
-                  DropdownMenuItem(value: 'customer', child: Text('Customer')),
-                  DropdownMenuItem(value: 'shop_owner', child: Text('Shop Owner')),
+                items: [
+                  DropdownMenuItem(value: 'customer', child: Text(l10n.authCustomerRole)),
+                  DropdownMenuItem(value: 'shop_owner', child: Text(l10n.authShopOwnerRole)),
                 ],
                 onChanged: (val) => setState(() => _role = val!),
               ),
@@ -157,7 +159,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
 
               // Language Preference
               _buildDropdownField(
-                label: 'Preferred language',
+                label: l10n.authPreferredLanguage,
                 value: _language,
                 prefixIcon: Icons.language_outlined,
                 items: const [
@@ -187,7 +189,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
 
                 // Password
                 _buildInputField(
-                  label: 'Password (for password sign-in)',
+                  label: '${l10n.authPassword} (optional)',
                   hintText: 'Min. 8 characters (optional)',
                   controller: _passwordCtrl,
                   prefixIcon: Icons.lock_outline,
@@ -206,7 +208,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
 
                 // Confirm Password
                 _buildInputField(
-                  label: 'Confirm password',
+                  label: l10n.securityConfirmNewPassword,
                   hintText: 'Repeat password',
                   controller: _confirmCtrl,
                   prefixIcon: Icons.vpn_key_outlined,
@@ -256,7 +258,7 @@ class _CompleteRegistrationScreenState extends State<CompleteRegistrationScreen>
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Complete Registration'),
+                    : Text(l10n.authCompleteRegistration),
               ),
             ],
           ),

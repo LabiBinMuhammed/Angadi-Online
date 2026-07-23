@@ -28,8 +28,7 @@ function CheckoutForm() {
     if (e.key === 'Escape') {
       setIsAddressModalOpen(false)
       // Inline form reset (avoids forward reference to resetForm)
-      setFormName('')
-      setFormPhone('')
+      setFormLabel('')
       setFormLine1('')
       setFormLine2('')
       setFormLandmark('')
@@ -75,8 +74,7 @@ function CheckoutForm() {
   }, [isAddressModalOpen, handleModalKeyDown])
   
   // New address form fields
-  const [formName, setFormName] = useState('')
-  const [formPhone, setFormPhone] = useState('')
+  const [formLabel, setFormLabel] = useState('')
   const [formLine1, setFormLine1] = useState('')
   const [formLine2, setFormLine2] = useState('')
   const [formLandmark, setFormLandmark] = useState('')
@@ -155,8 +153,7 @@ function CheckoutForm() {
   }, [])
 
   function resetForm() {
-    setFormName('')
-    setFormPhone('')
+    setFormLabel('')
     setFormLine1('')
     setFormLine2('')
     setFormLandmark('')
@@ -168,7 +165,7 @@ function CheckoutForm() {
     e.preventDefault()
     setFormError('')
 
-    if (!formName.trim() || !formPhone.trim() || !formLine1.trim()) {
+    if (!formLabel.trim() || !formLine1.trim()) {
       setFormError(t('checkout.err_fields_required'))
       return
     }
@@ -180,13 +177,16 @@ function CheckoutForm() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) throw new Error(t('checkout.err_not_logged_in'))
 
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
+        const phone = user.phone || user.user_metadata?.phone || '0000000000'
+
         const { data: newAddr, error: insertErr } = await supabase
           .from('user_addresses')
           .insert({
             user_id: user.id,
-            label: 'Home',
-            contact_name: formName.trim(),
-            contact_phone: formPhone.trim(),
+            label: formLabel.trim(),
+            contact_name: name,
+            contact_phone: phone,
             address_line_1: formLine1.trim(),
             address_line_2: formLine2.trim() || null,
             landmark: formLandmark.trim() || null,
@@ -208,10 +208,22 @@ function CheckoutForm() {
         setSavingAddress(false)
       }
     } else {
+      let name = 'Customer'
+      let phone = '0000000000'
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
+          phone = user.phone || user.user_metadata?.phone || '0000000000'
+        }
+      } catch (_) {}
+
       // Temporary "this time only" address object
       const tempAddr = {
-        contact_name: formName.trim(),
-        contact_phone: formPhone.trim(),
+        label: formLabel.trim(),
+        contact_name: name,
+        contact_phone: phone,
         address_line_1: formLine1.trim(),
         address_line_2: formLine2.trim() || null,
         landmark: formLandmark.trim() || null,
@@ -244,6 +256,7 @@ function CheckoutForm() {
       }
 
       const activeAddress = address || {
+        label: 'Home',
         contact_name: user.email?.split('@')[0] || 'Customer',
         contact_phone: '9999999999',
         address_line_1: 'Village Main Street',
@@ -263,7 +276,8 @@ function CheckoutForm() {
         p_contact_phone: activeAddress.contact_phone,
         p_address_line_1: activeAddress.address_line_1,
         p_address_line_2: activeAddress.address_line_2 || null,
-        p_landmark: activeAddress.landmark || null
+        p_landmark: activeAddress.landmark || null,
+        p_label: activeAddress.label || 'Home'
       })
 
       if (rpcErr) throw rpcErr
@@ -675,17 +689,59 @@ function CheckoutForm() {
                 <span>{t('checkout.payment_method')}</span>
               </h2>
               <div className="payment-toggle-row">
-                {(['cod', 'credit'] as PaymentType[]).map((type) => (
-                  <button
-                    key={type}
-                    id={`payment-${type}`}
-                    className={`payment-btn ${paymentType === type ? 'active' : ''}`}
-                    onClick={() => setPaymentType(type)}
-                  >
-                    <span>{type === 'cod' ? '💵' : '🏦'}</span>
-                    <span>{type === 'cod' ? t('checkout.cod') : t('checkout.credit')}</span>
-                  </button>
-                ))}
+                {(['cod', 'credit'] as PaymentType[]).map((type) => {
+                  const isCredit = type === 'credit';
+                  return (
+                    <button
+                      key={type}
+                      id={`payment-${type}`}
+                      className={`payment-btn ${paymentType === type ? 'active' : ''}`}
+                      onClick={() => {
+                        if (!isCredit) {
+                          setPaymentType(type);
+                        }
+                      }}
+                      disabled={isCredit}
+                      style={isCredit ? {
+                        opacity: 0.6,
+                        cursor: 'not-allowed',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '12px 8px'
+                      } : {
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '12px 8px'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span>{type === 'cod' ? '💵' : '🏦'}</span>
+                        <span>{type === 'cod' ? t('checkout.cod') : t('checkout.credit')}</span>
+                      </div>
+                      {isCredit && (
+                        <span style={{ 
+                          fontSize: '9px', 
+                          fontWeight: 800, 
+                          color: '#fff', 
+                          background: 'linear-gradient(135deg, #f59e0b, #d97706)', 
+                          padding: '2px 8px', 
+                          borderRadius: '8px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em',
+                          boxShadow: '0 2px 4px rgba(217,119,6,0.2)'
+                        }}>
+                          Coming Soon
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -813,28 +869,14 @@ function CheckoutForm() {
                   {formError && <p className="form-error" role="alert">{formError}</p>}
                   
                   <div className="form-group">
-                    <label className="form-label" htmlFor="addr-name">{t('checkout.contact_name')} *</label>
+                    <label className="form-label" htmlFor="addr-label">{t('checkout.address_label')} *</label>
                     <input 
-                      id="addr-name"
+                      id="addr-label"
                       type="text" 
                       className="form-input" 
-                      placeholder={t('checkout.placeholder_fullname')} 
-                      value={formName}
-                      onChange={(e) => setFormName(e.target.value)}
-                      autoComplete="name"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="addr-phone">{t('checkout.contact_phone')} *</label>
-                    <input 
-                      id="addr-phone"
-                      type="tel" 
-                      className="form-input" 
-                      placeholder={t('checkout.placeholder_phone')} 
-                      value={formPhone}
-                      onChange={(e) => setFormPhone(e.target.value)}
-                      autoComplete="tel"
+                      placeholder={t('checkout.placeholder_address_label')} 
+                      value={formLabel}
+                      onChange={(e) => setFormLabel(e.target.value)}
                     />
                   </div>
 

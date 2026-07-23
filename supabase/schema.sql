@@ -216,7 +216,8 @@ CREATE TABLE orders (
 
 CREATE TABLE order_addresses (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    order_id       UUID NOT NULL,
+    order_id       UUID NOT NULL UNIQUE,
+    label          TEXT DEFAULT 'Home',
     contact_name   TEXT NOT NULL,
     contact_phone  TEXT NOT NULL,
     address_line_1 TEXT NOT NULL,

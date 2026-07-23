@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
 
@@ -1683,6 +1684,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kVendorBg,
       appBar: AppBar(
@@ -1690,7 +1692,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: Text(
-          _isEdit ? 'Edit Product' : 'Add Product',
+          _isEdit ? l10n.vendorEditProduct : l10n.vendorDrawerAddProduct,
           style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
         ),
         leading: Navigator.canPop(context)

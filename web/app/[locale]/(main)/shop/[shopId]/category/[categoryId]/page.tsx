@@ -57,7 +57,7 @@ export default async function ShopCategoryPage({ params }: Props) {
           {itemList.map((item) => (
             <Link
               key={item.id}
-              href={`/item/${item.id}`}
+              href={`/shop/${shopId}`}
               id={`item-cat-${item.id}`}
               className="card"
               style={{ display: 'block' }}

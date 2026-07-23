@@ -221,6 +221,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noAddressesFound => 'لم يتم العثور على عناوين.';
 
   @override
+  String get addressLabel => 'اسم العنوان *';
+
+  @override
+  String get addressLabelPlaceholder => 'المنزل، السكن الجامعي، المكتب، إلخ.';
+
+  @override
   String get contactNameLabel => 'اسم جهة الاتصال *';
 
   @override
@@ -1092,4 +1098,301 @@ class AppLocalizationsAr extends AppLocalizations {
   String failedToLoadReviews(String error) {
     return 'فشل تحميل المراجعات: $error';
   }
+
+  @override
+  String get waitingUserConfirmation => 'بانتظار تأكيد المستخدم';
+
+  @override
+  String get authWelcomeBack => 'مرحباً بعودتك';
+
+  @override
+  String get authSignInSubtitle => 'سجل الدخول إلى حساب فيليج ماركت الخاص بك';
+
+  @override
+  String get authPhoneLogin => 'تسجيل الدخول بالهاتف';
+
+  @override
+  String get authEmailLogin => 'تسجيل الدخول بالبريد الإلكتروني';
+
+  @override
+  String get authForgotPassword => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get authSignIn => 'تسجيل الدخول';
+
+  @override
+  String get authCreateAccount => 'إنشاء حساب';
+
+  @override
+  String get authJoinSubtitle => 'انضم إلى فيليج ماركت — أدخل التفاصيل للبدء';
+
+  @override
+  String get authUsePhone => 'استخدام رقم الهاتف';
+
+  @override
+  String get authUseEmail => 'استخدام البريد الإلكتروني';
+
+  @override
+  String get authRegister => 'تسجيل';
+
+  @override
+  String get authResetPassword => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get authResetPwInstructions =>
+      'أدخل التفاصيل الخاصة بك لتلقي تعليمات إعادة تعيين كلمة المرور';
+
+  @override
+  String get authCheckInboxReset =>
+      'تحقق من بريدك الوارد للحصول على رابط إعادة التعيين';
+
+  @override
+  String get authEmailAccounts => 'حسابات البريد الإلكتروني';
+
+  @override
+  String get authPhoneAccounts => 'حسابات الهاتف';
+
+  @override
+  String get authSendResetLink => 'إرسال رابط إعادة التعيين';
+
+  @override
+  String get authGoToLogin => 'الانتقال إلى تسجيل الدخول';
+
+  @override
+  String get authRememberPw => 'هل تتذكر كلمة المرور الخاصة بك؟';
+
+  @override
+  String get authSignInLink => 'تسجيل الدخول';
+
+  @override
+  String authResetLinkSentTo(String email) {
+    return 'تم إرسال رابط إعادة تعيين كلمة المرور بنجاح إلى $email. يرجى التحقق من البريد الوارد والمجلدات غير المرغوب فيها.';
+  }
+
+  @override
+  String get authCompleteRegistration => 'إكمال التسجيل';
+
+  @override
+  String get authFewDetailsSetup => 'فقط بعض التفاصيل لإعداد حسابك';
+
+  @override
+  String get authPreferredLanguage => 'اللغة المفضلة';
+
+  @override
+  String get authVillageLocation => 'القرية / الموقع';
+
+  @override
+  String get authCompleteSetup => 'إكمال الإعداد';
+
+  @override
+  String get authLoadingLocations => 'جاري تحميل المواقع...';
+
+  @override
+  String get authFullName => 'الاسم الكامل';
+
+  @override
+  String get authEmail => 'البريد الإلكتروني';
+
+  @override
+  String get authPhone => 'رقم الهاتف';
+
+  @override
+  String get authPassword => 'كلمة المرور';
+
+  @override
+  String get securityTitle => 'إعدادات الأمان';
+
+  @override
+  String get securityChangePhone => 'تغيير رقم الهاتف';
+
+  @override
+  String get securityPhoneSuccess => 'تم تحديث رقم الهاتف بنجاح!';
+
+  @override
+  String get securityActivePhone => 'رقم الهاتف النشط';
+
+  @override
+  String get securityRequestPhoneChange => 'طلب تغيير الهاتف';
+
+  @override
+  String get securitySending => 'جاري الإرسال...';
+
+  @override
+  String securityEnterVerificationCode(String phone) {
+    return 'أدخل رمز التحقق المرسل إلى $phone';
+  }
+
+  @override
+  String get securityDidntReceiveCode => 'لم يصلك الرمز؟';
+
+  @override
+  String securityResendIn(String countdown) {
+    return 'إعادة الإرسال خلال $countdown ثانية';
+  }
+
+  @override
+  String get securityResendOtp => 'إعادة إرسال الرمز';
+
+  @override
+  String get securityCancel => 'إلغاء';
+
+  @override
+  String get securityVerifyChange => 'التحقق والتغيير';
+
+  @override
+  String get securityVerifying => 'جاري التحقق...';
+
+  @override
+  String get securityChangePassword => 'تغيير كلمة مرور الحساب';
+
+  @override
+  String get securityPasswordSuccess => 'تم تحديث كلمة المرور بنجاح!';
+
+  @override
+  String get securityNewPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get securityConfirmNewPassword => 'تأكيد كلمة المرور الجديدة';
+
+  @override
+  String get securityUpdatePassword => 'تحديث كلمة المرور';
+
+  @override
+  String get securitySaving => 'جاري الحفظ...';
+
+  @override
+  String get securityDangerZone => 'منطقة الخطر';
+
+  @override
+  String get securityDangerZoneDesc =>
+      'سيؤدي تسجيل الخروج من جميع الأجهزة إلى إنهاء كافة الجلسات النشطة عبر متصفحات الويب وتطبيقات الهاتف والأجهزة الأخرى.';
+
+  @override
+  String get securitySignOutAll => 'تسجيل الخروج من جميع الأجهزة';
+
+  @override
+  String get securityLoggingOut => 'جاري تسجيل الخروج...';
+
+  @override
+  String get securityConfirmSignOutAll =>
+      'هل أنت متأكد أنك تريد تسجيل الخروج من جميع الأجهزة؟ سيتعين عليك تسجيل الدخول مرة أخرى على جميع أجهزتك النشطة.';
+
+  @override
+  String get authNoAccountPrompt => 'ليس لديك حساب؟ ';
+
+  @override
+  String get authAlreadyHaveAccount => 'لديك حساب بالفعل؟ ';
+
+  @override
+  String get authAccountType => 'نوع الحساب';
+
+  @override
+  String get authCustomerRole => 'عميل';
+
+  @override
+  String get authShopOwnerRole => 'صاحب متجر';
+
+  @override
+  String get authVerifyPhone => 'التحقق من رقم الهاتف';
+
+  @override
+  String get authVerifyCode => 'تحقق من الرمز';
+
+  @override
+  String get authVerificationCodeResent => 'تم إعادة إرسال رمز التحقق!';
+
+  @override
+  String get selectLocationTitle => 'اختر الموقع';
+
+  @override
+  String get searchLocationsHint => 'البحث عن المواقع…';
+
+  @override
+  String get allLocationsOption => 'جميع المواقع';
+
+  @override
+  String failedToLoadLocations(String error) {
+    return 'فشل في تحميل المواقع: $error';
+  }
+
+  @override
+  String get noLocationsMatch => 'لا توجد مواقع تطابق بحثك.';
+
+  @override
+  String get vendorFooterDashboard => 'لوحة التحكم';
+
+  @override
+  String get vendorFooterOrders => 'الطلبات';
+
+  @override
+  String get vendorFooterProducts => 'المنتجات';
+
+  @override
+  String get vendorFooterCredit => 'الائتمان';
+
+  @override
+  String get vendorFooterExit => 'خروج';
+
+  @override
+  String get vendorEditProduct => 'تعديل المنتج';
+
+  @override
+  String get vendorUserCreditDetail => 'تفاصيل ائتمان المستخدم';
+
+  @override
+  String get tutorialSkip => 'تخطي';
+
+  @override
+  String get tutorialNext => 'التالي';
+
+  @override
+  String get tutorialFinish => 'إنهاء';
+
+  @override
+  String get tutorialHomeLocationTitle => 'اختر الموقع';
+
+  @override
+  String get tutorialHomeLocationDesc => 'انقر هنا لتغيير موقع قريتك أو سوقك.';
+
+  @override
+  String get tutorialHomeSearchTitle => 'البحث عن المحلات';
+
+  @override
+  String get tutorialHomeSearchDesc =>
+      'ابحث عن محلاتك المحلية المفضلة بالكتابة هنا.';
+
+  @override
+  String get tutorialHomeCategoryTitle => 'الفئات';
+
+  @override
+  String get tutorialHomeCategoryDesc =>
+      'تصفية الخضروات والفواكه والمنتجات حسب الفئة.';
+
+  @override
+  String get tutorialHomeShopCardTitle => 'استكشف المحلات';
+
+  @override
+  String get tutorialHomeShopCardDesc =>
+      'انقر على أي محل لعرض المنتجات المتاحة فيه.';
+
+  @override
+  String get tutorialShopFilterTitle => 'تصفية بالفئة';
+
+  @override
+  String get tutorialShopFilterDesc =>
+      'انقر على الفئة لتصفية المنتجات المحددة والعثور عليها بسرعة.';
+
+  @override
+  String get tutorialShopProductTitle => 'عرض المنتجات';
+
+  @override
+  String get tutorialShopProductDesc =>
+      'شاهد الأسعار والصور والتفاصيل لجميع المنتجات المتاحة.';
+
+  @override
+  String get tutorialShopOpenTitle => 'فتح المنتج';
+
+  @override
+  String get tutorialShopOpenDesc =>
+      'انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك.';
 }

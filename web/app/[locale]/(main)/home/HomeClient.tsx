@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import {
-  Search, Bell, ChevronDown, Heart, Plus, Minus,
+  Search, Bell, ChevronDown, Heart, Plus, Minus, MapPin,
   Home, LayoutGrid, ShoppingBag, User as UserIcon, Store, ShieldCheck, Trash2,
   Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Cookie, Package, CupSoda, Scale, RefreshCw, Scissors,
   Bookmark, History, MessageSquare
@@ -345,7 +345,10 @@ export default function HomeClient({
     const sellConfig = Array.isArray(item.item_sell_config) ? item.item_sell_config[0] : item.item_sell_config
     const defaultQty = sellConfig?.sell_mode?.toLowerCase() === 'manual' ? (localQtys[item.id] ?? 1.0) : 1.0
     const qty = defaultQty
-    const price = variant?.price || sellConfig?.price_per_base_unit || 0.0
+    const isDynamic = sellConfig?.sell_mode?.toLowerCase() === 'dynamic'
+    const price = isDynamic
+      ? (Number(sellConfig?.price_per_base_unit || 0) * Number(variant?.value || 1.0))
+      : (variant?.price || sellConfig?.price_per_base_unit || 0.0)
 
     startTransition(async () => {
       try {
@@ -535,10 +538,28 @@ export default function HomeClient({
           
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: '8px 16px', borderRadius: '24px', fontSize: '14px', fontWeight: 600, color: 'var(--text-base)', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }}>
-              <span>{t('nav.home')}</span>
-              <ChevronDown size={16} color="var(--text-base)" style={{ marginLeft: '4px' }} />
-            </div>
+            <Link 
+              href={`/${locale}/location`}
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                background: 'var(--bg-surface)', 
+                border: '1px solid var(--border)', 
+                padding: '8px 16px', 
+                borderRadius: '24px', 
+                fontSize: '14px', 
+                fontWeight: 700, 
+                color: 'var(--text-base)', 
+                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                textDecoration: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <MapPin size={16} style={{ color: 'var(--wa-green-dark)' }} />
+              <span>{locationName}</span>
+              <ChevronDown size={16} color="var(--text-base)" style={{ marginLeft: '2px' }} />
+            </Link>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {(role === 'shop_owner' || role === 'admin') && (

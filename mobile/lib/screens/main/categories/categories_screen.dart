@@ -414,7 +414,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         children: [
                           // Item Image/Emoji
                           GestureDetector(
-                            onTap: () => context.push('/home/item/${item.id}'),
+                            onTap: () => context.push('/home/shop/${item.shopId}'),
                             child: Container(
                               width: 80,
                               height: 80,

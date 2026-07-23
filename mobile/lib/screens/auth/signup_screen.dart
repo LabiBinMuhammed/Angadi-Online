@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../core/auth_service.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/theme_service.dart';
@@ -139,321 +140,318 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Brand Hero Banner
-            Container(
-              height: 200,
-              decoration: BoxDecoration(color: kWaTeal),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 40,
-                    left: 10,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => context.go('/login'),
-                    ),
-                  ),
-                  Positioned(
-                    top: -40,
-                    right: -40,
-                    child: Container(
-                      width: 160,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(20),
+      backgroundColor: kWaTeal,
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Top Header Section (Back button, Greeting & Logo)
+              Container(
+                padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          GestureDetector(
+                            onTap: () => context.go('/login'),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.arrow_back, color: Colors.white, size: 16),
+                                const SizedBox(width: 4),
+                                Text(
+                                  l10n.authSignInLink, // Back to login / Sign In
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.authCreateAccount, // "Sign Up"
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -1.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: -30,
-                    left: 20,
-                    child: Container(
-                      width: 100,
-                      height: 100,
+                    const SizedBox(width: 16),
+                    // Storefront Logo Container
+                    Container(
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withAlpha(20),
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.storefront_rounded,
+                        size: 40,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.storefront, size: 30, color: kWaTeal),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Village Market',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // Form Content
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Create account',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
-                      color: kWaTeal,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    "Join Village Market — enter your details to get started",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: kNeutral500,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Full Name Input
-                  _buildInputField(
-                    label: 'Full Name',
-                    hintText: 'John Doe',
-                    controller: _nameCtrl,
-                    prefixIcon: Icons.person_outline,
-                    keyboardType: TextInputType.name,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Preferred Language Select
-                  _buildDropdownField(
-                    label: 'Preferred Language',
-                    value: _selectedLanguage,
-                    prefixIcon: Icons.language_outlined,
-                    items: const [
-                      DropdownMenuItem(value: 'en', child: Text('English')),
-                      DropdownMenuItem(value: 'ar', child: Text('العربية (Arabic)')),
-                      DropdownMenuItem(value: 'hi', child: Text('हिंदी (Hindi)')),
-                      DropdownMenuItem(value: 'ml', child: Text('Malayalam')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedLanguage = val);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Account Type / Role Select
-                  _buildDropdownField(
-                    label: 'Account Type',
-                    value: _selectedRole,
-                    prefixIcon: Icons.group_outlined,
-                    items: const [
-                      DropdownMenuItem(value: 'customer', child: Text('Customer')),
-                      DropdownMenuItem(value: 'shop_owner', child: Text('Shop Owner')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setState(() => _selectedRole = val);
-                    },
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Method Switcher Toggle
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : kNeutral100,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: InkWell(
-                            onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: _isPhoneMode ? kWaTeal : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Phone Number',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              alignment: Alignment.center,
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: !_isPhoneMode ? kWaTeal : Colors.transparent,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'Email Address',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : kNeutral700),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  if (_isPhoneMode) ...[
-                    // Phone Input
+              // Bottom Sheet Form Card Container
+              Container(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 220,
+                ),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 16,
+                      offset: const Offset(0, -8),
+                    )
+                  ],
+                ),
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Full Name Input
                     _buildInputField(
-                      label: 'Phone number',
-                      hintText: '98765 43210',
-                      controller: _phoneCtrl,
-                      prefixIcon: Icons.phone_android_outlined,
-                      keyboardType: TextInputType.phone,
+                      label: l10n.authFullName,
+                      hintText: 'John Doe',
+                      controller: _nameCtrl,
+                      prefixIcon: Icons.person_outline,
+                      keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
-                      countryCode: _selectedCountryCode,
-                      onCountryCodeChanged: (val) {
-                        if (val != null) setState(() => _selectedCountryCode = val);
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Preferred Language Select
+                    _buildDropdownField(
+                      label: l10n.authPreferredLanguage,
+                      value: _selectedLanguage,
+                      prefixIcon: Icons.language_outlined,
+                      items: const [
+                        DropdownMenuItem(value: 'en', child: Text('English')),
+                        DropdownMenuItem(value: 'ar', child: Text('العربية (Arabic)')),
+                        DropdownMenuItem(value: 'hi', child: Text('हिंदी (Hindi)')),
+                        DropdownMenuItem(value: 'ml', child: Text('Malayalam')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedLanguage = val);
                       },
                     ),
-                  ] else ...[
-                    // Email Input
-                    _buildInputField(
-                      label: 'Email address',
-                      hintText: 'you@example.com',
-                      controller: _emailCtrl,
-                      prefixIcon: Icons.mail_outline,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                    ),
-                  ],
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-                  // Password Input
-                  _buildInputField(
-                    label: 'Password',
-                    hintText: '••••••••',
-                    controller: _passwordCtrl,
-                    prefixIcon: Icons.lock_outline,
-                    obscureText: !_showPw,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _handleSignup(),
-                    suffixIcon: GestureDetector(
-                      onTap: () => setState(() => _showPw = !_showPw),
-                      child: Icon(
-                        _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        size: 20,
-                        color: kNeutral500,
-                      ),
+                    // Account Type / Role Select
+                    _buildDropdownField(
+                      label: l10n.authAccountType,
+                      value: _selectedRole,
+                      prefixIcon: Icons.group_outlined,
+                      items: [
+                        DropdownMenuItem(value: 'customer', child: Text(l10n.authCustomerRole)),
+                        DropdownMenuItem(value: 'shop_owner', child: Text(l10n.authShopOwnerRole)),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setState(() => _selectedRole = val);
+                      },
                     ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Success Box
-                  if (_successInfo != null) ...[
-                    _buildSuccessAlert(_successInfo!),
                     const SizedBox(height: 20),
-                  ],
 
-                  // Error Box
-                  if (_error != null) ...[
-                    _buildErrorAlert(_error!),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // Submit Button
-                  ElevatedButton(
-                    onPressed: _loading ? null : _handleSignup,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kWaTeal,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // Method Switcher Toggle
+                    Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    child: _loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                      padding: const EdgeInsets.all(4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
+                              borderRadius: BorderRadius.circular(12),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: _isPhoneMode ? kWaTeal : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  l10n.authPhoneLogin,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ),
                             ),
-                          )
-                        : const Text('Register'),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // Footer Redirection
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        "Already have an account? ",
-                        style: TextStyle(color: kNeutral500, fontSize: 14, fontWeight: FontWeight.w500),
-                      ),
-                      GestureDetector(
-                        onTap: () => context.go('/login'),
-                        child: Text(
-                          'Sign in',
-                          style: TextStyle(
-                            color: kWaTeal,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            decoration: TextDecoration.underline,
                           ),
-                        ),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
+                              borderRadius: BorderRadius.circular(12),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: !_isPhoneMode ? kWaTeal : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  l10n.authEmailLogin,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    if (_isPhoneMode) ...[
+                      // Phone Input
+                      _buildInputField(
+                        label: l10n.authPhone,
+                        hintText: '98765 43210',
+                        controller: _phoneCtrl,
+                        prefixIcon: Icons.phone_android_outlined,
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
+                        countryCode: _selectedCountryCode,
+                        onCountryCodeChanged: (val) {
+                          if (val != null) setState(() => _selectedCountryCode = val);
+                        },
+                      ),
+                    ] else ...[
+                      // Email Input
+                      _buildInputField(
+                        label: l10n.authEmail,
+                        hintText: 'you@example.com',
+                        controller: _emailCtrl,
+                        prefixIcon: Icons.mail_outline,
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                       ),
                     ],
-                  ),
-                ],
+                    const SizedBox(height: 16),
+
+                    // Password Input
+                    _buildInputField(
+                      label: l10n.authPassword,
+                      hintText: '••••••••',
+                      controller: _passwordCtrl,
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: !_showPw,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _handleSignup(),
+                      suffixIcon: GestureDetector(
+                        onTap: () => setState(() => _showPw = !_showPw),
+                        child: Icon(
+                          _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          size: 20,
+                          color: kNeutral500,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Success Box
+                    if (_successInfo != null) ...[
+                      _buildSuccessAlert(_successInfo!),
+                      const SizedBox(height: 20),
+                    ],
+
+                    // Error Box
+                    if (_error != null) ...[
+                      _buildErrorAlert(_error!),
+                      const SizedBox(height: 20),
+                    ],
+
+                    // Submit Button
+                    ElevatedButton(
+                      onPressed: _loading ? null : _handleSignup,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kWaTeal,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Inter',
+                        ),
+                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : Text(l10n.authRegister),
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Footer Redirection
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          l10n.authAlreadyHaveAccount,
+                          style: const TextStyle(color: kNeutral500, fontSize: 14, fontWeight: FontWeight.w500),
+                        ),
+                        GestureDetector(
+                          onTap: () => context.go('/login'),
+                          child: Text(
+                            l10n.authSignInLink,
+                            style: TextStyle(
+                              color: kWaTeal,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -472,23 +470,34 @@ class _SignupScreenState extends State<SignupScreen> {
     String? countryCode,
     void Function(String?)? onCountryCodeChanged,
   }) {
+    final isDark = ThemeService.instance.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: kNeutral500,
-            letterSpacing: 0.8,
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white70 : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : kNeutral100,
-            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ]
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
@@ -497,10 +506,10 @@ class _SignupScreenState extends State<SignupScreen> {
                 DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: countryCode,
-                    dropdownColor: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                     style: TextStyle(
                       fontSize: 15,
-                      color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                       fontWeight: FontWeight.w600,
                     ),
                     items: const [
@@ -521,11 +530,11 @@ class _SignupScreenState extends State<SignupScreen> {
                 Container(
                   width: 1,
                   height: 20,
-                  color: kNeutral300,
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
                 ),
                 const SizedBox(width: 8),
               ] else ...[
-                Icon(prefixIcon, size: 18, color: kNeutral500),
+                Icon(prefixIcon, size: 18, color: isDark ? Colors.white60 : const Color(0xFF64748B)),
                 const SizedBox(width: 12),
               ],
               Expanded(
@@ -535,10 +544,17 @@ class _SignupScreenState extends State<SignupScreen> {
                   keyboardType: keyboardType,
                   textInputAction: textInputAction,
                   onSubmitted: onSubmitted,
-                  style: TextStyle(fontSize: 15, color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    fontWeight: FontWeight.w500,
+                  ),
                   decoration: InputDecoration(
                     hintText: hintText,
-                    hintStyle: const TextStyle(color: kNeutral400, fontWeight: FontWeight.w400),
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                      fontWeight: FontWeight.w400,
+                    ),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   ),
@@ -559,38 +575,49 @@ class _SignupScreenState extends State<SignupScreen> {
     required List<DropdownMenuItem<String>> items,
     required void Function(String?) onChanged,
   }) {
+    final isDark = ThemeService.instance.isDarkMode;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: kNeutral500,
-            letterSpacing: 0.8,
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white70 : const Color(0xFF475569),
           ),
         ),
         const SizedBox(height: 6),
         Container(
           decoration: BoxDecoration(
-            color: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : kNeutral100,
-            borderRadius: BorderRadius.circular(12),
+            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              )
+            ]
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Icon(prefixIcon, size: 18, color: kNeutral500),
+              Icon(prefixIcon, size: 18, color: isDark ? Colors.white60 : const Color(0xFF64748B)),
               const SizedBox(width: 12),
               Expanded(
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     value: value,
                     isExpanded: true,
-                    dropdownColor: ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : Colors.white,
+                    dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
                     style: TextStyle(
                       fontSize: 15,
-                      color: ThemeService.instance.isDarkMode ? Colors.white : kNeutral800,
+                      color: isDark ? Colors.white : const Color(0xFF1E293B),
                       fontWeight: FontWeight.w500,
                     ),
                     items: items,

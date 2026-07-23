@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth/AuthContext'
 import { Phone, Lock, Eye, EyeOff, ShieldAlert, KeyRound, CheckCircle, ArrowLeft, AlertCircle } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export default function SecurityClient({ initialPhone }: { initialPhone: string }) {
+  const { t } = useTranslation()
   const router = useRouter()
   const { updatePassword, updatePhone, verifyPhoneChange, signOutAll } = useAuth()
 
@@ -127,7 +129,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
 
   // Handle Logout from All Devices
   async function handleLogoutAll() {
-    if (!window.confirm('Are you sure you want to sign out from all devices? You will need to log in again on all your active devices.')) {
+    if (!window.confirm(t('security.confirm_sign_out_all'))) {
       return
     }
 
@@ -163,30 +165,30 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
           padding: 0
         }}
       >
-        <ArrowLeft size={16} /> Back to Profile
+        <ArrowLeft size={16} /> {t('security.back_to_profile')}
       </button>
 
       <h1 className="text-2xl font-bold" style={{ marginBottom: '1.5rem', color: 'var(--wa-teal)' }}>
-        Security Settings
+        {t('security.title')}
       </h1>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
         {/* Section: Change Phone */}
         <div className="card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.15rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1rem', color: 'var(--text-base)' }}>
-            <Phone size={18} style={{ color: 'var(--wa-green-dark)' }} /> Change Phone Number
+            <Phone size={18} style={{ color: 'var(--wa-green-dark)' }} /> {t('security.change_phone')}
           </h2>
 
           {phoneSuccess && (
             <div className="auth-alert auth-alert-success" style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1rem' }}>
-              <CheckCircle size={16} /> Phone number updated successfully!
+              <CheckCircle size={16} /> {t('security.phone_success')}
             </div>
           )}
 
           {phoneStep === 1 ? (
             <form onSubmit={handlePhoneChangeRequest} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="form-group">
-                <label className="form-label">Active Phone Number</label>
+                <label className="form-label">{t('security.active_phone')}</label>
                 <div className="input-icon-wrap">
                   <Phone size={16} className="input-icon" style={{ color: 'var(--text-muted)' }} />
                   <input
@@ -211,13 +213,13 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
                 disabled={phoneLoading}
                 style={{ alignSelf: 'flex-start', background: 'var(--wa-green-dark)', color: '#fff', fontWeight: 600, padding: '.6rem 1.2rem', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer' }}
               >
-                {phoneLoading ? 'Sending...' : 'Request Phone Change'}
+                {phoneLoading ? t('security.sending') : t('security.request_phone_change')}
               </button>
             </form>
           ) : (
             <form onSubmit={handlePhoneVerify} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="form-group">
-                <label className="form-label">Enter Verification Code sent to {phone}</label>
+                <label className="form-label">{t('security.enter_verification_code').replace('{phone}', phone)}</label>
                 <div className="input-icon-wrap">
                   <KeyRound size={16} className="input-icon" />
                   <input
@@ -241,9 +243,9 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
               )}
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '.85rem' }}>
-                <span style={{ color: 'var(--text-muted)' }}>Didn&apos;t receive code?</span>
+                <span style={{ color: 'var(--text-muted)' }}>{t('security.didnt_receive_code')}</span>
                 {countdown > 0 ? (
-                  <span style={{ color: 'var(--wa-teal)', fontWeight: 600 }}>Resend in {countdown}s</span>
+                  <span style={{ color: 'var(--wa-teal)', fontWeight: 600 }}>{t('security.resend_in').replace('{countdown}', countdown.toString())}</span>
                 ) : (
                   <button
                     type="button"
@@ -251,7 +253,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
                     onClick={handlePhoneChangeRequest}
                     disabled={phoneLoading}
                   >
-                    Resend OTP
+                    {t('security.resend_otp')}
                   </button>
                 )}
               </div>
@@ -263,7 +265,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
                   onClick={() => { setPhoneStep(1); setOtp(''); setPhoneError(''); }}
                   style={{ flex: 1, padding: '.6rem', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', background: 'transparent', cursor: 'pointer' }}
                 >
-                  Cancel
+                  {t('security.cancel')}
                 </button>
                 <button
                   type="submit"
@@ -271,7 +273,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
                   disabled={phoneLoading}
                   style={{ flex: 1, background: 'var(--wa-green-dark)', color: '#fff', fontWeight: 600, border: 'none', cursor: 'pointer', borderRadius: 'var(--radius-md)' }}
                 >
-                  {phoneLoading ? 'Verifying...' : 'Verify & Change'}
+                  {phoneLoading ? t('security.verifying') : t('security.verify_change')}
                 </button>
               </div>
             </form>
@@ -281,18 +283,18 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
         {/* Section: Change Password */}
         <div className="card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.15rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1rem', color: 'var(--text-base)' }}>
-            <Lock size={18} style={{ color: 'var(--wa-green-dark)' }} /> Change Account Password
+            <Lock size={18} style={{ color: 'var(--wa-green-dark)' }} /> {t('security.change_password')}
           </h2>
 
           {pwSuccess && (
             <div className="auth-alert auth-alert-success" style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '1rem' }}>
-              <CheckCircle size={16} /> Password updated successfully!
+              <CheckCircle size={16} /> {t('security.password_success')}
             </div>
           )}
 
           <form onSubmit={handlePasswordChange} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div className="form-group">
-              <label className="form-label">New Password</label>
+              <label className="form-label">{t('security.new_password')}</label>
               <div className="input-icon-wrap">
                 <Lock size={16} className="input-icon" />
                 <input
@@ -315,7 +317,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
             </div>
 
             <div className="form-group">
-              <label className="form-label">Confirm New Password</label>
+              <label className="form-label">{t('security.confirm_new_password')}</label>
               <div className="input-icon-wrap">
                 <Lock size={16} className="input-icon" />
                 <input
@@ -348,7 +350,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
               disabled={pwLoading}
               style={{ alignSelf: 'flex-start', background: 'var(--wa-green-dark)', color: '#fff', fontWeight: 600, padding: '.6rem 1.2rem', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer' }}
             >
-              {pwLoading ? 'Saving...' : 'Update Password'}
+              {pwLoading ? t('security.saving') : t('security.update_password')}
             </button>
           </form>
         </div>
@@ -356,10 +358,10 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
         {/* Section: Danger Zone (Global Logout) */}
         <div className="card" style={{ background: 'rgba(239,68,68,0.02)', border: '1px solid rgba(239,68,68,0.15)', borderRadius: 'var(--radius-lg)', padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.15rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '0.5rem', color: 'var(--danger)' }}>
-            <ShieldAlert size={18} /> Danger Zone
+            <ShieldAlert size={18} /> {t('security.danger_zone')}
           </h2>
           <p style={{ fontSize: '.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
-            Logging out from all devices will terminate all your active sessions across web browsers, mobile apps, and other logged-in clients.
+            {t('security.danger_zone_desc')}
           </p>
 
           {logoutError && (
@@ -385,7 +387,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
               transition: 'background .15s'
             }}
           >
-            {logoutLoading ? 'Logging out...' : 'Sign Out From All Devices'}
+            {logoutLoading ? t('security.logging_out') : t('security.sign_out_all')}
           </button>
         </div>
       </div>

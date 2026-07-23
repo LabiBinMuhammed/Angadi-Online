@@ -25,6 +25,7 @@ export default function MobileFooter() {
   }, [])
 
   if (!mounted) return null
+  if (pathname.includes('/checkout')) return null
 
   return (
     <>

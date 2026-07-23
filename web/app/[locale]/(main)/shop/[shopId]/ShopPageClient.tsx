@@ -6,7 +6,7 @@ import ShopReviewsClient from './ShopReviewsClient'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import type { Item, Category } from '@/types'
 import Link from 'next/link'
-import { Video, Phone, Search, MoreVertical, MessageSquare, ArrowLeft } from 'lucide-react'
+import { MessageSquare, ArrowLeft } from 'lucide-react'
 
 interface Props {
   items: Item[]
@@ -56,6 +56,7 @@ export default function ShopPageClient({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
+        .shop-chat-header { top: 0 !important; }
         .tabs-container { display: flex; background: var(--bg-surface); border-bottom: 1px solid var(--border); }
         .tab-btn { flex: 1; text-align: center; padding: 14px; font-size: 15px; font-weight: 700; color: var(--text-muted); cursor: pointer; background: transparent; border: none; border-bottom: 3px solid transparent; transition: all 0.2s; outline: none; }
         .tab-btn:hover { color: var(--text-base); }
@@ -122,10 +123,6 @@ export default function ShopPageClient({
               </span>
             )}
           </button>
-          <button className="shop-chat-icon-btn" aria-label="Video call"><Video size={20} /></button>
-          <button className="shop-chat-icon-btn" aria-label="Voice call"><Phone size={20} /></button>
-          <button className="shop-chat-icon-btn" aria-label="Search"><Search size={20} /></button>
-          <button className="shop-chat-icon-btn" aria-label="More options"><MoreVertical size={20} /></button>
         </div>
       </div>
 

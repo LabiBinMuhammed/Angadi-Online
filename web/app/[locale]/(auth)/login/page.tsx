@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { Phone, Lock, Eye, EyeOff, AlertCircle, Info, KeyRound, User, Globe, Users } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export function normalizePhone(phone: string, defaultCountryCode: string = '+91'): string {
   let cleaned = phone.replace(/[\s\-\(\)]/g, '')
@@ -22,6 +23,7 @@ export function normalizePhone(phone: string, defaultCountryCode: string = '+91'
 }
 
 export default function LoginPage() {
+  const { t } = useTranslation()
   const { user, session, signInWithPassword, completeRegistration } = useAuth()
   const router = useRouter()
   const params = useParams()
@@ -218,44 +220,55 @@ export default function LoginPage() {
       {step !== 'complete_registration' ? (
         <>
           <div className="auth-page-header">
-            <h1 className="auth-page-title">Welcome back</h1>
-            <p className="auth-page-sub">Sign in to your Angadi Online account</p>
+            <h1 className="auth-page-title">{t('auth.welcome_back')}</h1>
+            <p className="auth-page-sub">{t('auth.signin_to_account')}</p>
           </div>
 
           {/* Login Mode Toggle Buttons */}
           {step === 'login' && (
-            <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1.25rem' }}>
+            <div style={{
+              display: 'flex',
+              background: 'var(--neutral-100)',
+              borderRadius: '12px',
+              padding: '4px',
+              gap: '4px',
+              marginBottom: '1.5rem'
+            }} className="auth-mode-toggle-wrap">
               <button
                 type="button"
-                className={`btn btn-full ${mode === 'phone' ? 'btn-primary' : 'btn-outline'}`}
                 onClick={() => { setMode('phone'); setError(''); }}
                 style={{
+                  flex: 1,
                   background: mode === 'phone' ? 'var(--wa-green-dark)' : 'transparent',
-                  color: mode === 'phone' ? '#fff' : 'var(--text-base)',
-                  border: '1px solid var(--wa-green-dark)',
-                  padding: '.6rem',
-                  fontSize: '.9rem',
-                  fontWeight: 600,
-                  borderRadius: 'var(--radius-md)'
+                  color: mode === 'phone' ? '#fff' : 'var(--text-muted)',
+                  border: 'none',
+                  padding: '.55rem',
+                  fontSize: '.85rem',
+                  fontWeight: 700,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                Phone Login
+                {t('auth.phone_login')}
               </button>
               <button
                 type="button"
-                className={`btn btn-full ${mode === 'email' ? 'btn-primary' : 'btn-outline'}`}
                 onClick={() => { setMode('email'); setError(''); }}
                 style={{
+                  flex: 1,
                   background: mode === 'email' ? 'var(--wa-green-dark)' : 'transparent',
-                  color: mode === 'email' ? '#fff' : 'var(--text-base)',
-                  border: '1px solid var(--wa-green-dark)',
-                  padding: '.6rem',
-                  fontSize: '.9rem',
-                  fontWeight: 600,
-                  borderRadius: 'var(--radius-md)'
+                  color: mode === 'email' ? '#fff' : 'var(--text-muted)',
+                  border: 'none',
+                  padding: '.55rem',
+                  fontSize: '.85rem',
+                  fontWeight: 700,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
                 }}
               >
-                Email Login
+                {t('auth.email_login')}
               </button>
             </div>
           )}
@@ -265,7 +278,7 @@ export default function LoginPage() {
               {mode === 'phone' ? (
                 /* Phone Input */
                 <div className="form-group">
-                  <label className="form-label" htmlFor="login-phone">Phone number</label>
+                  <label className="form-label" htmlFor="login-phone">{t('auth.phone')}</label>
                   <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <select
                       value={countryCode}
@@ -303,7 +316,7 @@ export default function LoginPage() {
               ) : (
                 /* Email Input */
                 <div className="form-group">
-                  <label className="form-label" htmlFor="login-email">Email Address</label>
+                  <label className="form-label" htmlFor="login-email">{t('auth.email')}</label>
                   <div className="input-icon-wrap">
                     <Globe size={16} className="input-icon" />
                     <input
@@ -325,9 +338,9 @@ export default function LoginPage() {
               {/* Password Input */}
               <div className="form-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <label className="form-label" htmlFor="login-password">Password</label>
+                  <label className="form-label" htmlFor="login-password">{t('auth.password')}</label>
                   <Link href="/forgot-password" style={{ fontSize: '.8rem', color: 'var(--wa-green-dark)', fontWeight: 600, textDecoration: 'none', marginBottom: '.3rem' }}>
-                    Forgot Password?
+                    {t('auth.forgot_password')}
                   </Link>
                 </div>
                 <div className="input-icon-wrap">
@@ -367,27 +380,29 @@ export default function LoginPage() {
                 className="btn btn-primary btn-full auth-submit-btn"
                 disabled={loading}
               >
-                {loading ? <span className="spinner" /> : 'Sign In'}
+                {loading ? <span className="spinner" /> : t('auth.sign_in')}
               </button>
             </form>
           )}
 
           <p className="auth-footer-text">
-            Don&apos;t have an account?{' '}
-            <Link href="/signup" className="auth-link">Create one</Link>
+            {t('auth.dont_have_account_create').split('?')[0] + '? '}
+            <Link href="/signup" className="auth-link">
+              {t('auth.dont_have_account_create').split('?')[1]?.trim()}
+            </Link>
           </p>
         </>
       ) : (
         <>
           <div className="auth-page-header">
-            <h1 className="auth-page-title">Complete registration</h1>
-            <p className="auth-page-sub">Just a few details to set up your account</p>
+            <h1 className="auth-page-title">{t('auth.complete_registration')}</h1>
+            <p className="auth-page-sub">{t('auth.few_details_setup')}</p>
           </div>
 
           <form onSubmit={handleCompleteRegistration} className="auth-form">
             {/* Full Name */}
             <div className="form-group">
-              <label className="form-label" htmlFor="reg-name">Full name</label>
+              <label className="form-label" htmlFor="reg-name">{t('auth.name')}</label>
               <div className="input-icon-wrap">
                 <User size={16} className="input-icon" />
                 <input
@@ -406,7 +421,7 @@ export default function LoginPage() {
 
             {/* Language Selection */}
             <div className="form-group">
-              <label className="form-label" htmlFor="reg-lang">Preferred Language</label>
+              <label className="form-label" htmlFor="reg-lang">{t('auth.preferred_language')}</label>
               <div className="input-icon-wrap">
                 <Globe size={16} className="input-icon" />
                 <select
@@ -426,7 +441,7 @@ export default function LoginPage() {
 
             {/* Location Selection */}
             <div className="form-group">
-              <label className="form-label" htmlFor="reg-location">Village / Location</label>
+              <label className="form-label" htmlFor="reg-location">{t('auth.village_location')}</label>
               <div className="input-icon-wrap">
                 <Globe size={16} className="input-icon" />
                 <select
@@ -437,7 +452,7 @@ export default function LoginPage() {
                   required
                 >
                   {locations.length === 0 ? (
-                    <option value="" disabled>Loading locations...</option>
+                    <option value="" disabled>{t('auth.loading_locations')}</option>
                   ) : (
                     locations.map(loc => (
                       <option key={loc.id} value={loc.id}>{loc.name}</option>
@@ -450,7 +465,7 @@ export default function LoginPage() {
             {/* Phone Number (Show only if logged in with email and phone is missing) */}
             {showPhoneField && (
               <div className="form-group">
-                <label className="form-label" htmlFor="reg-phone">Phone number</label>
+                <label className="form-label" htmlFor="reg-phone">{t('auth.phone')}</label>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <select
                     value={regCountryCode}
@@ -500,7 +515,7 @@ export default function LoginPage() {
               className="btn btn-primary btn-full auth-submit-btn"
               disabled={loading}
             >
-              {loading ? <span className="spinner" /> : 'Complete Setup'}
+              {loading ? <span className="spinner" /> : t('auth.complete_setup')}
             </button>
           </form>
         </>

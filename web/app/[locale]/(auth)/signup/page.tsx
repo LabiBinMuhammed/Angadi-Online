@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth/AuthContext'
 import { createClient } from '@/lib/supabase/client'
 import { Phone, Lock, Eye, EyeOff, AlertCircle, Info, KeyRound, User, Globe, Users } from 'lucide-react'
 import { useRouter, useParams } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export function normalizePhone(phone: string, defaultCountryCode: string = '+91'): string {
   let cleaned = phone.replace(/[\s\-\(\)]/g, '')
@@ -22,6 +23,7 @@ export function normalizePhone(phone: string, defaultCountryCode: string = '+91'
 }
 
 export default function SignupPage() {
+  const { t } = useTranslation()
   const { user, session, signUp } = useAuth()
   const router = useRouter()
   const params = useParams()
@@ -110,14 +112,14 @@ export default function SignupPage() {
   return (
     <div className="auth-page-wrap">
       <div className="auth-page-header">
-        <h1 className="auth-page-title">Create account</h1>
-        <p className="auth-page-sub">Join Angadi Online — enter details to get started</p>
+        <h1 className="auth-page-title">{t('auth.create_account')}</h1>
+        <p className="auth-page-sub">{t('auth.join_angadi_starts')}</p>
       </div>
 
       <form onSubmit={handleSignup} className="auth-form">
         {/* Full Name */}
         <div className="form-group">
-          <label className="form-label" htmlFor="signup-name">Full name</label>
+          <label className="form-label" htmlFor="signup-name">{t('auth.name')}</label>
           <div className="input-icon-wrap">
             <User size={16} className="input-icon" />
             <input
@@ -137,7 +139,7 @@ export default function SignupPage() {
 
         {/* Language Selection */}
         <div className="form-group">
-          <label className="form-label" htmlFor="signup-lang">Preferred Language</label>
+          <label className="form-label" htmlFor="signup-lang">{t('auth.preferred_language')}</label>
           <div className="input-icon-wrap">
             <Globe size={16} className="input-icon" />
             <select
@@ -158,45 +160,56 @@ export default function SignupPage() {
 
 
         {/* Signup Method Toggle */}
-        <div style={{ display: 'flex', gap: '.5rem', margin: '1.25rem 0 .75rem 0' }}>
+        <div style={{
+          display: 'flex',
+          background: 'var(--neutral-100)',
+          borderRadius: '12px',
+          padding: '4px',
+          gap: '4px',
+          margin: '1.25rem 0 .75rem 0'
+        }} className="auth-mode-toggle-wrap">
           <button
             type="button"
-            className={`btn btn-full ${mode === 'phone' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => { setMode('phone'); setError(''); }}
             style={{
+              flex: 1,
               background: mode === 'phone' ? 'var(--wa-green-dark)' : 'transparent',
-              color: mode === 'phone' ? '#fff' : 'var(--text-base)',
-              border: '1px solid var(--wa-green-dark)',
-              padding: '.5rem',
+              color: mode === 'phone' ? '#fff' : 'var(--text-muted)',
+              border: 'none',
+              padding: '.55rem',
               fontSize: '.85rem',
-              fontWeight: 600,
-              borderRadius: 'var(--radius-md)'
+              fontWeight: 700,
+              borderRadius: '10px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
             }}
           >
-            Use Phone Number
+            {t('auth.use_phone')}
           </button>
           <button
             type="button"
-            className={`btn btn-full ${mode === 'email' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => { setMode('email'); setError(''); }}
             style={{
+              flex: 1,
               background: mode === 'email' ? 'var(--wa-green-dark)' : 'transparent',
-              color: mode === 'email' ? '#fff' : 'var(--text-base)',
-              border: '1px solid var(--wa-green-dark)',
-              padding: '.5rem',
+              color: mode === 'email' ? '#fff' : 'var(--text-muted)',
+              border: 'none',
+              padding: '.55rem',
               fontSize: '.85rem',
-              fontWeight: 600,
-              borderRadius: 'var(--radius-md)'
+              fontWeight: 700,
+              borderRadius: '10px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
             }}
           >
-            Use Email Address
+            {t('auth.use_email')}
           </button>
         </div>
 
         {mode === 'phone' ? (
           /* Phone Input */
           <div className="form-group">
-            <label className="form-label" htmlFor="signup-phone">Phone number</label>
+            <label className="form-label" htmlFor="signup-phone">{t('auth.phone')}</label>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               <select
                 value={countryCode}
@@ -232,7 +245,7 @@ export default function SignupPage() {
         ) : (
           /* Email Input */
           <div className="form-group">
-            <label className="form-label" htmlFor="signup-email">Email Address</label>
+            <label className="form-label" htmlFor="signup-email">{t('auth.email')}</label>
             <div className="input-icon-wrap">
               <Globe size={16} className="input-icon" />
               <input
@@ -271,13 +284,15 @@ export default function SignupPage() {
           className="btn btn-primary btn-full auth-submit-btn"
           disabled={loading}
         >
-          {loading ? <span className="spinner" /> : 'Register'}
+          {loading ? <span className="spinner" /> : t('auth.register')}
         </button>
       </form>
 
       <p className="auth-footer-text">
-        Already have an account?{' '}
-        <Link href="/login" className="auth-link">Sign in</Link>
+        {t('auth.already_have_account').split('?')[0] + '? '}
+        <Link href="/login" className="auth-link">
+          {t('auth.already_have_account').split('?')[1]?.replace('Login', '').replace('लॉगिन', '').replace('സൈൻ ഇൻ ചെയ്യുക', '').trim() || t('auth.sign_in_link')}
+        </Link>
       </p>
     </div>
   )

@@ -34,8 +34,14 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
   // Calculate estimated price range or single price
   function getPriceDisplay(v: ItemVariant) {
     const pricePerUnit = sellConfig?.price_per_base_unit
+    const mode = sellConfig?.sell_mode?.toLowerCase()
     
-    if (isDynamic && pricePerUnit != null) {
+    if (mode === 'manual' && pricePerUnit != null) {
+      const symbol = getUnitSymbol(sellConfig?.base_unit_id)
+      return `₹${Number(pricePerUnit).toFixed(0)} / ${symbol}`
+    }
+    
+    if (mode === 'dynamic' && pricePerUnit != null) {
       if (v.min_value != null && v.max_value != null) {
         const minPrice = Number(v.min_value) * Number(pricePerUnit)
         const maxPrice = Number(v.max_value) * Number(pricePerUnit)
@@ -61,18 +67,21 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
       
       const pricePerUnit = sellConfig?.price_per_base_unit;
       let calculatedPrice = 0;
+      const mode = sellConfig?.sell_mode?.toLowerCase();
       
-      if (isDynamic && pricePerUnit != null) {
+      if (mode === 'manual' && pricePerUnit != null) {
+        calculatedPrice = Number(pricePerUnit);
+      } else if (mode === 'dynamic' && pricePerUnit != null && selected) {
         if (selected.value != null) {
           calculatedPrice = Number(selected.value) * Number(pricePerUnit);
         } else if (selected.min_value != null) {
           calculatedPrice = Number(selected.min_value) * Number(pricePerUnit);
         }
-      } else {
+      } else if (selected) {
         calculatedPrice = selected.price != null ? Number(selected.price) : 0;
       }
       
-      await addToCart(item.shop_id, item.id, quantity, calculatedPrice, selected.id);
+      await addToCart(item.shop_id, item.id, quantity, calculatedPrice, selected?.id);
       
       setAdded(true)
       setTimeout(() => setAdded(false), 1500)
@@ -200,15 +209,19 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
 
   const currentTotalPrice = useMemo(() => {
     const pricePerUnit = sellConfig?.price_per_base_unit;
-    if (isDynamic && pricePerUnit != null) {
+    const mode = sellConfig?.sell_mode?.toLowerCase();
+    
+    if (mode === 'manual' && pricePerUnit != null) {
+      return Number(pricePerUnit) * quantity;
+    } else if (mode === 'dynamic' && pricePerUnit != null && selected) {
       if (selected.value != null) {
         return Number(selected.value) * Number(pricePerUnit) * quantity;
       } else if (selected.min_value != null) {
         return Number(selected.min_value) * Number(pricePerUnit) * quantity;
       }
     }
-    return selected.price != null ? Number(selected.price) * quantity : 0;
-  }, [selected, quantity, sellConfig, isDynamic])
+    return selected?.price != null ? Number(selected.price) * quantity : 0;
+  }, [selected, quantity, sellConfig])
 
   return (
     <div className="product-detail-container animate-fade-in">
@@ -266,15 +279,20 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
         .main-image-viewport {
           width: 100%;
           aspect-ratio: 1.1 / 1;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          background: var(--neutral-50);
+          border: 1px solid var(--border);
           border-radius: 28px;
           display: flex;
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          box-shadow: 0 4px 24px rgba(0,0,0,0.02);
+          box-shadow: 0 4px 24px rgba(0,0,0,0.015);
           position: relative;
+          transition: all 0.3s ease;
+        }
+        [data-theme="dark"] .main-image-viewport {
+          background: #0f172a;
+          border-color: #334155;
         }
 
         .main-image-viewport img {
@@ -301,7 +319,7 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
           height: 72px;
           border-radius: 16px;
           border: 2px solid transparent;
-          background: #f8fafc;
+          background: var(--neutral-50);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -311,15 +329,18 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
           transition: all 0.25s ease;
           flex-shrink: 0;
         }
+        [data-theme="dark"] .thumbnail-item {
+          background: #0f172a;
+        }
 
         .thumbnail-item:hover {
           transform: translateY(-2px);
-          border-color: #cbd5e1;
+          border-color: var(--neutral-300);
         }
 
         .thumbnail-item.active {
           border-color: var(--wa-green-dark);
-          background: #f4fbf7;
+          background: var(--wa-green-light);
           box-shadow: 0 4px 12px rgba(18,140,126,0.12);
         }
 
@@ -373,9 +394,9 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
         }
 
         .size-card {
-          border: 2px solid var(--border);
+          border: 1.5px solid var(--border);
           border-radius: 20px;
-          background: #fff;
+          background: var(--bg-surface);
           padding: 18px;
           cursor: pointer;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -393,7 +414,7 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
 
         .size-card.active {
           border-color: var(--wa-green-dark);
-          background: #f4fbf7;
+          background: var(--wa-green-light);
           box-shadow: 0 6px 16px rgba(18,140,126,0.08);
         }
 
@@ -416,7 +437,7 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
           height: 44px;
           border-radius: 50%;
           border: 1.5px solid var(--border);
-          background: #fff;
+          background: var(--bg-surface);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -428,7 +449,7 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
         .stepper-btn:hover {
           border-color: var(--wa-green-dark);
           color: var(--wa-green-dark);
-          background: #f4fbf7;
+          background: var(--wa-green-light);
         }
 
         .desktop-checkout-card {
@@ -439,11 +460,11 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
             display: flex;
             flex-direction: column;
             gap: 16px;
-            background: #fff;
-            border: 1px solid #f1f5f9;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
             border-radius: 24px;
             padding: 24px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.03);
+            box-shadow: var(--shadow-md);
             margin-top: 20px;
           }
         }
@@ -453,8 +474,8 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
           bottom: 0;
           left: 0;
           right: 0;
-          background: #fff;
-          border-top: 1px solid var(--wa-separator);
+          background: var(--bg-surface);
+          border-top: 1px solid var(--border);
           padding: 16px 20px;
           box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
           display: flex;
@@ -470,8 +491,17 @@ export default function AddToCartButton({ item, variants, sellConfig, units }: P
         @media (max-width: 767px) {
           .sticky-action-bar {
             bottom: 92px; /* Float above the MobileFooter */
-            border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
+            left: 16px;
+            right: 16px;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+          }
+          [data-theme="dark"] .sticky-action-bar {
+            background: rgba(17, 27, 33, 0.95);
           }
         }
       ` }} />

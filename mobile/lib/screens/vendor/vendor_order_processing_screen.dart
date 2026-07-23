@@ -53,6 +53,26 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
   }
 
   Future<void> _updateStatus(String next) async {
+    if (next == 'cancelled') {
+      final confirm = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Cancel Order'),
+          content: const Text('Are you sure you want to cancel this order?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('Yes', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+      if (confirm != true) return;
+    }
     setState(() => _updating = true);
     await supabase.from('orders').update({'status': next}).eq('id', widget.orderId);
     if (mounted) {
@@ -129,6 +149,35 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
     }
   }
 
+  Map<String, dynamic> _checkProcessingAllowed(String? deliveryDateStr, String? deliverySlot) {
+    if (deliveryDateStr == null) return {'allowed': true};
+    
+    final now = DateTime.now();
+    final year = now.year;
+    final month = now.month.toString().padLeft(2, '0');
+    final day = now.day.toString().padLeft(2, '0');
+    final localTodayStr = '$year-$month-$day';
+    
+    final cleanedDeliveryDate = deliveryDateStr.split('T')[0];
+    if (cleanedDeliveryDate != localTodayStr) {
+      return {
+        'allowed': false,
+        'reason': 'This order is scheduled for delivery on $cleanedDeliveryDate. Updates are only allowed on the scheduled date.'
+      };
+    }
+    
+    if (deliverySlot?.toLowerCase() == 'evening') {
+      if (now.hour < 12) {
+        return {
+          'allowed': false,
+          'reason': 'Evening slot orders cannot be processed before 12:00 PM.'
+        };
+      }
+    }
+    
+    return {'allowed': true};
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -146,6 +195,12 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
 
     final orderItems = (o['order_items'] as List?) ?? [];
     final allItemsProcessed = orderItems.every((oi) => oi['status'] != 'pending');
+
+    final deliveryDateStr = o['delivery_date'] as String?;
+    final deliverySlot = o['delivery_slot'] as String?;
+    final allowedCheck = _checkProcessingAllowed(deliveryDateStr, deliverySlot);
+    final isAllowed = allowedCheck['allowed'] as bool;
+    final disallowedReason = allowedCheck['reason'] as String?;
 
     // Determine status badge metadata
     VendorBadgeType badgeType = VendorBadgeType.neutral;
@@ -181,6 +236,30 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (!isAllowed && disallowedReason != null) ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                  border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.error_outline_rounded, color: Color(0xFFF87171), size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        disallowedReason,
+                        style: const TextStyle(color: Color(0xFFFCA5A5), fontSize: 13, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             // Customer Card
             Container(
               padding: const EdgeInsets.all(16),
@@ -398,53 +477,15 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                             ],
                           ),
                           // Actions Panel
+                          // Actions Panel
                           if (status == 'pending') ...[
                             if (itemStatus == 'pending') ...[
                               const SizedBox(height: 12),
-                              if (isDynamic) ...[
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 36,
-                                        child: TextFormField(
-                                          initialValue: _actualValues[oi['id']] ?? '',
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                          style: TextStyle(color: kVendorText, fontSize: 13),
-                                          decoration: InputDecoration(
-                                            hintText: 'Actual weight (e.g. 0.6)',
-                                            hintStyle: TextStyle(color: kVendorSubText.withOpacity(0.5), fontSize: 12),
-                                            filled: true,
-                                            fillColor: kVendorTransparentBg,
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(8),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                          ),
-                                          onChanged: (val) {
-                                            _actualValues[oi['id']!] = val;
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      onPressed: _updating
-                                          ? null
-                                          : () => _updateItemStatus(oi, 'adjusted'),
-                                      icon: const Icon(Icons.edit_note, color: Color(0xFF60A5FA), size: 24),
-                                      tooltip: 'Adjust Price',
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                              ],
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   ElevatedButton.icon(
-                                    onPressed: _updating ? null : () => _updateItemStatus(oi, 'approved'),
+                                    onPressed: (_updating || !isAllowed) ? null : () => _updateItemStatus(oi, 'approved'),
                                     icon: const Icon(Icons.check, size: 14, color: Colors.white),
                                     label: const Text('Approve', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                     style: ElevatedButton.styleFrom(
@@ -457,7 +498,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                   ),
                                   const SizedBox(width: 8),
                                   OutlinedButton.icon(
-                                    onPressed: _updating ? null : () => _updateItemStatus(oi, 'rejected'),
+                                    onPressed: (_updating || !isAllowed) ? null : () => _updateItemStatus(oi, 'rejected'),
                                     icon: const Icon(Icons.close, size: 14, color: Color(0xFFF87171)),
                                     label: const Text('Reject', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFF87171))),
                                     style: OutlinedButton.styleFrom(
@@ -479,6 +520,68 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                       : itemStatus == 'adjusted'
                                           ? VendorBadgeType.warning
                                           : VendorBadgeType.success,
+                                ),
+                              ),
+                            ],
+                          ] else if (status == 'accepted' || status == 'packing') ...[
+                            if (itemStatus == 'rejected') ...[
+                              const SizedBox(height: 8),
+                              const Align(
+                                alignment: Alignment.centerRight,
+                                child: VendorBadge(
+                                  label: 'rejected',
+                                  type: VendorBadgeType.danger,
+                                ),
+                              ),
+                            ] else ...[
+                              const SizedBox(height: 12),
+                              if (isDynamic) ...[
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: SizedBox(
+                                        height: 36,
+                                        child: TextFormField(
+                                          initialValue: _actualValues[oi['id']] ?? '',
+                                          enabled: isAllowed,
+                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                          style: TextStyle(color: kVendorText, fontSize: 13),
+                                          decoration: InputDecoration(
+                                            hintText: 'Actual weight (e.g. 0.6)',
+                                            hintStyle: TextStyle(color: kVendorSubText.withOpacity(0.5), fontSize: 12),
+                                            filled: true,
+                                            fillColor: kVendorTransparentBg,
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                            border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.circular(8),
+                                              borderSide: BorderSide.none,
+                                            ),
+                                          ),
+                                          onChanged: (val) {
+                                            _actualValues[oi['id']!] = val;
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      onPressed: (_updating || !isAllowed)
+                                          ? null
+                                          : () => _updateItemStatus(oi, 'adjusted'),
+                                      icon: const Icon(Icons.edit_note, color: Color(0xFF60A5FA), size: 24),
+                                      tooltip: 'Adjust Price',
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: VendorBadge(
+                                  label: itemStatus,
+                                  type: itemStatus == 'adjusted'
+                                      ? VendorBadgeType.warning
+                                      : VendorBadgeType.success,
                                 ),
                               ),
                             ],
@@ -522,18 +625,40 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-
             // Actions Buttons
-            if (nextStatus != null && status != 'cancelled') ...[
+            if (status == 'out_for_delivery') ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                  border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.access_time_rounded, color: Color(0xFF93C5FD), size: 18),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        l10n.waitingUserConfirmation,
+                        style: const TextStyle(color: Color(0xFF93C5FD), fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+            ] else if (nextStatus != null && status != 'cancelled' && nextStatus != 'delivered') ...[
               if (status == 'pending' && !allItemsProcessed) ...[
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFEF4444).withOpacity(0.1),
-                    border: Border.all(color: const Color(0xFFEF4444).withOpacity(0.2)),
+                    color: const Color(0xFFEF4444).withValues(alpha: 0.1),
+                    border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.2)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
@@ -559,10 +684,11 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
               ),
               const SizedBox(height: 12),
             ],
-            if (status == 'pending') ...[
+
+            if (status != 'cancelled' && status != 'delivered') ...[
               VendorOutlineButton(
                 width: double.infinity,
-                onPressed: _updating ? null : () => _updateStatus('cancelled'),
+                onPressed: (_updating || !isAllowed) ? null : () => _updateStatus('cancelled'),
                 borderColor: const Color(0x4DEF4444),
                 child: Text(
                   l10n.cancelOrderButton,

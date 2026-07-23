@@ -21,8 +21,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   dynamic _selectedAddress;
 
   // Form controllers for adding new address inline
-  final _nameController = TextEditingController();
-  final _phoneController = TextEditingController();
+  final _labelController = TextEditingController();
   final _line1Controller = TextEditingController();
   final _line2Controller = TextEditingController();
   final _landmarkController = TextEditingController();
@@ -36,8 +35,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
+    _labelController.dispose();
     _line1Controller.dispose();
     _line2Controller.dispose();
     _landmarkController.dispose();
@@ -45,8 +43,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _clearForm() {
-    _nameController.clear();
-    _phoneController.clear();
+    _labelController.clear();
     _line1Controller.clear();
     _line2Controller.clear();
     _landmarkController.clear();
@@ -264,19 +261,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           const SizedBox(height: 12),
                         ],
                         _buildDialogTextField(
-                          controller: _nameController,
-                          label: l10n.contactNameLabel,
-                          placeholder: l10n.fullNamePlaceholder,
-                          kText: kText,
-                          kSubText: kSubText,
-                          kBorder: kBorder,
-                          kCardBg: kInputBg,
-                        ),
-                        _buildDialogTextField(
-                          controller: _phoneController,
-                          label: l10n.contactPhoneLabel,
-                          placeholder: '+91 00000 00000',
-                          keyboardType: TextInputType.phone,
+                          controller: _labelController,
+                          label: l10n.addressLabel,
+                          placeholder: l10n.addressLabelPlaceholder,
                           kText: kText,
                           kSubText: kSubText,
                           kBorder: kBorder,
@@ -364,18 +351,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     onPressed: isSavingAddress
                         ? null
                         : () async {
-                            final name = _nameController.text.trim();
-                            final phone = _phoneController.text.trim();
+                            final label = _labelController.text.trim();
                             final line1 = _line1Controller.text.trim();
                             final line2 = _line2Controller.text.trim();
                             final landmark = _landmarkController.text.trim();
 
-                            if (name.isEmpty || phone.isEmpty || line1.isEmpty) {
+                            if (label.isEmpty || line1.isEmpty) {
                               setDialogState(() {
                                 dialogError = l10n.fillRequiredFieldsError;
                               });
                               return;
                             }
+
+                            final user = supabase.auth.currentUser;
+                            final name = user?.userMetadata?['full_name'] ?? user?.email?.split('@')[0] ?? 'Customer';
+                            final phone = user?.phone ?? '0000000000';
 
                             if (_saveToProfile) {
                               setDialogState(() {
@@ -388,7 +378,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                                 final res = await supabase.from('user_addresses').insert({
                                   'user_id': uid,
-                                  'label': 'Home',
+                                  'label': label,
                                   'contact_name': name,
                                   'contact_phone': phone,
                                   'address_line_1': line1,
@@ -412,6 +402,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             } else {
                               setState(() {
                                 _selectedAddress = {
+                                  'label': label,
                                   'contact_name': name,
                                   'contact_phone': phone,
                                   'address_line_1': line1,
@@ -479,6 +470,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'p_address_line_1': activeAddress['address_line_1'],
         'p_address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
         'p_landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
+        'p_label': activeAddress['label']?.toString().isNotEmpty == true ? activeAddress['label'] : 'Home',
       });
 
       if (mounted) {
@@ -751,37 +743,65 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          Row(
+                           Row(
                             children: PaymentType.values.map((type) {
                               final isSelected = _paymentType == type;
+                              final isCredit = type == PaymentType.credit;
                               return Expanded(
                                 child: GestureDetector(
-                                  onTap: () => setState(() => _paymentType = type),
-                                  child: AnimatedContainer(
-                                    duration: const Duration(milliseconds: 150),
-                                    margin: EdgeInsets.only(
-                                      right: type == PaymentType.values.first ? 8 : 0,
-                                      left: type == PaymentType.values.last ? 8 : 0,
-                                    ),
-                                    padding: const EdgeInsets.symmetric(vertical: 14),
-                                    decoration: BoxDecoration(
-                                      color: isSelected 
-                                          ? (isDark ? const Color(0xFF103629) : const Color(0xFFE8F9EC))
-                                          : kBg,
-                                      border: Border.all(
-                                        color: isSelected ? kGreen : kBorder,
-                                        width: isSelected ? 1.5 : 1,
+                                  onTap: isCredit ? null : () => setState(() => _paymentType = type),
+                                  child: Opacity(
+                                    opacity: isCredit ? 0.6 : 1.0,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 150),
+                                      margin: EdgeInsets.only(
+                                        right: type == PaymentType.values.first ? 8 : 0,
+                                        left: type == PaymentType.values.last ? 8 : 0,
                                       ),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        type == PaymentType.cod ? '💵 ' + l10n.cashOnDelivery : '🏦 ' + l10n.creditPayment,
-                                        style: TextStyle(
-                                          color: isSelected ? kGreenDark : kSubText,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 14,
+                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                      decoration: BoxDecoration(
+                                        color: isSelected 
+                                            ? (isDark ? const Color(0xFF103629) : const Color(0xFFE8F9EC))
+                                            : kBg,
+                                        border: Border.all(
+                                          color: isSelected ? kGreen : kBorder,
+                                          width: isSelected ? 1.5 : 1,
                                         ),
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            type == PaymentType.cod ? '💵 ' + l10n.cashOnDelivery : '🏦 ' + l10n.creditPayment,
+                                            style: TextStyle(
+                                              color: isSelected ? kGreenDark : kSubText,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          if (isCredit) ...[
+                                            const SizedBox(height: 4),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                gradient: const LinearGradient(
+                                                  colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                                                ),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: const Text(
+                                                'COMING SOON',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w800,
+                                                  fontSize: 8,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
                                       ),
                                     ),
                                   ),

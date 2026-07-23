@@ -7,7 +7,7 @@ import {
   Store, Users, Package, CreditCard, Coins,
   ClipboardList, AlertTriangle, Settings, Bell,
   ArrowLeft, ShieldCheck, MapPin, Sun, Moon,
-  Languages, MessageSquare
+  Languages, MessageSquare, RefreshCcw
 } from 'lucide-react'
 import { useTheme } from '@/components/ThemeProvider'
 import { useTranslation } from '@/lib/i18n/I18nContext'
@@ -27,6 +27,7 @@ const NAV = [
     { href: '/admin/locations',      icon: MapPin,    label: 'Locations' },
     { href: '/admin/users',          icon: Users,     label: 'Users' },
     { href: '/admin/orders',         icon: Package,   label: 'Orders' },
+    { href: '/admin/replacements',   icon: RefreshCcw, label: 'Replacements' },
   ]},
   { section: 'Finance', items: [
     { href: '/admin/credit',         icon: CreditCard, label: 'Credit Monitor' },

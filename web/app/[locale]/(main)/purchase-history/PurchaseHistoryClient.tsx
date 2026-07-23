@@ -28,6 +28,7 @@ interface OrderHistoryItem {
     name: string
   } | null
   order_items: OrderItemInfo[]
+  has_review?: boolean
 }
 
 interface StatsInfo {
@@ -43,7 +44,7 @@ interface Props {
 }
 
 export default function PurchaseHistoryClient({ initialOrders, initialStats }: Props) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [orders] = useState<OrderHistoryItem[]>(initialOrders)
   const [stats] = useState<StatsInfo>(initialStats)
   const [dateFilter, setDateFilter] = useState<'today' | 'week' | 'month' | 'year' | 'all'>('all')
@@ -338,10 +339,21 @@ export default function PurchaseHistoryClient({ initialOrders, initialStats }: P
                       <span className="total-val">₹{order.total_final_price.toFixed(2)}</span>
                     </div>
 
-                    <Link href={`/orders/${order.id}`} className="view-btn">
-                      <Eye size={14} />
-                      {t('purchase_history.view_order')}
-                    </Link>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {order.status === 'delivered' && !order.has_review && (
+                        <Link 
+                          href={`/${locale}/orders/${order.id}/review`} 
+                          className="view-btn" 
+                          style={{ background: 'var(--wa-green-dark)', color: '#fff', border: 'none', textDecoration: 'none' }}
+                        >
+                          Write Review
+                        </Link>
+                      )}
+                      <Link href={`/${locale}/orders/${order.id}`} className="view-btn" style={{ textDecoration: 'none' }}>
+                        <Eye size={14} />
+                        {t('purchase_history.view_order')}
+                      </Link>
+                    </div>
                   </div>
                 </div>
               )

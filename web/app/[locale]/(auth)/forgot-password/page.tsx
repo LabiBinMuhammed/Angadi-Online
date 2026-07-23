@@ -5,8 +5,10 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Phone, AlertCircle, Info, CheckCircle, Globe } from 'lucide-react'
 import { useParams } from 'next/navigation'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export default function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const params = useParams()
   const locale = (params?.locale as string) || 'en'
   
@@ -63,9 +65,9 @@ export default function ForgotPasswordPage() {
   return (
     <div className="auth-page-wrap">
       <div className="auth-page-header">
-        <h1 className="auth-page-title">Reset password</h1>
+        <h1 className="auth-page-title">{t('auth.reset_password')}</h1>
         <p className="auth-page-sub">
-          {!success ? 'Enter your details to receive password reset instructions' : 'Check your inbox for a reset link'}
+          {!success ? t('auth.reset_pw_instructions') : t('auth.check_inbox_reset')}
         </p>
       </div>
 
@@ -87,7 +89,7 @@ export default function ForgotPasswordPage() {
                 borderRadius: 'var(--radius-md)'
               }}
             >
-              Email Accounts
+              {t('auth.email_accounts')}
             </button>
             <button
               type="button"
@@ -103,14 +105,14 @@ export default function ForgotPasswordPage() {
                 borderRadius: 'var(--radius-md)'
               }}
             >
-              Phone Accounts
+              {t('auth.phone_accounts')}
             </button>
           </div>
 
           {mode === 'phone' ? (
             /* Phone Input */
             <div className="form-group">
-              <label className="form-label" htmlFor="reset-phone">Phone number</label>
+              <label className="form-label" htmlFor="reset-phone">{t('auth.phone')}</label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <select
                   value={countryCode}
@@ -145,7 +147,7 @@ export default function ForgotPasswordPage() {
           ) : (
             /* Email Input */
             <div className="form-group">
-              <label className="form-label" htmlFor="reset-email">Email Address</label>
+              <label className="form-label" htmlFor="reset-email">{t('auth.email')}</label>
               <div className="input-icon-wrap">
                 <Globe size={16} className="input-icon" />
                 <input
@@ -182,7 +184,7 @@ export default function ForgotPasswordPage() {
             className="btn btn-primary btn-full auth-submit-btn"
             disabled={loading}
           >
-            {loading ? <span className="spinner" /> : mode === 'email' ? 'Send Reset Link' : 'Reset Password'}
+            {loading ? <span className="spinner" /> : mode === 'email' ? t('auth.send_reset_link') : t('auth.reset_password')}
           </button>
         </form>
       ) : (
@@ -191,17 +193,17 @@ export default function ForgotPasswordPage() {
             <CheckCircle size={64} />
           </div>
           <div className="auth-alert auth-alert-success" role="alert" style={{ textAlign: 'center' }}>
-            A password reset link has been successfully sent to <strong>{email}</strong>. Please check your inbox and spam folders.
+            {t('auth.reset_link_sent_to').replace('{email}', email)}
           </div>
           <Link href="/login" className="btn btn-primary btn-full auth-submit-btn" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
-            Go to Login
+            {t('auth.go_to_login')}
           </Link>
         </div>
       )}
 
       <p className="auth-footer-text">
-        Remember your password?{' '}
-        <Link href="/login" className="auth-link">Sign in</Link>
+        {t('auth.remember_pw') + ' '}
+        <Link href="/login" className="auth-link">{t('auth.sign_in_link')}</Link>
       </p>
     </div>
   )

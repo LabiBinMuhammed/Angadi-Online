@@ -510,6 +510,18 @@ abstract class AppLocalizations {
   /// **'No addresses found.'**
   String get noAddressesFound;
 
+  /// No description provided for @addressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address Name *'**
+  String get addressLabel;
+
+  /// No description provided for @addressLabelPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Home, Hostel, Office, etc.'**
+  String get addressLabelPlaceholder;
+
   /// No description provided for @contactNameLabel.
   ///
   /// In en, this message translates to:
@@ -2117,6 +2129,564 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to load reviews: {error}'**
   String failedToLoadReviews(String error);
+
+  /// No description provided for @waitingUserConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for user confirmation'**
+  String get waitingUserConfirmation;
+
+  /// No description provided for @authWelcomeBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get authWelcomeBack;
+
+  /// No description provided for @authSignInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to your Village Market account'**
+  String get authSignInSubtitle;
+
+  /// No description provided for @authPhoneLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Login'**
+  String get authPhoneLogin;
+
+  /// No description provided for @authEmailLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Login'**
+  String get authEmailLogin;
+
+  /// No description provided for @authForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get authForgotPassword;
+
+  /// No description provided for @authSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In'**
+  String get authSignIn;
+
+  /// No description provided for @authCreateAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Create account'**
+  String get authCreateAccount;
+
+  /// No description provided for @authJoinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join Village Market — enter details to get started'**
+  String get authJoinSubtitle;
+
+  /// No description provided for @authUsePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Phone Number'**
+  String get authUsePhone;
+
+  /// No description provided for @authUseEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Email Address'**
+  String get authUseEmail;
+
+  /// No description provided for @authRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get authRegister;
+
+  /// No description provided for @authResetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get authResetPassword;
+
+  /// No description provided for @authResetPwInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your details to receive password reset instructions'**
+  String get authResetPwInstructions;
+
+  /// No description provided for @authCheckInboxReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your inbox for a reset link'**
+  String get authCheckInboxReset;
+
+  /// No description provided for @authEmailAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Accounts'**
+  String get authEmailAccounts;
+
+  /// No description provided for @authPhoneAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Accounts'**
+  String get authPhoneAccounts;
+
+  /// No description provided for @authSendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Reset Link'**
+  String get authSendResetLink;
+
+  /// No description provided for @authGoToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Login'**
+  String get authGoToLogin;
+
+  /// No description provided for @authRememberPw.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember your password?'**
+  String get authRememberPw;
+
+  /// No description provided for @authSignInLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get authSignInLink;
+
+  /// No description provided for @authResetLinkSentTo.
+  ///
+  /// In en, this message translates to:
+  /// **'A password reset link has been successfully sent to {email}. Please check your inbox and spam folders.'**
+  String authResetLinkSentTo(String email);
+
+  /// No description provided for @authCompleteRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete registration'**
+  String get authCompleteRegistration;
+
+  /// No description provided for @authFewDetailsSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Just a few details to set up your account'**
+  String get authFewDetailsSetup;
+
+  /// No description provided for @authPreferredLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred Language'**
+  String get authPreferredLanguage;
+
+  /// No description provided for @authVillageLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Village / Location'**
+  String get authVillageLocation;
+
+  /// No description provided for @authCompleteSetup.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Setup'**
+  String get authCompleteSetup;
+
+  /// No description provided for @authLoadingLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading locations...'**
+  String get authLoadingLocations;
+
+  /// No description provided for @authFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get authFullName;
+
+  /// No description provided for @authEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get authEmail;
+
+  /// No description provided for @authPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number'**
+  String get authPhone;
+
+  /// No description provided for @authPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get authPassword;
+
+  /// No description provided for @securityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Settings'**
+  String get securityTitle;
+
+  /// No description provided for @securityChangePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Phone Number'**
+  String get securityChangePhone;
+
+  /// No description provided for @securityPhoneSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number updated successfully!'**
+  String get securityPhoneSuccess;
+
+  /// No description provided for @securityActivePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Phone Number'**
+  String get securityActivePhone;
+
+  /// No description provided for @securityRequestPhoneChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Phone Change'**
+  String get securityRequestPhoneChange;
+
+  /// No description provided for @securitySending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending...'**
+  String get securitySending;
+
+  /// No description provided for @securityEnterVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Verification Code sent to {phone}'**
+  String securityEnterVerificationCode(String phone);
+
+  /// No description provided for @securityDidntReceiveCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t receive code?'**
+  String get securityDidntReceiveCode;
+
+  /// No description provided for @securityResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {countdown}s'**
+  String securityResendIn(String countdown);
+
+  /// No description provided for @securityResendOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend OTP'**
+  String get securityResendOtp;
+
+  /// No description provided for @securityCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get securityCancel;
+
+  /// No description provided for @securityVerifyChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify & Change'**
+  String get securityVerifyChange;
+
+  /// No description provided for @securityVerifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying...'**
+  String get securityVerifying;
+
+  /// No description provided for @securityChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Account Password'**
+  String get securityChangePassword;
+
+  /// No description provided for @securityPasswordSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully!'**
+  String get securityPasswordSuccess;
+
+  /// No description provided for @securityNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get securityNewPassword;
+
+  /// No description provided for @securityConfirmNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get securityConfirmNewPassword;
+
+  /// No description provided for @securityUpdatePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Password'**
+  String get securityUpdatePassword;
+
+  /// No description provided for @securitySaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get securitySaving;
+
+  /// No description provided for @securityDangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone'**
+  String get securityDangerZone;
+
+  /// No description provided for @securityDangerZoneDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging out from all devices will terminate all your active sessions across web browsers, mobile apps, and other logged-in clients.'**
+  String get securityDangerZoneDesc;
+
+  /// No description provided for @securitySignOutAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out From All Devices'**
+  String get securitySignOutAll;
+
+  /// No description provided for @securityLoggingOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Logging out...'**
+  String get securityLoggingOut;
+
+  /// No description provided for @securityConfirmSignOutAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out from all devices? You will need to log in again on all your active devices.'**
+  String get securityConfirmSignOutAll;
+
+  /// No description provided for @authNoAccountPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t have an account? '**
+  String get authNoAccountPrompt;
+
+  /// No description provided for @authAlreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account? '**
+  String get authAlreadyHaveAccount;
+
+  /// No description provided for @authAccountType.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Type'**
+  String get authAccountType;
+
+  /// No description provided for @authCustomerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Customer'**
+  String get authCustomerRole;
+
+  /// No description provided for @authShopOwnerRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop Owner'**
+  String get authShopOwnerRole;
+
+  /// No description provided for @authVerifyPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Phone Number'**
+  String get authVerifyPhone;
+
+  /// No description provided for @authVerifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Code'**
+  String get authVerifyCode;
+
+  /// No description provided for @authVerificationCodeResent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code resent!'**
+  String get authVerificationCodeResent;
+
+  /// No description provided for @selectLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Location'**
+  String get selectLocationTitle;
+
+  /// No description provided for @searchLocationsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search locations…'**
+  String get searchLocationsHint;
+
+  /// No description provided for @allLocationsOption.
+  ///
+  /// In en, this message translates to:
+  /// **'All Locations'**
+  String get allLocationsOption;
+
+  /// No description provided for @failedToLoadLocations.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load locations: {error}'**
+  String failedToLoadLocations(String error);
+
+  /// No description provided for @noLocationsMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No locations match your search.'**
+  String get noLocationsMatch;
+
+  /// No description provided for @vendorFooterDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get vendorFooterDashboard;
+
+  /// No description provided for @vendorFooterOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders'**
+  String get vendorFooterOrders;
+
+  /// No description provided for @vendorFooterProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Products'**
+  String get vendorFooterProducts;
+
+  /// No description provided for @vendorFooterCredit.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit'**
+  String get vendorFooterCredit;
+
+  /// No description provided for @vendorFooterExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get vendorFooterExit;
+
+  /// No description provided for @vendorEditProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Product'**
+  String get vendorEditProduct;
+
+  /// No description provided for @vendorUserCreditDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'User Credit Detail'**
+  String get vendorUserCreditDetail;
+
+  /// No description provided for @tutorialSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tutorialSkip;
+
+  /// No description provided for @tutorialNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tutorialNext;
+
+  /// No description provided for @tutorialFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish'**
+  String get tutorialFinish;
+
+  /// No description provided for @tutorialHomeLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Location'**
+  String get tutorialHomeLocationTitle;
+
+  /// No description provided for @tutorialHomeLocationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to change your village or marketplace location.'**
+  String get tutorialHomeLocationDesc;
+
+  /// No description provided for @tutorialHomeSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search Shops'**
+  String get tutorialHomeSearchTitle;
+
+  /// No description provided for @tutorialHomeSearchDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Find your favorite local shops by typing here.'**
+  String get tutorialHomeSearchDesc;
+
+  /// No description provided for @tutorialHomeCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get tutorialHomeCategoryTitle;
+
+  /// No description provided for @tutorialHomeCategoryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter fresh groceries and items by category.'**
+  String get tutorialHomeCategoryDesc;
+
+  /// No description provided for @tutorialHomeShopCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore Shops'**
+  String get tutorialHomeShopCardTitle;
+
+  /// No description provided for @tutorialHomeShopCardDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on any shop to see its available items.'**
+  String get tutorialHomeShopCardDesc;
+
+  /// No description provided for @tutorialShopFilterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by Category'**
+  String get tutorialShopFilterTitle;
+
+  /// No description provided for @tutorialShopFilterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a category to quickly filter and find specific items.'**
+  String get tutorialShopFilterDesc;
+
+  /// No description provided for @tutorialShopProductTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View Products'**
+  String get tutorialShopProductTitle;
+
+  /// No description provided for @tutorialShopProductDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See prices, images, and details of all available items.'**
+  String get tutorialShopProductDesc;
+
+  /// No description provided for @tutorialShopOpenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Product'**
+  String get tutorialShopOpenTitle;
+
+  /// No description provided for @tutorialShopOpenDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on any item card to see more details and add it to your bag.'**
+  String get tutorialShopOpenDesc;
 }
 
 class _AppLocalizationsDelegate

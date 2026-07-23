@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/auth_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -38,6 +39,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
   Future<void> _changePassword() async {
     if (_loading) return;
+    final l10n = AppLocalizations.of(context)!;
     final password = _passwordCtrl.text;
     final confirm = _confirmCtrl.text;
 
@@ -54,7 +56,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
     try {
       await authService.updatePassword(password);
       setState(() {
-        _successMessage = 'Password updated successfully!';
+        _successMessage = l10n.securityPasswordSuccess;
         _passwordCtrl.clear();
         _confirmCtrl.clear();
       });
@@ -68,17 +70,18 @@ class _SecurityScreenState extends State<SecurityScreen> {
   }
 
   Future<void> _logoutAll() async {
+    final l10n = AppLocalizations.of(context)!;
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sign Out Everywhere'),
-        content: const Text('Are you sure you want to sign out from all devices? You will need to log back in.'),
+        title: Text(l10n.securitySignOutAll),
+        content: Text(l10n.securityConfirmSignOutAll),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.securityCancel)),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Sign Out everywhere'),
+            child: Text(l10n.securitySignOutAll),
           ),
         ],
       ),
@@ -108,12 +111,13 @@ class _SecurityScreenState extends State<SecurityScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: kWaTeal,
         foregroundColor: Colors.white,
-        title: const Text('Security Settings'),
+        title: Text(l10n.securityTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -131,13 +135,13 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
             // 1. Change Phone section
             _buildCardSection(
-              title: 'Change Phone Number',
+              title: l10n.securityChangePhone,
               icon: Icons.phone_android_outlined,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _buildInputField(
-                    label: 'New phone number',
+                    label: l10n.authPhone,
                     hintText: '+1 555-555-5555',
                     controller: _phoneCtrl,
                     keyboardType: TextInputType.phone,
@@ -150,7 +154,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('Update Phone Number'),
+                    child: Text(l10n.securityRequestPhoneChange),
                   ),
                 ],
               ),
@@ -159,13 +163,13 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
             // 2. Change Password section
             _buildCardSection(
-              title: 'Change Password',
+              title: l10n.securityChangePassword,
               icon: Icons.lock_outline,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _buildInputField(
-                    label: 'New password',
+                    label: l10n.securityNewPassword,
                     hintText: 'Min. 8 characters',
                     controller: _passwordCtrl,
                     obscureText: !_showPw,
@@ -180,7 +184,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                   ),
                   const SizedBox(height: 12),
                   _buildInputField(
-                    label: 'Confirm new password',
+                    label: l10n.securityConfirmNewPassword,
                     hintText: 'Repeat password',
                     controller: _confirmCtrl,
                     obscureText: !_showConfirm,
@@ -201,7 +205,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('Update Password'),
+                    child: Text(l10n.securityUpdatePassword),
                   ),
                 ],
               ),
@@ -210,14 +214,14 @@ class _SecurityScreenState extends State<SecurityScreen> {
 
             // 3. Global Logout section
             _buildCardSection(
-              title: 'Global Device Logout',
+              title: l10n.securitySignOutAll,
               icon: Icons.devices_outlined,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
-                    'Sign out from all active sessions and devices, including other mobile phones, web browsers, and tablets.',
-                    style: TextStyle(fontSize: 13, color: kNeutral500, height: 1.4),
+                  Text(
+                    l10n.securityDangerZoneDesc,
+                    style: const TextStyle(fontSize: 13, color: kNeutral500, height: 1.4),
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
@@ -227,7 +231,7 @@ class _SecurityScreenState extends State<SecurityScreen> {
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
-                    child: const Text('Sign Out From All Devices'),
+                    child: Text(l10n.securitySignOutAll),
                   ),
                 ],
               ),

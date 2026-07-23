@@ -18,6 +18,7 @@ export default function Sidebar() {
   }, [])
 
   if (!mounted) return null
+  if (pathname.includes('/checkout')) return null
 
   const isActive = (href: string) => {
     const localizedHref = `/${locale}${href}`

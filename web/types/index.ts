@@ -83,6 +83,9 @@ export interface Shop {
   type?: string
   logo_url?: string
   distance?: string
+  replacement_enabled?: boolean
+  return_window_hours?: number
+  replacement_policy?: string
   created_at: string
   updated_at: string
 }
@@ -331,3 +334,73 @@ export interface FavoriteItem {
   item_id: string
   created_at: string
 }
+
+// ─── Replacement Request System ──────────────────────────────────────────────
+
+export type ReplacementRequestReason =
+  | 'Wrong Item'
+  | 'Damaged'
+  | 'Poor Quality'
+  | 'Expired'
+  | 'Missing Item'
+  | 'Other'
+
+export type ReplacementRequestStatus =
+  | 'Pending'
+  | 'Approved'
+  | 'Rejected'
+  | 'Completed'
+  | 'Cancelled'
+
+export interface ReplacementRequest {
+  id: string
+  order_id: string
+  user_id: string
+  shop_id: string
+  reason: ReplacementRequestReason
+  description?: string
+  status: ReplacementRequestStatus
+  customer_images: string[]
+  created_at: string
+  updated_at: string
+  shops?: {
+    name: string
+  }
+  users?: {
+    name: string
+    phone: string
+  }
+}
+
+export interface ReplacementItem {
+  id: string
+  replacement_request_id: string
+  order_item_id: string
+  quantity: number
+  seller_notes?: string
+  order_items?: {
+    item_id: string
+    variant_id: string
+    requested_value?: number
+    actual_value?: number
+    estimated_price: number
+    final_price: number
+    items?: {
+      name: string
+    }
+    item_variants?: {
+      label: string
+    }
+  }
+}
+
+export interface ReplacementStatusLog {
+  id: string
+  replacement_request_id: string
+  from_status?: ReplacementRequestStatus
+  to_status: ReplacementRequestStatus
+  changed_by?: string
+  notes?: string
+  created_at: string
+}
+

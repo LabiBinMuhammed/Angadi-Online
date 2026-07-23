@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import '../../core/auth_service.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/theme_service.dart';
@@ -70,6 +71,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -87,7 +89,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           children: [
             const SizedBox(height: 20),
             Text(
-              'Reset Password',
+              l10n.authResetPassword,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
@@ -98,8 +100,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             const SizedBox(height: 4),
             Text(
               !_success
-                  ? 'Enter your details to receive password reset instructions'
-                  : 'Check your inbox for password reset instructions',
+                  ? l10n.authResetPwInstructions
+                  : l10n.authCheckInboxReset,
               style: const TextStyle(
                 fontSize: 14,
                 color: kNeutral500,
@@ -130,7 +132,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'Email Accounts',
+                            l10n.authEmailAccounts,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -152,7 +154,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            'Phone Accounts',
+                            l10n.authPhoneAccounts,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -170,7 +172,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               if (_isPhoneMode) ...[
                 // Phone Input
                 _buildInputField(
-                  label: 'Phone number',
+                  label: l10n.authPhone,
                   hintText: '98765 43210',
                   controller: _phoneCtrl,
                   prefixIcon: Icons.phone_android_outlined,
@@ -185,7 +187,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ] else ...[
                 // Email Input
                 _buildInputField(
-                  label: 'Email address',
+                  label: l10n.authEmail,
                   hintText: 'you@example.com',
                   controller: _emailCtrl,
                   prefixIcon: Icons.mail_outline,
@@ -233,7 +235,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(_isPhoneMode ? 'Reset Password' : 'Send Reset Link'),
+                    : Text(_isPhoneMode ? l10n.authResetPassword : l10n.authSendResetLink),
               ),
             ] else ...[
               // Success Screen
@@ -245,7 +247,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 12),
               _buildSuccessAlert(
-                'A password reset link has been successfully sent to ${_emailCtrl.text.trim()}. Please check your inbox.',
+                l10n.authResetLinkSentTo(_emailCtrl.text.trim()),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
@@ -258,7 +260,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text('Back to Login'),
+                child: Text(l10n.authGoToLogin),
               ),
             ],
           ],

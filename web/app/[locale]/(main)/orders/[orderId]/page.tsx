@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { Order, OrderItem, OrderAddress } from '@/types'
 import { ArrowLeft, Clock, Package, Truck, CheckCircle2, XCircle, MapPin, CreditCard, ShoppingBag, Receipt, MessageSquare } from 'lucide-react'
+import MarkAsDeliveredButton from '@/components/MarkAsDeliveredButton'
+import CancelOrderButton from '@/components/CancelOrderButton'
 
 type Props = { params: Promise<{ locale: string; orderId: string }> }
 
@@ -15,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const STATUS_MAP: Record<string, { bg: string; color: string; label: string; Icon: any }> = {
   pending:    { bg: 'var(--status-pending-bg)', color: '#f59e0b', label: 'Order Placed', Icon: Clock },
   packing:    { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'Preparing',    Icon: Package },
-  delivering: { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'On the way', Icon: Truck },
+  out_for_delivery: { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'On the way', Icon: Truck },
   delivered:  { bg: 'var(--status-delivered-bg)', color: '#22c55e', label: 'Delivered',  Icon: CheckCircle2 },
   cancelled:  { bg: 'var(--status-cancelled-bg)', color: '#ef4444', label: 'Cancelled',  Icon: XCircle },
 }
@@ -25,10 +27,10 @@ export default async function OrderDetailPage({ params }: Props) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [{ data: order }, { data: orderItems }, { data: address }, { data: review }] = await Promise.all([
+  const [{ data: order }, { data: orderItems }, { data: address }, { data: review }, { data: replacements }] = await Promise.all([
     supabase
       .from('orders')
-      .select('*, shops(name)')
+      .select('*, shops(name, return_window_hours, replacement_enabled)')
       .eq('id', orderId)
       .eq('user_id', user!.id)
       .single(),
@@ -38,11 +40,16 @@ export default async function OrderDetailPage({ params }: Props) {
       .eq('order_id', orderId),
     supabase.from('order_addresses').select('*').eq('order_id', orderId).single(),
     supabase.from('shop_reviews').select('id').eq('order_id', orderId).maybeSingle(),
+    supabase
+      .from('replacement_requests')
+      .select('*, replacement_items(*, order_items(*, items(name))))')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: false })
   ])
 
   if (!order) notFound()
 
-  const o     = order as Order & { shops: { name: string } | null }
+  const o     = order as Order & { shops: { name: string; return_window_hours: number; replacement_enabled: boolean } | null }
   const items = (orderItems ?? []) as (OrderItem & {
     items: { name: string }
     item_variants: { label: string; price: number }
@@ -51,6 +58,13 @@ export default async function OrderDetailPage({ params }: Props) {
 
   const st = STATUS_MAP[o.status] ?? { bg: 'var(--bg-muted)', color: 'var(--text-muted)', label: o.status, Icon: Package }
   const StatusIcon = st.Icon
+
+  const deliveredAt = new Date(o.updated_at).getTime()
+  const windowHours = o.shops?.return_window_hours ?? 24
+  const windowMs = windowHours * 60 * 60 * 1000
+  const isEligibleForReplacement = o.status === 'delivered' && 
+                                   o.shops?.replacement_enabled !== false && 
+                                   (Date.now() - deliveredAt <= windowMs)
 
   return (
     <>
@@ -82,6 +96,11 @@ export default async function OrderDetailPage({ params }: Props) {
         .total-val { font-size: 24px; font-weight: 900; color: var(--wa-green); }
         
         .status-badge { display: inline-block; padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-approved { background: #dbeafe; color: #2563eb; }
+        .badge-completed { background: #d1fae5; color: #059669; }
+        .badge-rejected { background: #fee2e2; color: #dc2626; }
+        .badge-cancelled { background: var(--bg-muted); color: var(--text-muted); }
       `}} />
 
       <div className="page-container">
@@ -99,7 +118,7 @@ export default async function OrderDetailPage({ params }: Props) {
 
         <div className="card" style={{ background: 'linear-gradient(135deg, #1e4d1e, #2b5a2b)', color: '#fff' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '20px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '20px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justify-content: center, color: '#fff' }}>
               <StatusIcon size={28} strokeWidth={2.5} />
             </div>
             <div>
@@ -123,6 +142,104 @@ export default async function OrderDetailPage({ params }: Props) {
             <Link href={`/${locale}/orders/${o.id}/review`} className="submit-btn" style={{ textDecoration: 'none', margin: '8px 0 0', textAlign: 'center' }}>
               Write a Review
             </Link>
+          </div>
+        )}
+
+        {isEligibleForReplacement && (
+          <div className="card" style={{ border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <Receipt size={24} color="var(--text-light)" style={{ flexShrink: 0 }} />
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: 'var(--text-base)' }}>Need Help?</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                  If you received incorrect, damaged, or poor quality items, you can request a replacement.
+                </p>
+              </div>
+            </div>
+            <Link 
+              href={`/${locale}/orders/${o.id}/replacement`} 
+              className="submit-btn" 
+              style={{ 
+                textDecoration: 'none', 
+                margin: '8px 0 0', 
+                textAlign: 'center', 
+                background: 'var(--bg-surface)', 
+                border: '1px solid var(--border)', 
+                color: 'var(--text-base)', 
+                boxShadow: 'none' 
+              }}
+            >
+              Need Help?
+            </Link>
+          </div>
+        )}
+
+        {o.status === 'out_for_delivery' && (
+          <div className="card" style={{ border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: 'var(--text-base)' }}>Confirm Delivery</h3>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>Has your order arrived? Please click the button below to confirm receipt of the delivery.</p>
+            <MarkAsDeliveredButton orderId={o.id} />
+          </div>
+        )}
+
+        {o.status === 'pending' && (
+          <div className="card" style={{ border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: 'var(--text-base)' }}>Cancel Order</h3>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>You can cancel this order as long as it has not been accepted by the shop.</p>
+            <CancelOrderButton orderId={o.id} />
+          </div>
+        )}
+
+        {replacements && replacements.length > 0 && (
+          <div className="card">
+            <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Receipt size={20} color="#3b82f6" /> Replacement Requests
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {replacements.map((req: any) => {
+                const statusClasses: Record<string, string> = {
+                  Pending: 'badge-pending',
+                  Approved: 'badge-approved',
+                  Completed: 'badge-completed',
+                  Rejected: 'badge-rejected',
+                  Cancelled: 'badge-cancelled'
+                }
+                return (
+                  <div key={req.id} style={{ borderBottom: '1px dashed var(--border)', paddingBottom: '16px', marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                      <span style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-base)' }}>
+                        Request #{req.id.slice(0, 8).toUpperCase()}
+                      </span>
+                      <span className={`status-badge ${statusClasses[req.status] || ''}`} style={{ margin: 0 }}>
+                        {req.status}
+                      </span>
+                    </div>
+                    <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                      Reason: <strong style={{ color: 'var(--text-base)' }}>{req.reason}</strong>
+                    </p>
+                    {req.description && (
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                        Details: {req.description}
+                      </p>
+                    )}
+                    <div style={{ marginTop: '12px', background: 'var(--bg-base)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                      <p style={{ margin: '0 0 6px', fontSize: '12px', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Items Requested</p>
+                      {req.replacement_items?.map((ri: any) => (
+                        <div key={ri.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '4px 0', color: 'var(--text-base)', fontWeight: 600 }}>
+                          <span>{ri.order_items?.items?.name}</span>
+                          <span style={{ color: 'var(--wa-green)' }}>Qty: {ri.quantity}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {req.notes && (
+                      <div style={{ marginTop: '12px', padding: '12px', background: 'rgba(34, 197, 94, 0.05)', borderRadius: '12px', border: '1px solid rgba(34, 197, 94, 0.15)', fontSize: '13px', lineHeight: 1.4, color: 'var(--text-base)' }}>
+                        <strong>Seller Note:</strong> {req.notes}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
 

@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Lock, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export default function ResetPasswordPage() {
+  const { t } = useTranslation()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [showPw, setShowPw] = useState(false)
@@ -58,9 +60,9 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth-page-wrap">
       <div className="auth-page-header">
-        <h1 className="auth-page-title">Set new password</h1>
+        <h1 className="auth-page-title">{t('auth.set_new_password')}</h1>
         <p className="auth-page-sub">
-          {!success ? 'Choose a secure new password for your account' : 'Your password has been successfully updated'}
+          {!success ? t('auth.choose_secure_pw') : t('auth.pw_updated_success')}
         </p>
       </div>
 
@@ -68,7 +70,7 @@ export default function ResetPasswordPage() {
         <form onSubmit={handleResetPassword} className="auth-form">
           {/* Password */}
           <div className="form-group">
-            <label className="form-label" htmlFor="new-password">New Password</label>
+            <label className="form-label" htmlFor="new-password">{t('auth.new_password')}</label>
             <div className="input-icon-wrap">
               <Lock size={16} className="input-icon" />
               <input
@@ -93,7 +95,7 @@ export default function ResetPasswordPage() {
 
           {/* Confirm Password */}
           <div className="form-group">
-            <label className="form-label" htmlFor="confirm-password">Confirm Password</label>
+            <label className="form-label" htmlFor="confirm-password">{t('auth.confirm_password')}</label>
             <div className="input-icon-wrap">
               <Lock size={16} className="input-icon" />
               <input
@@ -129,7 +131,7 @@ export default function ResetPasswordPage() {
             className="btn btn-primary btn-full auth-submit-btn"
             disabled={loading}
           >
-            {loading ? <span className="spinner" /> : 'Update Password'}
+            {loading ? <span className="spinner" /> : t('auth.update_password')}
           </button>
         </form>
       ) : (
@@ -138,10 +140,10 @@ export default function ResetPasswordPage() {
             <CheckCircle size={64} />
           </div>
           <div className="auth-alert auth-alert-success" role="alert" style={{ textAlign: 'center' }}>
-            Your password has been successfully updated. You can now use your new password to sign in.
+            {t('auth.pw_updated_login_info')}
           </div>
           <Link href="/login" className="btn btn-primary btn-full auth-submit-btn" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', textDecoration: 'none' }}>
-            Go to Login
+            {t('auth.go_to_login')}
           </Link>
         </div>
       )}
