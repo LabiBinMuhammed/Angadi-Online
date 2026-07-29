@@ -153,7 +153,7 @@ class IntroScreen extends StatelessWidget {
 
               // Title and Subtitle
               Text(
-                l10n?.joinUsOrSignIn ?? 'Join Us Or Sign In',
+                'Join Us Or Sign In',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 26,
