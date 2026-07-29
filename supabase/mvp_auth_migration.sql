@@ -1,4 +1,4 @@
--- Database migration for Village Market MVP Authentication update
+-- Database migration for Angadi MVP Authentication update
 -- Supports nullable phone, nullable email, and email_verified flags on public.users table
 
 -- 1. Alter users table columns to support nullable phone and new email columns

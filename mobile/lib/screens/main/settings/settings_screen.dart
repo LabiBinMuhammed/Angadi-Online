@@ -91,7 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ListTile(
                 leading: const Icon(Icons.info_outline),
                 title: Text(l10n.appVersionTitle),
-                subtitle: const Text('Village Market 1.0.0'),
+                subtitle: const Text('Angadi 1.0.0'),
               ),
               const Divider(),
               ListTile(

@@ -54,11 +54,12 @@ export function I18nProvider({
     htmlEl.lang = newLocale
     htmlEl.dir = newLocale === 'ar' ? 'rtl' : 'ltr'
     
-    // Redirect or trigger router refresh depending on implementation
-    window.location.pathname = window.location.pathname.replace(
+    // Redirect preserving search parameters and hashes
+    const newPathname = window.location.pathname.replace(
       /^\/(en|ml|hi|ar)/,
       `/${newLocale}`
     )
+    window.location.href = `${window.location.origin}${newPathname}${window.location.search}${window.location.hash}`
   }
 
   // Load translations if locale changes client-side

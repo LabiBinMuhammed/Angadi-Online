@@ -105,7 +105,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In en, this message translates to:
-  /// **'Village Market'**
+  /// **'Angadi'**
   String get appTitle;
 
   /// No description provided for @navHome.
@@ -2145,7 +2145,7 @@ abstract class AppLocalizations {
   /// No description provided for @authSignInSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Sign in to your Village Market account'**
+  /// **'Sign in to your Angadi account'**
   String get authSignInSubtitle;
 
   /// No description provided for @authPhoneLogin.
@@ -2181,7 +2181,7 @@ abstract class AppLocalizations {
   /// No description provided for @authJoinSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Join Village Market — enter details to get started'**
+  /// **'Join Angadi — enter details to get started'**
   String get authJoinSubtitle;
 
   /// No description provided for @authUsePhone.

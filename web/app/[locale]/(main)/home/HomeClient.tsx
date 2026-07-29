@@ -521,7 +521,7 @@ export default function HomeClient({
         display: 'flex',
         width: '100%',
         background: 'var(--bg-base)',
-        height: '100dvh',
+        height: '104dvh',
         fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
         

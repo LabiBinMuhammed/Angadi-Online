@@ -132,23 +132,23 @@ export default async function VendorOrdersPage({
         </div>
       </div>
       {!dateParam && (
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', overflowX: 'auto', paddingBottom: '4px' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '24px', paddingBottom: '4px' }}>
           {['today', 'week', 'month', 'all'].map((f) => {
             const isActive = filter === f
             const labels: Record<string, string> = {
-              today: t('vendor_dashboard.today_label') || 'Today',
-              week: t('vendor_dashboard.last7_days_label') || 'Last 7 Days',
-              month: t('vendor_dashboard.last30_days_label') || 'Last 30 Days',
-              all: t('vendor_dashboard.filter_all') || 'All Time'
+              today: t('orders.filter_today') || 'Today',
+              week: t('orders.filter_week') || 'Last Week',
+              month: t('orders.filter_month') || 'Last Month',
+              all: t('orders.filter_all') || 'All'
             }
             return (
               <Link
                 key={f}
                 href={`/vendor/orders?filter=${f}`}
                 style={{
-                  padding: '8px 16px',
+                  padding: '6px 12px',
                   borderRadius: '20px',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',

@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Village Market — Credit System Triggers & Repayments Migration
+-- Angadi — Credit System Triggers & Repayments Migration
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- ─── 1. Repayment Logs Table ────────────────────────────────────────────────

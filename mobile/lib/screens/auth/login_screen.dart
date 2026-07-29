@@ -107,294 +107,326 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  bool _rememberMe = true;
+
   @override
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: kWaTeal,
+      backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
       body: SafeArea(
-        bottom: false,
         child: SingleChildScrollView(
-          physics: const ClampingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Header Section (Hello! Greeting + Storefront Logo)
+              // Circular Back Arrow Button
+              GestureDetector(
+                onTap: () {
+                  if (Navigator.of(context).canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/intro');
+                  }
+                },
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.arrow_back,
+                    size: 20,
+                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Title and Subtitle
+              Text(
+                'Sign In Your Account',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? Colors.white : const Color(0xFF1A1A1A),
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Welcome back! Please enter your details to sign in and continue.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF71717A),
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Mode Switcher (Phone / Email)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                padding: const EdgeInsets.all(4),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Hello!',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: -1.0,
-                            ),
+                      child: InkWell(
+                        onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
+                        borderRadius: BorderRadius.circular(99),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: _isPhoneMode ? const Color(0xFF2E5B28) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(99),
                           ),
-                          const SizedBox(height: 6),
-                          Text(
-                            l10n.findGroceriesSubtitle,
+                          child: Text(
+                            l10n.authPhoneLogin,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.85),
                               fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.w700,
+                              color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Storefront Logo Container
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.1),
-                          width: 1.5,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.storefront_rounded,
-                        size: 40,
-                        color: Colors.white,
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
+                        borderRadius: BorderRadius.circular(99),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            color: !_isPhoneMode ? const Color(0xFF2E5B28) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                          child: Text(
+                            l10n.authEmailLogin,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
 
-              // Bottom Sheet Form Card Container
-              Container(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height - 200,
+              if (_isPhoneMode) ...[
+                _buildInputField(
+                  label: '',
+                  hintText: 'Phone Number',
+                  controller: _phoneCtrl,
+                  prefixIcon: Icons.phone_android_outlined,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                  countryCode: _selectedCountryCode,
+                  onCountryCodeChanged: (val) {
+                    if (val != null) {
+                      setState(() {
+                        _selectedCountryCode = val;
+                      });
+                    }
+                  },
                 ),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 16,
-                      offset: const Offset(0, -8),
-                    )
-                  ],
+              ] else ...[
+                _buildInputField(
+                  label: '',
+                  hintText: 'Email Address',
+                  controller: _emailCtrl,
+                  prefixIcon: Icons.mail_outline,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
                 ),
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      l10n.authWelcomeBack,
+              ],
+              const SizedBox(height: 14),
+
+              _buildInputField(
+                label: '',
+                hintText: 'Password',
+                controller: _passwordCtrl,
+                prefixIcon: Icons.lock_outline,
+                obscureText: !_showPw,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _handleLogin(),
+                suffixIcon: GestureDetector(
+                  onTap: () => setState(() => _showPw = !_showPw),
+                  child: Icon(
+                    _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    size: 20,
+                    color: const Color(0xFF94A3B8),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Remember Me Checkbox & Forgot Password
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: Checkbox(
+                          value: _rememberMe,
+                          onChanged: (val) => setState(() => _rememberMe = val ?? true),
+                          activeColor: const Color(0xFF2E5B28),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Remember Me',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: isDark ? Colors.white70 : const Color(0xFF475569),
+                        ),
+                      ),
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push('/forgot-password'),
+                    child: const Text(
+                      'Forgot Password?',
                       style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: kWaTeal,
-                        letterSpacing: -0.5,
+                        color: Color(0xFF2E5B28),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.authSignInSubtitle,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: kNeutral500,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
 
-                    Container(
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      padding: const EdgeInsets.all(4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => setState(() { _isPhoneMode = true; _error = null; }),
-                              borderRadius: BorderRadius.circular(12),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: _isPhoneMode ? kWaTeal : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  l10n.authPhoneLogin,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: _isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
-                                  ),
-                                ),
-                              ),
-                            ),
+              if (_error != null) ...[
+                _buildErrorAlert(_error!),
+                const SizedBox(height: 16),
+              ],
+
+              // Primary Sign In Button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _loading ? null : _handleLogin,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2E5B28),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: const StadiumBorder(),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  child: _loading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
                           ),
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => setState(() { _isPhoneMode = false; _error = null; }),
-                              borderRadius: BorderRadius.circular(12),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                alignment: Alignment.center,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: !_isPhoneMode ? kWaTeal : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  l10n.authEmailLogin,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: !_isPhoneMode ? Colors.white : (isDark ? Colors.white70 : const Color(0xFF64748B)),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+                        )
+                      : const Text('Sign In'),
+                ),
+              ),
+              const SizedBox(height: 24),
 
-                    if (_isPhoneMode) ...[
-                      _buildInputField(
-                        label: l10n.authPhone,
-                        hintText: '98765 43210',
-                        controller: _phoneCtrl,
-                        prefixIcon: Icons.phone_android_outlined,
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
-                        countryCode: _selectedCountryCode,
-                        onCountryCodeChanged: (val) {
-                          if (val != null) {
-                            setState(() {
-                              _selectedCountryCode = val;
-                            });
-                          }
-                        },
-                      ),
-                    ] else ...[
-                      _buildInputField(
-                        label: l10n.authEmail,
-                        hintText: 'you@example.com',
-                        controller: _emailCtrl,
-                        prefixIcon: Icons.mail_outline,
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                      ),
-                    ],
-                    const SizedBox(height: 18),
+              // Divider with 'or'
+              Row(
+                children: [
+                  Expanded(child: Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text('or', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
+                  ),
+                  Expanded(child: Divider(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0))),
+                ],
+              ),
+              const SizedBox(height: 20),
 
-                    _buildInputField(
-                      label: l10n.authPassword,
-                      hintText: '••••••••',
-                      controller: _passwordCtrl,
-                      prefixIcon: Icons.lock_outline,
-                      obscureText: !_showPw,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (_) => _handleLogin(),
-                      suffixIcon: GestureDetector(
-                        onTap: () => setState(() => _showPw = !_showPw),
-                        child: Icon(
-                          _showPw ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                          size: 20,
-                          color: kNeutral500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: GestureDetector(
-                        onTap: () => context.push('/forgot-password'),
-                        child: Text(
-                          l10n.authForgotPassword,
-                          style: TextStyle(
-                            color: kWaTeal,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    if (_error != null) ...[
-                      _buildErrorAlert(_error!),
-                      const SizedBox(height: 20),
-                    ],
-
-                    ElevatedButton(
-                      onPressed: _loading ? null : _handleLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: kWaTeal,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Inter',
-                        ),
-                      ),
-                      child: _loading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
-                          : Text(l10n.authSignIn),
-                    ),
-                    const SizedBox(height: 24),
-
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          l10n.authNoAccountPrompt,
-                          style: const TextStyle(color: kNeutral500, fontSize: 14, fontWeight: FontWeight.w500),
-                        ),
-                        GestureDetector(
-                          onTap: () => context.push('/signup'),
-                          child: Text(
-                            l10n.authCreateAccount,
-                            style: TextStyle(
-                              color: kWaTeal,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
+              // Social Icons (Google & Facebook)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
                       ],
                     ),
-                  ],
-                ),
+                    child: const Center(
+                      child: Text('G', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Color(0xFF4285F4))),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0)),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(Icons.facebook, size: 22, color: Color(0xFF1877F2)),
+                    ),
+                  ),
+                ],
               ),
+              const SizedBox(height: 28),
+
+              // Footer Sign Up Link
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't Have An Account? ",
+                    style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  GestureDetector(
+                    onTap: () => context.push('/signup'),
+                    child: const Text(
+                      'Sign Up',
+                      style: TextStyle(
+                        color: Color(0xFF2E5B28),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),

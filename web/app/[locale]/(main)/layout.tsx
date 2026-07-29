@@ -21,12 +21,23 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           height: 100vh;
           overflow: hidden;
         }
-        main.page {
+        .page-scroll-area {
           flex: 1;
           overflow-y: auto;
           box-sizing: border-box;
           display: flex;
           flex-direction: column;
+          min-height: 0;
+        }
+        .page-content-container {
+          flex: 1;
+          width: 100%;
+          max-width: 1200px;
+          margin-inline: auto;
+          padding-inline: 1.25rem;
+          padding-top: 1.5rem;
+          padding-bottom: 2.5rem;
+          box-sizing: border-box;
         }
         
         @media (max-width: 767px) {
@@ -40,7 +51,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             height: auto;
             overflow: visible;
           }
-          main.page {
+          .page-scroll-area {
             overflow-y: visible;
           }
         }
@@ -48,10 +59,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <div className="main-layout-wrapper">
         <Sidebar />
         <div className="main-viewport">
-          <main className="container page fade-up" style={{ minHeight: '100%', display: 'flex', flexDirection: 'column', flex: 1 }}>
-            <div style={{ flex: 1 }}>{children}</div>
+          <div className="page-scroll-area">
+            <main className="fade-up">
+              {children}
+            </main>
             <Footer />
-          </main>
+          </div>
           <MobileFooter />
         </div>
       </div>

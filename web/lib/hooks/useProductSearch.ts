@@ -11,8 +11,9 @@ interface ItemImage {
   is_primary: boolean
 }
 
-interface Item {
+export interface Item {
   id: string
+  shop_id?: string
   name: string
   description?: string
   image_url?: string
@@ -70,4 +71,3 @@ export function useProductSearch(initialQuery = '', lang = 'en', shopId?: string
 
   return { query, setQuery, results, loading, error }
 }
-export type { Item }

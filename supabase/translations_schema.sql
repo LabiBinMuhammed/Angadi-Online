@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Village Market — Multilingual Schema Migration
+-- Angadi — Multilingual Schema Migration
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- 1. Create languages table

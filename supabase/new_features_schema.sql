@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Village Market — New Features Schema (Pinned Shops, Recent Purchases, Favorite Items)
+-- Angadi — New Features Schema (Pinned Shops, Recent Purchases, Favorite Items)
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- Ensure the item_status type, status column, and shops.logo_url exist in the database

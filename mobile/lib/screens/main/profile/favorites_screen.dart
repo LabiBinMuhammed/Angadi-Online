@@ -84,7 +84,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             'price': price,
             'image_url': imageUrl,
             'shop_id': item['shop_id'] as String,
-            'shop_name': (item['shops'] as Map<String, dynamic>?)?['name'] as String? ?? 'Village Market Shop',
+            'shop_name': (item['shops'] as Map<String, dynamic>?)?['name'] as String? ?? 'Angadi Shop',
             'is_active': item['is_active'] as bool? ?? true,
             'status': item['status'] as String? ?? 'ready',
             'variant_id': variantId,

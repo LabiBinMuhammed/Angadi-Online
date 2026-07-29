@@ -75,29 +75,29 @@ export default function VendorItemsClient({
   ]
 
   return (
-    <div className="vp-card">
+    <div className="vp-card" style={{ padding: '1.25rem' }}>
       {/* Toolbar */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ flex: 1, position: 'relative', minWidth: 200 }}>
-          <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ flex: 1, position: 'relative', minWidth: 180 }}>
+          <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
           <input
             className="vp-input"
-            style={{ paddingLeft: '2.75rem', borderRadius: '99px' }}
+            style={{ paddingLeft: '2.5rem', paddingTop: '0.45rem', paddingBottom: '0.45rem', borderRadius: '99px', fontSize: '0.88rem' }}
             placeholder={t('vendor_dashboard.search_products_placeholder') || 'Search products by name…'}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '0.35rem', background: 'rgba(0,0,0,0.2)', padding: '0.25rem', borderRadius: '99px' }}>
+        <div style={{ display: 'flex', gap: '0.25rem', background: 'rgba(0,0,0,0.15)', padding: '0.2rem', borderRadius: '99px' }}>
           {FILTERS.map(f => (
             <button
               key={f.value}
               id={`filter-${f.value}`}
               className="vp-btn"
               style={{
-                padding: '0.45rem 1rem',
-                fontSize: '0.85rem',
+                padding: '0.35rem 0.85rem',
+                fontSize: '0.8rem',
                 borderRadius: '99px',
                 background: filter === f.value ? '#3b82f6' : 'transparent',
                 color:      filter === f.value ? '#fff'    : '#94a3b8',
@@ -111,26 +111,26 @@ export default function VendorItemsClient({
           ))}
         </div>
 
-        <span style={{ fontSize: '0.85rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+        <span style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
           {filtered.length} {t('purchase_history.of') || 'of'} {items.length} {t('vendor_dashboard.orders_count_label') || 'items'}
         </span>
       </div>
 
       {/* Empty State */}
       {filtered.length === 0 ? (
-        <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#64748b' }}>
-          <Package size={52} style={{ margin: '0 auto 1.25rem', opacity: 0.35, display: 'block' }} />
-          <p style={{ fontSize: '1.1rem', fontWeight: 700, color: '#94a3b8' }}>
+        <div style={{ padding: '3rem 2rem', textAlign: 'center', color: '#64748b' }}>
+          <Package size={48} style={{ margin: '0 auto 1rem', opacity: 0.35, display: 'block' }} />
+          <p style={{ fontSize: '1rem', fontWeight: 700, color: '#94a3b8' }}>
             {items.length === 0 ? (t('vendor_dashboard.no_products_found') || 'No items yet') : (t('common.no_items') || 'No items match your search')}
           </p>
-          <p style={{ fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
+          <p style={{ fontSize: '0.85rem', marginTop: '0.4rem', marginBottom: '1.25rem' }}>
             {items.length === 0
               ? (t('vendor_dashboard.setup_shop_subtitle') || 'Add your first product to start selling.')
               : (t('recent_purchases.no_purchases') || 'Try adjusting your search or filter.')}
           </p>
           {items.length === 0 && (
-            <Link href="/vendor/items/new" className="vp-btn vp-btn-primary" id="empty-add-item-btn">
-              <PackagePlus size={18} /> {t('vendor_dashboard.add_new_product_action') || 'Add First Item'}
+            <Link href="/vendor/items/new" className="vp-btn vp-btn-primary" id="empty-add-item-btn" style={{ padding: '0.5rem 1.25rem', fontSize: '0.88rem' }}>
+              <PackagePlus size={16} /> {t('vendor_dashboard.add_new_product_action') || 'Add First Item'}
             </Link>
           )}
         </div>
@@ -139,74 +139,62 @@ export default function VendorItemsClient({
           <table className="vp-table">
             <thead>
               <tr>
-                <th>{t('catalog.product_label') || 'Product'}</th>
-                <th>{t('nav.categories') || 'Category'}</th>
-                <th>{t('purchase_history.status') || 'Status'}</th>
-                <th style={{ textAlign: 'right' }}>{t('vendor_commission.actions') || 'Actions'}</th>
+                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem' }}>{t('catalog.product_label') || 'Product'}</th>
+                <th style={{ textAlign: 'right', padding: '0.75rem 1rem', fontSize: '0.8rem' }}>{t('vendor_commission.actions') || 'Actions'}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(item => {
                 const itStatus = item.status || (item.is_active ? 'published' : 'draft')
-                const meta = STATUS_META[itStatus as ItemStatus] ?? STATUS_META.draft
-                const catName = item.category_id ? (catMap[item.category_id] ?? 'Unknown') : 'Uncategorized'
                 const thumb = item.item_images?.find(img => img.is_primary)?.image_url
                             ?? item.item_images?.[0]?.image_url
 
                 return (
                   <tr key={item.id} id={`item-row-${item.id}`}>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <td style={{ padding: '0.65rem 1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
                         {thumb
-                          ? <img src={thumb} alt={item.name} style={{ width: 48, height: 48, borderRadius: '12px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }} />
-                          : <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', flexShrink: 0 }}><Package size={22} /></div>
+                          ? <img src={thumb} alt={item.name} style={{ width: 40, height: 40, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }} />
+                          : <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', flexShrink: 0 }}><Package size={20} /></div>
                         }
                         <div>
-                          <p style={{ fontWeight: 600, color: '#fff', fontSize: '0.98rem' }}>{item.name}</p>
+                          <p style={{ fontWeight: 600, color: 'var(--text-base)', fontSize: '0.92rem', margin: 0 }}>{item.name}</p>
                           {item.description && (
-                            <p style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '0.15rem' }}>
-                              {item.description.slice(0, 50)}{item.description.length > 50 ? '…' : ''}
+                            <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0.1rem 0 0 0' }}>
+                              {item.description.slice(0, 60)}{item.description.length > 60 ? '…' : ''}
                             </p>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td>
-                      <span className="vp-badge vp-badge-neutral" style={{ fontWeight: 500, textTransform: 'none', fontSize: '0.82rem' }}>
-                        {catName}
-                      </span>
-                    </td>
-                    <td>
-                      <span className={`vp-badge ${meta.cls}`}>{t(`vendor_dashboard.status_${itStatus}`) || t(`vendor_dashboard.filter_${itStatus === 'published' ? 'live' : itStatus}`) || meta.label}</span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <td style={{ padding: '0.65rem 1rem' }}>
+                      <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
                         <button
                           id={`toggle-${item.id}`}
                           className={`vp-btn vp-btn-sm ${itStatus === 'published' ? 'vp-btn-outline' : 'vp-btn-primary'}`}
                           onClick={() => toggleActive(item)}
-                          style={{ padding: '0.5rem', minWidth: 36 }}
+                          style={{ padding: '0.4rem 0.6rem', minWidth: 32 }}
                           title={itStatus === 'published' ? (t('vendor_dashboard.deactivate_tooltip') || 'Deactivate') : (t('vendor_dashboard.go_live_tooltip') || 'Go Live')}
                         >
-                          <Power size={15} />
+                          <Power size={14} />
                         </button>
                         <button
                           id={`edit-${item.id}`}
                           className="vp-btn vp-btn-outline vp-btn-sm"
                           onClick={() => router.push(`/vendor/items/${item.id}`)}
-                          style={{ padding: '0.5rem', minWidth: 36 }}
+                          style={{ padding: '0.4rem 0.6rem', minWidth: 32 }}
                           title={t('common.edit') || 'Edit'}
                         >
-                          <Edit size={15} />
+                          <Edit size={14} />
                         </button>
                         <button
                           id={`del-${item.id}`}
                           className="vp-btn vp-btn-danger vp-btn-sm"
                           onClick={() => deleteItem(item)}
-                          style={{ padding: '0.5rem', minWidth: 36 }}
+                          style={{ padding: '0.4rem 0.6rem', minWidth: 32 }}
                           title={t('common.delete') || 'Delete'}
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </td>

@@ -23,17 +23,28 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
   async function saveLang(code: string) {
     setLang(code)
     setSaving(true)
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      await supabase.from('user_profiles').update({ preferred_language: code }).eq('user_id', user.id)
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ preferred_language: code })
+          .eq('user_id', user.id)
+        if (error) {
+          console.error("Failed to update preferred language in user_profiles:", error)
+        }
+      }
+    } catch (err) {
+      console.error("Error updating preferred language:", err)
+    } finally {
+      setSaving(false)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+      
+      // Dynamically switch the locale (sets cookie, document direction, and re-routes path)
+      setLocale(code as Locale)
     }
-    setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-    
-    // Dynamically switch the locale (sets cookie, document direction, and re-routes path)
-    setLocale(code as Locale)
   }
 
   async function handleLogout() {

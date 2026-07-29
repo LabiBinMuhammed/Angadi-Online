@@ -202,7 +202,7 @@ export default function ReplacementRequestClient({ order, orderItems, locale }: 
         <div className="header">
           <Link href={`/${locale}/orders/${order.id}`} className="back-btn">
             <ArrowLeft size={20} />
-          </</Link>
+          </Link>
           <h1 className="title">{t('replacements.request_replacement')}</h1>
         </div>
 

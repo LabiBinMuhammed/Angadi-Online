@@ -118,7 +118,7 @@ export default async function OrderDetailPage({ params }: Props) {
 
         <div className="card" style={{ background: 'linear-gradient(135deg, #1e4d1e, #2b5a2b)', color: '#fff' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '20px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justify-content: center, color: '#fff' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '20px', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
               <StatusIcon size={28} strokeWidth={2.5} />
             </div>
             <div>

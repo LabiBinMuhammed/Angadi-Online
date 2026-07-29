@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Village Market — Complete Database Schema
+-- Angadi — Complete Database Schema
 -- PostgreSQL / Supabase
 -- ═══════════════════════════════════════════════════════════════════════════
 

@@ -34,7 +34,7 @@ class VillageMarketApp extends StatelessWidget {
         final isDark = ThemeService.instance.isDarkMode;
         final currentLocale = LanguageService.instance.locale;
         return MaterialApp.router(
-          title: 'Village Market',
+          title: 'Angadi',
           debugShowCheckedModeBanner: false,
           theme: buildAppTheme(isDarkMode: isDark),
           routerConfig: buildRouter(),

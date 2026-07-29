@@ -235,14 +235,14 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
           onClick={() => setActiveTab('requests')}
         >
           <MessageSquare size={16} />
-          <span>Replacement Requests</span>
+          <span>{t('replacements.replacement_requests') || 'Replacement Requests'}</span>
         </button>
         <button 
           className={`vp-tab-btn ${activeTab === 'settings' ? 'active' : ''}`}
           onClick={() => setActiveTab('settings')}
         >
           <Settings size={16} />
-          <span>Policy & Settings</span>
+          <span>{t('replacements.policy_settings') || 'Policy & Settings'}</span>
         </button>
       </div>
 
@@ -255,7 +255,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
               <input 
                 type="text" 
                 className="search-input" 
-                placeholder="Search by customer name, order number, or ID..."
+                placeholder={t('replacements.search_replacement_placeholder') || 'Search by customer name, order number, or ID...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -266,11 +266,11 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
             >
-              <option value="all">All Request Statuses</option>
-              <option value="pending">Pending Requests</option>
-              <option value="approved">Approved Requests</option>
-              <option value="completed">Completed Requests</option>
-              <option value="rejected">Rejected Requests</option>
+              <option value="all">{t('replacements.all_request_statuses') || 'All Request Statuses'}</option>
+              <option value="pending">{t('replacements.pending_requests') || 'Pending Requests'}</option>
+              <option value="approved">{t('replacements.approved_requests') || 'Approved Requests'}</option>
+              <option value="completed">{t('replacements.completed_requests') || 'Completed Requests'}</option>
+              <option value="rejected">{t('replacements.rejected_requests') || 'Rejected Requests'}</option>
             </select>
           </div>
 
@@ -292,13 +292,16 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                       <div>
                         <h3 className="cust-name">{req.orders?.users?.name || 'Customer'}</h3>
                         <p className="cust-phone">
-                          Order Number: <strong style={{ color: '#fff' }}>{req.orders?.order_number || req.order_id.slice(0, 8).toUpperCase()}</strong>
+                          {t('replacements.order_number_label') || 'Order Number:'} <strong style={{ color: '#fff' }}>{req.orders?.order_number || req.order_id.slice(0, 8).toUpperCase()}</strong>
                           {req.orders?.users?.phone && ` · Phone: ${req.orders.users.phone}`}
                         </p>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <span className={`badge ${statusClasses[statusLower] || ''}`}>
-                          {req.status}
+                          {statusLower === 'pending' ? t('replacements.status_pending') :
+                           statusLower === 'approved' ? t('replacements.status_approved') :
+                           statusLower === 'completed' ? t('replacements.status_completed') :
+                           statusLower === 'rejected' ? t('replacements.status_rejected') : req.status}
                         </span>
                         {(statusLower === 'pending' || statusLower === 'approved') && (
                           <button 
@@ -306,7 +309,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                             style={{ padding: '4px 12px', fontSize: '12px' }}
                             onClick={() => handleOpenActionModal(req)}
                           >
-                            Resolve
+                            {t('replacements.resolve_action') || 'Resolve'}
                           </button>
                         )}
                       </div>
@@ -315,7 +318,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                     <div className="req-body">
                       <div>
                         <div style={{ marginBottom: '12px' }}>
-                          <div className="section-label">Reason & Explanation</div>
+                          <div className="section-label">{t('replacements.reason_explanation') || 'Reason & Explanation'}</div>
                           <p style={{ margin: 0, fontSize: '14px', fontWeight: 600, color: '#fff' }}>
                             {req.reason}
                           </p>
@@ -328,7 +331,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
 
                         {req.proof_images && req.proof_images.length > 0 && (
                           <div>
-                            <div className="section-label">Photo Proof</div>
+                            <div className="section-label">{t('replacements.photo_proof') || 'Photo Proof'}</div>
                             <div className="proof-gallery">
                               {req.proof_images.map((img: string, i: number) => (
                                 <img 
@@ -345,7 +348,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
 
                         {req.notes && (
                           <div style={{ marginTop: '12px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '12px', borderRadius: '12px' }}>
-                            <div className="section-label" style={{ color: '#10b981' }}>Resolution Notes</div>
+                            <div className="section-label" style={{ color: '#10b981' }}>{t('replacements.resolution_notes') || 'Resolution Notes'}</div>
                             <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8', lineHeight: 1.5 }}>
                               {req.notes}
                             </p>
@@ -354,7 +357,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                       </div>
 
                       <div>
-                        <div className="section-label">Requested Items</div>
+                        <div className="section-label">{t('replacements.requested_items') || 'Requested Items'}</div>
                         <div className="items-box">
                           {req.replacement_items?.map((itm: any) => (
                             <div key={itm.id} className="item-line">
@@ -388,10 +391,10 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
               <div className="empty-state">
                 <HelpCircle size={48} color="#475569" />
                 <h3 style={{ margin: '16px 0 8px', fontSize: '16px', fontWeight: 700, color: '#fff' }}>
-                  No Replacement Requests Found
+                  {t('replacements.no_requests') || 'No Replacement Requests Found'}
                 </h3>
                 <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>
-                  No requests matching the selected filters were found.
+                  {t('replacements.no_matching_requests_desc') || 'No requests matching the selected filters were found.'}
                 </p>
               </div>
             )}
@@ -422,34 +425,34 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                       style={{ width: '18px', height: '18px' }}
                     />
                     <span style={{ fontSize: '14px', fontWeight: 700, color: '#fff' }}>
-                      Enable Replacement Requests for this Shop
+                      {t('replacements.enable_replacements_label') || 'Enable Replacement Requests for this Shop'}
                     </span>
                   </label>
                 </div>
 
                 <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
                   <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
-                    Return Window (Hours)
+                    {t('replacements.return_window_label') || 'Return Window (Hours)'}
                   </label>
                   <input 
-                    type="number" 
-                    className="search-input" 
-                    style={{ maxWidth: '120px', padding: '10px 14px' }}
-                    value={config.window}
-                    onChange={(e) => setShopSettings(prev => ({
-                      ...prev,
-                      [shop.id]: { ...prev[shop.id], window: parseInt(e.target.value) || 24 }
-                    }))}
-                    min={1}
+                     type="number" 
+                     className="search-input" 
+                     style={{ maxWidth: '120px', padding: '10px 14px' }}
+                     value={config.window}
+                     onChange={(e) => setShopSettings(prev => ({
+                       ...prev,
+                       [shop.id]: { ...prev[shop.id], window: parseInt(e.target.value) || 24 }
+                     }))}
+                     min={1}
                   />
                   <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>
-                    Number of hours post-delivery during which a customer can file replacement claims.
+                    {t('replacements.return_window_desc') || 'Number of hours post-delivery during which a customer can file replacement claims.'}
                   </p>
                 </div>
 
                 <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
                   <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
-                    Replacement Policy Terms
+                    {t('replacements.replacement_policy_terms') || 'Replacement Policy Terms'}
                   </label>
                   <textarea 
                     className="search-input" 
@@ -474,7 +477,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                   ) : (
                     <Save size={16} />
                   )}
-                  <span>Save Shop Rules</span>
+                  <span>{t('replacements.save_shop_rules') || 'Save Shop Rules'}</span>
                 </button>
               </div>
             )
@@ -487,13 +490,13 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
         <div className="modal-overlay">
           <div className="modal-content">
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#fff', margin: '0 0 16px' }}>
-              Resolve Replacement Request
+              {t('replacements.resolve_replacement_request') || 'Resolve Replacement Request'}
             </h3>
             
             <form onSubmit={handleSubmitAction}>
               <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
                 <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
-                  Action Decision
+                  {t('replacements.action_decision') || 'Action Decision'}
                 </label>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '14px', cursor: 'pointer' }}>
@@ -504,7 +507,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                       checked={resolutionStatus === 'approved'}
                       onChange={() => setResolutionStatus('approved')}
                     />
-                    Approve
+                    {t('replacements.approve') || 'Approve'}
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '14px', cursor: 'pointer' }}>
                     <input 
@@ -514,7 +517,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                       checked={resolutionStatus === 'completed'}
                       onChange={() => setResolutionStatus('completed')}
                     />
-                    Complete (Resolved)
+                    {t('replacements.complete_resolved') || 'Complete (Resolved)'}
                   </label>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '14px', cursor: 'pointer' }}>
                     <input 
@@ -524,14 +527,14 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                       checked={resolutionStatus === 'rejected'}
                       onChange={() => setResolutionStatus('rejected')}
                     />
-                    Reject
+                    {t('replacements.reject') || 'Reject'}
                   </label>
                 </div>
               </div>
 
               {/* Item-specific notes */}
               <div style={{ marginBottom: '16px' }}>
-                <div className="section-label" style={{ marginBottom: '8px' }}>Item Resolutions</div>
+                <div className="section-label" style={{ marginBottom: '8px' }}>{t('replacements.item_resolutions') || 'Item Resolutions'}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {selectedReq.replacement_items?.map((ri: any) => (
                     <div key={ri.id} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '10px', borderRadius: '8px' }}>
@@ -556,7 +559,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
 
               <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
                 <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
-                  General Resolution Explanation
+                  {t('replacements.general_resolution_explanation') || 'General Resolution Explanation'}
                 </label>
                 <textarea 
                   className="search-input" 
@@ -574,7 +577,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                   onClick={() => setSelectedReq(null)}
                   disabled={submitting}
                 >
-                  Cancel
+                  {t('common.cancel') || 'Cancel'}
                 </button>
                 <button 
                   type="submit" 
@@ -598,7 +601,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
             <img src={activeImagePreview} alt="proof-zoom" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '16px' }} />
             <button 
               onClick={() => setActiveImagePreview(null)}
-              style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justify-content: 'center', color: '#fff', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' }}
+              style={{ position: 'absolute', top: '12px', right: '12px', background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', cursor: 'pointer', fontSize: '18px', fontWeight: 'bold' }}
             >
               ✕
             </button>

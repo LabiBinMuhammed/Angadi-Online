@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- Village Market — Product Search System Migration
+-- Angadi — Product Search System Migration
 -- PostgreSQL / Supabase
 -- ═══════════════════════════════════════════════════════════════════════════
 

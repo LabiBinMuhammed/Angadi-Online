@@ -148,6 +148,53 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
+      <style dangerouslySetInnerHTML={{ __html: `
+        .vp-main {
+          padding: 1.5rem 2rem !important;
+        }
+        .vp-card {
+          padding: 1.25rem !important;
+        }
+        @media (max-width: 767px) {
+          .vp-main { padding: 1rem !important; }
+          .vp-card { padding: 1rem !important; }
+        }
+        @media (max-width: 600px) {
+          .customer-card-wrap {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start !important;
+          }
+          .status-header-mobile {
+            display: flex !important;
+          }
+          .status-step-label {
+            display: none !important;
+          }
+          .order-item-row {
+            flex-direction: column;
+            align-items: stretch !important;
+            gap: 0.75rem !important;
+          }
+          .order-item-details {
+            width: 100%;
+          }
+          .order-item-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left !important;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 0.75rem;
+            margin-top: 0.25rem;
+            width: 100%;
+          }
+          .order-item-actions > div {
+            margin-top: 0 !important;
+          }
+        }
+      `}} />
+
       {!isAllowed && disallowedReason && (
         <div style={{ 
           padding: '1rem', 
@@ -169,7 +216,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
         </div>
       )}
       {/* Customer */}
-      <div className="vp-card" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="vp-card customer-card-wrap" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
           <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
             <User size={24} />
@@ -216,6 +263,10 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
 
       {/* Status progress */}
       <div className="vp-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+        <div className="status-header-mobile" style={{ display: 'none', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('purchase_history.status') || 'Status'}</span>
+          <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#60a5fa', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{getStatusLabel(order.status)}</span>
+        </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           {STATUS_FLOW.map((s, i) => {
             const isActive = i <= currentIdx
@@ -229,12 +280,13 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                   boxShadow: isCurrent ? '0 0 10px rgba(59,130,246,0.5)' : 'none',
                   transition: 'all 0.3s ease'
                 }} />
-                <p style={{ 
+                <p className="status-step-label" style={{ 
                   fontSize: '0.75rem', 
                   color: isActive ? '#fff' : '#64748b', 
                   fontWeight: isActive ? 700 : 500,
                   textTransform: 'uppercase',
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.05em',
+                  margin: 0
                 }}>
                   {getStatusLabel(s)}
                 </p>
@@ -252,28 +304,30 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
           const isDynamic = variantTypeLower === 'dynamic' || variantTypeLower === 'portion'
           
           return (
-            <div key={oi.id} style={{ 
-              display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem',
+            <div key={oi.id} className="order-item-row" style={{ 
+              display: 'flex', alignItems: 'center', gap: '1rem', padding: '1.25rem 1.5rem',
               borderBottom: i < order.order_items.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none'
             }}>
-              <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-                {oi.item_variants?.image_url
-                  ? <img src={oi.item_variants.image_url} alt={oi.items?.name ?? 'Item'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <Package size={24} color="#94a3b8" />}
-              </div>
-              <div style={{ flex: 1, minWidth: 200 }}>
-                <p style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem' }}>{oi.items?.name ?? t('vendor_order_processing.item')}</p>
-                <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.3rem' }}>
-                  {t('vendor_order_processing.requested')} <span style={{ color: '#e2e8f0' }}>{oi.requested_value ?? oi.item_variants?.value ?? 1} {oi.item_variants?.label ?? ''}</span>
-                </p>
-                {oi.actual_value && (
-                  <p style={{ fontSize: '0.85rem', color: '#10b981', marginTop: '0.2rem' }}>
-                    {t('vendor_order_processing.actual_packed')} {oi.actual_value}
+              <div className="order-item-details" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flex: 1 }}>
+                <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                  {oi.item_variants?.image_url
+                    ? <img src={oi.item_variants.image_url} alt={oi.items?.name ?? 'Item'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    : <Package size={24} color="#94a3b8" />}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem' }}>{oi.items?.name ?? t('vendor_order_processing.item')}</p>
+                  <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.3rem' }}>
+                    {t('vendor_order_processing.requested')} <span style={{ color: '#e2e8f0' }}>{oi.requested_value ?? oi.item_variants?.value ?? 1} {oi.item_variants?.label ?? ''}</span>
                   </p>
-                )}
+                  {oi.actual_value && (
+                    <p style={{ fontSize: '0.85rem', color: '#10b981', marginTop: '0.2rem' }}>
+                      {t('vendor_order_processing.actual_packed')} {oi.actual_value}
+                    </p>
+                  )}
+                </div>
               </div>
               
-              <div style={{ textAlign: 'right', minWidth: 120 }}>
+              <div className="order-item-actions" style={{ textAlign: 'right', minWidth: 120 }}>
                 {oi.status === 'rejected' ? (
                   <span style={{ fontWeight: 700, color: '#ef4444', textDecoration: 'line-through' }}>₹{oi.estimated_price}</span>
                 ) : (
@@ -287,7 +341,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                 <div style={{ marginTop: '0.5rem' }}>
                   {order.status === 'pending' ? (
                     oi.status === 'pending' ? (
-                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
                         <button onClick={() => updateItemStatus(oi, 'approved')} disabled={updating || !isAllowed} className="vp-btn vp-btn-success vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><Check size={14} /> {t('vendor_order_processing.approve')}</button>
                         <button onClick={() => updateItemStatus(oi, 'rejected')} disabled={updating || !isAllowed} className="vp-btn vp-btn-danger vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><X size={14} /> {t('vendor_order_processing.reject')}</button>
                       </div>

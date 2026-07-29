@@ -125,7 +125,7 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '12px', paddingBottom: '4px' }}>
           {['today', 'week', 'month', 'all'].map((f) => {
             const isActive = filter === f
             const labels: Record<string, string> = {
@@ -139,9 +139,9 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
                 key={f}
                 href={`/orders?filter=${f}&slot=${slotFilter}`}
                 style={{
-                  padding: '8px 16px',
+                  padding: '6px 12px',
                   borderRadius: '20px',
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: 600,
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
@@ -157,7 +157,7 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
           })}
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px', overflowX: 'auto', paddingBottom: '4px' }}>
+        <div style={{ display: 'flex', gap: '6px', marginBottom: '24px', paddingBottom: '4px' }}>
           {['all', 'morning', 'evening'].map((s) => {
             const isActive = slotFilter === s
             const labels: Record<string, string> = {
@@ -170,9 +170,9 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
                 key={s}
                 href={`/orders?filter=${filter}&slot=${s}`}
                 style={{
-                  padding: '6px 12px',
+                  padding: '5px 10px',
                   borderRadius: '20px',
-                  fontSize: '13px',
+                  fontSize: '12px',
                   fontWeight: 600,
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',

@@ -61,6 +61,7 @@ class AuthService {
     required String name,
     required String role,
     required String language,
+    String? locationId,
   }) async {
     final Map<String, dynamic> data = {
       'name': name,
@@ -95,6 +96,21 @@ class AuthService {
           'email': email?.trim(),
         });
       } catch (_) {}
+
+      if (locationId != null && locationId.isNotEmpty) {
+        try {
+          await supabase.from('user_addresses').insert({
+            'user_id': response.user!.id,
+            'label': 'Home',
+            'contact_name': name,
+            'contact_phone': phone != null && phone.trim().isNotEmpty ? _normalizePhone(phone) : '0000000000',
+            'address_line_1': 'Default Address',
+            'location_id': locationId,
+            'is_default': true,
+            'is_active': true,
+          });
+        } catch (_) {}
+      }
     }
 
     return response;

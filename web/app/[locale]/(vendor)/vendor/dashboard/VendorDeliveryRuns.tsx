@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { createDeliveryBatch, updateBatchStatus } from './actions'
 import { Sun, Moon, Calendar, Truck, CheckCircle2, ChevronRight, Loader2, Play } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 interface RunItem {
@@ -27,18 +28,23 @@ export default function VendorDeliveryRuns({
   initialRuns: RunItem[]
 }) {
   const { t } = useTranslation()
+  const router = useRouter()
   const [runs, setRuns] = useState<RunItem[]>(initialRuns)
   const [isPending, startTransition] = useTransition()
   const [loadingRunKey, setLoadingRunKey] = useState<string | null>(null)
 
   const handleAction = async (run: RunItem) => {
+    if (!run.batch) {
+      router.push(`/vendor/orders?date=${run.date}&slot=${run.slot}`)
+      return
+    }
     const runKey = `${run.date}-${run.slot}`
     setLoadingRunKey(runKey)
 
     startTransition(async () => {
       try {
         if (!run.batch) {
-          // 1. Create batch
+          // 1. Create batch (fallback, though bypassed above)
           const batchId = await createDeliveryBatch(shopId, run.date, run.slot)
           // Update local state
           setRuns(prev => prev.map(r => {

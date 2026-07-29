@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════
--- Village Market — Sample Seed Data
+-- Angadi — Sample Seed Data
 -- Run this in the Supabase SQL Editor
 -- ═══════════════════════════════════════════════════════════
 

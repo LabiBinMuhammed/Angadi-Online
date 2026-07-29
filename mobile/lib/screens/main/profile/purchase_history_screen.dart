@@ -273,7 +273,7 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
 
     final buffer = StringBuffer();
     buffer.writeln('========================================');
-    buffer.writeln('       VILLAGE MARKET PURCHASE HISTORY  ');
+    buffer.writeln('       ANGADI PURCHASE HISTORY  ');
     buffer.writeln('       Report Generated: ${DateFormat('yyyy-MM-dd HH:mm').format(DateTime.now())}');
     buffer.writeln('========================================\n');
     buffer.writeln('STATS SUMMARY:');
@@ -511,7 +511,7 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                           final o = _filteredOrders[index];
                           final id = o['id'] as String;
                           final orderNumber = o['order_number'] != null ? '#${o['order_number']}' : '#${id.substring(0, 8)}';
-                          final shopName = (o['shops'] as Map<String, dynamic>?)?['name'] as String? ?? 'Village Market Shop';
+                          final shopName = (o['shops'] as Map<String, dynamic>?)?['name'] as String? ?? 'Angadi Shop';
                           final dateStr = o['created_at'] as String;
                           final status = o['status'] as String? ?? 'pending';
                           final price = (o['total_final_price'] as num?)?.toDouble() ?? 0.0;

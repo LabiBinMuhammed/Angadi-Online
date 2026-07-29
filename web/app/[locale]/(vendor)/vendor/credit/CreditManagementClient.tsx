@@ -141,22 +141,22 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
           onClick={() => setShowGrantPanel(!showGrantPanel)}
         >
           {showGrantPanel ? <X size={18} /> : <UserPlus size={18} />}
-          {showGrantPanel ? t('common.cancel') : 'Grant Credit'}
+          {showGrantPanel ? t('common.cancel') : t('vendor_credit.grant_credit')}
         </button>
       </div>
 
       {/* Grant Credit Form Panel */}
       {showGrantPanel && (
         <div style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-          <h3 style={{ margin: '0 0 1rem', color: '#fff', fontSize: '1.1rem', fontWeight: 600 }}>Grant Credit Account to Customer</h3>
+          <h3 style={{ margin: '0 0 1rem', color: '#fff', fontSize: '1.1rem', fontWeight: 600 }}>{t('vendor_credit.grant_credit_title')}</h3>
           
           <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
             {!selectedUser ? (
               <div style={{ position: 'relative' }}>
-                <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>Search Customer (Name or Phone)</label>
+                <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>{t('vendor_credit.search_customer_label')}</label>
                 <input
                   className="vp-input"
-                  placeholder="Type name or phone number..."
+                  placeholder={t('vendor_credit.type_search_placeholder')}
                   value={userQuery}
                   onChange={e => searchCustomers(e.target.value)}
                 />
@@ -184,13 +184,13 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
                   <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}>{selectedUser.phone}</p>
                 </div>
                 <button className="vp-btn vp-btn-sm vp-btn-outline" style={{ padding: '0.25rem 0.5rem' }} onClick={() => setSelectedUser(null)}>
-                  Change
+                  {t('vendor_credit.change_button')}
                 </button>
               </div>
             )}
 
             <div>
-              <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>Credit Limit (₹)</label>
+              <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>{t('vendor_credit.credit_limit_label_with_currency')}</label>
               <input
                 type="number"
                 className="vp-input"
@@ -210,7 +210,7 @@ export default function CreditManagementClient({ credits: initial, shopId }: { c
               onClick={handleGrantCredit} 
               disabled={grantLoading || !selectedUser}
             >
-              {grantLoading ? 'Granting...' : 'Grant Credit Account'}
+              {grantLoading ? t('vendor_credit.granting_status') : t('vendor_credit.grant_account_button')}
             </button>
           </div>
         </div>

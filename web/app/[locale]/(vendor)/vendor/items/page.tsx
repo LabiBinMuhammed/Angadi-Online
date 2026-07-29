@@ -80,13 +80,13 @@ export default async function VendorItemsPage({ params }: { params: Promise<{ lo
 
   return (
     <>
-      <div className="vp-header">
+      <div className="vp-header" style={{ marginBottom: '1rem' }}>
         <div>
-          <h1 className="vp-title">{t('vendor_dashboard.manage_products_title') || 'Manage Items'}</h1>
-          <p className="vp-subtitle">{t('vendor_dashboard.manage_shop_settings_subtitle') || 'View and control your product catalog'}</p>
+          <h1 className="vp-title" style={{ fontSize: '1.5rem', marginBottom: '0.15rem' }}>{t('vendor_dashboard.manage_products_title') || 'Manage Items'}</h1>
+          <p className="vp-subtitle" style={{ fontSize: '0.85rem' }}>{t('vendor_dashboard.manage_shop_settings_subtitle') || 'View and control your product catalog'}</p>
         </div>
-        <Link href="/vendor/items/new" className="vp-btn vp-btn-primary" id="add-item-btn">
-          <Plus size={18} /> {t('vendor_dashboard.add_new_product_action') || 'Add Item'}
+        <Link href="/vendor/items/new" className="vp-btn vp-btn-primary" id="add-item-btn" style={{ padding: '0.5rem 1.25rem', fontSize: '0.88rem' }}>
+          <Plus size={16} /> {t('vendor_dashboard.add_new_product_action') || 'Add Item'}
         </Link>
       </div>
       <VendorItemsClient

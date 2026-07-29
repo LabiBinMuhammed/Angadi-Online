@@ -12,7 +12,7 @@ interface AuthContextType {
   session: Session | null
   loading: boolean
   role: UserRole
-  signUp: (params: { email?: string; phone?: string; password: string; name: string; role: string; language: string }) => Promise<{ data: any; error: any }>
+  signUp: (params: { email?: string; phone?: string; password: string; name: string; role: string; language: string; locationId?: string }) => Promise<{ data: any; error: any }>
   signInWithOtp: (phone: string) => Promise<{ error: any }>
   verifyOtp: (phone: string, token: string) => Promise<{ data: any; error: any }>
   signInWithPassword: (phoneOrEmail: string, password: string) => Promise<{ data: any; error: any }>
@@ -110,7 +110,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Sign up with Email or Phone and Password (MVP)
-  async function signUp({ email, phone, password, name, role, language }: { email?: string; phone?: string; password: string; name: string; role: string; language: string }) {
+  async function signUp({ email, phone, password, name, role, language, locationId }: { email?: string; phone?: string; password: string; name: string; role: string; language: string; locationId?: string }) {
     const signUpParams: any = {
       password,
       options: {
@@ -165,6 +165,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .update({ preferred_language: language, email: email || undefined })
           .eq('user_id', data.user.id)
       } catch (_) {}
+
+      // 4. Create default address with location_id
+      if (locationId) {
+        try {
+          await supabase
+            .from('user_addresses')
+            .insert({
+              user_id: data.user.id,
+              label: 'Home',
+              contact_name: name,
+              contact_phone: phone || '0000000000',
+              address_line_1: 'Default Address',
+              location_id: locationId,
+              is_default: true,
+              is_active: true
+            })
+        } catch (e) {
+          console.error("Failed to create default address during signup:", e)
+        }
+      }
       
       await resolveUserRole(data.user.id)
     }

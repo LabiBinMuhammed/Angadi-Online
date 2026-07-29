@@ -41,37 +41,72 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
 
   return (
     <div className="vp-card">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .vp-main {
+          padding: 1.5rem 2rem !important;
+        }
+        .vp-card {
+          padding: 1.25rem !important;
+        }
+        .vp-table td, .vp-table th {
+          padding: 1rem 1.25rem !important;
+        }
+        @media (max-width: 767px) {
+          .hide-on-mobile { display: none !important; }
+          .vp-table { min-width: unset !important; }
+          .vp-main { padding: 1rem !important; }
+          .vp-card { padding: 1rem !important; }
+          .vp-table td, .vp-table th { padding: 0.75rem 0.5rem !important; }
+        }
+      `}} />
+
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
         <div style={{ flex: 1, position: 'relative', minWidth: 200 }}>
           <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
           <input 
             className="vp-input" 
-            style={{ paddingLeft: '2.75rem', borderRadius: '99px' }}
+            style={{ paddingLeft: '2.75rem', borderRadius: '99px', border: '1px solid rgba(255, 255, 255, 0.15)' }}
             placeholder={t('vendor_dashboard.search_products_placeholder') || 'Search by customer or order ID…'} 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
           />
         </div>
-        <div style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.2)', padding: '0.25rem', borderRadius: '99px', overflowX: 'auto' }}>
-          {STATUSES.map(s => (
-            <button 
-              key={s} 
-              className="vp-btn" 
-              style={{
-                padding: '0.5rem 1rem',
-                fontSize: '0.85rem',
-                borderRadius: '99px',
-                background: filter === s ? '#8b5cf6' : 'transparent',
-                color: filter === s ? '#fff' : '#94a3b8',
-                boxShadow: filter === s ? '0 2px 8px rgba(139,92,246,0.3)' : 'none',
-                whiteSpace: 'nowrap'
-              }}
-              onClick={() => setFilter(s)} 
-              id={`filter-${s}`}
-            >
-              {s === 'all' ? (t('vendor_dashboard.filter_all') || 'All') : t(`orders.status_${s === 'accepted' ? 'pending' : s === 'ready' ? 'packing' : s === 'out_for_delivery' ? 'delivering' : s}`) || s.charAt(0).toUpperCase() + s.slice(1)}
-            </button>
-          ))}
+        <div style={{ position: 'relative' }}>
+          <select 
+            value={filter} 
+            onChange={e => setFilter(e.target.value)}
+            className="vp-input"
+            style={{ 
+              borderRadius: '99px',
+              padding: '0.5rem 2.5rem 0.5rem 1.25rem', 
+              background: 'rgba(255, 255, 255, 0.05)', 
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              color: '#fff',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              appearance: 'none',
+              WebkitAppearance: 'none',
+              minWidth: '180px'
+            }}
+          >
+            {STATUSES.map(s => (
+              <option key={s} value={s} style={{ background: '#1e1b4b', color: '#fff' }}>
+                {s === 'all' 
+                  ? (t('vendor_dashboard.filter_all') || 'All') 
+                  : (t(`orders.status_${s === 'accepted' ? 'pending' : s === 'ready' ? 'packing' : s === 'out_for_delivery' ? 'delivering' : s}`) || s.charAt(0).toUpperCase() + s.slice(1))}
+              </option>
+            ))}
+          </select>
+          <span style={{
+            position: 'absolute',
+            right: '1rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'none',
+            color: '#94a3b8',
+            fontSize: '0.8rem'
+          }}>▼</span>
         </div>
       </div>
 
@@ -86,27 +121,27 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
           <table className="vp-table">
             <thead>
               <tr>
-                <th>{t('purchase_history.order_id') || 'Order ID'}</th>
+                <th className="hide-on-mobile">{t('purchase_history.order_id') || 'Order ID'}</th>
                 <th>{t('reviews.customer_fallback') || 'Customer'}</th>
-                <th>{t('purchase_history.date') || 'Date'}</th>
-                <th>{t('checkout.delivery_slot') || 'Delivery Slot'}</th>
+                <th className="hide-on-mobile">{t('purchase_history.date') || 'Date'}</th>
+                <th className="hide-on-mobile">{t('checkout.delivery_slot') || 'Delivery Slot'}</th>
                 <th>{t('purchase_history.total') || 'Amount'}</th>
-                <th>{t('purchase_history.status') || 'Status'}</th>
+                <th className="hide-on-mobile">{t('purchase_history.status') || 'Status'}</th>
                 <th style={{ textAlign: 'right' }}>{t('vendor_commission.actions') || 'Actions'}</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(order => (
                 <tr key={order.id} id={`vorder-${order.id}`}>
-                  <td style={{ color: '#94a3b8', fontSize: '0.85rem', fontFamily: 'monospace' }}>
+                  <td className="hide-on-mobile" style={{ color: '#94a3b8', fontSize: '0.85rem', fontFamily: 'monospace' }}>
                     {order.order_number ? `#${order.order_number}` : `#${order.id.slice(0, 8)}`}
                   </td>
                   <td>
                     <p style={{ fontWeight: 600, color: '#fff', fontSize: '0.95rem' }}>{order.users?.name ?? '—'}</p>
                     <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.2rem' }}>{order.users?.phone}</p>
                   </td>
-                  <td style={{ fontSize: '0.9rem', color: '#e2e8f0' }}>{new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
-                  <td>
+                  <td className="hide-on-mobile" style={{ fontSize: '0.9rem', color: '#e2e8f0' }}>{new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</td>
+                  <td className="hide-on-mobile">
                     {order.delivery_date && order.delivery_slot ? (
                       <div>
                         <span style={{ 
@@ -131,7 +166,7 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
                   <td style={{ fontWeight: 700, color: '#10b981' }}>
                     {order.total_final_price != null ? `₹${order.total_final_price}` : order.total_estimated_price != null ? `~₹${order.total_estimated_price}` : '—'}
                   </td>
-                  <td>
+                  <td className="hide-on-mobile">
                     <span className={`vp-badge ${STATUS_BADGE[order.status] ?? 'vp-badge-neutral'}`}>
                       {t(`orders.status_${order.status === 'accepted' ? 'pending' : order.status === 'ready' ? 'packing' : order.status === 'out_for_delivery' ? 'delivering' : order.status}`) || order.status}
                     </span>

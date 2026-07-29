@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Village Market',
+                  'Angadi',
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: .5),
                 ),
                 const SizedBox(height: 8),

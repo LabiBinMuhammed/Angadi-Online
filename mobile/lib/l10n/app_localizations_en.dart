@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'Village Market';
+  String get appTitle => 'Angadi';
 
   @override
   String get navHome => 'Home';
@@ -1110,7 +1110,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authWelcomeBack => 'Welcome back';
 
   @override
-  String get authSignInSubtitle => 'Sign in to your Village Market account';
+  String get authSignInSubtitle => 'Sign in to your Angadi account';
 
   @override
   String get authPhoneLogin => 'Phone Login';
@@ -1129,7 +1129,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authJoinSubtitle =>
-      'Join Village Market — enter details to get started';
+      'Join Angadi — enter details to get started';
 
   @override
   String get authUsePhone => 'Use Phone Number';

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { recordRepaymentAction } from '@/app/actions/credit'
 import { CreditCard, DollarSign, Calendar, FileText, AlertCircle, CheckCircle } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 
 type Repayment = {
   id: string
@@ -12,6 +13,7 @@ type Repayment = {
 }
 
 export default function RepaymentClient({ shopId, userId, initialRepayments }: { shopId: string; userId: string; initialRepayments: Repayment[] }) {
+  const { t } = useTranslation()
   const [repayments, setRepayments] = useState<Repayment[]>(initialRepayments)
   const [amount, setAmount] = useState('')
   const [notes, setNotes] = useState('')
@@ -59,12 +61,12 @@ export default function RepaymentClient({ shopId, userId, initialRepayments }: {
       <div className="vp-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <DollarSign size={20} color="#10b981" />
-          <h2 className="vp-title" style={{ fontSize: '1.25rem', margin: 0 }}>Record Repayment</h2>
+          <h2 className="vp-title" style={{ fontSize: '1.25rem', margin: 0 }}>{t('vendor_credit.record_repayment_title') || 'Record Repayment'}</h2>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>Amount (₹)</label>
+            <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>{t('vendor_credit.amount_label_with_currency') || 'Amount (₹)'}</label>
             <input
               type="number"
               step="0.01"
@@ -77,7 +79,7 @@ export default function RepaymentClient({ shopId, userId, initialRepayments }: {
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>Notes / Reference</label>
+            <label style={{ display: 'block', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.35rem' }}>{t('vendor_credit.notes_reference_label') || 'Notes / Reference'}</label>
             <textarea
               className="vp-input"
               rows={3}
@@ -96,12 +98,12 @@ export default function RepaymentClient({ shopId, userId, initialRepayments }: {
 
           {success && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontSize: '0.9rem' }}>
-              <CheckCircle size={16} /> Repayment recorded successfully!
+              <CheckCircle size={16} /> {t('vendor_credit.repayment_success_message') || 'Repayment recorded successfully!'}
             </div>
           )}
 
           <button type="submit" className="vp-btn vp-btn-primary" disabled={loading}>
-            {loading ? 'Recording...' : 'Submit Repayment'}
+            {loading ? (t('vendor_credit.submitting_status') || 'Recording...') : (t('vendor_credit.submit_repayment_button') || 'Submit Repayment')}
           </button>
         </form>
       </div>
@@ -110,14 +112,14 @@ export default function RepaymentClient({ shopId, userId, initialRepayments }: {
       <div className="vp-card">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <CreditCard size={20} color="#8b5cf6" />
-          <h2 className="vp-title" style={{ fontSize: '1.25rem', margin: 0 }}>Repayment History</h2>
+          <h2 className="vp-title" style={{ fontSize: '1.25rem', margin: 0 }}>{t('vendor_credit.repayment_history_title') || 'Repayment History'}</h2>
         </div>
 
         {repayments.length === 0 ? (
           <div style={{ padding: '3rem 1rem', textAlign: 'center', color: '#64748b' }}>
             <Calendar size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
-            <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>No Repayments Yet</p>
-            <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>Repayment logs will be listed here once recorded.</p>
+            <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>{t('vendor_credit.no_repayments_yet_title') || 'No Repayments Yet'}</p>
+            <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('vendor_credit.no_repayments_yet_desc') || 'Repayment logs will be listed here once recorded.'}</p>
           </div>
         ) : (
           <div style={{ maxHeight: '350px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

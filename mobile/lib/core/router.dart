@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../screens/auth/splash_screen.dart';
+import '../screens/auth/intro_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
@@ -72,10 +73,10 @@ GoRouter buildRouter() {
       final isLoggedIn = session != null;
       final path       = state.matchedLocation;
 
-      final publicPaths = ['/login', '/signup', '/splash', '/forgot-password', '/otp-verification'];
+      final publicPaths = ['/intro', '/login', '/signup', '/splash', '/forgot-password', '/otp-verification'];
       final isPublic    = publicPaths.any((p) => path.startsWith(p));
 
-      if (!isLoggedIn && !isPublic) return '/login';
+      if (!isLoggedIn && !isPublic) return '/intro';
       if (isLoggedIn  &&  isPublic && path != '/splash') return '/home';
       return null;
     },
@@ -88,6 +89,7 @@ GoRouter buildRouter() {
     routes: [
       // ── Splash ────────────────────────────────────────────────────────
       GoRoute(path: '/splash', builder: (_, __) => const SplashScreen()),
+      GoRoute(path: '/intro',  builder: (_, __) => const IntroScreen()),
 
       // ── Auth routes (no shell) ────────────────────────────────────────
       GoRoute(path: '/login',  builder: (_, __) => const LoginScreen()),
