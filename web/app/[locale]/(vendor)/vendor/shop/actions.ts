@@ -6,7 +6,14 @@ export async function createShopAction(
   userId: string,
   name: string,
   type: string | null,
-  locationId: string | null
+  locationId: string | null,
+  extraFields?: {
+    logoUrl?: string | null
+    bannerUrl?: string | null
+    description?: string | null
+    openingTime?: string | null
+    closingTime?: string | null
+  }
 ) {
   // Use the service role key to bypass RLS for the initial shop creation and linking
   const supabaseAdmin = createClient(
@@ -16,8 +23,6 @@ export async function createShopAction(
 
   try {
     // 0. Ensure the user exists in the public.users table (Sync if missing)
-    // This prevents the "violates foreign key constraint shop_owners_user_id_fkey" error
-    // if the Supabase auth trigger hasn't populated the public.users table yet.
     const { data: existingUser } = await supabaseAdmin
       .from('users')
       .select('id')
@@ -46,13 +51,20 @@ export async function createShopAction(
     }
 
     // 1. Create new shop
+    const shopInsertPayload: any = {
+      name,
+      type: type || null,
+      location_id: locationId || null,
+    }
+    if (extraFields?.logoUrl) shopInsertPayload.logo_url = extraFields.logoUrl.trim()
+    if (extraFields?.bannerUrl) shopInsertPayload.banner_url = extraFields.bannerUrl.trim()
+    if (extraFields?.description) shopInsertPayload.description = extraFields.description.trim()
+    if (extraFields?.openingTime) shopInsertPayload.opening_time = extraFields.openingTime.trim()
+    if (extraFields?.closingTime) shopInsertPayload.closing_time = extraFields.closingTime.trim()
+
     const { data: shopData, error: shopErr } = await supabaseAdmin
       .from('shops')
-      .insert({
-        name,
-        type: type || null,
-        location_id: locationId || null,
-      })
+      .insert(shopInsertPayload)
       .select()
       .single()
 
@@ -66,7 +78,6 @@ export async function createShopAction(
       .insert({ shop_id: shopData.id, user_id: userId })
 
     if (linkErr) {
-      // Rollback shop creation if linking fails
       await supabaseAdmin.from('shops').delete().eq('id', shopData.id)
       return { error: linkErr.message }
     }
@@ -82,7 +93,14 @@ export async function updateShopAction(
   name: string,
   type: string | null,
   locationId: string | null,
-  isActive: boolean
+  isActive: boolean,
+  extraFields?: {
+    logoUrl?: string | null
+    bannerUrl?: string | null
+    description?: string | null
+    openingTime?: string | null
+    closingTime?: string | null
+  }
 ) {
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -95,13 +113,20 @@ export async function updateShopAction(
       finalType = `${finalType}_inactive`
     }
 
+    const shopUpdatePayload: any = {
+      name,
+      type: finalType,
+      location_id: locationId || null,
+    }
+    if (extraFields?.logoUrl !== undefined) shopUpdatePayload.logo_url = extraFields.logoUrl ? extraFields.logoUrl.trim() : null
+    if (extraFields?.bannerUrl !== undefined) shopUpdatePayload.banner_url = extraFields.bannerUrl ? extraFields.bannerUrl.trim() : null
+    if (extraFields?.description !== undefined) shopUpdatePayload.description = extraFields.description ? extraFields.description.trim() : null
+    if (extraFields?.openingTime !== undefined) shopUpdatePayload.opening_time = extraFields.openingTime ? extraFields.openingTime.trim() : null
+    if (extraFields?.closingTime !== undefined) shopUpdatePayload.closing_time = extraFields.closingTime ? extraFields.closingTime.trim() : null
+
     const { data, error } = await supabaseAdmin
       .from('shops')
-      .update({
-        name,
-        type: finalType,
-        location_id: locationId || null
-      })
+      .update(shopUpdatePayload)
       .eq('id', shopId)
       .select()
       .single()

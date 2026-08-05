@@ -106,7 +106,9 @@ export async function proxy(request: NextRequest) {
     publicRoutes.some((r) => cleanPathname.startsWith(r)) ||
     cleanPathname === '/' ||
     pathname === '/api/search' ||
-    pathname.startsWith('/api/search')
+    pathname.startsWith('/api/search') ||
+    pathname === '/api/translate' ||
+    pathname.startsWith('/api/translate')
 
   // Unauthenticated user → redirect to login
   if (!user && !isPublicRoute) {
@@ -143,8 +145,8 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Already authenticated → don't allow accessing public auth routes
-  if (user && isPublicRoute) {
+  // Already authenticated → don't allow accessing public auth pages (skip API routes)
+  if (user && isPublicRoute && !pathname.startsWith('/api')) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/home`
     return redirect(homeUrl)

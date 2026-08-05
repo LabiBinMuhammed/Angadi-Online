@@ -277,7 +277,12 @@ function CheckoutForm() {
         p_address_line_1: activeAddress.address_line_1,
         p_address_line_2: activeAddress.address_line_2 || null,
         p_landmark: activeAddress.landmark || null,
-        p_label: activeAddress.label || 'Home'
+        p_label: activeAddress.label || 'Home',
+        p_house_name: (activeAddress as any).house_name || null,
+        p_village: (activeAddress as any).village || null,
+        p_delivery_note: (activeAddress as any).delivery_note || null,
+        p_latitude: (activeAddress as any).latitude || null,
+        p_longitude: (activeAddress as any).longitude || null
       })
 
       if (rpcErr) throw rpcErr

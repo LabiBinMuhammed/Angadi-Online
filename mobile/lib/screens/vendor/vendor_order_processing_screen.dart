@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/supabase_client.dart';
 import '../../widgets/directional_huge_icon.dart';
+import '../../theme/app_theme.dart';
 import 'vendor_theme_helper.dart';
 
 class VendorOrderProcessingScreen extends StatefulWidget {
@@ -39,16 +41,30 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
   final Map<String, String> _actualValues = {};
 
   Future<void> _load() async {
-    final res = await supabase
-        .from('orders')
-        .select('*, users(name, phone), order_items(*, items(name, image_url), item_variants:vw_item_variants_with_fallback(label, value, unit_id, image_url))')
-        .eq('id', widget.orderId)
-        .single();
-    if (mounted) {
-      setState(() {
-        _order = res;
-        _loading = false;
-      });
+    if (!mounted) return;
+    setState(() => _loading = true);
+    try {
+      final res = await supabase
+          .from('orders')
+          .select('*, users(name, phone), order_addresses(*), order_items(*, items(name, image_url), item_variants:vw_item_variants_with_fallback(label, value, unit_id, image_url))')
+          .eq('id', widget.orderId)
+          .maybeSingle();
+      if (mounted) {
+        setState(() {
+          _order = res;
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('Error loading vendor order details: $e\n$stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading order details: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -189,6 +205,14 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
     }
     
     final o = _order!;
+    final addrRow = o['order_addresses'];
+    Map<String, dynamic>? address;
+    if (addrRow is Map) {
+      address = Map<String, dynamic>.from(addrRow);
+    } else if (addrRow is List && addrRow.isNotEmpty) {
+      address = Map<String, dynamic>.from(addrRow.first);
+    }
+
     final status = o['status'] as String;
     final currentIdx = _flow.indexOf(status);
     final nextStatus = currentIdx >= 0 && currentIdx < _flow.length - 1 ? _flow[currentIdx + 1] : null;
@@ -294,6 +318,138 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
               ),
             ),
             const SizedBox(height: 16),
+
+            if (address != null) ...[
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: vendorCardDecoration(radius: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const HugeIcon(icon: HugeIcons.strokeRoundedLocation01, color: Color(0xFF3B82F6), size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Delivery Address (${address['label'] ?? 'Home'})',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: kVendorText),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Receiver: ${address['contact_name'] ?? '—'} (${address['contact_phone'] ?? '—'})',
+                      style: TextStyle(fontSize: 13, color: kVendorText, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'House Name: ${address['house_name'] ?? address['address_line_1'] ?? '—'}',
+                      style: TextStyle(fontSize: 13, color: kVendorText),
+                    ),
+                    if (address['landmark'] != null && address['landmark'].toString().isNotEmpty)
+                      Text(
+                        'Landmark: Near ${address['landmark']}',
+                        style: TextStyle(fontSize: 13, color: kVendorText),
+                      ),
+                    if (address['village'] != null && address['village'].toString().isNotEmpty)
+                      Text(
+                        'Village: ${address['village']}',
+                        style: TextStyle(fontSize: 13, color: kVendorText),
+                      ),
+                    if (address['delivery_note'] != null && address['delivery_note'].toString().trim().isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF115E59).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFF134E5A).withOpacity(0.12)),
+                        ),
+                        child: Text(
+                          '📝 Note: ${address['delivery_note']}',
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF0F766E), fontStyle: FontStyle.italic, fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        if (address['latitude'] != null && address['longitude'] != null)
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () async {
+                                final lat = address!['latitude'];
+                                final lng = address['longitude'];
+                                final url = Uri.parse('https://www.google.com/maps/search/?api=1&query=$lat,$lng');
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF3B82F6),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              icon: const Icon(Icons.map_rounded, size: 16),
+                              label: const Text('Maps', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        if (address['latitude'] != null && address['longitude'] != null)
+                          const SizedBox(width: 8),
+                        
+                        if (address['contact_phone'] != null && address['contact_phone'].toString().isNotEmpty)
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                final phone = address!['contact_phone'];
+                                final url = Uri.parse('tel:$phone');
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url);
+                                }
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: kWaTeal,
+                                side: BorderSide(color: kWaTeal),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              icon: const Icon(Icons.call, size: 16),
+                              label: const Text('Call', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        const SizedBox(width: 8),
+
+                        if (address['contact_phone'] != null && address['contact_phone'].toString().isNotEmpty)
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () async {
+                                final phone = address!['contact_phone'];
+                                String cleanPhone = phone.replaceAll(RegExp(r'\D'), '');
+                                if (!cleanPhone.startsWith('91') && cleanPhone.length == 10) {
+                                  cleanPhone = '91$cleanPhone';
+                                }
+                                final url = Uri.parse('https://wa.me/$cleanPhone');
+                                if (await canLaunchUrl(url)) {
+                                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: kWaGreen,
+                                side: BorderSide(color: kWaGreen),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              ),
+                              icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16),
+                              label: const Text('WhatsApp', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
 
             // Delivery Slot Card
             if (o['delivery_date'] != null && o['delivery_slot'] != null) ...[

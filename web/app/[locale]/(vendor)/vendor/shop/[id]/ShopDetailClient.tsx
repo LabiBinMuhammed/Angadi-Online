@@ -14,6 +14,11 @@ type Shop = {
   name: string
   type: string | null
   location_id: string | null
+  logo_url?: string | null
+  banner_url?: string | null
+  description?: string | null
+  opening_time?: string | null
+  closing_time?: string | null
   created_at: string
   updated_at: string
   locations: { id: string; name: string } | null
@@ -32,13 +37,18 @@ const SHOP_TYPES = [
 export default function ShopDetailClient({ shop, locations }: Props) {
   const { t, locale } = useTranslation()
   const router = useRouter()
-  const [name, setName]         = useState(shop.name || '')
-  const [type, setType]         = useState(shop.type ? shop.type.replace('_inactive', '') : '')
-  const [locationId, setLocationId] = useState(shop.location_id || '')
-  const [isActive, setIsActive] = useState(!shop.type?.endsWith('_inactive'))
-  const [saving, setSaving]     = useState(false)
-  const [success, setSuccess]   = useState('')
-  const [error, setError]       = useState('')
+  const [name, setName]               = useState(shop.name || '')
+  const [type, setType]               = useState(shop.type ? shop.type.replace('_inactive', '') : '')
+  const [locationId, setLocationId]   = useState(shop.location_id || '')
+  const [logoUrl, setLogoUrl]         = useState(shop.logo_url || '')
+  const [bannerUrl, setBannerUrl]     = useState(shop.banner_url || '')
+  const [description, setDescription] = useState(shop.description || '')
+  const [openingTime, setOpeningTime] = useState(shop.opening_time || '')
+  const [closingTime, setClosingTime] = useState(shop.closing_time || '')
+  const [isActive, setIsActive]       = useState(!shop.type?.endsWith('_inactive'))
+  const [saving, setSaving]           = useState(false)
+  const [success, setSuccess]         = useState('')
+  const [error, setError]             = useState('')
 
   const shopInitials = name
     ? name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -55,7 +65,14 @@ export default function ShopDetailClient({ shop, locations }: Props) {
       name.trim(),
       type || null,
       locationId || null,
-      isActive
+      isActive,
+      {
+        logoUrl,
+        bannerUrl,
+        description,
+        openingTime,
+        closingTime,
+      }
     )
 
     if (result.error) {
@@ -177,6 +194,88 @@ export default function ShopDetailClient({ shop, locations }: Props) {
                     <option key={loc.id} value={loc.id}>{loc.name}</option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            {/* Logo / Shop Photo */}
+            <div className="vp-form-group">
+              <label className="vp-label" htmlFor="shop-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Logo / Shop Photo</span>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>Optional - 🔥 More Important</span>
+              </label>
+              <input
+                id="shop-logo"
+                className="vp-input"
+                type="text"
+                placeholder="https://example.com/logo.png"
+                value={logoUrl}
+                onChange={e => setLogoUrl(e.target.value)}
+              />
+            </div>
+
+            {/* Banner Image */}
+            <div className="vp-form-group">
+              <label className="vp-label" htmlFor="shop-banner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Banner Image</span>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>Optional - 🔥 More Important</span>
+              </label>
+              <input
+                id="shop-banner"
+                className="vp-input"
+                type="text"
+                placeholder="https://example.com/banner.png"
+                value={bannerUrl}
+                onChange={e => setBannerUrl(e.target.value)}
+              />
+            </div>
+
+            {/* Description */}
+            <div className="vp-form-group">
+              <label className="vp-label" htmlFor="shop-desc" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span>Description</span>
+                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>Optional - 🔥 More Important</span>
+              </label>
+              <textarea
+                id="shop-desc"
+                className="vp-input"
+                rows={3}
+                placeholder="Brief description about your shop and offerings..."
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                style={{ padding: '0.75rem 1rem', resize: 'vertical' }}
+              />
+            </div>
+
+            {/* Opening Hours (2 Inputs) */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="vp-form-group">
+                <label className="vp-label" htmlFor="shop-opening" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span>Opening Time</span>
+                  <span style={{ fontSize: '0.7rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', width: 'fit-content' }}>Optional - 🔥 More Important</span>
+                </label>
+                <input
+                  id="shop-opening"
+                  className="vp-input"
+                  type="text"
+                  placeholder="e.g. 08:00 AM"
+                  value={openingTime}
+                  onChange={e => setOpeningTime(e.target.value)}
+                />
+              </div>
+
+              <div className="vp-form-group">
+                <label className="vp-label" htmlFor="shop-closing" style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  <span>Closing Time</span>
+                  <span style={{ fontSize: '0.7rem', padding: '1px 6px', borderRadius: '4px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', width: 'fit-content' }}>Optional - 🔥 More Important</span>
+                </label>
+                <input
+                  id="shop-closing"
+                  className="vp-input"
+                  type="text"
+                  placeholder="e.g. 10:00 PM"
+                  value={closingTime}
+                  onChange={e => setClosingTime(e.target.value)}
+                />
               </div>
             </div>
 

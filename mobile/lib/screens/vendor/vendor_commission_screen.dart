@@ -29,46 +29,56 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
   }
 
   Future<_Data> _fetchData(String? shopId) async {
-    final uid = supabase.auth.currentUser!.id;
-    
-    // Get shops owned by this user
-    final ownedShopsRes = await supabase
-        .from('shop_owners')
-        .select('shop_id, shops(id, name, type)')
-        .eq('user_id', uid);
-
-    final shops = (ownedShopsRes as List).map((o) {
-      final s = o['shops'] as Map;
-      return _Shop(id: s['id'] as String, name: s['name'] as String);
-    }).toList();
-
-    if (shops.isEmpty) {
+    final user = supabase.auth.currentUser;
+    if (user == null) {
       return _Data(shops: [], selectedShopId: null);
     }
+    final uid = user.id;
 
-    final activeShopId = shopId ?? _selectedShopId ?? shops.first.id;
+    try {
+      // Get shops owned by this user
+      final ownedShopsRes = await supabase
+          .from('shop_owners')
+          .select('shop_id, shops(id, name, type)')
+          .eq('user_id', uid);
 
-    // Fetch subscription, reports, payments, and delivered orders
-    final results = await Future.wait([
-      supabase.from('shop_subscription').select('*').eq('shop_id', activeShopId).maybeSingle(),
-      supabase.from('monthly_commission_reports').select('*').eq('shop_id', activeShopId).order('year', ascending: false).order('month', ascending: false),
-      supabase.from('commission_payments').select('amount, paid_at').eq('shop_id', activeShopId),
-      supabase.from('orders').select('total_final_price, created_at').eq('shop_id', activeShopId).eq('status', 'delivered'),
-    ]);
+      final shops = (ownedShopsRes as List).map((o) {
+        final s = o['shops'] as Map?;
+        if (s == null) return null;
+        return _Shop(id: s['id'] as String, name: s['name'] as String);
+      }).whereType<_Shop>().toList();
 
-    final sub = results[0] as Map?;
-    final reports = results[1] as List;
-    final payments = results[2] as List;
-    final orders = results[3] as List;
+      if (shops.isEmpty) {
+        return _Data(shops: [], selectedShopId: null);
+      }
 
-    return _Data(
-      shops: shops,
-      selectedShopId: activeShopId,
-      subscription: sub,
-      reports: reports,
-      orders: orders,
-      payments: payments,
-    );
+      final activeShopId = shopId ?? _selectedShopId ?? shops.first.id;
+
+      // Fetch subscription, reports, payments, and delivered orders
+      final results = await Future.wait([
+        supabase.from('shop_subscription').select('*').eq('shop_id', activeShopId).maybeSingle(),
+        supabase.from('monthly_commission_reports').select('*').eq('shop_id', activeShopId).order('year', ascending: false).order('month', ascending: false),
+        supabase.from('commission_payments').select('amount, paid_at').eq('shop_id', activeShopId),
+        supabase.from('orders').select('total_final_price, created_at').eq('shop_id', activeShopId).eq('status', 'delivered'),
+      ]);
+
+      final sub = results[0] as Map?;
+      final reports = (results[1] as List?) ?? [];
+      final payments = (results[2] as List?) ?? [];
+      final orders = (results[3] as List?) ?? [];
+
+      return _Data(
+        shops: shops,
+        selectedShopId: activeShopId,
+        subscription: sub,
+        reports: reports,
+        orders: orders,
+        payments: payments,
+      );
+    } catch (e, stack) {
+      debugPrint('Error fetching commission data: $e\n$stack');
+      return _Data(shops: [], selectedShopId: null);
+    }
   }
 
   void _onShopChanged(String? shopId) {
@@ -96,7 +106,7 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: Text(l10n.vendorDrawerCommissions, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Navigator.canPop(context)
+        leading: context.canPop()
             ? IconButton(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
                 onPressed: () => context.pop(),
@@ -113,6 +123,31 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
       body: FutureBuilder<_Data>(
         future: _future,
         builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)));
+          }
+          if (snap.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                    const SizedBox(height: 16),
+                    Text('Failed to load commission data', style: TextStyle(color: kVendorText, fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text('${snap.error}', style: TextStyle(color: kVendorSubText, fontSize: 12), textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => setState(() { _future = _fetchData(null); }),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)));
           }

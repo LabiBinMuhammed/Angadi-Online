@@ -42,46 +42,66 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
     if (!mounted) return;
     setState(() => _loading = true);
     
-    final uid = supabase.auth.currentUser!.id;
-    final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-    _shopId = ownerRes?['shop_id'] as String?;
-    if (_shopId == null) {
-      if (mounted) setState(() => _loading = false);
-      return;
-    }
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+      final uid = user.id;
+      final ownersRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid);
+      final shopIds = List<String>.from((ownersRes as List).map((r) => r['shop_id'] as String));
+      if (shopIds.isEmpty) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+      _shopId = shopIds.first;
 
-    final res = await supabase
-        .from('items')
-        .select('*, categories(name)')
-        .eq('shop_id', _shopId!)
-        .isFilter('deleted_at', null)
-        .order('updated_at', ascending: false);
+      final res = await supabase
+          .from('items')
+          .select('*, categories(name)')
+          .inFilter('shop_id', shopIds)
+          .isFilter('deleted_at', null)
+          .order('updated_at', ascending: false);
 
-    if (mounted) {
-      setState(() {
-        _items = (res as List).cast<Map<String, dynamic>>();
-        _loading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _items = (res as List).cast<Map<String, dynamic>>();
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('Error loading vendor items: $e\n$stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading products: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
   Future<void> _toggleActive(Map<String, dynamic> item) async {
     final l10n = AppLocalizations.of(context)!;
-    final currentStatus = item['status'] as String? ?? (item['is_active'] == true ? 'published' : 'draft');
-    final nextStatus = currentStatus == 'published' ? 'hidden' : 'published';
-    final nextIsActive = (nextStatus == 'published');
+    final isCurrentlyActive = item['is_active'] == true || item['status'] == 'published';
+    final nextIsActive = !isCurrentlyActive;
+    final nextStatus = nextIsActive ? 'published' : 'hidden';
     
     await supabase.from('items').update({
       'is_active': nextIsActive,
       'status': nextStatus,
     }).eq('id', item['id']);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(nextStatus == 'published' ? l10n.itemMarkedLive : l10n.itemMarkedHidden),
-        backgroundColor: kVendorDialogBg,
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(nextIsActive ? l10n.itemMarkedLive : l10n.itemMarkedHidden),
+          backgroundColor: kVendorDialogBg,
+        ),
+      );
+    }
     _load();
   }
 
@@ -125,17 +145,18 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
       final name = (i['name'] as String? ?? '').toLowerCase();
       final matchesSearch = name.contains(_searchQuery.toLowerCase());
       
-      final status = i['status'] as String? ?? (i['is_active'] == true ? 'published' : 'draft');
+      final isActive = i['is_active'] == true || i['status'] == 'published';
+      final status = i['status'] as String? ?? (isActive ? 'published' : 'draft');
       
       bool matchesFilter = false;
       if (_filter == 'all') {
         matchesFilter = true;
       } else if (_filter == 'active') {
-        matchesFilter = (status == 'published');
+        matchesFilter = isActive;
       } else if (_filter == 'draft') {
-        matchesFilter = (status == 'draft' || status == 'incomplete');
+        matchesFilter = !isActive && (status == 'draft' || status == 'incomplete');
       } else if (_filter == 'inactive') {
-        matchesFilter = (status == 'hidden' || status == 'rejected' || status == 'out_of_stock');
+        matchesFilter = !isActive;
       }
       return matchesSearch && matchesFilter;
     }).toList();
@@ -148,7 +169,7 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: Text(l10n.manageProductsTitle, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Navigator.canPop(context)
+        leading: context.canPop()
             ? IconButton(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
                 onPressed: () => context.pop(),
@@ -248,7 +269,8 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                         itemCount: filtered.length,
                         itemBuilder: (context, i) {
                           final item = filtered[i];
-                          final status = item['status'] as String? ?? (item['is_active'] == true ? 'published' : 'draft');
+                          final isActive = item['is_active'] == true || item['status'] == 'published';
+                          final status = item['status'] as String? ?? (isActive ? 'published' : 'draft');
                           final categoryName = (item['categories'] as Map?)?['name'] as String? ?? 'Uncategorized';
                           
                           // Determine status badge metadata
@@ -347,9 +369,9 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                     // Power Toggle
                                     _ActionButton(
                                       icon: HugeIcons.strokeRoundedShutDown,
-                                      color: status == 'published' ? Color(0xFF60A5FA) : kVendorSubText,
+                                      color: isActive ? const Color(0xFF60A5FA) : kVendorSubText,
                                       onPressed: () => _toggleActive(item),
-                                      tooltip: status == 'published' ? l10n.deactivateTooltip : l10n.goLiveTooltip,
+                                      tooltip: isActive ? l10n.deactivateTooltip : l10n.goLiveTooltip,
                                     ),
                                     const SizedBox(width: 6),
                                     // Edit

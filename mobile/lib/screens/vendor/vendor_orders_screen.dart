@@ -25,6 +25,15 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
   String? _selectedDate;
   String _selectedSlot = 'all';
 
+  int _selectedMonth = DateTime.now().month;
+  int _selectedYear = DateTime.now().year;
+  int _selectedWeek = 1;
+
+  final List<String> _monthNames = const [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -42,49 +51,86 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
     if (!mounted) return;
     setState(() => _loading = true);
 
-    final uid = supabase.auth.currentUser!.id;
-    final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-    final shopId = ownerRes?['shop_id'] as String?;
-    if (shopId == null) {
-      if (mounted) setState(() => _loading = false);
-      return;
-    }
-
-    var query = supabase
-        .from('orders')
-        .select('id, status, created_at, total_final_price, total_estimated_price, users(name, phone), delivery_date, delivery_slot, order_number')
-        .eq('shop_id', shopId)
-        .not('payment_type', 'is', null);
-
-    if (_selectedDate != null) {
-      query = query.eq('delivery_date', _selectedDate!);
-    } else {
-      final now = DateTime.now();
-      if (_timeFilter == 'today') {
-        final todayStr = now.toIso8601String().split('T')[0];
-        query = query.gte('delivery_date', todayStr);
-      } else if (_timeFilter == 'week') {
-        final sevenDaysAgo = now.subtract(const Duration(days: 7));
-        final sevenDaysAgoStr = sevenDaysAgo.toIso8601String().split('T')[0];
-        query = query.gte('delivery_date', sevenDaysAgoStr);
-      } else if (_timeFilter == 'month') {
-        final thirtyDaysAgo = now.subtract(const Duration(days: 30));
-        final thirtyDaysAgoStr = thirtyDaysAgo.toIso8601String().split('T')[0];
-        query = query.gte('delivery_date', thirtyDaysAgoStr);
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
       }
-    }
+      final uid = user.id;
+      final ownersRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid);
+      final shopIds = List<String>.from((ownersRes as List).map((r) => r['shop_id'] as String));
+      if (shopIds.isEmpty) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
 
-    if (_selectedSlot != 'all') {
-      query = query.eq('delivery_slot', _selectedSlot);
-    }
+      var query = supabase
+          .from('orders')
+          .select('id, status, created_at, total_final_price, total_estimated_price, users(name, phone), delivery_date, delivery_slot, order_number')
+          .inFilter('shop_id', shopIds)
+          .not('payment_type', 'is', null);
 
-    final res = await query.order('created_at', ascending: false);
+      if (_selectedDate != null) {
+        query = query.eq('delivery_date', _selectedDate!);
+      } else {
+        final now = DateTime.now();
+        if (_timeFilter == 'today') {
+          final todayStr = DateFormat('yyyy-MM-dd').format(now);
+          query = query.gte('delivery_date', todayStr);
+        } else if (_timeFilter == 'week') {
+          final sevenDaysAgo = now.subtract(const Duration(days: 7));
+          final sevenDaysAgoStr = DateFormat('yyyy-MM-dd').format(sevenDaysAgo);
+          query = query.gte('delivery_date', sevenDaysAgoStr);
+        } else if (_timeFilter == 'month') {
+          final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+          final thirtyDaysAgoStr = DateFormat('yyyy-MM-dd').format(thirtyDaysAgo);
+          query = query.gte('delivery_date', thirtyDaysAgoStr);
+        } else if (_timeFilter == 'week_of_month') {
+          final startDay = (_selectedWeek - 1) * 7 + 1;
+          final lastDayOfMon = DateTime(_selectedYear, _selectedMonth + 1, 0).day;
+          final endDay = _selectedWeek == 5 ? lastDayOfMon : (_selectedWeek * 7).clamp(1, lastDayOfMon);
 
-    if (mounted) {
-      setState(() {
-        _orders = (res as List).cast<Map<String, dynamic>>();
-        _loading = false;
-      });
+          final startDt = DateTime(_selectedYear, _selectedMonth, startDay);
+          final endDt = DateTime(_selectedYear, _selectedMonth, endDay);
+
+          final startStr = DateFormat('yyyy-MM-dd').format(startDt);
+          final endStr = DateFormat('yyyy-MM-dd').format(endDt);
+
+          query = query.gte('delivery_date', startStr).lte('delivery_date', endStr);
+        } else if (_timeFilter == 'month_year') {
+          final startDt = DateTime(_selectedYear, _selectedMonth, 1);
+          final endDt = DateTime(_selectedYear, _selectedMonth + 1, 0);
+
+          final startStr = DateFormat('yyyy-MM-dd').format(startDt);
+          final endStr = DateFormat('yyyy-MM-dd').format(endDt);
+
+          query = query.gte('delivery_date', startStr).lte('delivery_date', endStr);
+        }
+      }
+
+      if (_selectedSlot != 'all') {
+        query = query.eq('delivery_slot', _selectedSlot);
+      }
+
+      final res = await query.order('created_at', ascending: false);
+
+      if (mounted) {
+        setState(() {
+          _orders = (res as List).cast<Map<String, dynamic>>();
+        });
+      }
+    } catch (e, stack) {
+      debugPrint('Error loading vendor orders: $e\n$stack');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading orders: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 
@@ -101,7 +147,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
         elevation: 0,
         foregroundColor: kVendorText,
         title: Text(l10n.vendorManageOrdersTitle, style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
-        leading: Navigator.canPop(context)
+        leading: context.canPop()
             ? IconButton(
                 icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
                 onPressed: () => context.pop(),
@@ -167,7 +213,8 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                 children: [
                   ('today', l10n.todayLabel),
                   ('week', l10n.last7DaysLabel),
-                  ('month', l10n.last30DaysLabel),
+                  ('week_of_month', 'Week of Month'),
+                  ('month_year', 'Month & Year'),
                   ('all', l10n.allTimeLabel),
                 ].map((entry) {
                   final isSelected = _timeFilter == entry.$1;
@@ -185,7 +232,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: isSelected ? Color(0xFF3B82F6) : kVendorTransparentBg,
+                        color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBg,
                         borderRadius: BorderRadius.circular(99),
                         border: Border.all(
                           color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
@@ -211,6 +258,109 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     ),
                   );
                 }).toList(),
+              ),
+            ),
+
+          // Secondary Sub-filter bar for Week of Month and Month & Year
+          if (_selectedDate == null && (_timeFilter == 'week_of_month' || _timeFilter == 'month_year'))
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: kVendorCardBg,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: kVendorTransparentBorder),
+              ),
+              child: Row(
+                children: [
+                  // Month Dropdown
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: kVendorTransparentBg,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: _selectedMonth,
+                          dropdownColor: kVendorCardBg,
+                          isExpanded: true,
+                          style: TextStyle(color: kVendorText, fontSize: 13, fontWeight: FontWeight.w600),
+                          items: List.generate(12, (index) => DropdownMenuItem(
+                            value: index + 1,
+                            child: Text(_monthNames[index]),
+                          )),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _selectedMonth = val);
+                              _load();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
+                  // Year Dropdown
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: kVendorTransparentBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: _selectedYear,
+                        dropdownColor: kVendorCardBg,
+                        style: TextStyle(color: kVendorText, fontSize: 13, fontWeight: FontWeight.w600),
+                        items: [2024, 2025, 2026, 2027].map((yr) => DropdownMenuItem(
+                          value: yr,
+                          child: Text('$yr'),
+                        )).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setState(() => _selectedYear = val);
+                            _load();
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+
+                  if (_timeFilter == 'week_of_month') ...[
+                    const SizedBox(width: 8),
+                    // Week Dropdown
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: kVendorTransparentBg,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: _selectedWeek,
+                          dropdownColor: kVendorCardBg,
+                          style: TextStyle(color: kVendorText, fontSize: 13, fontWeight: FontWeight.w600),
+                          items: const [
+                            DropdownMenuItem(value: 1, child: Text('Week 1 (1–7)')),
+                            DropdownMenuItem(value: 2, child: Text('Week 2 (8–14)')),
+                            DropdownMenuItem(value: 3, child: Text('Week 3 (15–21)')),
+                            DropdownMenuItem(value: 4, child: Text('Week 4 (22–28)')),
+                            DropdownMenuItem(value: 5, child: Text('Week 5 (29+)')),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() => _selectedWeek = val);
+                              _load();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
 

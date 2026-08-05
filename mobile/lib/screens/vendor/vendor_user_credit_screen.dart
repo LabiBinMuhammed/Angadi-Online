@@ -28,9 +28,15 @@ class _VendorUserCreditScreenState extends State<VendorUserCreditScreen> {
 
   Future<void> _load() async {
     try {
-      final uid = supabase.auth.currentUser!.id;
-      final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-      final shopId = ownerRes?['shop_id'] as String?;
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+      final uid = user.id;
+      final ownersRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid);
+      final shopIds = List<String>.from((ownersRes as List).map((r) => r['shop_id'] as String));
+      final shopId = shopIds.isNotEmpty ? shopIds.first : null;
 
       final results = await Future.wait<dynamic>([
         supabase.from('users').select('name, phone').eq('id', widget.userId).single(),

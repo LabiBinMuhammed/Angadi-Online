@@ -1,4 +1,7 @@
 import 'dart:typed_data';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -95,10 +98,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   Future<void> _init() async {
     setState(() => _loading = true);
     try {
-      final uid = supabase.auth.currentUser!.id;
-
-      final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-      _shopId = ownerRes?['shop_id'] as String?;
+      final user = supabase.auth.currentUser;
+      if (user != null) {
+        final ownersRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', user.id);
+        final shopIds = List<String>.from((ownersRes as List).map((r) => r['shop_id'] as String));
+        _shopId = shopIds.isNotEmpty ? shopIds.first : null;
+      }
 
       // Parallel data fetching matching Next.js
       final results = await Future.wait([
@@ -540,6 +545,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           'name': _nameCtrl.text.trim(),
           'description': _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
           'category_id': _categoryId,
+          'status': intendedStatus,
           'is_active': isActive,
           'image_url': finalUrls.isNotEmpty ? finalUrls[0] : null,
         };
@@ -572,7 +578,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           'max_price_increase_percent': 15,
           'max_price_limit': 0,
         };
-        await supabase.from('item_sell_config').upsert(sellConfigPayload);
+        await supabase.from('item_sell_config').upsert(
+          sellConfigPayload,
+          onConflict: 'item_id',
+        );
 
         // 4. Sync item_variants
         await supabase.from('item_variants').delete().eq('item_id', widget.itemId!);
@@ -596,6 +605,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           }).toList();
           await supabase.from('item_variants').insert(varPayloads);
         }
+        _triggerAllTranslations(widget.itemId!, _nameCtrl.text.trim(), _descCtrl.text.trim());
       } else {
         // Create transactional insert for new items via RPC
         final config = _demoConfigs.firstWhere((c) => c['demo_item_id'] == _demoItemId, orElse: () => {});
@@ -655,11 +665,18 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
             'image_url': finalUrls[0],
           }).eq('id', itemId);
         }
+        if (itemId != null) {
+          _triggerAllTranslations(itemId, _nameCtrl.text.trim(), _descCtrl.text.trim());
+        }
       }
 
       if (mounted) {
         setState(() => _saving = false);
-        context.pop();
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/vendor/items');
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -668,6 +685,100 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           SnackBar(content: Text('Error: ${e.toString()}'), backgroundColor: const Color(0xFFEF4444)),
         );
       }
+    }
+  }
+
+  Future<void> _triggerAllTranslations(String itemId, String name, String description) async {
+    // 1. Translate the main item
+    await _triggerTranslation(itemId, name, description);
+
+    // 2. Fetch and translate all variants
+    try {
+      final List<dynamic> variantsData = await supabase
+          .from('item_variants')
+          .select('id, label')
+          .eq('item_id', itemId);
+
+      if (variantsData.isNotEmpty) {
+        for (final v in variantsData) {
+          final String? varId = v['id'] as String?;
+          final String? varLabel = v['label'] as String?;
+          if (varId != null && varLabel != null && varLabel.isNotEmpty) {
+            await _triggerVariantTranslation(varId, varLabel);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('[Translation] Error translating variants: $e');
+    }
+  }
+
+  Future<void> _triggerTranslation(String itemId, String name, String description) async {
+    try {
+      String url = '';
+      if (kIsWeb) {
+        final uri = Uri.parse(Uri.base.toString());
+        url = '${uri.scheme}://${uri.host}:3000/api/translate';
+      } else {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          url = 'http://10.0.2.2:3000/api/translate';
+        } else {
+          url = 'http://localhost:3000/api/translate';
+        }
+      }
+
+      debugPrint('[Translation] Triggering translation for item $itemId on $url');
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'type': 'item',
+          'id': itemId,
+          'fields': {
+            'name': name,
+            'description': description,
+          }
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        debugPrint('[Translation] Successfully translated item $itemId');
+      } else {
+        debugPrint('[Translation] Failed to translate item $itemId: Status ${response.statusCode}');
+      }
+    } catch (e) {
+      debugPrint('[Translation] Error triggering translation for item $itemId: $e');
+    }
+  }
+
+  Future<void> _triggerVariantTranslation(String variantId, String label) async {
+    try {
+      String url = '';
+      if (kIsWeb) {
+        final uri = Uri.parse(Uri.base.toString());
+        url = '${uri.scheme}://${uri.host}:3000/api/translate';
+      } else {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          url = 'http://10.0.2.2:3000/api/translate';
+        } else {
+          url = 'http://localhost:3000/api/translate';
+        }
+      }
+
+      await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'type': 'variant',
+          'id': variantId,
+          'fields': {
+            'label': label,
+          }
+        }),
+      );
+    } catch (e) {
+      debugPrint('[Translation] Error triggering variant translation: $e');
     }
   }
 
@@ -1143,7 +1254,13 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
       children: [
         Expanded(
           child: VendorOutlineButton(
-            onPressed: () => context.pop(),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/vendor/items');
+              }
+            },
             child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ),
@@ -1695,12 +1812,16 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           _isEdit ? l10n.vendorEditProduct : l10n.vendorDrawerAddProduct,
           style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
         ),
-        leading: Navigator.canPop(context)
-            ? IconButton(
-                icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
-                onPressed: () => context.pop(),
-              )
-            : null,
+        leading: IconButton(
+          icon: HugeIcon(icon: HugeIcons.strokeRoundedArrowLeft01, color: kVendorText, size: 20),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/vendor/items');
+            }
+          },
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)))

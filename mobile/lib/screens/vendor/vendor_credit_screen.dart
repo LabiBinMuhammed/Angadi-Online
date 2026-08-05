@@ -42,18 +42,24 @@ class _VendorCreditScreenState extends State<VendorCreditScreen> {
     setState(() => _loading = true);
 
     try {
-      final uid = supabase.auth.currentUser!.id;
-      final ownerRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid).maybeSingle();
-      _shopId = ownerRes?['shop_id'] as String?;
-      if (_shopId == null) {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
         if (mounted) setState(() => _loading = false);
         return;
       }
+      final uid = user.id;
+      final ownersRes = await supabase.from('shop_owners').select('shop_id').eq('user_id', uid);
+      final shopIds = List<String>.from((ownersRes as List).map((r) => r['shop_id'] as String));
+      if (shopIds.isEmpty) {
+        if (mounted) setState(() => _loading = false);
+        return;
+      }
+      _shopId = shopIds.first;
 
       final res = await supabase
           .from('shop_user_credit')
           .select('*, users(name, phone)')
-          .eq('shop_id', _shopId!)
+          .inFilter('shop_id', shopIds)
           .order('created_at', ascending: false);
 
       if (mounted) {

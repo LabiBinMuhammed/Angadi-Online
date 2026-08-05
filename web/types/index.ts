@@ -41,9 +41,12 @@ export interface UserAddress {
   label: string
   contact_name: string
   contact_phone: string
-  address_line_1: string
+  address_line_1?: string
   address_line_2?: string
   landmark?: string
+  house_name?: string
+  village?: string
+  delivery_note?: string
   location_id?: string
   latitude?: number
   longitude?: number
@@ -55,11 +58,15 @@ export interface UserAddress {
 export interface OrderAddress {
   id: string
   order_id: string
+  label?: string
   contact_name: string
   contact_phone: string
-  address_line_1: string
+  address_line_1?: string
   address_line_2?: string
   landmark?: string
+  house_name?: string
+  village?: string
+  delivery_note?: string
   latitude?: number
   longitude?: number
 }

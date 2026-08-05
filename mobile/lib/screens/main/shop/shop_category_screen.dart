@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../../models/models.dart';
 import '../../../core/language_service.dart';
+import '../../../widgets/product_card.dart';
 
 class ShopCategoryScreen extends StatefulWidget {
   final String shopId;
@@ -27,19 +29,25 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
       supabase.from('categories').select('id, name, is_active, category_translations(*)').eq('id', widget.categoryId).single(),
       supabase
           .from('items')
-          .select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*), item_translations(*)')
+          .select('*, item_translations(*), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*, variant_translations(*)), item_images(*)')
           .eq('shop_id', widget.shopId)
           .eq('category_id', widget.categoryId)
           .eq('is_active', true)
           .isFilter('deleted_at', null)
           .order('name'),
+      supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
+      supabase.from('units').select('*'),
     ]);
     final category = Category.fromJson(results[0] as Map<String, dynamic>);
     final itemsList = (results[1] as List).map((j) => Item.fromJson(j)).toList();
     final filteredItems = category.isActive ? itemsList : <Item>[];
+    final cats = (results[2] as List).map((j) => Category.fromJson(j)).toList();
+    final unitsList = (results[3] as List).map((j) => Unit.fromJson(j)).toList();
     return _Data(
-      category: category,
-      items:    filteredItems,
+      category:   category,
+      items:      filteredItems,
+      categories: cats,
+      units:      unitsList,
     );
   }
 
@@ -60,40 +68,21 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: .85,
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 0.65,
                   ),
                   itemCount: d.items.length,
                   itemBuilder: (_, i) {
                     final item = d.items[i];
-                    return GestureDetector(
-                      onTap: null,
-                      child: Card(
-                        child: Column(children: [
-                          Expanded(
-                            child: Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                              ),
-                              child: Center(
-                                child: item.imageUrl != null
-                                    ? Image.network(item.imageUrl!, fit: BoxFit.cover)
-                                    : const Text('📦', style: TextStyle(fontSize: 36)),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(item.getLocalizedName(LanguageService.instance.locale.languageCode),
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                                  maxLines: 2, overflow: TextOverflow.ellipsis),
-                            ),
-                          ),
-                        ]),
-                      ),
+                    return ProductCard(
+                      item: item,
+                      isLiked: false,
+                      onLikeToggle: () {},
+                      units: d.units,
+                      categories: d.categories,
+                      onTap: () => context.push('/home/item/${item.id}'),
                     );
                   },
                 ),
@@ -106,5 +95,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
 class _Data {
   final Category category;
   final List<Item> items;
-  _Data({required this.category, required this.items});
+  final List<Category> categories;
+  final List<Unit> units;
+  _Data({required this.category, required this.items, required this.categories, required this.units});
 }

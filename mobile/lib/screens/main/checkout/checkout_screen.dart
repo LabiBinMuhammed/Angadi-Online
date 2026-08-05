@@ -471,6 +471,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'p_address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
         'p_landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
         'p_label': activeAddress['label']?.toString().isNotEmpty == true ? activeAddress['label'] : 'Home',
+        'p_house_name': activeAddress['house_name'],
+        'p_village': activeAddress['village'],
+        'p_delivery_note': activeAddress['delivery_note']?.toString().isNotEmpty == true ? activeAddress['delivery_note'] : null,
+        'p_latitude': activeAddress['latitude'],
+        'p_longitude': activeAddress['longitude'],
       });
 
       if (mounted) {
@@ -613,26 +618,46 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          if (hasAddress) ...[
+                           if (hasAddress) ...[
                             Text(
                               '${_selectedAddress['contact_name']} (${_selectedAddress['contact_phone']})',
                               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: kText),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _selectedAddress['address_line_1'] ?? '',
-                              style: TextStyle(fontSize: 13, color: kSubText, fontWeight: FontWeight.w500),
+                              _selectedAddress['house_name'] as String? ?? _selectedAddress['address_line_1'] as String? ?? '',
+                              style: TextStyle(fontSize: 13, color: kText, fontWeight: FontWeight.w600),
                             ),
-                            if (_selectedAddress['address_line_2'] != null && _selectedAddress['address_line_2'].toString().isNotEmpty)
-                              Text(
-                                _selectedAddress['address_line_2'],
-                                style: TextStyle(fontSize: 13, color: kSubText, fontWeight: FontWeight.w500),
-                              ),
                             if (_selectedAddress['landmark'] != null && _selectedAddress['landmark'].toString().isNotEmpty)
                               Text(
                                 'Near ${_selectedAddress['landmark']}',
                                 style: TextStyle(fontSize: 13, color: kSubText, fontWeight: FontWeight.w500),
                               ),
+                            if (_selectedAddress['village'] != null && _selectedAddress['village'].toString().isNotEmpty)
+                              Text(
+                                _selectedAddress['village'],
+                                style: TextStyle(fontSize: 13, color: kSubText, fontWeight: FontWeight.w500),
+                              ),
+                            if (_selectedAddress['latitude'] != null && _selectedAddress['longitude'] != null) ...[
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  const Icon(Icons.pin_drop_rounded, size: 16, color: Colors.red),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Map Coordinates Saved (${(_selectedAddress['latitude'] as num).toStringAsFixed(4)}, ${(_selectedAddress['longitude'] as num).toStringAsFixed(4)})',
+                                    style: TextStyle(fontSize: 11, color: kSubText, fontWeight: FontWeight.w600),
+                                  ),
+                                ],
+                              ),
+                            ],
+                            if (_selectedAddress['delivery_note'] != null && _selectedAddress['delivery_note'].toString().trim().isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                '📝 Note: ${_selectedAddress['delivery_note']}',
+                                style: const TextStyle(fontSize: 12, color: Color(0xFF0F766E), fontStyle: FontStyle.italic),
+                              ),
+                            ],
                             if (_selectedAddress['is_temp'] == true) ...[
                               const SizedBox(height: 6),
                               Container(

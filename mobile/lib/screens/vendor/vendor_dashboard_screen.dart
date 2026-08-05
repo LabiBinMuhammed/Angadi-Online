@@ -23,92 +23,117 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
   }
 
   Future<_Data> _fetch() async {
-    final uid = supabase.auth.currentUser!.id;
-    final ownerRes = await supabase
-        .from('shop_owners')
-        .select('shop_id, shops(name)')
-        .eq('user_id', uid)
-        .maybeSingle();
-    
-    final shopId = ownerRes?['shop_id'] as String?;
-    final shopName = (ownerRes?['shops'] as Map?)?['name'] as String? ?? 'Your Shop';
-
-    if (shopId == null) {
-      return _Data(shopId: null, shopName: shopName, items: 0, orders: 0, pending: 0, revenue: 0.0, runs: []);
+    final user = supabase.auth.currentUser;
+    if (user == null) {
+      return _Data(shopId: null, shopName: 'Guest', items: 0, orders: 0, pending: 0, revenue: 0.0, runs: []);
     }
+    final uid = user.id;
 
-    final results = await Future.wait([
-      supabase.from('items').select('id').eq('shop_id', shopId).isFilter('deleted_at', null),
-      supabase.from('orders').select('id').eq('shop_id', shopId).not('payment_type', 'is', null),
-      supabase.from('orders').select('id').eq('shop_id', shopId).eq('status', 'pending').not('payment_type', 'is', null),
-      supabase.from('orders').select('total_final_price').eq('shop_id', shopId).eq('status', 'delivered').not('payment_type', 'is', null),
-    ]);
-
-    final deliveredOrders = results[3] as List;
-    final totalRev = deliveredOrders.fold<double>(0.0, (sum, o) => sum + (o['total_final_price'] ?? 0).toDouble());
-
-    // ── Delivery Runs Management Data ──
-    final today = DateTime.now();
-    final todayStr = today.toIso8601String().split('T')[0];
-    final tomorrow = today.add(const Duration(days: 1));
-    final tomorrowStr = tomorrow.toIso8601String().split('T')[0];
-
-    // Query orders for today and tomorrow
-    final deliveryOrdersRes = await supabase
-        .from('orders')
-        .select('id, delivery_date, delivery_slot, total_final_price, total_estimated_price, delivery_batch_id')
-        .eq('shop_id', shopId)
-        .inFilter('delivery_date', [todayStr, tomorrowStr])
-        .not('payment_type', 'is', null)
-        .neq('status', 'cancelled');
-
-    // Query existing batches
-    final deliveryBatchesRes = await supabase
-        .from('delivery_batches')
-        .select('id, delivery_date, delivery_slot, status')
-        .eq('shop_id', shopId)
-        .inFilter('delivery_date', [todayStr, tomorrowStr]);
-
-    final deliveryOrders = List<Map<String, dynamic>>.from(deliveryOrdersRes as List);
-    final deliveryBatches = List<Map<String, dynamic>>.from(deliveryBatchesRes as List);
-
-    final runs = <Map<String, dynamic>>[];
-    final slots = ['morning', 'evening'];
-    final dates = [todayStr, tomorrowStr];
-
-    for (final date in dates) {
-      for (final slot in slots) {
-        final batch = deliveryBatches.firstWhere(
-          (b) => b['delivery_date'] == date && b['delivery_slot'] == slot,
-          orElse: () => {},
-        );
-
-        final matchingOrders = deliveryOrders.where((o) =>
-            o['delivery_date'] == date && o['delivery_slot'] == slot).toList();
-
-        final totalValue = matchingOrders.fold<double>(0.0, (sum, o) =>
-            sum + (o['total_final_price'] ?? o['total_estimated_price'] ?? 0.0).toDouble());
-
-        runs.add({
-          'date': date,
-          'label': date == todayStr ? 'Today' : 'Tomorrow',
-          'slot': slot,
-          'batch': batch.isEmpty ? null : batch,
-          'orderCount': matchingOrders.length,
-          'totalValue': totalValue,
-        });
+    try {
+      final ownerListRes = await supabase
+          .from('shop_owners')
+          .select('shop_id, shops(name)')
+          .eq('user_id', uid);
+      
+      final ownerList = (ownerListRes as List).cast<Map<String, dynamic>>();
+      if (ownerList.isEmpty) {
+        return _Data(shopId: null, shopName: 'Your Shop', items: 0, orders: 0, pending: 0, revenue: 0.0, runs: []);
       }
-    }
 
-    return _Data(
-      shopId: shopId,
-      shopName: shopName,
-      items: (results[0] as List).length,
-      orders: (results[1] as List).length,
-      pending: (results[2] as List).length,
-      revenue: totalRev,
-      runs: runs,
-    );
+      final primaryOwner = ownerList.first;
+      final shopId = primaryOwner['shop_id'] as String?;
+      final shopName = (primaryOwner['shops'] as Map?)?['name'] as String? ?? 'Your Shop';
+
+      if (shopId == null) {
+        return _Data(shopId: null, shopName: shopName, items: 0, orders: 0, pending: 0, revenue: 0.0, runs: []);
+      }
+
+      final shopIds = ownerList.map((o) => o['shop_id'] as String).toList();
+
+      final results = await Future.wait([
+        supabase.from('items').select('id').inFilter('shop_id', shopIds).isFilter('deleted_at', null),
+        supabase.from('orders').select('id').inFilter('shop_id', shopIds).not('payment_type', 'is', null),
+        supabase.from('orders').select('id').inFilter('shop_id', shopIds).eq('status', 'pending').not('payment_type', 'is', null),
+        supabase.from('orders').select('total_final_price').inFilter('shop_id', shopIds).eq('status', 'delivered').not('payment_type', 'is', null),
+      ]);
+
+      final deliveredOrders = results[3] as List;
+      final totalRev = deliveredOrders.fold<double>(0.0, (sum, o) => sum + (o['total_final_price'] ?? 0).toDouble());
+
+      // ── Delivery Runs Management Data ──
+      final today = DateTime.now();
+      final todayStr = today.toIso8601String().split('T')[0];
+      final tomorrow = today.add(const Duration(days: 1));
+      final tomorrowStr = tomorrow.toIso8601String().split('T')[0];
+
+      List deliveryOrdersRes = [];
+      List deliveryBatchesRes = [];
+      try {
+        deliveryOrdersRes = await supabase
+            .from('orders')
+            .select('id, delivery_date, delivery_slot, total_final_price, total_estimated_price, delivery_batch_id')
+            .eq('shop_id', shopId)
+            .inFilter('delivery_date', [todayStr, tomorrowStr])
+            .not('payment_type', 'is', null)
+            .neq('status', 'cancelled');
+      } catch (e) {
+        debugPrint('Error fetching delivery orders: $e');
+      }
+
+      try {
+        deliveryBatchesRes = await supabase
+            .from('delivery_batches')
+            .select('id, delivery_date, delivery_slot, status')
+            .eq('shop_id', shopId)
+            .inFilter('delivery_date', [todayStr, tomorrowStr]);
+      } catch (e) {
+        debugPrint('Error fetching delivery batches: $e');
+      }
+
+      final deliveryOrders = List<Map<String, dynamic>>.from(deliveryOrdersRes);
+      final deliveryBatches = List<Map<String, dynamic>>.from(deliveryBatchesRes);
+
+      final runs = <Map<String, dynamic>>[];
+      final slots = ['morning', 'evening'];
+      final dates = [todayStr, tomorrowStr];
+
+      for (final date in dates) {
+        for (final slot in slots) {
+          final batch = deliveryBatches.firstWhere(
+            (b) => b['delivery_date'] == date && b['delivery_slot'] == slot,
+            orElse: () => {},
+          );
+
+          final matchingOrders = deliveryOrders.where((o) =>
+              o['delivery_date'] == date && o['delivery_slot'] == slot).toList();
+
+          final totalValue = matchingOrders.fold<double>(0.0, (sum, o) =>
+              sum + (o['total_final_price'] ?? o['total_estimated_price'] ?? 0.0).toDouble());
+
+          runs.add({
+            'date': date,
+            'label': date == todayStr ? 'Today' : 'Tomorrow',
+            'slot': slot,
+            'batch': batch.isEmpty ? null : batch,
+            'orderCount': matchingOrders.length,
+            'totalValue': totalValue,
+          });
+        }
+      }
+
+      return _Data(
+        shopId: shopId,
+        shopName: shopName,
+        items: (results[0] as List).length,
+        orders: (results[1] as List).length,
+        pending: (results[2] as List).length,
+        revenue: totalRev,
+        runs: runs,
+      );
+    } catch (e, stack) {
+      debugPrint('Error fetching dashboard: $e\n$stack');
+      return _Data(shopId: null, shopName: 'Your Shop', items: 0, orders: 0, pending: 0, revenue: 0.0, runs: []);
+    }
   }
 
   Future<void> _createBatch(String date, String slot, String shopId) async {
@@ -370,6 +395,31 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
       body: FutureBuilder<_Data>(
         future: _future,
         builder: (context, snap) {
+          if (snap.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)));
+          }
+          if (snap.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
+                    const SizedBox(height: 16),
+                    Text('Failed to load dashboard data', style: TextStyle(color: kVendorText, fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    Text('${snap.error}', style: TextStyle(color: kVendorSubText, fontSize: 12), textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => setState(() { _future = _fetch(); }),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (!snap.hasData) {
             return const Center(child: CircularProgressIndicator(color: Color(0xFF60A5FA)));
           }

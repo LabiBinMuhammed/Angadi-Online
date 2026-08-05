@@ -46,15 +46,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<_Data> _fetch() async {
-    final userId = supabase.auth.currentUser!.id;
-    final results = await Future.wait([
-      supabase.from('users').select('name, phone, role, phone_verified').eq('id', userId).single(),
-      supabase.from('user_profiles').select('email, profile_image_url, gender, preferred_language, date_of_birth').eq('user_id', userId).maybeSingle(),
-    ]);
-    return _Data(
-      user:    results[0] as Map<String, dynamic>,
-      profile: results[1] != null ? results[1] as Map<String, dynamic> : null,
-    );
+    final user = supabase.auth.currentUser;
+    if (user == null) {
+      return _Data(user: {'name': 'Guest', 'phone': ''}, profile: null);
+    }
+    final userId = user.id;
+    try {
+      final results = await Future.wait([
+        supabase.from('users').select('name, phone, role, phone_verified').eq('id', userId).maybeSingle(),
+        supabase.from('user_profiles').select('email, profile_image_url, gender, preferred_language, date_of_birth').eq('user_id', userId).maybeSingle(),
+      ]);
+      return _Data(
+        user: (results[0] as Map<String, dynamic>?) ?? {'name': 'User', 'phone': ''},
+        profile: results[1] != null ? results[1] as Map<String, dynamic> : null,
+      );
+    } catch (e) {
+      return _Data(user: {'name': 'User', 'phone': ''}, profile: null);
+    }
   }
 
   Future<void> _signOut() async {

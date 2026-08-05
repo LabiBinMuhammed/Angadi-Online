@@ -266,16 +266,26 @@ class Item {
   }
 
   String? getLocalizedDescription(String languageCode) {
-    if (languageCode == 'en') return description;
-    if (itemTranslations == null) return description;
-    final trans = itemTranslations!.firstWhere(
-      (t) => t['language_code'] == languageCode,
-      orElse: () => <String, dynamic>{},
-    );
-    if (trans.isNotEmpty && trans['description'] != null && trans['description'].toString().isNotEmpty) {
-      return trans['description'] as String;
+    String? desc;
+    if (languageCode == 'en') {
+      desc = description;
+    } else if (itemTranslations == null) {
+      desc = description;
+    } else {
+      final trans = itemTranslations!.firstWhere(
+        (t) => t['language_code'] == languageCode,
+        orElse: () => <String, dynamic>{},
+      );
+      if (trans.isNotEmpty && trans['description'] != null && trans['description'].toString().isNotEmpty) {
+        desc = trans['description'] as String;
+      } else {
+        desc = description;
+      }
     }
-    return description;
+    if (desc != null && desc.contains('Keywords:')) {
+      desc = desc.split(RegExp(r'\n*Keywords:', caseSensitive: false))[0].trim();
+    }
+    return desc;
   }
 }
 
@@ -430,9 +440,14 @@ class UserAddress {
   final String label;
   final String contactName;
   final String contactPhone;
-  final String addressLine1;
+  final String? addressLine1;
   final String? addressLine2;
   final String? landmark;
+  final String? houseName;
+  final String? village;
+  final String? deliveryNote;
+  final double? latitude;
+  final double? longitude;
   final bool isDefault;
 
   const UserAddress({
@@ -441,9 +456,14 @@ class UserAddress {
     required this.label,
     required this.contactName,
     required this.contactPhone,
-    required this.addressLine1,
+    this.addressLine1,
     this.addressLine2,
     this.landmark,
+    this.houseName,
+    this.village,
+    this.deliveryNote,
+    this.latitude,
+    this.longitude,
     required this.isDefault,
   });
 
@@ -453,9 +473,14 @@ class UserAddress {
         label: json['label'] as String,
         contactName: json['contact_name'] as String,
         contactPhone: json['contact_phone'] as String,
-        addressLine1: json['address_line_1'] as String,
+        addressLine1: json['address_line_1'] as String?,
         addressLine2: json['address_line_2'] as String?,
         landmark: json['landmark'] as String?,
+        houseName: json['house_name'] as String?,
+        village: json['village'] as String?,
+        deliveryNote: json['delivery_note'] as String?,
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
         isDefault: json['is_default'] as bool? ?? false,
       );
 }

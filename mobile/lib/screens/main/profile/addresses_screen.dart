@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 
 class AddressesScreen extends StatefulWidget {
@@ -39,7 +40,11 @@ class _AddressesScreenState extends State<AddressesScreen> {
         actions: [
           IconButton(
             icon: const HugeIcon(icon: HugeIcons.strokeRoundedAdd01),
-            onPressed: () {}, 
+            onPressed: () {
+              context.push('/profile/addresses/new').then((_) => setState(() {
+                _future = _fetch();
+              }));
+            }, 
             tooltip: l10n.addAddressButton,
           ),
         ],
@@ -62,7 +67,11 @@ class _AddressesScreenState extends State<AddressesScreen> {
                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 24),
                   ElevatedButton(
-                    onPressed: () {}, 
+                    onPressed: () {
+                      context.push('/profile/addresses/new').then((_) => setState(() {
+                        _future = _fetch();
+                      }));
+                    }, 
                     child: Text(l10n.addAddressButton),
                   ),
                 ],
@@ -76,10 +85,29 @@ class _AddressesScreenState extends State<AddressesScreen> {
             itemBuilder: (_, i) {
               final a = addresses[i];
               final isDefault = a['is_default'] as bool? ?? false;
+              
+              // Get icon for address label
+              IconData labelIcon = Icons.home_rounded;
+              final String lbl = (a['label'] as String).toLowerCase();
+              if (lbl.contains('work') || lbl.contains('office')) {
+                labelIcon = Icons.work_rounded;
+              } else if (lbl.contains('hostel')) {
+                labelIcon = Icons.apartment_rounded;
+              } else if (lbl.contains('other')) {
+                labelIcon = Icons.location_on_rounded;
+              }
+
               return Card(
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  leading: const HugeIcon(icon: HugeIcons.strokeRoundedLocation01, color: Color(0xFF0EA5E9)),
+                  leading: HugeIcon(
+                    icon: labelIcon == Icons.home_rounded
+                        ? HugeIcons.strokeRoundedHome01
+                        : labelIcon == Icons.work_rounded
+                            ? HugeIcons.strokeRoundedBriefcase01
+                            : HugeIcons.strokeRoundedLocation01,
+                    color: const Color(0xFF0EA5E9),
+                  ),
                   title: Row(children: [
                     Text(a['label'] as String,
                         style: const TextStyle(fontWeight: FontWeight.w700)),
@@ -100,14 +128,45 @@ class _AddressesScreenState extends State<AddressesScreen> {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${a['contact_name']} · ${a['contact_phone']}'),
-                      Text(a['address_line_1'] as String,
-                          style: const TextStyle(color: Color(0xFF64748B))),
+                      const SizedBox(height: 6),
+                      Text('${a['contact_name']} · ${a['contact_phone']}',
+                          style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E293B))),
+                      const SizedBox(height: 4),
+                      Text(
+                        a['house_name'] as String? ?? a['address_line_1'] as String? ?? '',
+                        style: const TextStyle(color: Color(0xFF334155), fontWeight: FontWeight.w500),
+                      ),
+                      if (a['landmark'] != null && (a['landmark'] as String).isNotEmpty)
+                        Text(
+                          'Near: ${a['landmark']}',
+                          style: const TextStyle(color: Color(0xFF475569)),
+                        ),
+                      if (a['village'] != null && (a['village'] as String).isNotEmpty)
+                        Text(
+                          a['village'] as String,
+                          style: const TextStyle(color: Color(0xFF475569)),
+                        )
+                      else if (a['address_line_2'] != null && (a['address_line_2'] as String).isNotEmpty)
+                        Text(
+                          a['address_line_2'] as String,
+                          style: const TextStyle(color: Color(0xFF475569)),
+                        ),
+                      if (a['delivery_note'] != null && (a['delivery_note'] as String).trim().isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          '📝 Note: ${a['delivery_note']}',
+                          style: const TextStyle(color: Color(0xFF0F766E), fontSize: 13, fontStyle: FontStyle.italic),
+                        ),
+                      ],
                     ],
                   ),
                   trailing: IconButton(
                     icon: const HugeIcon(icon: HugeIcons.strokeRoundedPencilEdit02, size: 18),
-                    onPressed: () {}, 
+                    onPressed: () {
+                      context.push('/profile/addresses/${a['id']}').then((_) => setState(() {
+                        _future = _fetch();
+                      }));
+                    }, 
                   ),
                 ),
               );

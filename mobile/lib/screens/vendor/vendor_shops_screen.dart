@@ -20,6 +20,11 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _logoController = TextEditingController();
+  final _bannerController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _openingTimeController = TextEditingController();
+  final _closingTimeController = TextEditingController();
   String? _selectedType;
   String? _selectedLocationId;
   bool _saving = false;
@@ -44,6 +49,11 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _logoController.dispose();
+    _bannerController.dispose();
+    _descriptionController.dispose();
+    _openingTimeController.dispose();
+    _closingTimeController.dispose();
     super.dispose();
   }
 
@@ -94,6 +104,11 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
         'name': _nameController.text.trim(),
         'type': _selectedType,
         'location_id': _selectedLocationId,
+        'logo_url': _logoController.text.trim().isEmpty ? null : _logoController.text.trim(),
+        'banner_url': _bannerController.text.trim().isEmpty ? null : _bannerController.text.trim(),
+        'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+        'opening_time': _openingTimeController.text.trim().isEmpty ? null : _openingTimeController.text.trim(),
+        'closing_time': _closingTimeController.text.trim().isEmpty ? null : _closingTimeController.text.trim(),
       }).select().single();
 
       // 2. Link shop in shop_owners
@@ -107,6 +122,11 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
           SnackBar(content: Text(l10n.shopCreatedSuccess), backgroundColor: Colors.green),
         );
         _nameController.clear();
+        _logoController.clear();
+        _bannerController.clear();
+        _descriptionController.clear();
+        _openingTimeController.clear();
+        _closingTimeController.clear();
         setState(() {
           _selectedType = null;
           _selectedLocationId = null;
@@ -361,6 +381,165 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
                               style: TextStyle(fontSize: 12, color: kVendorSubText),
                             ),
                           ],
+                          const SizedBox(height: 20),
+
+                          // Logo / Shop Photo
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Logo / Shop Photo', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                                ),
+                                child: const Text(
+                                  'Optional - 🔥 More Important',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _logoController,
+                            style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
+                            decoration: vendorInputDecoration(
+                              hintText: 'https://example.com/logo.png',
+                              prefixIcon: Icon(Icons.image, color: kVendorSubText, size: 20),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Banner Image
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Banner Image', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                                ),
+                                child: const Text(
+                                  'Optional - 🔥 More Important',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _bannerController,
+                            style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
+                            decoration: vendorInputDecoration(
+                              hintText: 'https://example.com/banner.png',
+                              prefixIcon: Icon(Icons.panorama, color: kVendorSubText, size: 20),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Description
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Description', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                                ),
+                                child: const Text(
+                                  'Optional - 🔥 More Important',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          TextFormField(
+                            controller: _descriptionController,
+                            maxLines: 3,
+                            style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
+                            decoration: vendorInputDecoration(
+                              hintText: 'Brief description about your shop...',
+                              prefixIcon: Icon(Icons.description, color: kVendorSubText, size: 20),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+
+                          // Opening Hours (2 Inputs)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Opening Time', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
+                                    const SizedBox(height: 2),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                                      ),
+                                      child: const Text(
+                                        'Optional - 🔥 More Important',
+                                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextFormField(
+                                      controller: _openingTimeController,
+                                      style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
+                                      decoration: vendorInputDecoration(
+                                        hintText: '08:00 AM',
+                                        prefixIcon: Icon(Icons.access_time, color: kVendorSubText, size: 18),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Closing Time', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
+                                    const SizedBox(height: 2),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                                      ),
+                                      child: const Text(
+                                        'Optional - 🔥 More Important',
+                                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    TextFormField(
+                                      controller: _closingTimeController,
+                                      style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
+                                      decoration: vendorInputDecoration(
+                                        hintText: '10:00 PM',
+                                        prefixIcon: Icon(Icons.access_time_filled, color: kVendorSubText, size: 18),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 28),
 
                           // Submit Button

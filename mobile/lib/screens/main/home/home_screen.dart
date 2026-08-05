@@ -13,6 +13,7 @@ import '../../../core/location_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../widgets/tutorial/tutorial_manager.dart';
 import '../../../widgets/tutorial/tutorial_step.dart';
+import '../../../widgets/product_card.dart';
 import 'package:intl/intl.dart';
 
 // ── Colors ────────────────────────────────────────────────────────────────────
@@ -1469,7 +1470,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: leftItems.map((item) {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 16),
-                                    child: _buildItemCard(item),
+                                    child: ProductCard(
+                                      item: item,
+                                      isLiked: _likedItems.contains(item.id),
+                                      onLikeToggle: () => _toggleLike(item.id),
+                                      units: _units,
+                                      categories: _categories,
+                                    ),
                                   );
                                 }).toList(),
                               ),
@@ -1480,7 +1487,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: rightItems.map((item) {
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 16),
-                                    child: _buildItemCard(item),
+                                    child: ProductCard(
+                                      item: item,
+                                      isLiked: _likedItems.contains(item.id),
+                                      onLikeToggle: () => _toggleLike(item.id),
+                                      units: _units,
+                                      categories: _categories,
+                                    ),
                                   );
                                 }).toList(),
                               ),

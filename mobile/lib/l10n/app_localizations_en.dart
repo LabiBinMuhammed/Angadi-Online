@@ -1128,8 +1128,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authCreateAccount => 'Create account';
 
   @override
-  String get authJoinSubtitle =>
-      'Join Angadi — enter details to get started';
+  String get authJoinSubtitle => 'Join Angadi — enter details to get started';
 
   @override
   String get authUsePhone => 'Use Phone Number';

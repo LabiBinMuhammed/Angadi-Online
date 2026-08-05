@@ -17,7 +17,23 @@ interface CacheData {
 }
 
 let dbCache: CacheData | null = null;
-const CACHE_TTL = 300000; // 5 minutes
+const CACHE_TTL = 5000; // 5 seconds
+
+async function fetchWithTimeout(url: string, options: any = {}, timeout = 800): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
 
 // Custom search terms / synonyms dictionary
 const CUSTOM_SYNONYMS: Record<string, string[]> = {
@@ -154,13 +170,41 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await fetchDatabaseData();
+    
+    let englishQuery = query;
+    let hasTranslated = false;
+    
+    // Auto-translate non-ASCII queries (Malayalam, Hindi, Arabic)
+    if (query && /[^\x00-\x7F]/.test(query)) {
+      try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(query)}`;
+        const res = await fetchWithTimeout(url);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json[0] && json[0][0] && json[0][0][0]) {
+            const translated = json[0][0][0].trim();
+            if (translated && translated.toLowerCase() !== query.toLowerCase()) {
+              englishQuery = translated;
+              hasTranslated = true;
+              console.log(`[Search Translate] "${query}" -> "${englishQuery}"`);
+            }
+          }
+        }
+      } catch (err) {
+        console.error("[Search Translate] Failed to translate query:", err);
+      }
+    }
+
     const normQ = normalizeSearchQuery(query);
     const phoneQ = generatePhoneticKey(query);
+    const normEngQ = hasTranslated ? normalizeSearchQuery(englishQuery) : normQ;
+    const phoneEngQ = hasTranslated ? generatePhoneticKey(englishQuery) : phoneQ;
 
     // Filter items that are active and belong to active shops
     let matchedItems = data.items.filter(item => {
       const shop = item.shops;
       const category = item.categories;
+      if (item.deleted_at || !item.is_active || item.status !== 'published') return false;
       if (!shop || shop.type?.includes('_inactive')) return false;
       if (item.category_id && (!category || !category.is_active)) return false;
       if (shopId && item.shop_id !== shopId) return false;
@@ -206,9 +250,22 @@ export async function GET(request: NextRequest) {
           });
         }
         if (t.description) {
-          t.description.replace(/[^\w\s]/g, ' ').split(/\s+/).forEach((w: string) => {
+          const parts = t.description.split(/Keywords:/i);
+          const baseDesc = parts[0] || '';
+          const keywordsPart = parts[1] || '';
+
+          baseDesc.replace(/[^\w\s]/g, ' ').split(/\s+/).forEach((w: string) => {
             if (w.length >= 3) searchTerms.push({ term: w, priority: 1 });
           });
+
+          if (keywordsPart) {
+            keywordsPart.split(',').forEach((kw: string) => {
+              const cleanKw = kw.trim();
+              if (cleanKw.length >= 2) {
+                searchTerms.push({ term: cleanKw, priority: 8 });
+              }
+            });
+          }
         }
       });
 
@@ -240,32 +297,47 @@ export async function GET(request: NextRequest) {
         const normTerm = normalizeSearchQuery(st.term);
         const phoneTerm = generatePhoneticKey(st.term);
 
-        let termScore = 0;
-
-        // A. Exact Match (10x)
-        if (normTerm === normQ) {
-          termScore = 10.0 * st.priority;
-        }
-        // B. Prefix Match (7x)
-        else if (normQ && normTerm.startsWith(normQ)) {
-          termScore = 7.0 * st.priority;
-        }
-        // C. Phonetic Match (5x)
-        else if (phoneQ && phoneTerm === phoneQ) {
-          termScore = 5.0 * st.priority;
-        }
-        // D. Fuzzy Match (4x similarity)
-        else {
-          const sim = getSimilarity(normTerm, normQ);
-          if (sim >= 0.3) {
-            termScore = 4.0 * sim * st.priority;
+        // A. Score against original query (normQ, phoneQ)
+        let origScore = 0;
+        if (normQ) {
+          if (normTerm === normQ) {
+            origScore = 10.0 * st.priority;
+          } else if (normTerm.startsWith(normQ)) {
+            origScore = 7.0 * st.priority;
+          } else if (phoneQ && phoneTerm === phoneQ) {
+            origScore = 5.0 * st.priority;
+          } else {
+            const sim = getSimilarity(normTerm, normQ);
+            if (sim >= 0.3) {
+              origScore = 4.0 * sim * st.priority;
+            }
+          }
+          if (origScore === 0 && normTerm.includes(normQ)) {
+            origScore = 2.0 * st.priority;
           }
         }
 
-        // E. Partial Match fallback (2x)
-        if (termScore === 0 && normQ && normTerm.includes(normQ)) {
-          termScore = 2.0 * st.priority;
+        // B. Score against translated English query (normEngQ, phoneEngQ)
+        let engScore = 0;
+        if (hasTranslated && normEngQ) {
+          if (normTerm === normEngQ) {
+            engScore = 10.0 * st.priority;
+          } else if (normTerm.startsWith(normEngQ)) {
+            engScore = 7.0 * st.priority;
+          } else if (phoneEngQ && phoneTerm === phoneEngQ) {
+            engScore = 5.0 * st.priority;
+          } else {
+            const sim = getSimilarity(normTerm, normEngQ);
+            if (sim >= 0.3) {
+              engScore = 4.0 * sim * st.priority;
+            }
+          }
+          if (engScore === 0 && normTerm.includes(normEngQ)) {
+            engScore = 2.0 * st.priority;
+          }
         }
+
+        const termScore = Math.max(origScore, engScore);
 
         if (termScore > maxScore) {
           maxScore = termScore;
@@ -291,13 +363,20 @@ export async function GET(request: NextRequest) {
       const activeCatTrans = catTrans.find((t: any) => t.language_code === lang);
       const categoryName = activeCatTrans?.name || category?.name || '';
 
+      // Strip keywords section from the descriptions sent to the client
+      const cleanDesc = displayDesc.split(/Keywords:/i)[0].trim();
+      const cleanTranslations = itemTrans.map((t: any) => ({
+        ...t,
+        description: t.description ? t.description.split(/Keywords:/i)[0].trim() : t.description
+      }));
+
       return {
         id: item.id,
         name: displayName,
-        description: displayDesc,
+        description: cleanDesc,
         item_id: item.id,
         item_name: displayName,
-        item_description: displayDesc,
+        item_description: cleanDesc,
         image_url: item.image_url || '',
         category_id: item.category_id || '',
         category_name: categoryName,
@@ -309,7 +388,7 @@ export async function GET(request: NextRequest) {
         sell_mode: sellMode,
         has_variants: item.has_variants || false,
         is_active: item.is_active || true,
-        item_translations: itemTrans,
+        item_translations: cleanTranslations,
         item_images: item.image_url ? [{ image_url: item.image_url, is_primary: true }] : []
       };
     });

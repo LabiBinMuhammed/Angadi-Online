@@ -8,6 +8,7 @@ import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
 import '../../../widgets/tutorial/tutorial_manager.dart';
 import '../../../widgets/tutorial/tutorial_step.dart';
+import '../../../widgets/product_card.dart';
 
 class ShopScreen extends StatefulWidget {
   final String shopId;
@@ -56,13 +57,14 @@ class _ShopScreenState extends State<ShopScreen> {
       supabase.from('shops').select('id, name, type').eq('id', widget.shopId).single(),
       supabase
           .from('items')
-          .select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*), item_translations(*)')
+          .select('*, item_translations(*), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*, variant_translations(*)), item_images(*)')
           .eq('shop_id', widget.shopId)
           .eq('is_active', true)
           .isFilter('deleted_at', null)
           .order('name'),
       supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
       supabase.from('shop_rating_summary').select('*').eq('shop_id', widget.shopId).maybeSingle(),
+      supabase.from('units').select('*'),
     ]);
 
     final summaryMap = results[3] as Map<String, dynamic>?;
@@ -89,11 +91,13 @@ class _ShopScreenState extends State<ShopScreen> {
     final filteredItems = itemsList.where((item) =>
       item.categoryId == null || activeCategoryIds.contains(item.categoryId)
     ).toList();
+    final unitsList = (results[4] as List).map((j) => Unit.fromJson(j)).toList();
 
     return _ShopData(
       shop:       Shop.fromJson(results[0] as Map<String, dynamic>),
       items:      filteredItems,
       categories: cats,
+      units:      unitsList,
       summary:    ratingSummary,
     );
   }
@@ -197,13 +201,23 @@ class _ShopScreenState extends State<ShopScreen> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 12,
                                 mainAxisSpacing: 12,
-                                childAspectRatio: .85,
+                                childAspectRatio: 0.65,
                               ),
                               itemCount: d.items.length,
-                              itemBuilder: (_, i) => Container(
+                              itemBuilder: (_, i) {
+                                final item = d.items[i];
+                                return Container(
                                   key: i == 0 ? _productCardKey : null,
-                                  child: _ItemCard(item: d.items[i]),
-                                ),
+                                  child: ProductCard(
+                                    item: item,
+                                    isLiked: false,
+                                    onLikeToggle: () {},
+                                    units: d.units,
+                                    categories: d.categories,
+                                    onTap: () => context.push('/home/item/${item.id}'),
+                                  ),
+                                );
+                              },
                             ),
                     ),
                   ],
@@ -263,8 +277,9 @@ class _ShopData {
   final Shop shop;
   final List<Item> items;
   final List<Category> categories;
+  final List<Unit> units;
   final ShopRatingSummary summary;
-  _ShopData({required this.shop, required this.items, required this.categories, required this.summary});
+  _ShopData({required this.shop, required this.items, required this.categories, required this.units, required this.summary});
 }
 
 // ── Shop Reviews List and Breakdown Widget ────────────────────────────────────
