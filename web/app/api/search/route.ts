@@ -49,8 +49,10 @@ const CUSTOM_SYNONYMS: Record<string, string[]> = {
 
 function normalizeSearchQuery(input: string): string {
   let val = input.toLowerCase();
-  // Strip punctuation, keeping all Unicode letters and numbers
-  val = val.replace(/[^\p{L}\p{N}]/gu, '');
+  // Replace punctuation and special characters with spaces
+  val = val.replace(/[^\p{L}\p{N}\s]/gu, ' ');
+  // Collapse duplicate spaces and trim
+  val = val.replace(/\s+/g, ' ').trim();
   return val;
 }
 
@@ -109,6 +111,40 @@ function getSimilarity(str1: string, str2: string): number {
   }
   const union = trigrams1.length + trigrams2.length - intersection;
   return union > 0 ? intersection / union : 0;
+}
+
+function scoreSingleQueryWord(qWordNorm: string, qWordPhone: string, searchTerms: any[]): { score: number; term: string } {
+  let maxScore = 0;
+  let matchedTerm = '';
+
+  for (const st of searchTerms) {
+    const normTerm = normalizeSearchQuery(st.term);
+    const phoneTerm = generatePhoneticKey(st.term);
+
+    let score = 0;
+    if (normTerm === qWordNorm) {
+      score = 10.0 * st.priority;
+    } else if (normTerm.startsWith(qWordNorm)) {
+      score = 7.0 * st.priority;
+    } else if (qWordPhone && phoneTerm === qWordPhone) {
+      score = 5.0 * st.priority;
+    } else {
+      const sim = getSimilarity(normTerm, qWordNorm);
+      if (sim >= 0.35) {
+        score = 4.0 * sim * st.priority;
+      }
+    }
+    if (score === 0 && normTerm.includes(qWordNorm)) {
+      score = 2.0 * st.priority;
+    }
+
+    if (score > maxScore) {
+      maxScore = score;
+      matchedTerm = st.term;
+    }
+  }
+
+  return { score: maxScore, term: matchedTerm };
 }
 
 async function fetchDatabaseData(): Promise<CacheData> {
@@ -289,60 +325,74 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      // Score the query against all compiled search terms
+      // Score the query against all compiled search terms (multi-word aware)
       let maxScore = 0;
       let matchedTerm = '';
 
-      for (const st of searchTerms) {
-        const normTerm = normalizeSearchQuery(st.term);
-        const phoneTerm = generatePhoneticKey(st.term);
+      // 1. Score against original query (normQ, phoneQ)
+      let origScore = 0;
+      if (normQ) {
+        const qWords = normQ.split(/\s+/).filter(w => w.length >= 2);
+        let wordScoresSum = 0;
+        let matchedTermsList: string[] = [];
 
-        // A. Score against original query (normQ, phoneQ)
-        let origScore = 0;
-        if (normQ) {
-          if (normTerm === normQ) {
-            origScore = 10.0 * st.priority;
-          } else if (normTerm.startsWith(normQ)) {
-            origScore = 7.0 * st.priority;
-          } else if (phoneQ && phoneTerm === phoneQ) {
-            origScore = 5.0 * st.priority;
-          } else {
-            const sim = getSimilarity(normTerm, normQ);
-            if (sim >= 0.3) {
-              origScore = 4.0 * sim * st.priority;
-            }
-          }
-          if (origScore === 0 && normTerm.includes(normQ)) {
-            origScore = 2.0 * st.priority;
+        for (const qw of qWords) {
+          const qwPhone = generatePhoneticKey(qw);
+          const { score: wordScore, term: wordTerm } = scoreSingleQueryWord(qw, qwPhone, searchTerms);
+          if (wordScore > 0) {
+            wordScoresSum += wordScore;
+            matchedTermsList.push(wordTerm);
           }
         }
 
-        // B. Score against translated English query (normEngQ, phoneEngQ)
-        let engScore = 0;
-        if (hasTranslated && normEngQ) {
-          if (normTerm === normEngQ) {
-            engScore = 10.0 * st.priority;
-          } else if (normTerm.startsWith(normEngQ)) {
-            engScore = 7.0 * st.priority;
-          } else if (phoneEngQ && phoneTerm === phoneEngQ) {
-            engScore = 5.0 * st.priority;
-          } else {
-            const sim = getSimilarity(normTerm, normEngQ);
-            if (sim >= 0.3) {
-              engScore = 4.0 * sim * st.priority;
-            }
+        const baseMatch = scoreSingleQueryWord(normQ, phoneQ, searchTerms);
+        origScore = baseMatch.score;
+        matchedTerm = baseMatch.term;
+
+        if (qWords.length > 1) {
+          const wordMatchRatio = matchedTermsList.length / qWords.length;
+          const multiWordScore = (wordScoresSum / qWords.length) * (1.0 + wordMatchRatio);
+          if (multiWordScore > origScore) {
+            origScore = multiWordScore;
+            matchedTerm = matchedTermsList.join(', ');
           }
-          if (engScore === 0 && normTerm.includes(normEngQ)) {
-            engScore = 2.0 * st.priority;
+        }
+      }
+
+      // 2. Score against translated English query (normEngQ, phoneEngQ)
+      let engScore = 0;
+      let engMatchedTerm = '';
+      if (hasTranslated && normEngQ) {
+        const engWords = normEngQ.split(/\s+/).filter(w => w.length >= 2);
+        let engWordScoresSum = 0;
+        let engMatchedTermsList: string[] = [];
+
+        for (const ew of engWords) {
+          const ewPhone = generatePhoneticKey(ew);
+          const { score: wordScore, term: wordTerm } = scoreSingleQueryWord(ew, ewPhone, searchTerms);
+          if (wordScore > 0) {
+            engWordScoresSum += wordScore;
+            engMatchedTermsList.push(wordTerm);
           }
         }
 
-        const termScore = Math.max(origScore, engScore);
+        const baseEngMatch = scoreSingleQueryWord(normEngQ, phoneEngQ, searchTerms);
+        engScore = baseEngMatch.score;
+        engMatchedTerm = baseEngMatch.term;
 
-        if (termScore > maxScore) {
-          maxScore = termScore;
-          matchedTerm = st.term;
+        if (engWords.length > 1) {
+          const engWordMatchRatio = engMatchedTermsList.length / engWords.length;
+          const engMultiWordScore = (engWordScoresSum / engWords.length) * (1.0 + engWordMatchRatio);
+          if (engMultiWordScore > engScore) {
+            engScore = engMultiWordScore;
+            engMatchedTerm = engMatchedTermsList.join(', ');
+          }
         }
+      }
+
+      maxScore = Math.max(origScore, engScore);
+      if (engScore > origScore && engMatchedTerm) {
+        matchedTerm = engMatchedTerm;
       }
 
       // Price resolution: check variants first, then config

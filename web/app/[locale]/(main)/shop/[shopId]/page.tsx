@@ -37,7 +37,7 @@ export default async function ShopPage({ params }: Props) {
   ] = await Promise.all([
     supabase.from('shops').select('*').eq('id', shopId).single(),
     supabase.from('items')
-      .select('*, item_images(image_url), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*)')
+      .select('*, item_images(image_url), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*), item_translations(*)')
       .eq('shop_id', shopId).eq('is_active', true).is('deleted_at', null).order('name'),
     supabase.from('categories').select('id, name').eq('is_active', true).order('name'),
     supabase.from('units').select('*'),

@@ -44,6 +44,7 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
   const [selections, setSelections] = useState<Record<string, Selection>>({})
   const [wishlist, setWishlist] = useState<Set<string>>(new Set())
   const [isPending, startTransition] = useTransition()
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   // Sync with initialCartItems from the server
   useEffect(() => {
@@ -84,9 +85,31 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
   }
 
   const filtered = useMemo(() => {
-    if (activeCat === 'all') return items
-    return items.filter(i => i.category_id === activeCat)
-  }, [items, activeCat])
+    let list = items
+    if (activeCat !== 'all') {
+      list = list.filter(i => i.category_id === activeCat)
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim()
+      list = list.filter(item => {
+        // 1. Match item base name & description
+        if (item.name.toLowerCase().includes(q)) return true
+        if (item.description?.toLowerCase().includes(q)) return true
+
+        // 2. Match translations (name, description, keywords)
+        const translations = item.item_translations || []
+        for (const t of translations) {
+          if (t.name?.toLowerCase().includes(q)) return true
+          if (t.description?.toLowerCase().includes(q)) return true
+        }
+
+        return false
+      })
+    }
+
+    return list
+  }, [items, activeCat, searchQuery])
 
   function getCartItem(itemId: string, variantId?: string, isManualOrDynamic?: boolean) {
     if (isManualOrDynamic) return cart.find(c => c.itemId === itemId)
@@ -770,7 +793,19 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
             className="bottom-input"
             placeholder={t('catalog.search_placeholder')}
             id="catalog-message-input"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
+          {searchQuery && (
+            <button 
+              type="button"
+              className="bottom-icon-btn" 
+              onClick={() => setSearchQuery('')}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <X size={18} />
+            </button>
+          )}
         </div>
 
         {totalItems > 0 ? (
