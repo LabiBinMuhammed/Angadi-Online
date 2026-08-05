@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
@@ -152,7 +153,17 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => _searchingItems = true);
       
       final lang = LanguageService.instance.locale.languageCode;
-      final base = 'http://192.168.18.176:3000';
+      String base = 'http://localhost:3000';
+      if (kIsWeb) {
+        final uri = Uri.parse(Uri.base.toString());
+        base = '${uri.scheme}://${uri.host}:3000';
+      } else {
+        if (defaultTargetPlatform == TargetPlatform.android) {
+          base = 'http://10.0.2.2:3000';
+        } else {
+          base = 'http://localhost:3000';
+        }
+      }
       var urlStr = '$base/api/search?q=${Uri.encodeComponent(query.trim())}&lang=$lang';
       if (_selectedShopId != null) {
         urlStr += '&shopId=$_selectedShopId';
@@ -1268,7 +1279,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
     List<Item> itemsToShow;
     if (_itemSearch.isNotEmpty) {
-      itemsToShow = _itemSearchResults;
+      final queryLower = _itemSearch.toLowerCase().trim();
+      itemsToShow = shopItems.where((item) {
+        // 1. Base name & description match
+        if (item.name.toLowerCase().contains(queryLower)) return true;
+        if (item.description?.toLowerCase().contains(queryLower) ?? false) return true;
+
+        // 2. Localized translations match (name, description, keywords)
+        if (item.itemTranslations != null) {
+          for (var t in item.itemTranslations!) {
+            final tName = t['name']?.toString().toLowerCase() ?? '';
+            final tDesc = t['description']?.toString().toLowerCase() ?? '';
+            if (tName.contains(queryLower)) return true;
+            if (tDesc.contains(queryLower)) return true;
+          }
+        }
+        return false;
+      }).toList();
+
+      if (_selectedCategory != null) {
+        itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
+      }
     } else {
       itemsToShow = List.from(shopItems);
       if (_selectedCategory != null) {
