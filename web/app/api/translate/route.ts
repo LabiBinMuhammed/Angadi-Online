@@ -7,7 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 }
 
-const targetLanguages = ['ml', 'hi', 'ar']
+const targetLanguages = ['ml', 'hi', 'ar', 'me', 'he', 'ae']
 
 function normalizeSearchQuery(input: string): string {
   let val = input.toLowerCase();
@@ -22,16 +22,23 @@ async function translateWithGemini(
   type: string
 ): Promise<{ translatedFields: Record<string, string>; keywords: string[] }> {
   const languageNames: Record<string, string> = {
-    ml: 'Malayalam',
-    hi: 'Hindi',
-    ar: 'Arabic'
+    ml: 'Malayalam (native Malayalam script, e.g. തക്കാളി, സവാള)',
+    hi: 'Hindi (native Devanagari script, e.g. टमाटर, प्याज)',
+    ar: 'Arabic (native Arabic script, e.g. طماطم, بصل)',
+    me: 'Manglish (Malayalam written in English/Latin letters phonetically, e.g. thakkali, ulli, savala, vellakka)',
+    he: 'Hinglish (Hindi written in English/Latin letters phonetically, e.g. tamatar, pyaz)',
+    ae: 'Arabish (Arabic written in English/Latin letters phonetically, e.g. banadora, basal)'
   };
   const langName = languageNames[targetLang] || targetLang;
 
   const prompt = `
 You are a helpful localization assistant.
-Translate the following fields to the language: ${langName} (code: ${targetLang}).
+Translate the following fields to the language/transliteration: ${langName} (code: ${targetLang}).
 If the field is empty or undefined, keep it empty.
+
+Guideline for Translating/Transliterating:
+1. Translate the meaning accurately to the target language/transliteration.
+2. If you cannot translate a specific term, or if a term is commonly referred to by its English name in daily local speech, simply write the English word itself in the target script/letters (e.g. keep it as the English word, or transliterate it phonetically).
 
 Fields to translate:
 ${JSON.stringify(fields, null, 2)}
@@ -47,7 +54,7 @@ You MUST return the output ONLY as a valid JSON object matching the following Ty
 `;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent?key=${apiKey}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
