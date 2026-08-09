@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function FavoritesClient({ initialFavorites }: Props) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [favorites, setFavorites] = useState<FavoriteItemType[]>(initialFavorites)
   const [isPending, startTransition] = useTransition()
   const [addingItemId, setAddingItemId] = useState<string | null>(null)

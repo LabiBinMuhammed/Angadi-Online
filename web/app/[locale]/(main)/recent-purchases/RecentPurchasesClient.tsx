@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function RecentPurchasesClient({ initialPurchases }: Props) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [purchases] = useState<RecentPurchaseItem[]>(initialPurchases)
   const [daysFilter, setDaysFilter] = useState<'7' | '30' | '90' | 'all'>('90')
   const [sortBy, setSortBy] = useState<'recent' | 'ordered'>('recent')

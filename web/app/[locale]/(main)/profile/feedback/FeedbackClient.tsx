@@ -23,7 +23,7 @@ interface Props {
 }
 
 export default function FeedbackClient({ initialFeedbacks, userId }: Props) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [feedbacks, setFeedbacks] = useState<Feedback[]>(initialFeedbacks)
   const [activeTab, setActiveTab] = useState<'submit' | 'history'>('submit')
 
