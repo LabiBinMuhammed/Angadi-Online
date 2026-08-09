@@ -110,8 +110,8 @@ export default function AddressDropdownClient({ addresses }: Props) {
                   {addr.label} {addr.is_default && <span style={{ fontSize: '10px', background: 'var(--bg-muted)', padding: '2px 6px', borderRadius: '8px', marginLeft: '6px', color: 'var(--text-muted)', fontWeight: 700 }}>{t('address.default')}</span>}
                 </b>
                 <span style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: 1.4, fontWeight: 500 }}>
-                  {addr.address_line_1}
-                  {addr.address_line_2 ? `, ${addr.address_line_2}` : ''}
+                  {[addr.house_name, addr.address_line_1].filter(Boolean).join(', ')}
+                  {[addr.address_line_2, addr.village].filter(Boolean).length > 0 ? `, ${[addr.address_line_2, addr.village].filter(Boolean).join(', ')}` : ''}
                 </span>
               </div>
             </button>

@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -5,6 +7,7 @@ import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../widgets/directional_huge_icon.dart';
 import 'vendor_theme_helper.dart';
+import 'vendor_single_image_uploader.dart';
 
 class VendorShopDetailScreen extends StatefulWidget {
   final String shopId;
@@ -106,16 +109,27 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
         finalType = '${finalType}_inactive';
       }
 
-      await supabase.from('shops').update({
-        'name': _nameController.text.trim(),
-        'type': finalType,
-        'location_id': _selectedLocationId,
-        'logo_url': _logoController.text.trim().isEmpty ? null : _logoController.text.trim(),
-        'banner_url': _bannerController.text.trim().isEmpty ? null : _bannerController.text.trim(),
-        'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
-        'opening_time': _openingTimeController.text.trim().isEmpty ? null : _openingTimeController.text.trim(),
-        'closing_time': _closingTimeController.text.trim().isEmpty ? null : _closingTimeController.text.trim(),
-      }).eq('id', widget.shopId);
+      final res = await http.put(
+        Uri.parse('http://localhost:3000/api/vendor/shop'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'shopId': widget.shopId,
+          'name': _nameController.text.trim(),
+          'type': _selectedType,
+          'locationId': _selectedLocationId,
+          'isActive': _isActive,
+          'logoUrl': _logoController.text.trim().isEmpty ? null : _logoController.text.trim(),
+          'bannerUrl': _bannerController.text.trim().isEmpty ? null : _bannerController.text.trim(),
+          'description': _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
+          'openingTime': _openingTimeController.text.trim().isEmpty ? null : _openingTimeController.text.trim(),
+          'closingTime': _closingTimeController.text.trim().isEmpty ? null : _closingTimeController.text.trim(),
+        }),
+      );
+
+      final data = jsonDecode(res.body);
+      if (res.statusCode != 200 || data['success'] != true) {
+        throw Exception(data['error'] ?? 'Failed to update shop');
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -140,6 +154,52 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
     }
     return name.substring(0, name.length > 2 ? 2 : name.length).toUpperCase();
+  }
+
+  Future<void> _selectTime(TextEditingController controller) async {
+    TimeOfDay initial = TimeOfDay.now();
+    if (controller.text.isNotEmpty) {
+      try {
+        final parts = controller.text.trim().split(' ');
+        final timeParts = parts[0].split(':');
+        int hour = int.parse(timeParts[0]);
+        int minute = int.parse(timeParts[1]);
+        if (parts.length > 1 && parts[1].toUpperCase() == 'PM' && hour < 12) {
+          hour += 12;
+        } else if (parts.length > 1 && parts[1].toUpperCase() == 'AM' && hour == 12) {
+          hour = 0;
+        }
+        initial = TimeOfDay(hour: hour, minute: minute);
+      } catch (_) {}
+    }
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF60A5FA),
+              onPrimary: Colors.black,
+              surface: Color(0xFF18181B),
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final hour = picked.hourOfPeriod == 0 ? 12 : picked.hourOfPeriod;
+      final minute = picked.minute.toString().padLeft(2, '0');
+      final period = picked.period == DayPeriod.am ? 'AM' : 'PM';
+      final formattedHour = hour.toString().padLeft(2, '0');
+      setState(() {
+        controller.text = '$formattedHour:$minute $period';
+      });
+    }
   }
 
   @override
@@ -283,9 +343,10 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                               const SizedBox(height: 8),
                               DropdownButtonFormField<String>(
                                 value: _selectedType,
-                                dropdownColor: const Color(0xFF18181B),
-                                style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
-                                icon: Icon(Icons.keyboard_arrow_down, color: kVendorSubText),
+                                dropdownColor: const Color(0xFF1E293B),
+                                borderRadius: BorderRadius.circular(16),
+                                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF60A5FA), size: 22),
                                 decoration: vendorInputDecoration(
                                   hintText: '-- Select a type --',
                                   prefixIcon: Icon(Icons.tag, color: kVendorSubText, size: 20),
@@ -293,7 +354,10 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                 items: _shopTypes.map((t) {
                                   return DropdownMenuItem<String>(
                                     value: t,
-                                    child: Text(t[0].toUpperCase() + t.substring(1)),
+                                    child: Text(
+                                      t[0].toUpperCase() + t.substring(1),
+                                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                                    ),
                                   );
                                 }).toList(),
                                 onChanged: (val) => setState(() => _selectedType = val),
@@ -305,9 +369,10 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                               const SizedBox(height: 8),
                               DropdownButtonFormField<String>(
                                 value: _selectedLocationId,
-                                dropdownColor: const Color(0xFF18181B),
-                                style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
-                                icon: Icon(Icons.keyboard_arrow_down, color: kVendorSubText),
+                                dropdownColor: const Color(0xFF1E293B),
+                                borderRadius: BorderRadius.circular(16),
+                                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF60A5FA), size: 22),
                                 decoration: vendorInputDecoration(
                                   hintText: '-- No location --',
                                   prefixIcon: Icon(Icons.location_on, color: kVendorSubText, size: 20),
@@ -315,7 +380,10 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                 items: _locations.map((loc) {
                                   return DropdownMenuItem<String>(
                                     value: loc['id'] as String,
-                                    child: Text(loc['name'] as String),
+                                    child: Text(
+                                      loc['name'] as String,
+                                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                                    ),
                                   );
                                 }).toList(),
                                 onChanged: (val) => setState(() => _selectedLocationId = val),
@@ -323,62 +391,21 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                               const SizedBox(height: 20),
 
                               // Logo / Shop Photo
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Logo / Shop Photo', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
-                                    ),
-                                    child: const Text(
-                                      'Optional - 🔥 More Important',
-                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              TextFormField(
-                                controller: _logoController,
-                                style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
-                                decoration: vendorInputDecoration(
-                                  hintText: 'https://example.com/logo.png',
-                                  prefixIcon: Icon(Icons.image, color: kVendorSubText, size: 20),
-                                ),
+                              VendorSingleImageUploader(
+                                label: 'Logo / Shop Photo',
+                                initialUrl: _logoController.text,
+                                helperText: 'Optional - 🔥 More Important',
+                                onUrlChanged: (url) => setState(() => _logoController.text = url),
                               ),
                               const SizedBox(height: 20),
 
                               // Banner Image
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Banner Image', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
-                                    ),
-                                    child: const Text(
-                                      'Optional - 🔥 More Important',
-                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              TextFormField(
-                                controller: _bannerController,
-                                style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
-                                decoration: vendorInputDecoration(
-                                  hintText: 'https://example.com/banner.png',
-                                  prefixIcon: Icon(Icons.panorama, color: kVendorSubText, size: 20),
-                                ),
+                              VendorSingleImageUploader(
+                                label: 'Banner Image',
+                                initialUrl: _bannerController.text,
+                                isBanner: true,
+                                helperText: 'Optional - 🔥 More Important',
+                                onUrlChanged: (url) => setState(() => _bannerController.text = url),
                               ),
                               const SizedBox(height: 20),
 
@@ -437,9 +464,11 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                         const SizedBox(height: 8),
                                         TextFormField(
                                           controller: _openingTimeController,
+                                          readOnly: true,
+                                          onTap: () => _selectTime(_openingTimeController),
                                           style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
                                           decoration: vendorInputDecoration(
-                                            hintText: '08:00 AM',
+                                            hintText: 'Select opening time',
                                             prefixIcon: Icon(Icons.access_time, color: kVendorSubText, size: 18),
                                           ),
                                         ),
@@ -468,9 +497,11 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                         const SizedBox(height: 8),
                                         TextFormField(
                                           controller: _closingTimeController,
+                                          readOnly: true,
+                                          onTap: () => _selectTime(_closingTimeController),
                                           style: TextStyle(color: kVendorText, fontSize: 15, fontWeight: FontWeight.w500),
                                           decoration: vendorInputDecoration(
-                                            hintText: '10:00 PM',
+                                            hintText: 'Select closing time',
                                             prefixIcon: Icon(Icons.access_time_filled, color: kVendorSubText, size: 18),
                                           ),
                                         ),

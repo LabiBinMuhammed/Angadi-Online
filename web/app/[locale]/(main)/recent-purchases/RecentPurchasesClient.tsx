@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, History, Search, ShoppingCart, Loader2, Check } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import BackButton from '@/components/BackButton'
 import { addToCart } from '../cart/actions'
 
 interface RecentPurchaseItem {
@@ -159,9 +160,9 @@ export default function RecentPurchasesClient({ initialPurchases }: Props) {
         {toast && <div className="toast">{toast}</div>}
 
         <div className="header">
-          <Link href="/profile" className="back-btn">
+          <BackButton fallbackHref={`/${locale}/profile`}>
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">{t('recent_purchases.title')}</h1>
         </div>
 

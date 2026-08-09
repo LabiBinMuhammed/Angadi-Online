@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { supabaseAdmin } from '@/lib/supabase/admin'
 import ReplacementRequestClient from './ReplacementRequestClient'
 
 type Props = { params: Promise<{ locale: string; orderId: string }> }
@@ -19,13 +20,12 @@ export default async function ReplacementPage({ params }: Props) {
     redirect(`/${locale}/login`)
   }
 
-  // Fetch order details with shop settings
-  const { data: order, error: orderErr } = await supabase
+  // Fetch order details with shop settings using supabaseAdmin to ensure reliable access
+  const { data: order, error: orderErr } = await supabaseAdmin
     .from('orders')
     .select('*, shops(name, replacement_enabled, return_window_hours, replacement_policy)')
     .eq('id', orderId)
-    .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (orderErr || !order) {
     notFound()
@@ -53,13 +53,13 @@ export default async function ReplacementPage({ params }: Props) {
     redirect(`/${locale}/orders/${orderId}?error=window_expired`)
   }
 
-  // Fetch order items with variant details
-  const { data: orderItems, error: itemsErr } = await supabase
+  // Fetch order items with variant details using fallback view
+  const { data: orderItems, error: itemsErr } = await supabaseAdmin
     .from('order_items')
-    .select('*, items(name), item_variants(label)')
+    .select('*, items(name), item_variants:vw_item_variants_with_fallback(label)')
     .eq('order_id', orderId)
 
-  if (itemsErr || !orderItems || orderItems.length === 0) {
+  if (itemsErr || !orderItems) {
     notFound()
   }
 

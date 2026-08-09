@@ -512,6 +512,10 @@
   transition: all 0.2s ease;
 }
 
+input[type="time"].vp-input {
+  color-scheme: dark;
+}
+
 .vp-input::placeholder, .vp-textarea::placeholder { color: var(--text-muted); }
 
 .vp-input:focus, .vp-textarea:focus, .vp-select:focus {

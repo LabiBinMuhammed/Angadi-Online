@@ -98,7 +98,7 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
         if (item.description?.toLowerCase().includes(q)) return true
 
         // 2. Match translations (name, description, keywords)
-        const translations = item.item_translations || []
+        const translations = (item as any).item_translations || (item as any).translations || []
         for (const t of translations) {
           if (t.name?.toLowerCase().includes(q)) return true
           if (t.description?.toLowerCase().includes(q)) return true

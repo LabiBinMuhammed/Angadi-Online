@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { updateShopAction } from '../actions'
 import { Store, Tag, MapPin, Rocket, AlertCircle, CheckCircle, ArrowLeft, Eye, EyeOff, Plus, ShoppingBag, CreditCard, LayoutGrid } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import FileUploadInput from '@/components/FileUploadInput'
 
 type Location = { id: string; name: string }
 
@@ -197,37 +198,27 @@ export default function ShopDetailClient({ shop, locations }: Props) {
               </div>
             </div>
 
-            {/* Logo / Shop Photo */}
-            <div className="vp-form-group">
-              <label className="vp-label" htmlFor="shop-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>Logo / Shop Photo</span>
-                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>Optional - 🔥 More Important</span>
-              </label>
-              <input
-                id="shop-logo"
-                className="vp-input"
-                type="text"
-                placeholder="https://example.com/logo.png"
-                value={logoUrl}
-                onChange={e => setLogoUrl(e.target.value)}
-              />
-            </div>
+            {/* Logo / Shop Photo File Upload */}
+            <FileUploadInput
+              id="shop-logo"
+              label="Logo / Shop Photo"
+              value={logoUrl}
+              onChange={setLogoUrl}
+              aspectRatio="square"
+              placeholder="Click or drag logo file here"
+              helperText="Optional - 🔥 More Important"
+            />
 
-            {/* Banner Image */}
-            <div className="vp-form-group">
-              <label className="vp-label" htmlFor="shop-banner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span>Banner Image</span>
-                <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)' }}>Optional - 🔥 More Important</span>
-              </label>
-              <input
-                id="shop-banner"
-                className="vp-input"
-                type="text"
-                placeholder="https://example.com/banner.png"
-                value={bannerUrl}
-                onChange={e => setBannerUrl(e.target.value)}
-              />
-            </div>
+            {/* Banner Image File Upload */}
+            <FileUploadInput
+              id="shop-banner"
+              label="Banner Image"
+              value={bannerUrl}
+              onChange={setBannerUrl}
+              aspectRatio="banner"
+              placeholder="Click or drag banner file here"
+              helperText="Optional - 🔥 More Important"
+            />
 
             {/* Description */}
             <div className="vp-form-group">
@@ -256,8 +247,7 @@ export default function ShopDetailClient({ shop, locations }: Props) {
                 <input
                   id="shop-opening"
                   className="vp-input"
-                  type="text"
-                  placeholder="e.g. 08:00 AM"
+                  type="time"
                   value={openingTime}
                   onChange={e => setOpeningTime(e.target.value)}
                 />
@@ -271,8 +261,7 @@ export default function ShopDetailClient({ shop, locations }: Props) {
                 <input
                   id="shop-closing"
                   className="vp-input"
-                  type="text"
-                  placeholder="e.g. 10:00 PM"
+                  type="time"
                   value={closingTime}
                   onChange={e => setClosingTime(e.target.value)}
                 />

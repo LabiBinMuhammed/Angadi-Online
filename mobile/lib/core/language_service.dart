@@ -41,9 +41,9 @@ class LanguageService extends ChangeNotifier {
       final user = supabase.auth.currentUser;
       if (user != null) {
         await supabase
-            .from('user_profiles')
+            .from('users')
             .update({'preferred_language': code})
-            .eq('user_id', user.id);
+            .eq('id', user.id);
       }
     } catch (e) {
       debugPrint('Failed to sync language selection to Supabase: $e');
@@ -57,9 +57,9 @@ class LanguageService extends ChangeNotifier {
       if (user == null) return;
 
       final res = await supabase
-          .from('user_profiles')
+          .from('users')
           .select('preferred_language')
-          .eq('user_id', user.id)
+          .eq('id', user.id)
           .maybeSingle();
 
       if (res != null && res['preferred_language'] != null) {

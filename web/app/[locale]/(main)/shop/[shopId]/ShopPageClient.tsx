@@ -5,8 +5,8 @@ import ShopCatalogClient from './ShopCatalogClient'
 import ShopReviewsClient from './ShopReviewsClient'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import type { Item, Category } from '@/types'
-import Link from 'next/link'
-import { MessageSquare, ArrowLeft } from 'lucide-react'
+import { MessageSquare, ArrowLeft, Star, Store, MapPin, CheckCircle2 } from 'lucide-react'
+import BackButton from '@/components/BackButton'
 
 interface Props {
   items: Item[]
@@ -41,7 +41,7 @@ export default function ShopPageClient({
   distance,
   initialCartItems
 }: Props) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const [activeTab, setActiveTab] = useState<'catalog' | 'reviews'>('catalog')
 
   useEffect(() => {
@@ -56,92 +56,223 @@ export default function ShopPageClient({
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
-        .shop-chat-header { top: 0 !important; }
-        .tabs-container { display: flex; background: var(--bg-surface); border-bottom: 1px solid var(--border); }
-        .tab-btn { flex: 1; text-align: center; padding: 14px; font-size: 15px; font-weight: 700; color: var(--text-muted); cursor: pointer; background: transparent; border: none; border-bottom: 3px solid transparent; transition: all 0.2s; outline: none; }
-        .tab-btn:hover { color: var(--text-base); }
-        .tab-btn.active { color: var(--wa-green-dark); border-bottom-color: var(--wa-green-dark); }
-        .tab-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--border); color: var(--text-base); margin-left: 6px; font-weight: 800; }
-        .tab-btn.active .tab-badge { background: var(--wa-green-light); color: var(--wa-green-dark); }
+        .shop-header-card {
+          background: linear-gradient(135deg, rgba(37, 211, 102, 0.08) 0%, rgba(16, 185, 129, 0.03) 100%), var(--bg-surface);
+          border-bottom: 1px solid var(--border);
+          padding: 16px 20px 0;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          position: sticky;
+          top: 0;
+          z-index: 40;
+          backdrop-filter: blur(12px);
+        }
+
+        .shop-header-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 12px;
+        }
+
+        .shop-header-main {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          min-width: 0;
+        }
+
+        .shop-avatar-box {
+          position: relative;
+          width: 52px;
+          height: 52px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, var(--wa-green), #10b981);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 800;
+          font-size: 20px;
+          box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+          flex-shrink: 0;
+          overflow: hidden;
+        }
+
+        .shop-avatar-box img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .shop-online-dot {
+          position: absolute;
+          bottom: 2px;
+          right: 2px;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #22c55e;
+          border: 2px solid var(--bg-surface);
+          box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+
+        .shop-info-meta {
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
+          min-width: 0;
+        }
+
+        .shop-title-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .shop-name-heading {
+          font-size: 20px;
+          font-weight: 800;
+          color: var(--text-base);
+          margin: 0;
+          letter-spacing: -0.4px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .shop-tags-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-wrap: wrap;
+          font-size: 12px;
+          color: var(--text-muted);
+        }
+
+        .rating-badge-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          background: rgba(245, 158, 11, 0.12);
+          color: #f59e0b;
+          padding: 2px 8px;
+          border-radius: 20px;
+          font-weight: 700;
+          font-size: 12px;
+        }
+
+        .tabs-header-nav {
+          display: flex;
+          gap: 8px;
+          margin-top: 8px;
+        }
+
+        .header-tab-btn {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 12px 16px;
+          font-size: 14px;
+          font-weight: 700;
+          color: var(--text-muted);
+          background: transparent;
+          border: none;
+          border-bottom: 3px solid transparent;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .header-tab-btn:hover {
+          color: var(--text-base);
+        }
+
+        .header-tab-btn.active {
+          color: var(--wa-green);
+          border-bottom-color: var(--wa-green);
+        }
+
+        .review-count-badge {
+          font-size: 11px;
+          padding: 2px 8px;
+          border-radius: 12px;
+          background: var(--bg-muted);
+          color: var(--text-base);
+          font-weight: 800;
+        }
+
+        .header-tab-btn.active .review-count-badge {
+          background: rgba(37, 211, 102, 0.15);
+          color: var(--wa-green);
+        }
       `}} />
 
-      {/* ── WA-style Shop Header ─────────────────────────────── */}
-      <div className="shop-chat-header">
-        <div className="shop-chat-header-left">
-          {/* Back Button */}
-          <Link href="/home" className="shop-chat-icon-btn" style={{ marginRight: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title={t('vendor_nav.back_to_marketplace')}>
-            <ArrowLeft size={20} />
-          </Link>
-          {/* Avatar */}
-          <div className="shop-chat-avatar">
-            {logoUrl
-              ? <img src={logoUrl} alt={shopName} />
-              : initials}
-          </div>
-          {/* Info */}
-          <div className="shop-chat-info">
-            <h1 className="shop-chat-name">{shopName}</h1>
-            <p className="shop-chat-status">
-              <span className="shop-open-dot" />
-              {t('catalog.open')}
-              {distance && ` · ${distance} ${t('catalog.away')}`}
-              {' · '}
-              <span className="shop-click-info">{t('catalog.click_for_info')}</span>
-            </p>
+      {/* ── Redesigned Shop Hero Header ─────────────────────────────── */}
+      <div className="shop-header-card">
+        <div className="shop-header-top">
+          <div className="shop-header-main">
+            <BackButton fallbackHref={`/${locale}/home`}>
+              <ArrowLeft size={20} />
+            </BackButton>
+
+            <div className="shop-avatar-box">
+              {logoUrl ? <img src={logoUrl} alt={shopName} /> : initials}
+              <span className="shop-online-dot" />
+            </div>
+
+            <div className="shop-info-meta">
+              <div className="shop-title-row">
+                <h1 className="shop-name-heading">{shopName}</h1>
+                <CheckCircle2 size={16} color="var(--wa-green)" />
+              </div>
+              
+              <div className="shop-tags-row">
+                {ratingSummary.total_reviews > 0 ? (
+                  <span className="rating-badge-pill">
+                    <Star size={12} fill="#f59e0b" color="#f59e0b" />
+                    {ratingSummary.average_rating.toFixed(1)} ({ratingSummary.total_reviews})
+                  </span>
+                ) : (
+                  <span className="rating-badge-pill" style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}>
+                    New Shop
+                  </span>
+                )}
+                <span>·</span>
+                <span style={{ color: '#22c55e', fontWeight: 600 }}>{t('catalog.open')}</span>
+                {distance && (
+                  <>
+                    <span>·</span>
+                    <span><MapPin size={11} style={{ display: 'inline', marginRight: 2 }} />{distance}</span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Right action icons */}
-        <div className="shop-chat-actions">
-          {/* Feedback Icon / Button */}
-          <button 
-            className={`shop-chat-icon-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-            style={{ position: 'relative' }}
-            onClick={() => setActiveTab(activeTab === 'reviews' ? 'catalog' : 'reviews')}
-            title={t('catalog.read_reviews')}
-            aria-label="Feedback"
+        {/* Segmented Nav Tabs */}
+        <div className="tabs-header-nav">
+          <button
+            className={`header-tab-btn ${activeTab === 'catalog' ? 'active' : ''}`}
+            onClick={() => setActiveTab('catalog')}
+            id="shop-tab-catalog"
           >
-            <MessageSquare size={20} style={activeTab === 'reviews' ? { color: 'var(--wa-green-dark)' } : undefined} />
-            {ratingSummary.total_reviews > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '-4px',
-                right: '-4px',
-                background: 'var(--wa-green-dark)',
-                color: 'white',
-                fontSize: '9px',
-                fontWeight: 800,
-                borderRadius: '50%',
-                width: '15px',
-                height: '15px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}>
-                {ratingSummary.total_reviews}
-              </span>
-            )}
+            <Store size={16} />
+            {t('reviews.catalog_tab')}
+          </button>
+          
+          <button
+            className={`header-tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reviews')}
+            id="shop-tab-reviews"
+          >
+            <MessageSquare size={16} />
+            {t('reviews.tab_title')}
+            <span className="review-count-badge">{ratingSummary.total_reviews}</span>
           </button>
         </div>
-      </div>
-
-      <div className="tabs-container">
-        <button
-          className={`tab-btn ${activeTab === 'catalog' ? 'active' : ''}`}
-          onClick={() => setActiveTab('catalog')}
-          id="shop-tab-catalog"
-        >
-          {t('reviews.catalog_tab')}
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-          onClick={() => setActiveTab('reviews')}
-          id="shop-tab-reviews"
-        >
-          {t('reviews.tab_title')}
-          <span className="tab-badge">{ratingSummary.total_reviews}</span>
-        </button>
       </div>
 
       <div className="shop-tab-content">

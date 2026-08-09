@@ -19,6 +19,7 @@ import '../screens/main/checkout/checkout_screen.dart';
 import '../screens/main/checkout/order_success_screen.dart';
 import '../screens/main/orders/orders_screen.dart';
 import '../screens/main/orders/order_detail_screen.dart';
+import '../screens/main/orders/replacement_request_screen.dart';
 import '../screens/main/profile/profile_screen.dart';
 import '../screens/main/profile/addresses_screen.dart';
 import '../screens/main/profile/add_edit_address_screen.dart';
@@ -34,6 +35,7 @@ import '../screens/vendor/vendor_credit_screen.dart';
 import '../screens/vendor/vendor_user_credit_screen.dart';
 import '../screens/vendor/vendor_shops_screen.dart';
 import '../screens/vendor/vendor_shop_detail_screen.dart';
+import '../screens/vendor/vendor_replacements_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/admin_screens.dart';
 import '../screens/admin/admin_user_detail_screen.dart';
@@ -116,6 +118,13 @@ GoRouter buildRouter() {
 
       // ── Full-screen routes (above shell) ─────────────────────────────
       GoRoute(path: '/search', builder: (_, __) => const SearchScreen()),
+      GoRoute(
+        path: '/shop/:shopId',
+        builder: (_, state) => ShopScreen(
+          shopId: state.pathParameters['shopId']!,
+          initialTab: state.uri.queryParameters['tab'],
+        ),
+      ),
 
       // ── Vendor routes ─────────────────────────────────────────────────
       GoRoute(path: '/vendor/dashboard',  builder: (_, __) => const VendorDashboardScreen()),
@@ -147,6 +156,7 @@ GoRouter buildRouter() {
         path: '/vendor/shop/:shopId',
         builder: (_, state) => VendorShopDetailScreen(shopId: state.pathParameters['shopId']!),
       ),
+      GoRoute(path: '/vendor/replacements', builder: (_, __) => const VendorReplacementsScreen()),
 
       // ── Admin routes ──────────────────────────────────────────────────
       GoRoute(path: '/admin/dashboard',   builder: (_, __) => const AdminDashboardScreen()),
@@ -252,6 +262,12 @@ GoRouter buildRouter() {
                   GoRoute(
                     path: 'review',
                     builder: (_, state) => LeaveReviewScreen(
+                      orderId: state.pathParameters['orderId']!,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'replacement',
+                    builder: (_, state) => ReplacementRequestScreen(
                       orderId: state.pathParameters['orderId']!,
                     ),
                   ),

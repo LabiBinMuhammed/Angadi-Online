@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { useState, useTransition } from 'react'
-import { removeOrderItem, updateOrderItemQty, updateDeliverySchedule } from './actions'
+import { removeOrderItem, updateOrderItemQty, updateDeliverySchedule, updateOrderItemVariant } from './actions'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import { ArrowLeft, Trash2, Heart, Plus, Minus, Calendar, Sun, Moon, Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Cookie, Package, CupSoda } from 'lucide-react'
+import BackButton from '@/components/BackButton'
 
 function getFallbackIcon(name: string = '', size = 40) {
   const lower = name.toLowerCase()
@@ -25,13 +26,16 @@ import { useEffect } from 'react'
 export default function CartPageClient({ 
   initialOrders,
   deliverySettings = [],
-  placedOrders = []
+  placedOrders = [],
+  units = []
 }: { 
   initialOrders: any[]
   deliverySettings?: any[]
   placedOrders?: any[]
+  units?: any[]
 }) {
-  const { t } = useTranslation()
+
+  const { t, locale } = useTranslation()
   const [isPending, startTransition] = useTransition()
 
   const pendingOrders = initialOrders?.filter(o => o.status === 'pending' && !o.payment_type) || []
@@ -229,6 +233,16 @@ export default function CartPageClient({
     })
   }
 
+  function handleUpdateVariant(orderId: string, orderItemId: string, newVariantId: string, newPrice: number) {
+    startTransition(async () => {
+      try {
+        await updateOrderItemVariant(orderId, orderItemId, newVariantId, newPrice)
+      } catch (err) {
+        alert(t('cart.err_update_qty'))
+      }
+    })
+  }
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: `
@@ -269,15 +283,15 @@ export default function CartPageClient({
         .cart-items { flex: 1; overflow-y: auto; padding: 12px 12px 120px; display: flex; flex-direction: column; gap: 10px; }
         .cart-items::-webkit-scrollbar { display: none; }
         
-        .cart-item-content { position: relative; width: 100%; background: var(--bg-surface); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+        .cart-item-content { position: relative; width: 100%; background: var(--bg-surface); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
         
-        .item-img-wrap { width: 72px; height: 72px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--bg-muted); border-radius: 12px; overflow: hidden; padding: 6px; }
+        .item-img-wrap { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--bg-muted); border-radius: 12px; overflow: hidden; padding: 6px; }
         .item-img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
-        .item-info { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 18px; }
+        .item-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; padding-right: 28px; }
         .item-name { font-size: 14px; font-weight: 700; color: var(--text-base); margin: 0; line-height: 1.3; white-space: normal; word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
         .item-weight { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-        .item-price-qty-row { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+        .item-price-qty-row { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; width: 100%; }
         .item-price { font-size: 15px; font-weight: 800; color: var(--wa-green-dark); }
         
         .delete-btn-absolute { position: absolute; top: 8px; right: 8px; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; color: var(--text-light); transition: all 0.2s; border: none; background: transparent; cursor: pointer; }
@@ -288,7 +302,6 @@ export default function CartPageClient({
         .qty-btn:hover { background: rgba(0, 0, 0, 0.04); }
         .qty-btn.minus { color: var(--text-muted); }
         
-        
         .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .summary-label { font-size: 14px; color: var(--text-base); font-weight: 500; }
         .summary-val { font-size: 18px; font-weight: 800; color: var(--wa-green); }
@@ -298,7 +311,7 @@ export default function CartPageClient({
         
         .checkout-btn { width: 100%; background: var(--wa-green); color: #fff; border: none; border-radius: 20px; padding: 14px; font-size: 15px; font-weight: 700; margin-top: 8px; cursor: pointer; box-shadow: 0 4px 12px rgba(76,217,100,0.2); transition: opacity 0.2s; text-align: center; text-decoration: none; }
         .checkout-btn:hover { opacity: 0.9; }
- 
+
         .delivery-schedule-card { margin: 8px 0; padding: 16px; background: var(--bg-surface); border-radius: 20px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px; }
         .schedule-title-row { display: flex; align-items: center; gap: 8px; color: var(--wa-green); font-weight: 800; font-size: 15px; }
         .date-picker-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg-muted); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; cursor: pointer; position: relative; }
@@ -324,11 +337,11 @@ export default function CartPageClient({
         <div className="cart-page">
           <div className="cart-header">
             <div className="cart-header-top">
-              <Link href="/home" className="back-btn">
+              <BackButton fallbackHref={`/${locale}/home`}>
                 <ArrowLeft size={16} />
-              </Link>
+              </BackButton>
               <h1 className="cart-title">{t('cart.title')}</h1>
-              <span className="cart-count">{cartItems.length} {cartItems.length === 1 ? t('cart.item_label') : t('cart.items_label')}</span>
+              <span className="cart-count">({cartItems.length})</span>
             </div>
           </div>
 
@@ -342,50 +355,130 @@ export default function CartPageClient({
               </div>
             ) : (
               cartItems.map((item) => {
-                const imgUrl = item.item_variants?.image_url
+                const imgUrl = item.item_variants?.image_url || item.items?.image_url
                 const sellConfig = Array.isArray(item.items?.item_sell_config) ? item.items.item_sell_config[0] : item.items?.item_sell_config
-                const isManual = sellConfig?.sell_mode?.toLowerCase() === 'manual'
-                const unitPrice = item.estimated_price
-                const label = item.item_variants?.label || `${item.requested_value} kg`
+                const sellMode = sellConfig?.sell_mode?.toLowerCase() || 'packed'
+                const isManual = sellMode === 'manual'
+                const baseUnitId = sellConfig?.base_unit_id
+                const unitSymbol = units.find((u: any) => u.id === baseUnitId)?.symbol || 'kg'
+                const allVariants = item.items?.item_variants || []
+                const unitPrice = item.estimated_price || 0
+                const lineTotal = item.final_price ?? (unitPrice * item.requested_value)
+                const label = item.item_variants?.label || ''
 
                 return (
                   <div key={item.id} className="cart-item-content">
-                    <div className="item-img-wrap">
-                      {imgUrl ? (
-                        <img src={imgUrl} className="item-img" alt={item.items?.name} />
-                      ) : (
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light)', width: '100%', height: '100%' }}>
-                          {getFallbackIcon(item.items?.name, 32)}
-                        </span>
-                      )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', position: 'relative' }}>
+                      <div className="item-img-wrap">
+                        {imgUrl ? (
+                          <img src={imgUrl} className="item-img" alt={item.items?.name} />
+                        ) : (
+                          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-light)', width: '100%', height: '100%' }}>
+                            {getFallbackIcon(item.items?.name, 32)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="item-info">
+                        <h3 className="item-name">{item.items?.name}</h3>
+                        {label && <span className="item-weight">{label}</span>}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                          <span className="item-price">₹ {lineTotal.toFixed(0)}</span>
+                          {isManual && (
+                            <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                              (₹ {unitPrice.toFixed(0)} / {unitSymbol})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button 
+                        className="delete-btn-absolute" 
+                        onClick={() => handleRemoveItem(item.orderId, item.id)}
+                        title={t('cart.remove_item')}
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                    <div className="item-info">
-                      <h3 className="item-name">{item.items?.name}</h3>
-                      <span className="item-weight">{label}</span>
-                      <div className="item-price-qty-row">
-                        <span className="item-price">
-                          ₹ {unitPrice.toFixed(0)}{isManual ? ' / kg' : ''}
-                        </span>
+
+                    {(sellMode === 'dynamic' || sellMode === 'portion' || allVariants.length > 1) && allVariants.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', width: '100%', paddingTop: '6px', borderTop: '1px solid var(--border)' }}>
+                        {allVariants.map((v: any) => {
+                          const isActive = v.id === item.variant_id
+                          return (
+                            <button
+                              key={v.id}
+                              type="button"
+                              onClick={() => {
+                                if (isActive) return
+                                let newPrice = v.price || 0
+                                if (sellMode === 'manual') {
+                                  newPrice = sellConfig?.price_per_base_unit || 0
+                                } else if (sellMode === 'dynamic') {
+                                  newPrice = (sellConfig?.price_per_base_unit || 0) * (v.value || 1)
+                                }
+                                handleUpdateVariant(item.orderId, item.id, v.id, newPrice)
+                              }}
+                              style={{
+                                borderRadius: '8px',
+                                padding: '3px 8px',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                border: isActive ? '1.5px solid var(--wa-green)' : '1px solid var(--border)',
+                                background: isActive ? 'var(--wa-green-light)' : 'var(--bg-surface)',
+                                color: isActive ? 'var(--wa-green-dark)' : 'var(--text-muted)',
+                                cursor: isActive ? 'default' : 'pointer'
+                              }}
+                            >
+                              {v.label || v.variant_type}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', paddingTop: '4px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-muted)' }}>
+                        {isManual ? 'Weight / Qty:' : 'Quantity:'}
+                      </span>
+                      {isManual ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', background: 'var(--wa-green-light)', border: '1px solid var(--wa-green)', borderRadius: '10px', padding: '3px 8px' }}>
+                          <input
+                            type="number"
+                            step="0.1"
+                            min="0.1"
+                            defaultValue={item.requested_value}
+                            key={`${item.id}-${item.requested_value}`}
+                            style={{ width: '50px', fontSize: '13px', fontWeight: 800, color: 'var(--wa-green-dark)', background: 'transparent', border: 'none', outline: 'none' }}
+                            onBlur={(e) => {
+                              const val = parseFloat(e.target.value)
+                              if (!isNaN(val) && val > 0 && val !== item.requested_value) {
+                                handleUpdateQty(item.orderId, item.id, val)
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                const val = parseFloat((e.target as HTMLInputElement).value)
+                                if (!isNaN(val) && val > 0 && val !== item.requested_value) {
+                                  handleUpdateQty(item.orderId, item.id, val)
+                                }
+                              }
+                            }}
+                          />
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--wa-green-dark)' }}>{unitSymbol}</span>
+                        </div>
+                      ) : (
                         <div className="qty-control">
                           <button className="qty-btn minus" onClick={() => handleUpdateQty(item.orderId, item.id, item.requested_value - 1)}>
                             <Minus size={12} strokeWidth={2.5} />
                           </button>
-                          <span style={{ fontSize: '13px', fontWeight: 700, width: '18px', textAlign: 'center', color: 'var(--text-base)' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 700, minWidth: '18px', textAlign: 'center', color: 'var(--text-base)' }}>
                             {item.requested_value % 1 === 0 ? item.requested_value.toString() : item.requested_value.toFixed(1)}
                           </span>
                           <button className="qty-btn" onClick={() => handleUpdateQty(item.orderId, item.id, item.requested_value + 1)}>
                             <Plus size={12} strokeWidth={2.5} />
                           </button>
                         </div>
-                      </div>
+                      )}
                     </div>
-                    <button 
-                      className="delete-btn-absolute" 
-                      onClick={() => handleRemoveItem(item.orderId, item.id)}
-                      title={t('cart.remove_item')}
-                    >
-                      <Trash2 size={16} />
-                    </button>
                   </div>
                 )
               })

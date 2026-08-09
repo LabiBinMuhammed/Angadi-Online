@@ -90,11 +90,9 @@ class AuthService {
 
     if (response.user != null) {
       try {
-        await supabase.from('user_profiles').upsert({
-          'user_id': response.user!.id,
+        await supabase.from('users').update({
           'preferred_language': language,
-          'email': email?.trim(),
-        });
+        }).eq('id', response.user!.id);
       } catch (_) {}
 
       if (locationId != null && locationId.isNotEmpty) {
@@ -172,19 +170,12 @@ class AuthService {
       'last_login_at': DateTime.now().toIso8601String(),
     }).eq('id', user.id);
 
-    // 3. Update public.user_profiles record (preferred language)
+    // 3. Update preferred language in users record
     try {
-      await supabase.from('user_profiles').upsert({
-        'user_id': user.id,
+      await supabase.from('users').update({
         'preferred_language': language,
-      });
-    } catch (_) {
-      try {
-        await supabase.from('user_profiles').update({
-          'preferred_language': language,
-        }).eq('user_id', user.id);
-      } catch (_) {}
-    }
+      }).eq('id', user.id);
+    } catch (_) {}
   }
 
   Future<UserResponse> updatePassword(String password) async {

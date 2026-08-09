@@ -11,6 +11,37 @@ interface Props {
   locale: string
 }
 
+function parseEvidenceImages(req: any): string[] {
+  if (!req) return []
+  const raw = req.customer_images || req.proof_images || req.customerImages || req.images
+  if (!raw) return []
+
+  if (Array.isArray(raw)) {
+    return raw.map((item: any) => String(item).trim()).filter(url => url.length > 0)
+  }
+
+  if (typeof raw === 'string') {
+    const str = raw.trim()
+    if (!str) return []
+    if (str.startsWith('[')) {
+      try {
+        const arr = JSON.parse(str)
+        if (Array.isArray(arr)) {
+          return arr.map((item: any) => String(item).trim()).filter(url => url.length > 0)
+        }
+      } catch (e) {}
+    }
+    if (str.startsWith('{') && str.endsWith('}')) {
+      return str.slice(1, -1).split(',').map(s => s.replace(/^"|"$/g, '').trim()).filter(Boolean)
+    }
+    if (str.startsWith('http')) {
+      return [str]
+    }
+  }
+
+  return []
+}
+
 export default function VendorReplacementsClient({ initialRequests, shops, locale }: Props) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<'requests' | 'settings'>('requests')
@@ -95,16 +126,22 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                          : resolutionStatus === 'completed' ? 'Completed'
                          : 'Rejected'
 
-      const res = await updateReplacementStatusAction(
-        selectedReq.shop_id,
-        selectedReq.id,
-        mappedStatus,
-        generalNotes,
-        itemNotes
-      )
+      const response = await fetch('/api/vendor/replacements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          requestId: selectedReq.id,
+          shopId: selectedReq.shop_id,
+          status: mappedStatus,
+          notes: generalNotes,
+          sellerNotesMap: itemNotes
+        })
+      })
 
-      if (res.error) {
-        setErrorMsg(res.error)
+      const res = await response.json()
+
+      if (!response.ok || res.error) {
+        setErrorMsg(res.error || 'Operation failed.')
       } else {
         // Update local requests list
         setRequests(prev => prev.map(r => r.id === selectedReq.id ? {
@@ -112,7 +149,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
           status: mappedStatus,
           notes: generalNotes,
           updated_at: new Date().toISOString(),
-          replacement_items: r.replacement_items.map((ri: any) => ({
+          replacement_items: r.replacement_items?.map((ri: any) => ({
             ...ri,
             notes: itemNotes[ri.id] || ri.notes
           }))
@@ -329,22 +366,26 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
                           )}
                         </div>
 
-                        {req.proof_images && req.proof_images.length > 0 && (
-                          <div>
-                            <div className="section-label">{t('replacements.photo_proof') || 'Photo Proof'}</div>
-                            <div className="proof-gallery">
-                              {req.proof_images.map((img: string, i: number) => (
-                                <img 
-                                  key={i} 
-                                  src={img} 
-                                  alt="proof" 
-                                  className="proof-thumb"
-                                  onClick={() => setActiveImagePreview(img)}
-                                />
-                              ))}
+                        {(() => {
+                          const images = parseEvidenceImages(req)
+                          if (images.length === 0) return null
+                          return (
+                            <div style={{ marginTop: '12px' }}>
+                              <div className="section-label">{t('replacements.photo_proof') || 'Photo Proof / Evidence'}</div>
+                              <div className="proof-gallery">
+                                {images.map((img: string, i: number) => (
+                                  <img 
+                                    key={i} 
+                                    src={img} 
+                                    alt="proof" 
+                                    className="proof-thumb"
+                                    onClick={() => setActiveImagePreview(img)}
+                                  />
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )
+                        })()}
 
                         {req.notes && (
                           <div style={{ marginTop: '12px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '12px', borderRadius: '12px' }}>

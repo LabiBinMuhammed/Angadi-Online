@@ -54,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF075E54), // WhatsApp teal
+      backgroundColor: const Color(0xFF25D366), // Primary Green
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnim,

@@ -18,8 +18,9 @@ export default function LogoutButton() {
       await signOut()
     } catch (err) {
       console.error("Signout error in button:", err)
+    } finally {
+      window.location.href = `/${locale}/login`
     }
-    window.location.href = `/${locale}/login`
   }
 
   return (

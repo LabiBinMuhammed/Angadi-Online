@@ -50,7 +50,7 @@ export async function createShopAction(
       }
     }
 
-    // 1. Create new shop
+    // 1. Create new shop (with automatic fallback if extra columns are missing in DB schema)
     const shopInsertPayload: any = {
       name,
       type: type || null,
@@ -62,15 +62,29 @@ export async function createShopAction(
     if (extraFields?.openingTime) shopInsertPayload.opening_time = extraFields.openingTime.trim()
     if (extraFields?.closingTime) shopInsertPayload.closing_time = extraFields.closingTime.trim()
 
-    const { data: shopData, error: shopErr } = await supabaseAdmin
+    let shopData: any = null
+    let { data: resData, error: shopErr } = await supabaseAdmin
       .from('shops')
       .insert(shopInsertPayload)
       .select()
       .single()
 
+    if (shopErr && (shopErr.message.includes('column') || shopErr.message.includes('schema cache'))) {
+      // Fallback: DB schema missing extra columns
+      const fallbackPayload = { name, type: type || null, location_id: locationId || null }
+      const fallbackRes = await supabaseAdmin
+        .from('shops')
+        .insert(fallbackPayload)
+        .select()
+        .single()
+      resData = fallbackRes.data
+      shopErr = fallbackRes.error
+    }
+
     if (shopErr) {
       return { error: shopErr.message }
     }
+    shopData = resData
 
     // 2. Link shop to this vendor
     const { error: linkErr } = await supabaseAdmin
@@ -124,12 +138,24 @@ export async function updateShopAction(
     if (extraFields?.openingTime !== undefined) shopUpdatePayload.opening_time = extraFields.openingTime ? extraFields.openingTime.trim() : null
     if (extraFields?.closingTime !== undefined) shopUpdatePayload.closing_time = extraFields.closingTime ? extraFields.closingTime.trim() : null
 
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from('shops')
       .update(shopUpdatePayload)
       .eq('id', shopId)
       .select()
       .single()
+
+    if (error && (error.message.includes('column') || error.message.includes('schema cache'))) {
+      const fallbackPayload = { name, type: finalType, location_id: locationId || null }
+      const fallbackRes = await supabaseAdmin
+        .from('shops')
+        .update(fallbackPayload)
+        .eq('id', shopId)
+        .select()
+        .single()
+      data = fallbackRes.data
+      error = fallbackRes.error
+    }
 
     if (error) {
       return { error: error.message }

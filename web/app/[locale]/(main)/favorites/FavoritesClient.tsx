@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Heart, ShoppingCart, Loader2, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import BackButton from '@/components/BackButton'
 import { toggleFavoriteItem } from '@/app/actions/newFeatures'
 import { addToCart } from '../cart/actions'
 
@@ -128,9 +129,9 @@ export default function FavoritesClient({ initialFavorites }: Props) {
         {toast && <div className="toast">{toast}</div>}
 
         <div className="header">
-          <Link href="/profile" className="back-btn">
+          <BackButton fallbackHref={`/${locale}/profile`}>
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">{t('favorites.title')}</h1>
         </div>
 

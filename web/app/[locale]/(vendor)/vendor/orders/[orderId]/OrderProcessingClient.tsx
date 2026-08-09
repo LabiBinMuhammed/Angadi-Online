@@ -92,53 +92,102 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
 
   async function updateOrderStatus(nextStatus: string) {
     setUpdating(true)
-    const supabase = createClient()
-    await supabase.from('orders').update({ status: nextStatus }).eq('id', order.id)
-    setOrder(o => ({ ...o, status: nextStatus }))
-    setUpdating(false)
+    try {
+      const res = await fetch('/api/vendor/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update_order_status', orderId: order.id, nextStatus })
+      })
+      const data = await res.json()
+      if (data.success && data.order) {
+        setOrder(data.order)
+      } else {
+        const supabase = createClient()
+        await supabase.from('orders').update({ status: nextStatus }).eq('id', order.id)
+        setOrder(o => ({ ...o, status: nextStatus }))
+      }
+    } catch (err: any) {
+      console.error('Failed to update order status:', err)
+      const supabase = createClient()
+      await supabase.from('orders').update({ status: nextStatus }).eq('id', order.id)
+      setOrder(o => ({ ...o, status: nextStatus }))
+    } finally {
+      setUpdating(false)
+    }
   }
 
   async function updatePaymentType(type: 'cod' | 'credit') {
     setUpdating(true)
-    const supabase = createClient()
-    await supabase.from('orders').update({ payment_type: type }).eq('id', order.id)
-    setOrder(o => ({ ...o, payment_type: type }))
-    setUpdating(false)
+    try {
+      const res = await fetch('/api/vendor/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update_payment_type', orderId: order.id, paymentType: type })
+      })
+      const data = await res.json()
+      if (data.success && data.order) {
+        setOrder(data.order)
+      } else {
+        const supabase = createClient()
+        await supabase.from('orders').update({ payment_type: type }).eq('id', order.id)
+        setOrder(o => ({ ...o, payment_type: type }))
+      }
+    } catch (err: any) {
+      console.error('Failed to update payment type:', err)
+      const supabase = createClient()
+      await supabase.from('orders').update({ payment_type: type }).eq('id', order.id)
+      setOrder(o => ({ ...o, payment_type: type }))
+    } finally {
+      setUpdating(false)
+    }
   }
 
   async function updateItemStatus(item: OrderItem, newStatus: string) {
     setUpdating(true)
-    const supabase = createClient()
-    
-    let newFinalPrice = item.estimated_price ?? item.final_price
-    let newActualValue = item.actual_value
-
-    if (newStatus === 'rejected') {
-      newFinalPrice = 0
-    } else if (newStatus === 'adjusted') {
-      const val = parseFloat(actualValues[item.id])
-      if (!isNaN(val) && item.requested_value && item.estimated_price) {
-        newActualValue = val
-        newFinalPrice = Number(((val / item.requested_value) * item.estimated_price).toFixed(2))
+    try {
+      const actualVal = actualValues[item.id] ? parseFloat(actualValues[item.id]) : undefined
+      const res = await fetch('/api/vendor/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_item_status',
+          orderId: order.id,
+          itemId: item.id,
+          newStatus,
+          actualValue: actualVal
+        })
+      })
+      const data = await res.json()
+      if (data.success && data.order) {
+        setOrder(data.order)
+      } else {
+        const supabase = createClient()
+        let newFinalPrice = item.estimated_price ?? item.final_price
+        let newActualValue = item.actual_value
+        if (newStatus === 'rejected') {
+          newFinalPrice = 0
+        } else if (newStatus === 'adjusted') {
+          const val = parseFloat(actualValues[item.id])
+          if (!isNaN(val) && item.requested_value && item.estimated_price) {
+            newActualValue = val
+            newFinalPrice = Number(((val / item.requested_value) * item.estimated_price).toFixed(2))
+          }
+        } else if (newStatus === 'approved') {
+          newFinalPrice = item.estimated_price ?? item.final_price
+        }
+        const updateData: any = { status: newStatus, final_price: newFinalPrice }
+        if (newActualValue !== undefined) updateData.actual_value = newActualValue
+        await supabase.from('order_items').update(updateData).eq('id', item.id)
+        const updatedItems = order.order_items.map(oi => oi.id === item.id ? { ...oi, ...updateData } : oi)
+        const newTotal = updatedItems.reduce((sum, oi) => sum + Number(oi.final_price), 0)
+        await supabase.from('orders').update({ total_final_price: newTotal }).eq('id', order.id)
+        setOrder(o => ({ ...o, order_items: updatedItems, total_final_price: newTotal }))
       }
-    } else if (newStatus === 'approved') {
-      newFinalPrice = item.estimated_price ?? item.final_price
+    } catch (err: any) {
+      console.error('Failed to update item status:', err)
+    } finally {
+      setUpdating(false)
     }
-
-    const updateData: any = { status: newStatus, final_price: newFinalPrice }
-    if (newActualValue !== undefined) updateData.actual_value = newActualValue
-    
-    await supabase.from('order_items').update(updateData).eq('id', item.id)
-    
-    const updatedItems = order.order_items.map(oi => 
-      oi.id === item.id ? { ...oi, ...updateData } : oi
-    )
-    
-    const newTotal = updatedItems.reduce((sum, oi) => sum + Number(oi.final_price), 0)
-    await supabase.from('orders').update({ total_final_price: newTotal }).eq('id', order.id)
-    
-    setOrder(o => ({ ...o, order_items: updatedItems, total_final_price: newTotal }))
-    setUpdating(false)
   }
 
   const currentIdx = STATUS_FLOW.indexOf(order.status)

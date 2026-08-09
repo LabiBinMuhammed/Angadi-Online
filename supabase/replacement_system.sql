@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS replacement_requests (
     order_id        UUID      NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     user_id         UUID      NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     shop_id         UUID      NOT NULL REFERENCES shops(id) ON DELETE CASCADE,
-    reason          TEXT      NOT NULL CHECK (reason IN ('Wrong Item', 'Damaged', 'Poor Quality', 'Expired', 'Missing Item', 'Other')),
+    reason          TEXT      NOT NULL CHECK (reason IN ('Wrong Item', 'Damaged', 'Poor Quality', 'Expired', 'Missing Item', 'Other', 'wrong_item', 'damaged', 'poor_quality', 'expired', 'missing_item', 'other')),
     description     TEXT,
     status          TEXT      NOT NULL DEFAULT 'Pending' CHECK (status IN ('Pending', 'Approved', 'Rejected', 'Completed', 'Cancelled')),
     customer_images TEXT[]    DEFAULT '{}'::TEXT[],
@@ -338,3 +338,10 @@ CREATE POLICY "Users can insert replacement status logs if they can update reque
             WHERE replacement_requests.id = replacement_status_logs.replacement_request_id
         )
     );
+
+-- ─── 14. Grant Permissions & Reload Schema ────────────────────────────────────
+GRANT ALL ON public.replacement_requests TO anon, authenticated, service_role;
+GRANT ALL ON public.replacement_items TO anon, authenticated, service_role;
+GRANT ALL ON public.replacement_status_logs TO anon, authenticated, service_role;
+
+NOTIFY pgrst, 'reload schema';

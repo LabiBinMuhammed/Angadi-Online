@@ -108,6 +108,69 @@ export async function updateOrderItemQty(orderId: string, orderItemId: string, n
   revalidatePath('/cart')
 }
 
+export async function updateOrderItemVariant(orderId: string, orderItemId: string, newVariantId: string, newPrice: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not logged in')
+
+  const { data: order } = await supabase
+    .from('orders')
+    .select('id, status')
+    .eq('id', orderId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!order || order.status !== 'pending') throw new Error('Cannot edit this order')
+
+  const { data: v } = await supabase
+    .from('item_variants')
+    .select('variant_type')
+    .eq('id', newVariantId)
+    .single()
+
+  const { data: itemData } = await supabase
+    .from('order_items')
+    .select('requested_value')
+    .eq('id', orderItemId)
+    .single()
+
+  const qty = itemData?.requested_value || 1
+
+  let dbVariantType = 'Fixed'
+  if (v?.variant_type) {
+    const vt = v.variant_type.toLowerCase()
+    if (vt === 'manual') dbVariantType = 'Manual'
+    else if (vt === 'dynamic') dbVariantType = 'Dynamic'
+    else if (vt === 'portion') dbVariantType = 'Portion'
+    else dbVariantType = 'Fixed'
+  }
+
+  const { error } = await supabase
+    .from('order_items')
+    .update({ 
+      variant_id: newVariantId,
+      variant_type: dbVariantType,
+      estimated_price: newPrice,
+      final_price: newPrice * qty
+    })
+    .eq('id', orderItemId)
+    .eq('order_id', orderId)
+
+  if (error) throw error
+
+  // Recalculate total
+  const { data: remainingItems } = await supabase
+    .from('order_items')
+    .select('requested_value, estimated_price')
+    .eq('order_id', orderId)
+
+  const total = remainingItems?.reduce((acc, item) => acc + (item.requested_value || 0) * (item.estimated_price || 0), 0) || 0
+  await supabase.from('orders').update({ total_estimated_price: total, total_final_price: total }).eq('id', orderId)
+
+  revalidatePath('/cart')
+}
+
+
 export async function addToCart(shopId: string, itemId: string, qty: number, price: number, variantId?: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -124,7 +187,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
   }
 
   // Ensure user exists in public.users
-  const { data: publicUser } = await supabase.from('users').select('id').eq('id', user.id).single()
+  const { data: publicUser } = await supabase.from('users').select('id').eq('id', user.id).maybeSingle()
   if (!publicUser) {
     await supabase.from('users').insert({
       id: user.id,
@@ -138,7 +201,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
   let variantType: string | undefined
 
   if (finalVariantId) {
-    const { data: v } = await supabase.from('item_variants').select('variant_type').eq('id', finalVariantId).single()
+    const { data: v } = await supabase.from('item_variants').select('variant_type').eq('id', finalVariantId).maybeSingle()
     variantType = v?.variant_type
   } else {
     // Find the default variant for the item
@@ -147,7 +210,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
       .select('id, variant_type')
       .eq('item_id', itemId)
       .eq('is_default', true)
-      .single()
+      .maybeSingle()
 
     finalVariantId = defaultVariant?.id
     variantType = defaultVariant?.variant_type
@@ -158,14 +221,46 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
         .select('id, variant_type')
         .eq('item_id', itemId)
         .limit(1)
-        .single()
+        .maybeSingle()
       finalVariantId = anyVariant?.id
       variantType = anyVariant?.variant_type
     }
   }
 
+  // Fallback: If item has no variants in DB, auto-create a default variant
+  if (!finalVariantId) {
+    const { data: newVariant } = await supabase
+      .from('item_variants')
+      .insert({
+        item_id: itemId,
+        variant_type: 'Manual',
+        label: 'Default',
+        value: 1,
+        price: price || 0,
+        is_default: true,
+        is_active: true
+      })
+      .select('id, variant_type')
+      .single()
+
+    if (newVariant) {
+      finalVariantId = newVariant.id
+      variantType = newVariant.variant_type
+    }
+  }
+
   if (!finalVariantId) {
     throw new Error('Item has no variants configured.')
+  }
+
+  // Normalize variantType for order_items schema
+  let dbVariantType = 'Fixed'
+  if (variantType) {
+    const vt = variantType.toLowerCase()
+    if (vt === 'manual') dbVariantType = 'Manual'
+    else if (vt === 'dynamic') dbVariantType = 'Dynamic'
+    else if (vt === 'portion') dbVariantType = 'Portion'
+    else dbVariantType = 'Fixed'
   }
 
   // Find or create pending order
@@ -175,7 +270,8 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
     .eq('user_id', user.id)
     .eq('shop_id', shopId)
     .eq('status', 'pending')
-    .single()
+    .limit(1)
+    .maybeSingle()
 
   if (!order) {
     const today = new Date()
@@ -208,7 +304,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
     .select('id, requested_value, estimated_price')
     .eq('order_id', order.id)
     .eq('item_id', itemId)
-    .single()
+    .maybeSingle()
 
   if (existingItem) {
     const newQty = existingItem.requested_value + qty
@@ -227,7 +323,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
         order_id: order.id,
         item_id: itemId,
         variant_id: finalVariantId,
-        variant_type: variantType,
+        variant_type: dbVariantType,
         requested_value: qty,
         estimated_price: price,
         final_price: price * qty,

@@ -7,7 +7,7 @@ import { Phone, Lock, Eye, EyeOff, ShieldAlert, KeyRound, CheckCircle, ArrowLeft
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export default function SecurityClient({ initialPhone }: { initialPhone: string }) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const router = useRouter()
   const { updatePassword, updatePhone, verifyPhoneChange, signOutAll } = useAuth()
 
@@ -142,8 +142,7 @@ export default function SecurityClient({ initialPhone }: { initialPhone: string 
     if (error) {
       setLogoutError(error.message)
     } else {
-      router.push('/login')
-      router.refresh()
+      window.location.href = `/${locale}/login`
     }
   }
 

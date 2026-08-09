@@ -353,7 +353,13 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: isDark ? Colors.white : kNeutral900, size: 20),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/profile');
+            }
+          },
         ),
         title: Text(
           l10n.purchaseHistoryLabel,

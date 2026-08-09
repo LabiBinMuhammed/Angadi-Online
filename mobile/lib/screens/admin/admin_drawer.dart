@@ -244,7 +244,7 @@ class AdminDrawer extends StatelessWidget {
                   // Back to Shop / Marketplace
                   ListTile(
                     onTap: () {
-                      context.go('/profile');
+                      context.go('/home');
                     },
                     leading: DirectionalHugeIcon(
                       icon: HugeIcons.strokeRoundedArrowLeft01,

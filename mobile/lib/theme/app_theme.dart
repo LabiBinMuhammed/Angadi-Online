@@ -6,9 +6,9 @@ import 'theme_service.dart';
 const kBrand50  = Color(0xFFF0FDF4);
 const kBrand100 = Color(0xFFDCFCE7);
 const kBrand400 = Color(0xFF4ADE80);
-const kBrand500 = Color(0xFF128C7E);
-const kBrand600 = Color(0xFF075E54);
-const kBrand700 = Color(0xFF05443D);
+const kBrand500 = Color(0xFF25D366);
+const kBrand600 = Color(0xFF25D366);
+const kBrand700 = Color(0xFF22C55E);
 
 const kNeutral50  = Color(0xFFF8FAFC);
 const kNeutral100 = Color(0xFFF1F5F9);
@@ -28,8 +28,8 @@ const kInfo    = Color(0xFF3B82F6);
 
 // WhatsApp-style palette (dynamic getters for dark/light mode)
 Color get kWaGreen     => ThemeService.instance.isDarkMode ? const Color(0xFF22C55E) : const Color(0xFF25D366);
-Color get kWaGreenDark => ThemeService.instance.isDarkMode ? const Color(0xFF16A34A) : const Color(0xFF128C7E);
-Color get kWaTeal      => ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFF075E54);
+Color get kWaGreenDark => ThemeService.instance.isDarkMode ? const Color(0xFF22C55E) : const Color(0xFF25D366);
+Color get kWaTeal      => ThemeService.instance.isDarkMode ? const Color(0xFF1E293B) : const Color(0xFF25D366);
 Color get kWaBg        => ThemeService.instance.isDarkMode ? const Color(0xFF0F172A) : const Color(0xFFF0F2F5);
 
 // ─── Theme ────────────────────────────────────────────────────────────────────

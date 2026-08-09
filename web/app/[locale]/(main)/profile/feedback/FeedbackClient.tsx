@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowLeft, MessageSquare, AlertCircle, CheckCircle2, Star } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import BackButton from '@/components/BackButton'
 
 type Feedback = {
   id: string
@@ -133,9 +134,9 @@ export default function FeedbackClient({ initialFeedbacks, userId }: Props) {
 
       <div className="page-container">
         <div className="header">
-          <Link href="/profile" className="back-btn">
+          <BackButton fallbackHref={`/${locale}/profile`}>
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">{t('feedback.title')}</h1>
         </div>
 

@@ -74,12 +74,16 @@ function CheckoutForm() {
   }, [isAddressModalOpen, handleModalKeyDown])
   
   // New address form fields
-  const [formLabel, setFormLabel] = useState('')
-  const [formLine1, setFormLine1] = useState('')
-  const [formLine2, setFormLine2] = useState('')
+  const [formLabel, setFormLabel]       = useState('Home')
+  const [formName, setFormName]         = useState('')
+  const [formPhone, setFormPhone]       = useState('')
+  const [formHouse, setFormHouse]       = useState('')
+  const [formLine1, setFormLine1]       = useState('')
+  const [formLine2, setFormLine2]       = useState('')
   const [formLandmark, setFormLandmark] = useState('')
+  const [formVillage, setFormVillage]   = useState('')
   const [saveToProfile, setSaveToProfile] = useState(true)
-  const [formError, setFormError] = useState('')
+  const [formError, setFormError]       = useState('')
   const [savingAddress, setSavingAddress] = useState(false)
 
   const [cartItems, setCartItems]     = useState<any[]>([])
@@ -100,6 +104,13 @@ function CheckoutForm() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
+      if (user.user_metadata?.full_name) {
+        setFormName(user.user_metadata.full_name)
+      }
+      if (user.phone || user.user_metadata?.phone) {
+        setFormPhone(user.phone || user.user_metadata?.phone)
+      }
+
       // Load all active addresses
       const { data: userAddrs } = await supabase
         .from('user_addresses')
@@ -109,21 +120,8 @@ function CheckoutForm() {
         
       if (userAddrs && userAddrs.length > 0) {
         setAddresses(userAddrs)
-        const defaultAddr = userAddrs.find(a => a.is_default) || userAddrs[0]
-        setAddress(defaultAddr)
-      } else {
-        // Fallback or load default specifically
-        const { data: defaultAddr } = await supabase
-          .from('user_addresses')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('is_default', true)
-          .maybeSingle()
-          
-        if (defaultAddr) {
-          setAddress(defaultAddr)
-          setAddresses([defaultAddr])
-        }
+        const def = userAddrs.find(a => a.is_default) || userAddrs[0]
+        setAddress(def)
       }
 
       // Load cart summary
@@ -153,10 +151,12 @@ function CheckoutForm() {
   }, [])
 
   function resetForm() {
-    setFormLabel('')
+    setFormLabel('Home')
+    setFormHouse('')
     setFormLine1('')
     setFormLine2('')
     setFormLandmark('')
+    setFormVillage('')
     setSaveToProfile(true)
     setFormError('')
   }
@@ -165,8 +165,8 @@ function CheckoutForm() {
     e.preventDefault()
     setFormError('')
 
-    if (!formLabel.trim() || !formLine1.trim()) {
-      setFormError(t('checkout.err_fields_required'))
+    if (!formLine1.trim() && !formHouse.trim()) {
+      setFormError(t('checkout.err_fields_required') || 'Street address or House/Building name is required')
       return
     }
 
@@ -177,22 +177,33 @@ function CheckoutForm() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user) throw new Error(t('checkout.err_not_logged_in'))
 
-        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
-        const phone = user.phone || user.user_metadata?.phone || '0000000000'
+        const name = formName.trim() || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
+        const phone = formPhone.trim() || user.phone || user.user_metadata?.phone || '0000000000'
+
+        let fullLine1 = formLine1.trim()
+        if (formHouse.trim()) {
+          fullLine1 = fullLine1 ? `${formHouse.trim()}, ${fullLine1}` : formHouse.trim()
+        }
+        let fullLine2 = formLine2.trim()
+        if (formVillage.trim()) {
+          fullLine2 = fullLine2 ? `${fullLine2}, ${formVillage.trim()}` : formVillage.trim()
+        }
+
+        const payload = {
+          user_id: user.id,
+          label: formLabel.trim() || 'Home',
+          contact_name: name,
+          contact_phone: phone,
+          address_line_1: fullLine1 || null,
+          address_line_2: fullLine2 || null,
+          landmark: formLandmark.trim() || null,
+          is_active: true,
+          is_default: addresses.length === 0
+        }
 
         const { data: newAddr, error: insertErr } = await supabase
           .from('user_addresses')
-          .insert({
-            user_id: user.id,
-            label: formLabel.trim(),
-            contact_name: name,
-            contact_phone: phone,
-            address_line_1: formLine1.trim(),
-            address_line_2: formLine2.trim() || null,
-            landmark: formLandmark.trim() || null,
-            is_active: true,
-            is_default: addresses.length === 0 // Make default if it's the first address
-          })
+          .insert(payload)
           .select('*')
           .single()
 
@@ -208,28 +219,30 @@ function CheckoutForm() {
         setSavingAddress(false)
       }
     } else {
-      let name = 'Customer'
-      let phone = '0000000000'
+      let name = formName.trim() || 'Customer'
+      let phone = formPhone.trim() || '0000000000'
       try {
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
-          phone = user.phone || user.user_metadata?.phone || '0000000000'
+          name = formName.trim() || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Customer'
+          phone = formPhone.trim() || user.phone || user.user_metadata?.phone || '0000000000'
         }
       } catch (_) {}
 
-      // Temporary "this time only" address object
-      const tempAddr = {
-        label: formLabel.trim(),
+      const tempAddress = {
+        id: `temp-${Date.now()}`,
+        label: formLabel.trim() || 'Home',
         contact_name: name,
         contact_phone: phone,
-        address_line_1: formLine1.trim(),
+        house_name: formHouse.trim() || null,
+        address_line_1: formLine1.trim() || null,
         address_line_2: formLine2.trim() || null,
         landmark: formLandmark.trim() || null,
-        is_temp: true
+        village: formVillage.trim() || null,
+        is_temp: true,
       }
-      setAddress(tempAddr)
+      setAddress(tempAddress)
       setIsAddressModalOpen(false)
       resetForm()
     }
@@ -267,7 +280,8 @@ function CheckoutForm() {
       const orderIds = pendingOrders.map(o => o.id)
 
       // Call transaction-safe checkout RPC
-      const { error: rpcErr } = await supabase.rpc('place_checkout_orders', {
+      let rpcErr: any = null
+      const { error: primaryErr } = await supabase.rpc('place_checkout_orders', {
         p_order_ids: orderIds,
         p_payment_type: paymentType,
         p_delivery_date: dateParam || new Date().toISOString().split('T')[0],
@@ -284,6 +298,38 @@ function CheckoutForm() {
         p_latitude: (activeAddress as any).latitude || null,
         p_longitude: (activeAddress as any).longitude || null
       })
+      rpcErr = primaryErr
+
+      if (primaryErr && (primaryErr.code === 'PGRST202' || primaryErr.message?.includes('place_checkout_orders'))) {
+        const { error: fallbackErr } = await supabase.rpc('place_checkout_orders', {
+          p_order_ids: orderIds,
+          p_payment_type: paymentType,
+          p_delivery_date: dateParam || new Date().toISOString().split('T')[0],
+          p_delivery_slot: modeParam || 'morning',
+          p_contact_name: activeAddress.contact_name,
+          p_contact_phone: activeAddress.contact_phone,
+          p_address_line_1: activeAddress.address_line_1,
+          p_address_line_2: activeAddress.address_line_2 || null,
+          p_landmark: activeAddress.landmark || null,
+          p_label: activeAddress.label || 'Home'
+        })
+        rpcErr = fallbackErr
+
+        if (!fallbackErr) {
+          const updateData: any = {}
+          if ((activeAddress as any).house_name) updateData.house_name = (activeAddress as any).house_name
+          if ((activeAddress as any).village) updateData.village = (activeAddress as any).village
+          if ((activeAddress as any).delivery_note) updateData.delivery_note = (activeAddress as any).delivery_note
+          if ((activeAddress as any).latitude) updateData.latitude = (activeAddress as any).latitude
+          if ((activeAddress as any).longitude) updateData.longitude = (activeAddress as any).longitude
+
+          if (Object.keys(updateData).length > 0) {
+            for (const oid of orderIds) {
+              await supabase.from('order_addresses').update(updateData).eq('order_id', oid)
+            }
+          }
+        }
+      }
 
       if (rpcErr) throw rpcErr
 
@@ -842,6 +888,8 @@ function CheckoutForm() {
                     <div className="address-list">
                       {addresses.map((addr) => {
                         const isSelected = address?.id === addr.id && !address.is_temp
+                        const l1 = [addr.house_name, addr.address_line_1].filter(Boolean).join(', ')
+                        const l2 = [addr.address_line_2, addr.village].filter(Boolean).join(', ')
                         return (
                           <div 
                             key={addr.id} 
@@ -852,9 +900,9 @@ function CheckoutForm() {
                             }}
                           >
                             <div className="address-item-details">
-                              <p className="address-contact">{addr.contact_name} ({addr.contact_phone})</p>
-                              <p className="address-line">{addr.address_line_1}</p>
-                              {addr.address_line_2 && <p className="address-line">{addr.address_line_2}</p>}
+                              <p className="address-contact">{addr.label || 'Home'} · {addr.contact_name} ({addr.contact_phone})</p>
+                              {l1 && <p className="address-line">{l1}</p>}
+                              {l2 && <p className="address-line">{l2}</p>}
                               {addr.landmark && <p className="address-landmark">Near {addr.landmark}</p>}
                             </div>
                             {isSelected && (
@@ -879,9 +927,48 @@ function CheckoutForm() {
                       id="addr-label"
                       type="text" 
                       className="form-input" 
-                      placeholder={t('checkout.placeholder_address_label')} 
+                      placeholder={t('checkout.placeholder_address_label') || 'e.g. Home / Work'} 
                       value={formLabel}
                       onChange={(e) => setFormLabel(e.target.value)}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="addr-name">{t('address.contact_name_req') || 'Name'} *</label>
+                      <input 
+                        id="addr-name"
+                        type="text" 
+                        className="form-input" 
+                        placeholder="Full Name" 
+                        value={formName}
+                        onChange={(e) => setFormName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="addr-phone">{t('address.contact_phone_req') || 'Phone'} *</label>
+                      <input 
+                        id="addr-phone"
+                        type="tel" 
+                        className="form-input" 
+                        placeholder="Phone Number" 
+                        value={formPhone}
+                        onChange={(e) => setFormPhone(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="addr-house">{t('address.house_name_label') || 'House / Villa / Building Name'}</label>
+                    <input 
+                      id="addr-house"
+                      type="text" 
+                      className="form-input" 
+                      placeholder="e.g. Al Madeena Villa, Door #4" 
+                      value={formHouse}
+                      onChange={(e) => setFormHouse(e.target.value)}
                     />
                   </div>
 
@@ -895,30 +982,46 @@ function CheckoutForm() {
                       value={formLine1}
                       onChange={(e) => setFormLine1(e.target.value)}
                       autoComplete="address-line1"
+                      required
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="addr-line2">{t('checkout.address_line_2_opt')}</label>
-                    <input 
-                      id="addr-line2"
-                      type="text" 
-                      className="form-input" 
-                      placeholder={t('checkout.placeholder_apt')} 
-                      value={formLine2}
-                      onChange={(e) => setFormLine2(e.target.value)}
-                      autoComplete="address-line2"
-                    />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="addr-line2">{t('checkout.address_line_2_opt')}</label>
+                      <input 
+                        id="addr-line2"
+                        type="text" 
+                        className="form-input" 
+                        placeholder={t('checkout.placeholder_apt')} 
+                        value={formLine2}
+                        onChange={(e) => setFormLine2(e.target.value)}
+                        autoComplete="address-line2"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label" htmlFor="addr-landmark">{t('checkout.landmark_opt')}</label>
+                      <input 
+                        id="addr-landmark"
+                        type="text" 
+                        className="form-input" 
+                        placeholder={t('checkout.placeholder_landmark')} 
+                        value={formLandmark}
+                        onChange={(e) => setFormLandmark(e.target.value)}
+                      />
+                    </div>
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">{t('checkout.landmark_opt')}</label>
+                    <label className="form-label" htmlFor="addr-village">{t('address.village_label') || 'Village / City / Area'}</label>
                     <input 
+                      id="addr-village"
                       type="text" 
                       className="form-input" 
-                      placeholder={t('checkout.placeholder_landmark')} 
-                      value={formLandmark}
-                      onChange={(e) => setFormLandmark(e.target.value)}
+                      placeholder="e.g. Kizhisseri / Kondotty" 
+                      value={formVillage}
+                      onChange={(e) => setFormVillage(e.target.value)}
                     />
                   </div>
 

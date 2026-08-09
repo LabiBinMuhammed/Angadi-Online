@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { useAuth } from '@/lib/auth/AuthContext'
 import { Search, ShoppingCart, Bell, Store, ShieldCheck, LogOut, Plus, MoreVertical } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
@@ -12,10 +13,12 @@ type Props = { user: User | null; role?: string }
 export default function NavbarClient({ user, role }: Props) {
   const router = useRouter()
   const { locale, t } = useTranslation()
+  const { signOut } = useAuth()
 
   async function handleLogout() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    try {
+      await signOut()
+    } catch (_) {}
     window.location.href = `/${locale}/login`
   }
 

@@ -20,3 +20,15 @@ export async function confirmNewUser(userId: string) {
     return { success: false, error: err.message }
   }
 }
+
+export async function signOutAction() {
+  try {
+    const { createClient: createServerSupabase } = await import('@/lib/supabase/server')
+    const supabase = await createServerSupabase()
+    await supabase.auth.signOut()
+    return { success: true }
+  } catch (err: any) {
+    return { success: false, error: err.message }
+  }
+}
+

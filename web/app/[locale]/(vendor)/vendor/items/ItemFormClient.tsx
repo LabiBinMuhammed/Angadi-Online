@@ -472,8 +472,12 @@ export default function ItemFormClient({
   )
 
   async function handleFinalSubmit(intendedStatus: 'draft' | 'published') {
-    if (!form.name || !shopId) {
+    if (!form.name) {
       setError(t('vendor_items.err_name_required'))
+      return
+    }
+    if (!shopId) {
+      setError('No active shop found. Please create your shop profile first.')
       return
     }
     setSaving(true)
@@ -620,46 +624,45 @@ export default function ItemFormClient({
         }
       }
 
-      // ─── Trigger Auto-Translation ───
+      // ─── Trigger Auto-Translation Asynchronously (Non-Blocking) ───
       if (targetId) {
-        try {
-          await fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'item',
-              id: targetId,
-              fields: {
-                name: form.name,
-                description: form.description || ''
-              }
-            })
-          })
-
-          // Fetch and translate all item variants
-          const { data: insertedVars } = await supabase
-            .from('item_variants')
-            .select('id, label')
-            .eq('item_id', targetId)
-          
-          if (insertedVars && insertedVars.length > 0) {
-            for (const v of insertedVars) {
-              await fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  type: 'variant',
-                  id: v.id,
-                  fields: {
-                    label: v.label
-                  }
-                })
+        const itemTitle = form.name
+        const itemDesc = form.description || ''
+        const createdTargetId = targetId
+        ;(async () => {
+          try {
+            await fetch('/api/translate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'item',
+                id: createdTargetId,
+                fields: { name: itemTitle, description: itemDesc }
               })
+            })
+
+            const { data: insertedVars } = await supabase
+              .from('item_variants')
+              .select('id, label')
+              .eq('item_id', createdTargetId)
+
+            if (insertedVars && insertedVars.length > 0) {
+              for (const v of insertedVars) {
+                fetch('/api/translate', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    type: 'variant',
+                    id: v.id,
+                    fields: { label: v.label }
+                  })
+                }).catch(() => {})
+              }
             }
+          } catch (tErr) {
+            console.error("Auto translation failed:", tErr)
           }
-        } catch (tErr) {
-          console.error("Auto translation failed:", tErr)
-        }
+        })()
       }
 
       router.push('/vendor/items')

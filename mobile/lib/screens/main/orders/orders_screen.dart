@@ -211,6 +211,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       final orderNum = o['order_number'];
                       final delivDate = o['delivery_date'] as String?;
                       final delivSlot = o['delivery_slot'] as String?;
+                      final reviewsList = o['shop_reviews'];
+                      final hasReview = reviewsList != null && (reviewsList is List ? reviewsList.isNotEmpty : true);
 
                       return GestureDetector(
                         onTap: () => context.push('/orders/${o['id']}'),
@@ -313,41 +315,52 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                   ],
                                 ),
                                 
-                                // Direct leave review action
-                                (() {
-                                  final reviewsList = o['shop_reviews'];
-                                  final hasReview = reviewsList != null && (reviewsList is List ? reviewsList.isNotEmpty : true);
-                                  if (status == 'delivered' && !hasReview) {
-                                    return Column(
+                                // Action buttons on order card
+                                if (status == 'delivered')
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Row(
                                       children: [
-                                        const SizedBox(height: 12),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          child: FilledButton.icon(
+                                        Expanded(
+                                          child: OutlinedButton.icon(
                                             onPressed: () async {
-                                              final result = await context.push<bool>('/orders/${o['id']}/review');
+                                              final result = await context.push<bool>('/orders/${o['id']}/replacement');
                                               if (result == true) {
-                                                setState(() {
-                                                  _future = _fetch();
-                                                });
+                                                setState(() { _future = _fetch(); });
                                               }
                                             },
-                                            icon: const Icon(Icons.rate_review_outlined, size: 16, color: Colors.white),
-                                            label: const Text('Leave Review', style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w700)),
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor: kWaGreen,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              padding: const EdgeInsets.symmetric(vertical: 10),
+                                            icon: const Icon(Icons.assignment_return_outlined, size: 16, color: Color(0xFFF59E0B)),
+                                            label: const Text('Request Replacement', style: TextStyle(fontSize: 12, color: Color(0xFFF59E0B), fontWeight: FontWeight.bold)),
+                                            style: OutlinedButton.styleFrom(
+                                              side: const BorderSide(color: Color(0xFFF59E0B)),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                              padding: const EdgeInsets.symmetric(vertical: 8),
                                             ),
                                           ),
                                         ),
+                                        if (!hasReview) ...[
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: FilledButton.icon(
+                                              onPressed: () async {
+                                                final result = await context.push<bool>('/orders/${o['id']}/review');
+                                                if (result == true) {
+                                                  setState(() { _future = _fetch(); });
+                                                }
+                                              },
+                                              icon: const Icon(Icons.rate_review_outlined, size: 16, color: Colors.white),
+                                              label: const Text('Review', style: TextStyle(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor: kWaGreen,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                padding: const EdgeInsets.symmetric(vertical: 8),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
-                                    );
-                                  }
-                                  return const SizedBox.shrink();
-                                })(),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),

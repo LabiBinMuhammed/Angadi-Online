@@ -8,11 +8,15 @@ export default async function SecuritySettingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  if (!user) {
+    return <SecurityClient initialPhone="" />
+  }
+
   const { data: userRow } = await supabase
     .from('users')
     .select('phone')
-    .eq('id', user!.id)
-    .single()
+    .eq('id', user.id)
+    .maybeSingle()
 
   return (
     <>

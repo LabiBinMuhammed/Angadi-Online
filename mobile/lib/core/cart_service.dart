@@ -324,6 +324,90 @@ class CartService extends ChangeNotifier {
     }
   }
 
+  Future<void> updateVariant(String oldVariantId, ItemVariant newVariant) async {
+    final index = _items.indexWhere((i) => i.variant.id == oldVariantId);
+    if (index == -1) return;
+
+    final cartItem = _items[index];
+    _items[index] = CartItem(
+      item: cartItem.item,
+      variant: newVariant,
+      quantity: cartItem.quantity,
+      sellConfig: cartItem.sellConfig,
+    );
+    notifyListeners();
+
+    final uid = supabase.auth.currentUser?.id;
+    if (uid == null) return;
+
+    try {
+      final pendingOrders = await supabase
+          .from('orders')
+          .select('id')
+          .eq('user_id', uid)
+          .eq('status', 'pending')
+          .isFilter('payment_type', null);
+
+      final orderIds = (pendingOrders as List<dynamic>).map((o) => o['id'] as String).toList();
+      if (orderIds.isEmpty) return;
+
+      final orderItemRes = await supabase
+          .from('order_items')
+          .select('id, order_id, requested_value')
+          .inFilter('order_id', orderIds)
+          .eq('variant_id', oldVariantId)
+          .maybeSingle();
+
+      if (orderItemRes != null) {
+        final orderItemId = orderItemRes['id'] as String;
+        final orderId = orderItemRes['order_id'] as String;
+        final qty = (orderItemRes['requested_value'] as num?)?.toDouble() ?? cartItem.quantity;
+
+        final sellConfig = cartItem.sellConfig;
+        double unitPrice;
+        if (sellConfig?.sellMode == SellMode.manual) {
+          unitPrice = sellConfig?.pricePerBaseUnit ?? 0.0;
+        } else if (sellConfig?.sellMode == SellMode.dynamic) {
+          unitPrice = (sellConfig?.pricePerBaseUnit ?? 0.0) * (newVariant.value ?? 1.0);
+        } else {
+          unitPrice = newVariant.price ?? 0.0;
+        }
+
+        String dbVariantType;
+        switch (newVariant.variantType) {
+          case VariantType.manual:
+            dbVariantType = 'Manual';
+            break;
+          case VariantType.packed:
+            dbVariantType = 'Fixed';
+            break;
+          case VariantType.dynamic:
+            dbVariantType = 'Dynamic';
+            break;
+          case VariantType.portion:
+            dbVariantType = 'Portion';
+            break;
+        }
+
+        await supabase
+            .from('order_items')
+            .update({
+              'variant_id': newVariant.id,
+              'variant_type': dbVariantType,
+              'estimated_price': unitPrice,
+              'final_price': unitPrice * qty,
+            })
+            .eq('id', orderItemId);
+
+        await _recalculateOrderTotals(orderId);
+        await _loadCartFromDatabase();
+      }
+    } catch (e) {
+      debugPrint('Error updating variant in database cart: $e');
+    }
+  }
+
+
   Future<void> removeItem(String variantId) async {
     // 1. Optimistic Local Update
     _items.removeWhere((i) => i.variant.id == variantId);

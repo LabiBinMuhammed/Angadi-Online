@@ -31,7 +31,7 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
   Future<void> _load() async {
     final results = await Future.wait([
       supabase.from('users')
-          .select('*, user_profiles(email, profile_image_url, preferred_language, gender)')
+          .select('*')
           .eq('id', widget.userId)
           .single(),
       supabase.from('orders')
@@ -87,10 +87,9 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
     final isActive = _user?['is_active'] as bool? ?? true;
     final name     = _user?['name'] as String? ?? '—';
     final phone    = _user?['phone'] as String? ?? '';
-    final profile  = _user?['user_profiles'] as Map? ?? {};
-    final email    = profile['email'] as String?;
-    final lang     = profile['preferred_language'] as String?;
-    final gender   = profile['gender'] as String?;
+    final email    = _user?['email'] as String?;
+    final lang     = _user?['preferred_language'] as String?;
+    final gender   = _user?['gender'] as String?;
 
     return Scaffold(
       backgroundColor: scaffoldBg,

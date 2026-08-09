@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Bookmark, Store, ExternalLink, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import BackButton from '@/components/BackButton'
 import { togglePinnedShop } from '@/app/actions/newFeatures'
 
 interface PinnedShopItem {
@@ -100,9 +101,9 @@ export default function PinnedShopsClient({ initialPinned }: Props) {
         {toast && <div className="toast">{toast}</div>}
 
         <div className="header">
-          <Link href="/profile" className="back-btn">
+          <BackButton fallbackHref={`/${locale}/profile`}>
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">{t('pinned_shops.title')}</h1>
         </div>
 

@@ -14,9 +14,13 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, { ...options, maxAge: 3153600000 })
-            )
+            cookiesToSet.forEach(({ name, value, options }) => {
+              if (value === '' || options?.maxAge === 0) {
+                cookieStore.set(name, '', { ...options, maxAge: 0 })
+              } else {
+                cookieStore.set(name, value, { ...options, maxAge: options?.maxAge ?? 3153600000 })
+              }
+            })
           } catch {
             // Server Component — cookies set via middleware
           }
@@ -25,3 +29,4 @@ export async function createClient() {
     }
   )
 }
+

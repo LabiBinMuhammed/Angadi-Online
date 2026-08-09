@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import NotificationsClient from './NotificationsClient'
-import Link from 'next/link'
+import BackButton from '@/components/BackButton'
 import { ArrowLeft } from 'lucide-react'
 
 export const metadata: Metadata = { title: 'Notifications' }
@@ -10,10 +10,18 @@ export default async function NotificationsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  if (!user) {
+    return (
+      <div className="page-container">
+        <NotificationsClient orders={[]} />
+      </div>
+    )
+  }
+
   const { data: orders } = await supabase
     .from('orders')
     .select('id, status, created_at, shops(name)')
-    .eq('user_id', user!.id)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(30)
 
@@ -28,9 +36,9 @@ export default async function NotificationsPage() {
       `}} />
       <div className="page-container">
         <div className="header">
-          <Link href="/profile" className="back-btn">
+          <BackButton fallbackHref="/home">
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">Notifications</h1>
         </div>
         <NotificationsClient orders={(orders ?? []) as any[]} />

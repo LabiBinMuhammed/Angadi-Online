@@ -24,6 +24,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<_Data> _fetch() async {
+    List<Map<String, dynamic>> replacementRequests = [];
+    try {
+      final res = await supabase
+          .from('replacement_requests')
+          .select('*, replacement_items(*, order_items(*, items(name))))')
+          .eq('order_id', widget.orderId)
+          .order('created_at', ascending: false);
+      replacementRequests = List<Map<String, dynamic>>.from(res as List? ?? []);
+    } catch (_) {
+      // Gracefully ignore if replacement_requests table is missing or schema cache is not yet refreshed
+    }
+
     final results = await Future.wait<dynamic>([
       supabase
           .from('orders')
@@ -44,6 +56,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       items:   List<Map<String, dynamic>>.from(results[1] as List),
       address: results[2] as Map<String, dynamic>?,
       review:  results[3] as Map<String, dynamic>?,
+      replacementRequests: replacementRequests,
     );
   }
 
@@ -114,6 +127,50 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       }
     }
   }
+  Future<void> _cancelReplacementRequest(String requestId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Request'),
+        content: const Text('Are you sure you want to cancel this complaint/replacement request?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Yes', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _updating = true);
+    try {
+      await supabase
+          .from('replacement_requests')
+          .update({'status': 'Cancelled'})
+          .eq('id', requestId);
+      setState(() {
+        _future = _fetch();
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error cancelling request: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _updating = false);
+      }
+    }
+  }
+
+
 
   // ─── Status map ─────────────────────────────────────────────────────────────
   static const _statusMap = {
@@ -129,6 +186,41 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   _StatusConfig _getStatus(String status) =>
       _statusMap[status] ?? const _StatusConfig(color: Color(0xFF94A3B8), bg: Color(0xFFF8FAFC), icon: Icons.help_outline_rounded, label: 'Unknown');
+
+  Widget _buildSectionCard({required Widget child, required Color surface, required Color border}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: border),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 16, offset: const Offset(0, 4))],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildCardTitle({required IconData icon, required Color iconColor, required String title, required Color textBase}) {
+    return Row(
+      children: [
+        Icon(icon, color: iconColor, size: 20),
+        const SizedBox(width: 8),
+        Text(title, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: textBase)),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow({required String label, required String value, required Color textLight, required Color textBase}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(fontSize: 12, color: textLight, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 2),
+        Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: textBase)),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,9 +352,72 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         const SizedBox(height: 16),
 
+                        // ─── Request Replacement / Complaint Quick Action Card ─────
+                        if (status == 'delivered') ...[
+                          _buildSectionCard(
+                            surface: surface, border: border,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildCardTitle(
+                                  icon: Icons.assignment_return_rounded,
+                                  iconColor: const Color(0xFFF59E0B),
+                                  title: 'Request Replacement / Complaint',
+                                  textBase: textBase,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Received damaged, missing, or incorrect items? Submit a complaint or replacement request.',
+                                  style: TextStyle(fontSize: 13, color: textMuted, fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 16),
+                                GestureDetector(
+                                  onTap: () async {
+                                    final result = await context.push<bool>('/orders/${widget.orderId}/replacement');
+                                    if (result == true) {
+                                      setState(() { _future = _fetch(); });
+                                    }
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF59E0B),
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFFF59E0B).withValues(alpha: 0.25),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        )
+                                      ],
+                                    ),
+                                    child: const Center(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.assignment_return_rounded, color: Colors.white, size: 20),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Request Replacement / Complaint',
+                                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+
+                        const SizedBox(height: 16),
+
                         // ─── Review prompt (if delivered and no review) ──────
                         if (status == 'delivered' && d.review == null) ...[
-                          _SectionCard(
+                          _buildSectionCard(
                             surface: surface, border: border,
                             child: Row(
                               children: [
@@ -310,12 +465,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         // ─── Confirm Delivery prompt (if out_for_delivery or delivering) ──────
                         if (status == 'out_for_delivery' || status == 'delivering') ...[
-                          _SectionCard(
+                          _buildSectionCard(
                             surface: surface, border: border,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _CardTitle(icon: Icons.check_circle_outline_rounded, iconColor: kWaGreen, title: 'Confirm Delivery', textBase: textBase),
+                                _buildCardTitle(icon: Icons.check_circle_outline_rounded, iconColor: kWaGreen, title: 'Confirm Delivery', textBase: textBase),
                                 const SizedBox(height: 8),
                                 Text(
                                   'Has your order arrived? Please click the button below to confirm receipt of the delivery.',
@@ -359,12 +514,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         // ─── Cancel Order prompt (if pending) ──────
                         if (status == 'pending') ...[
-                          _SectionCard(
+                          _buildSectionCard(
                             surface: surface, border: border,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _CardTitle(icon: Icons.cancel_outlined, iconColor: const Color(0xFFEF4444), title: 'Cancel Order', textBase: textBase),
+                                _buildCardTitle(icon: Icons.cancel_outlined, iconColor: const Color(0xFFEF4444), title: 'Cancel Order', textBase: textBase),
                                 const SizedBox(height: 8),
                                 Text(
                                   'You can cancel this order as long as it has not been accepted by the shop.',
@@ -408,12 +563,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         // ─── Delivery Schedule ───────────────────────────────
                         if (deliveryDate != null && deliverySlot != null) ...[
-                          _SectionCard(
+                          _buildSectionCard(
                             surface: surface, border: border,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _CardTitle(icon: Icons.schedule_rounded, iconColor: const Color(0xFF0EA5E9), title: 'Delivery Schedule', textBase: textBase),
+                                _buildCardTitle(icon: Icons.schedule_rounded, iconColor: const Color(0xFF0EA5E9), title: 'Delivery Schedule', textBase: textBase),
                                 const SizedBox(height: 12),
                                 Row(
                                   children: [
@@ -437,14 +592,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ],
 
                         // ─── Payment Details ─────────────────────────────────
-                        _SectionCard(
+                        _buildSectionCard(
                           surface: surface, border: border,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _CardTitle(icon: Icons.credit_card_rounded, iconColor: kWaGreen, title: 'Payment Details', textBase: textBase),
+                              _buildCardTitle(icon: Icons.credit_card_rounded, iconColor: kWaGreen, title: 'Payment Details', textBase: textBase),
                               const SizedBox(height: 12),
-                              _InfoRow(
+                              _buildInfoRow(
                                 label: 'Payment Method',
                                 value: paymentType == 'credit' ? 'Pay Later' : 'Cash on Delivery',
                                 textLight: textLight, textBase: textBase,
@@ -457,12 +612,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                         // ─── Delivery Address ─────────────────────────────────
                         if (addr != null) ...[
-                          _SectionCard(
+                          _buildSectionCard(
                             surface: surface, border: border,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _CardTitle(icon: Icons.location_on_rounded, iconColor: const Color(0xFF3B82F6), title: l10n.orderDetailAddressSection, textBase: textBase),
+                                _buildCardTitle(icon: Icons.location_on_rounded, iconColor: const Color(0xFF3B82F6), title: l10n.orderDetailAddressSection, textBase: textBase),
                                 const SizedBox(height: 12),
                                 if (addr['label'] != null) ...[
                                   Container(
@@ -476,9 +631,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                 ],
-                                _InfoRow(label: 'Contact', value: '${addr['contact_name']} · ${addr['contact_phone']}', textLight: textLight, textBase: textBase),
+                                _buildInfoRow(label: 'Contact', value: '${addr['contact_name']} · ${addr['contact_phone']}', textLight: textLight, textBase: textBase),
                                 const SizedBox(height: 8),
-                                _InfoRow(label: 'Address', value: addr['address_line_1'] as String, textLight: textLight, textBase: textBase),
+                                _buildInfoRow(label: 'Address', value: addr['address_line_1'] as String, textLight: textLight, textBase: textBase),
                                 if (addr['address_line_2'] != null && (addr['address_line_2'] as String).isNotEmpty) ...[
                                   const SizedBox(height: 2),
                                   Text(addr['address_line_2'] as String,
@@ -496,12 +651,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         ],
 
                         // ─── Order Summary ───────────────────────────────────
-                        _SectionCard(
+                        _buildSectionCard(
                           surface: surface, border: border,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _CardTitle(icon: Icons.receipt_long_rounded, iconColor: const Color(0xFFF59E0B), title: l10n.orderDetailItemsSection, textBase: textBase),
+                              _buildCardTitle(icon: Icons.receipt_long_rounded, iconColor: const Color(0xFFF59E0B), title: l10n.orderDetailItemsSection, textBase: textBase),
                               const SizedBox(height: 4),
 
                               // Items
@@ -574,7 +729,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         // ─── Review Card ────────────────────────────────────
                         if (d.review != null) ...[
                           const SizedBox(height: 16),
-                          _SectionCard(
+                          _buildSectionCard(
                             surface: isDark ? const Color(0xFF0D2918) : const Color(0xFFF0FDF4),
                             border: isDark ? const Color(0xFF1A4228) : const Color(0xFFBBF7D0),
                             child: Column(
@@ -610,6 +765,78 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             ),
                           ),
                         ],
+
+                        // ─── Replacement Requests History ───────────────────
+                        if (d.replacementRequests.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          ...d.replacementRequests.map((req) {
+                            final reqStatus = req['status'] as String? ?? 'Pending';
+                            final reasonStr = req['reason'] as String? ?? '';
+                            final desc = req['description'] as String?;
+                            final itemsList = (req['replacement_items'] as List?) ?? [];
+
+                            Color statusColor = const Color(0xFFF59E0B);
+                            if (reqStatus == 'Approved' || reqStatus == 'Completed') statusColor = const Color(0xFF22C55E);
+                            if (reqStatus == 'Rejected') statusColor = const Color(0xFFEF4444);
+                            if (reqStatus == 'Cancelled') statusColor = const Color(0xFF94A3B8);
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: _buildSectionCard(
+                                surface: surface, border: border,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.report_problem_rounded, color: statusColor, size: 20),
+                                            const SizedBox(width: 8),
+                                            Text('Complaint Request', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: textBase)),
+                                          ],
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: statusColor.withValues(alpha: 0.15),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(reqStatus.toUpperCase(),
+                                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: statusColor)),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text('Reason: ${reasonStr.replaceAll('_', ' ').toUpperCase()}',
+                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: textBase)),
+                                    if (desc != null && desc.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(desc, style: TextStyle(fontSize: 13, color: textMuted)),
+                                    ],
+                                    if (itemsList.isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      ...itemsList.map((ri) {
+                                        final itemObj = (ri['order_items'] as Map?)?['items'] as Map?;
+                                        final itemName = itemObj?['name'] ?? 'Item';
+                                        final qty = ri['quantity'] ?? 1;
+                                        return Text('• $itemName × $qty', style: TextStyle(fontSize: 13, color: textLight, fontWeight: FontWeight.w600));
+                                      }),
+                                    ],
+                                    if (reqStatus == 'Pending') ...[
+                                      const SizedBox(height: 12),
+                                      GestureDetector(
+                                        onTap: () => _cancelReplacementRequest(req['id'] as String),
+                                        child: const Text('Cancel Request', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFFEF4444))),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
                       ],
                     ),
                   ),
@@ -623,67 +850,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 }
 
-// ─── Shared Widgets ──────────────────────────────────────────────────────────
-class _SectionCard extends StatelessWidget {
-  final Widget child;
-  final Color surface;
-  final Color border;
-  const _SectionCard({required this.child, required this.surface, required this.border});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: border),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 16, offset: const Offset(0, 4))],
-      ),
-      child: child,
-    );
-  }
-}
-
-class _CardTitle extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final Color textBase;
-  const _CardTitle({required this.icon, required this.iconColor, required this.title, required this.textBase});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, color: iconColor, size: 20),
-        const SizedBox(width: 8),
-        Text(title, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: textBase)),
-      ],
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color textLight;
-  final Color textBase;
-  const _InfoRow({required this.label, required this.value, required this.textLight, required this.textBase});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(fontSize: 12, color: textLight, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 2),
-        Text(value, style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: textBase)),
-      ],
-    );
-  }
-}
 
 // ─── Data model ──────────────────────────────────────────────────────────────
 class _Data {
@@ -691,7 +858,14 @@ class _Data {
   final List<Map<String, dynamic>> items;
   final Map<String, dynamic>? address;
   final Map<String, dynamic>? review;
-  _Data({required this.order, required this.items, this.address, this.review});
+  final List<Map<String, dynamic>> replacementRequests;
+  _Data({
+    required this.order,
+    required this.items,
+    this.address,
+    this.review,
+    this.replacementRequests = const [],
+  });
 }
 
 class _StatusConfig {
@@ -701,3 +875,5 @@ class _StatusConfig {
   final String label;
   const _StatusConfig({required this.color, required this.bg, required this.icon, required this.label});
 }
+
+

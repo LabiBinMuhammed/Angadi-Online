@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ArrowLeft, Star, MessageSquare, CheckCircle2, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import BackButton from '@/components/BackButton'
 
 interface Props {
   orderId: string
@@ -77,40 +78,38 @@ export default function LeaveReviewClient({ orderId, shopId, shopName, userId }:
     setSubmitting(true)
     setErrorMsg('')
 
-    const supabase = createClient()
-    const { error } = await supabase
-      .from('shop_reviews')
-      .insert({
-        shop_id: shopId,
-        user_id: userId,
-        order_id: orderId,
-        product_quality_rating: ratings.quality,
-        delivery_experience_rating: ratings.delivery,
-        delivery_timeliness_rating: ratings.delivery,
-        order_accuracy_rating: ratings.accuracy,
-        overall_experience_rating: ratings.overall,
-        product_quality_description: descriptions.quality.trim() || null,
-        product_quality_review: descriptions.quality.trim() || null,
-        delivery_experience_description: descriptions.delivery.trim() || null,
-        delivery_timeliness_review: descriptions.delivery.trim() || null,
-        order_accuracy_description: descriptions.accuracy.trim() || null,
-        order_accuracy_review: descriptions.accuracy.trim() || null,
-        overall_experience_description: descriptions.overall.trim() || null,
-        overall_experience_review: descriptions.overall.trim() || null,
-        title: null,
-        review: null
+    try {
+      const res = await fetch('/api/orders/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          shopId,
+          orderId,
+          product_quality_rating: ratings.quality,
+          delivery_experience_rating: ratings.delivery,
+          order_accuracy_rating: ratings.accuracy,
+          overall_experience_rating: ratings.overall,
+          product_quality_description: descriptions.quality.trim() || null,
+          delivery_experience_description: descriptions.delivery.trim() || null,
+          order_accuracy_description: descriptions.accuracy.trim() || null,
+          overall_experience_description: descriptions.overall.trim() || null,
+        })
       })
 
-    setSubmitting(false)
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to submit review')
+      }
 
-    if (error) {
-      setErrorMsg(error.message)
-    } else {
       setSuccess(true)
       setTimeout(() => {
         router.push(`/${locale}/orders/${orderId}`)
         router.refresh()
       }, 2500)
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to submit review. Please try again.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -176,9 +175,9 @@ export default function LeaveReviewClient({ orderId, shopId, shopName, userId }:
 
       <div className="page-container">
         <div className="header">
-          <Link href={`/${locale}/orders/${orderId}`} className="back-btn">
+          <BackButton fallbackHref={`/${locale}/orders/${orderId}`}>
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">{t('reviews.title')}</h1>
         </div>
 

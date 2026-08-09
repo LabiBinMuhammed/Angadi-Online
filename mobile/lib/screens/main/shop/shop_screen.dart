@@ -54,7 +54,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   Future<_ShopData> _fetch() async {
     final results = await Future.wait([
-      supabase.from('shops').select('id, name, type').eq('id', widget.shopId).single(),
+      supabase.from('shops').select('id, name, type, logo_url').eq('id', widget.shopId).single(),
       supabase
           .from('items')
           .select('*, item_translations(*), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*, variant_translations(*)), item_images(*)')
@@ -123,40 +123,224 @@ class _ShopScreenState extends State<ShopScreen> {
         final activeCategoryIds = d.items.map((item) => item.categoryId).toSet();
         final filteredCategories = d.categories.where((cat) => activeCategoryIds.contains(cat.id)).toList();
 
-        final ratingText = d.summary.totalReviews > 0
-            ? ' ⭐ ${d.summary.averageRating.toStringAsFixed(1)}'
-            : '';
-
         return DefaultTabController(
           length: 2,
           initialIndex: widget.initialTab == 'reviews' ? 1 : 0,
           child: Scaffold(
             backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA),
             appBar: AppBar(
-              backgroundColor: kWaTeal,
-              foregroundColor: Colors.white,
-              title: Text('${d.shop.name}$ratingText'),
-              actions: [
-                Builder(
-                  builder: (context) {
-                    return IconButton(
-                      icon: const Icon(Icons.rate_review_rounded),
-                      tooltip: 'View Reviews',
-                      onPressed: () {
-                        DefaultTabController.of(context).animateTo(1);
-                      },
-                    );
-                  },
-                ),
-              ],
-              bottom: TabBar(
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white.withValues(alpha: 0.6),
-                indicatorColor: kWaGreen,
-                tabs: [
-                  Tab(text: l10n.catalogTab),
-                  Tab(text: l10n.reviewsTab),
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              elevation: 0,
+              scrolledUnderElevation: 2,
+              toolbarHeight: 64,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? Colors.white : const Color(0xFF0F172A), size: 20),
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              title: Row(
+                children: [
+                  Stack(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF25D366), Color(0xFF10B981)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF25D366).withValues(alpha: 0.25),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: d.shop.logoUrl != null && d.shop.logoUrl!.isNotEmpty
+                              ? Image.network(d.shop.logoUrl!, fit: BoxFit.cover)
+                              : Center(
+                                  child: Text(
+                                    d.shop.name.split(' ').take(2).map((e) => e.isNotEmpty ? e[0] : '').join().toUpperCase(),
+                                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
+                                ),
+                        ),
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: Container(
+                          width: 12,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF22C55E),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: isDark ? const Color(0xFF1E293B) : Colors.white, width: 2),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                d.shop.name,
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w800,
+                                  color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                  letterSpacing: -0.3,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            const Icon(Icons.verified_rounded, size: 16, color: Color(0xFF25D366)),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            if (d.summary.totalReviews > 0) ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFFBEB),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.star_rounded, size: 13, color: Color(0xFFF59E0B)),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      '${d.summary.averageRating.toStringAsFixed(1)} (${d.summary.totalReviews})',
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFFD97706)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                            ] else ...[
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  'New Shop',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF64748B)),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                            ],
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF22C55E),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              l10n.catalogOpen,
+                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
+              ),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(52),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: isDark ? const Color(0x14FFFFFF) : const Color(0xFFE2E8F0))),
+                  ),
+                  child: Container(
+                    height: 40,
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: TabBar(
+                      indicator: BoxDecoration(
+                        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                        borderRadius: BorderRadius.circular(11),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.06),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      labelColor: const Color(0xFF25D366),
+                      unselectedLabelColor: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                      dividerColor: Colors.transparent,
+                      labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                      tabs: [
+                        Tab(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.storefront_rounded, size: 16),
+                              const SizedBox(width: 6),
+                              Text(l10n.catalogTab),
+                            ],
+                          ),
+                        ),
+                        Tab(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.rate_review_rounded, size: 16),
+                              const SizedBox(width: 6),
+                              Text(l10n.reviewsTab),
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF25D366).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  '${d.summary.totalReviews}',
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF25D366)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
             body: TabBarView(
@@ -652,8 +836,6 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // ── 2. Rating Distribution Card ──
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
@@ -662,7 +844,7 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                         border: Border.all(color: kBorder),
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAlignment.start,
                         children: [
                           Text(
                             'Rating Breakdown',
@@ -725,7 +907,83 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 20),
+
+                    // ── 2.5 Quick Review Banner Prompt (Matching Next.js Web) ──
+                    if (_checkedOrder)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        margin: const EdgeInsets.only(bottom: 24),
+                        decoration: BoxDecoration(
+                          color: kCardBg,
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: kBorder),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF25D366).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(Icons.rate_review_rounded, color: Color(0xFF25D366), size: 22),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAlignment.start,
+                                children: [
+                                  Text(
+                                    _unreviewedOrderId != null ? 'Share Your Experience' : 'Your Orders',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      color: isDark ? Colors.white : kNeutral900,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _unreviewedOrderId != null
+                                        ? 'Rate your recent order from this shop.'
+                                        : 'View your delivered orders to write a review.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark ? kNeutral400 : kNeutral600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton.icon(
+                              onPressed: _handleWriteReviewClick,
+                              icon: const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white),
+                              label: Text(
+                                _unreviewedOrderId != null ? l10n.leaveShopReviewButton : l10n.myOrdersTitle,
+                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12, color: Colors.white),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF25D366),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                     // ── 3. Reviews Header ──
                     Row(
@@ -779,8 +1037,6 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                                       fontWeight: FontWeight.bold,
                                       color: kWaGreen,
                                     ),
-                                  ),
-                                ),
                       ],
                     ),
                     const SizedBox(height: 16),

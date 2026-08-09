@@ -89,6 +89,12 @@ class VendorDrawer extends StatelessWidget {
                   ),
                   _buildDrawerItem(
                     context: context,
+                    icon: HugeIcons.strokeRoundedAlert02,
+                    label: 'Complaints / Replacements',
+                    route: '/vendor/replacements',
+                  ),
+                  _buildDrawerItem(
+                    context: context,
                     icon: HugeIcons.strokeRoundedCreditCard,
                     label: l10n.vendorDrawerCustomerCredit,
                     route: '/vendor/credit',
@@ -146,8 +152,8 @@ class VendorDrawer extends StatelessWidget {
                   // Back to Marketplace
                   ListTile(
                     onTap: () {
-                      // Navigate back to marketplace /profile
-                      context.go('/profile');
+                      // Navigate back to marketplace home /home
+                      context.go('/home');
                     },
                     leading: DirectionalHugeIcon(
                       icon: HugeIcons.strokeRoundedArrowLeft01,

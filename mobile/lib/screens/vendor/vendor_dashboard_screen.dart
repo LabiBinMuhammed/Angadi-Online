@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -139,24 +141,21 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
   Future<void> _createBatch(String date, String slot, String shopId) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      final res = await supabase.from('delivery_batches').insert({
-        'shop_id': shopId,
-        'delivery_date': date,
-        'delivery_slot': slot,
-        'status': 'pending',
-      }).select('id').single();
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/api/vendor/delivery-batch'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'action': 'create',
+          'shopId': shopId,
+          'date': date,
+          'slot': slot,
+        }),
+      );
 
-      final batchId = res['id'] as String;
-
-      // Link orders
-      await supabase.from('orders').update({
-        'delivery_batch_id': batchId,
-      }).eq('shop_id', shopId)
-        .eq('delivery_date', date)
-        .eq('delivery_slot', slot)
-        .not('payment_type', 'is', null)
-        .neq('status', 'cancelled')
-        .isFilter('delivery_batch_id', null);
+      if (response.statusCode != 200) {
+        final json = jsonDecode(response.body);
+        throw Exception(json['error'] ?? 'API error ${response.statusCode}');
+      }
 
       setState(() {
         _future = _fetch();
@@ -177,21 +176,19 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
 
   Future<void> _updateBatchStatus(String batchId, String status) async {
     try {
-      await supabase.from('delivery_batches').update({
-        'status': status,
-      }).eq('id', batchId);
+      final response = await http.post(
+        Uri.parse('http://localhost:3000/api/vendor/delivery-batch'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'action': 'update_status',
+          'batchId': batchId,
+          'status': status,
+        }),
+      );
 
-      final orderStatusMap = {
-        'pending': 'accepted',
-        'delivering': 'out_for_delivery',
-        'completed': 'delivered',
-      };
-
-      final orderStatus = orderStatusMap[status];
-      if (orderStatus != null) {
-        await supabase.from('orders').update({
-          'status': orderStatus,
-        }).eq('delivery_batch_id', batchId);
+      if (response.statusCode != 200) {
+        final json = jsonDecode(response.body);
+        throw Exception(json['error'] ?? 'API error ${response.statusCode}');
       }
 
       setState(() {
@@ -467,7 +464,7 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                       const SizedBox(width: 8),
                       VendorOutlineButton(
                         height: 38,
-                        onPressed: () => context.push('/home/shop/${d.shopId}'),
+                        onPressed: () => context.push('/vendor/shop/${d.shopId}'),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

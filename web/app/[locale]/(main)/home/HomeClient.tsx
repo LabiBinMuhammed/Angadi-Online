@@ -364,7 +364,7 @@ export default function HomeClient({
           })
         }, 1500)
       } catch (err: any) {
-        showToast('Failed to add to cart. Please try again.')
+        showToast(err.message || 'Failed to add to cart. Please try again.')
       }
     })
   }

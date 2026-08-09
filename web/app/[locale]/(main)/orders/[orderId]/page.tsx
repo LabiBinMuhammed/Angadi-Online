@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import type { Order, OrderItem, OrderAddress } from '@/types'
 import { ArrowLeft, Clock, Package, Truck, CheckCircle2, XCircle, MapPin, CreditCard, ShoppingBag, Receipt, MessageSquare } from 'lucide-react'
 import MarkAsDeliveredButton from '@/components/MarkAsDeliveredButton'
 import CancelOrderButton from '@/components/CancelOrderButton'
+import BackButton from '@/components/BackButton'
 
 type Props = { params: Promise<{ locale: string; orderId: string }> }
 
@@ -22,25 +24,32 @@ const STATUS_MAP: Record<string, { bg: string; color: string; label: string; Ico
   cancelled:  { bg: 'var(--status-cancelled-bg)', color: '#ef4444', label: 'Cancelled',  Icon: XCircle },
 }
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey)
+
 export default async function OrderDetailPage({ params }: Props) {
   const { locale, orderId } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  if (!user) {
+    redirect(`/${locale}/login`)
+  }
+
   const [{ data: order }, { data: orderItems }, { data: address }, { data: review }, { data: replacements }] = await Promise.all([
-    supabase
+    supabaseAdmin
       .from('orders')
-      .select('*, shops(name, return_window_hours, replacement_enabled)')
+      .select('*, shops(name)')
       .eq('id', orderId)
-      .eq('user_id', user!.id)
-      .single(),
-    supabase
+      .maybeSingle(),
+    supabaseAdmin
       .from('order_items')
       .select('*, items(name), item_variants(label, price)')
       .eq('order_id', orderId),
-    supabase.from('order_addresses').select('*').eq('order_id', orderId).single(),
-    supabase.from('shop_reviews').select('id').eq('order_id', orderId).maybeSingle(),
-    supabase
+    supabaseAdmin.from('order_addresses').select('*').eq('order_id', orderId).maybeSingle(),
+    supabaseAdmin.from('shop_reviews').select('id').eq('order_id', orderId).maybeSingle(),
+    supabaseAdmin
       .from('replacement_requests')
       .select('*, replacement_items(*, order_items(*, items(name))))')
       .eq('order_id', orderId)
@@ -62,9 +71,7 @@ export default async function OrderDetailPage({ params }: Props) {
   const deliveredAt = new Date(o.updated_at).getTime()
   const windowHours = o.shops?.return_window_hours ?? 24
   const windowMs = windowHours * 60 * 60 * 1000
-  const isEligibleForReplacement = o.status === 'delivered' && 
-                                   o.shops?.replacement_enabled !== false && 
-                                   (Date.now() - deliveredAt <= windowMs)
+  const isEligibleForReplacement = o.status === 'delivered' && (Date.now() - deliveredAt <= windowMs)
 
   return (
     <>
@@ -106,9 +113,9 @@ export default async function OrderDetailPage({ params }: Props) {
       <div className="page-container">
         <div className="header">
           <div className="header-left">
-            <Link href={`/${locale}/orders`} className="back-btn">
+            <BackButton fallbackHref={`/${locale}/orders`}>
               <ArrowLeft size={20} />
-            </Link>
+            </BackButton>
             <h1 className="title">{o.order_number ? `#${o.order_number}` : `#${o.id.slice(0, 8).toUpperCase()}`}</h1>
           </div>
           <div className="header-status" style={{ color: st.color }}>
@@ -222,6 +229,21 @@ export default async function OrderDetailPage({ params }: Props) {
                         Details: {req.description}
                       </p>
                     )}
+                    {(() => {
+                      const imgs = req.customer_images || req.proof_images || []
+                      const images = Array.isArray(imgs) ? imgs : typeof imgs === 'string' && imgs.startsWith('http') ? [imgs] : []
+                      if (images.length === 0) return null
+                      return (
+                        <div style={{ marginTop: '12px' }}>
+                          <p style={{ margin: '0 0 6px', fontSize: '12px', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Evidence Photos</p>
+                          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                            {images.map((img: string, idx: number) => (
+                              <img key={idx} src={img} alt="evidence" style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border)' }} />
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    })()}
                     <div style={{ marginTop: '12px', background: 'var(--bg-base)', padding: '12px', borderRadius: '12px', border: '1px solid var(--border)' }}>
                       <p style={{ margin: '0 0 6px', fontSize: '12px', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Items Requested</p>
                       {req.replacement_items?.map((ri: any) => (

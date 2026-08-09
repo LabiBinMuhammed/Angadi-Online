@@ -13,12 +13,15 @@ export default function MarkAsDeliveredButton({ orderId }: { orderId: string }) 
   async function handleMarkAsDelivered() {
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: 'delivered' })
-        .eq('id', orderId)
-      
-      if (error) throw error
+      const res = await fetch('/api/orders/deliver', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId })
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Failed to confirm delivery')
+      }
       router.refresh()
     } catch (e: any) {
       alert('Error updating status: ' + e.message)

@@ -24,13 +24,18 @@ export default async function CartPage() {
           items (
             id,
             name,
+            image_url,
             item_sell_config (
               id,
               sell_mode,
-              price_per_base_unit
+              price_per_base_unit,
+              base_unit_id
+            ),
+            item_variants:vw_item_variants_with_fallback (
+              id, label, image_url, price, value, is_default, variant_type
             )
           ),
-          item_variants:vw_item_variants_with_fallback (id, label, image_url)
+          item_variants:vw_item_variants_with_fallback (id, label, image_url, price, value, variant_type)
         )
       `)
       .eq('user_id', user.id)
@@ -44,6 +49,14 @@ export default async function CartPage() {
   } catch (err: any) {
     console.error(err)
     return <div className="p-4">Exception: {err.message}</div>
+  }
+
+  let units: any[] = []
+  try {
+    const { data: unitsData } = await supabase.from('units').select('*')
+    units = unitsData || []
+  } catch (err) {
+    console.error('Error loading units:', err)
   }
 
   // Fetch shop delivery settings and order counts for capacity check
@@ -85,6 +98,8 @@ export default async function CartPage() {
       initialOrders={pendingOrders} 
       deliverySettings={deliverySettings}
       placedOrders={placedOrders}
+      units={units}
     />
   )
 }
+

@@ -135,12 +135,12 @@ export default function VendorItemsClient({
           )}
         </div>
       ) : (
-        <div className="vp-table-wrapper">
-          <table className="vp-table">
+        <div className="vp-table-wrapper" style={{ width: '100%', overflowX: 'hidden' }}>
+          <table className="vp-table" style={{ width: '100%', minWidth: 0, tableLayout: 'fixed' }}>
             <thead>
               <tr>
-                <th style={{ padding: '0.75rem 1rem', fontSize: '0.8rem' }}>{t('catalog.product_label') || 'Product'}</th>
-                <th style={{ textAlign: 'right', padding: '0.75rem 1rem', fontSize: '0.8rem' }}>{t('vendor_commission.actions') || 'Actions'}</th>
+                <th style={{ width: '62%', padding: '0.6rem 0.5rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-base)' }}>Name</th>
+                <th style={{ width: '38%', textAlign: 'right', padding: '0.6rem 0.5rem', fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-base)' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -151,50 +151,50 @@ export default function VendorItemsClient({
 
                 return (
                   <tr key={item.id} id={`item-row-${item.id}`}>
-                    <td style={{ padding: '0.65rem 1rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                    <td style={{ padding: '0.5rem 0.5rem', overflow: 'hidden' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
                         {thumb
-                          ? <img src={thumb} alt={item.name} style={{ width: 40, height: 40, borderRadius: '10px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }} />
-                          : <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', flexShrink: 0 }}><Package size={20} /></div>
+                          ? <img src={thumb} alt={item.name} style={{ width: 36, height: 36, borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }} />
+                          : <div style={{ width: 36, height: 36, borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', flexShrink: 0 }}><Package size={18} /></div>
                         }
-                        <div>
-                          <p style={{ fontWeight: 600, color: 'var(--text-base)', fontSize: '0.92rem', margin: 0 }}>{item.name}</p>
+                        <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                          <p style={{ fontWeight: 600, color: 'var(--text-base)', fontSize: '0.88rem', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{item.name}</p>
                           {item.description && (
-                            <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0.1rem 0 0 0' }}>
-                              {item.description.slice(0, 60)}{item.description.length > 60 ? '…' : ''}
+                            <p style={{ fontSize: '0.75rem', color: '#64748b', margin: 0, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                              {item.description}
                             </p>
                           )}
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: '0.65rem 1rem' }}>
-                      <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
+                    <td style={{ padding: '0.5rem 0.5rem' }}>
+                      <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end', alignItems: 'center' }}>
                         <button
                           id={`toggle-${item.id}`}
                           className={`vp-btn vp-btn-sm ${itStatus === 'published' ? 'vp-btn-outline' : 'vp-btn-primary'}`}
                           onClick={() => toggleActive(item)}
-                          style={{ padding: '0.4rem 0.6rem', minWidth: 32 }}
+                          style={{ padding: '0.35rem 0.5rem', minWidth: 28, height: 28 }}
                           title={itStatus === 'published' ? (t('vendor_dashboard.deactivate_tooltip') || 'Deactivate') : (t('vendor_dashboard.go_live_tooltip') || 'Go Live')}
                         >
-                          <Power size={14} />
+                          <Power size={13} />
                         </button>
                         <button
                           id={`edit-${item.id}`}
                           className="vp-btn vp-btn-outline vp-btn-sm"
                           onClick={() => router.push(`/vendor/items/${item.id}`)}
-                          style={{ padding: '0.4rem 0.6rem', minWidth: 32 }}
+                          style={{ padding: '0.35rem 0.5rem', minWidth: 28, height: 28 }}
                           title={t('common.edit') || 'Edit'}
                         >
-                          <Edit size={14} />
+                          <Edit size={13} />
                         </button>
                         <button
                           id={`del-${item.id}`}
                           className="vp-btn vp-btn-danger vp-btn-sm"
                           onClick={() => deleteItem(item)}
-                          style={{ padding: '0.4rem 0.6rem', minWidth: 32 }}
+                          style={{ padding: '0.35rem 0.5rem', minWidth: 28, height: 28 }}
                           title={t('common.delete') || 'Delete'}
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={13} />
                         </button>
                       </div>
                     </td>

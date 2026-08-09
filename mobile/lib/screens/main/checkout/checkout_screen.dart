@@ -460,23 +460,60 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final firstOrderId = orderIds.first;
 
       // 2. Call transaction-safe checkout RPC
-      await supabase.rpc('place_checkout_orders', params: {
-        'p_order_ids': orderIds,
-        'p_payment_type': _paymentType == PaymentType.cod ? 'cod' : 'credit',
-        'p_delivery_date': cart.selectedDate.toIso8601String().split('T')[0],
-        'p_delivery_slot': cart.selectedSlot,
-        'p_contact_name': activeAddress['contact_name'],
-        'p_contact_phone': activeAddress['contact_phone'],
-        'p_address_line_1': activeAddress['address_line_1'],
-        'p_address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
-        'p_landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
-        'p_label': activeAddress['label']?.toString().isNotEmpty == true ? activeAddress['label'] : 'Home',
-        'p_house_name': activeAddress['house_name'],
-        'p_village': activeAddress['village'],
-        'p_delivery_note': activeAddress['delivery_note']?.toString().isNotEmpty == true ? activeAddress['delivery_note'] : null,
-        'p_latitude': activeAddress['latitude'],
-        'p_longitude': activeAddress['longitude'],
-      });
+      try {
+        await supabase.rpc('place_checkout_orders', params: {
+          'p_order_ids': orderIds,
+          'p_payment_type': _paymentType == PaymentType.cod ? 'cod' : 'credit',
+          'p_delivery_date': cart.selectedDate.toIso8601String().split('T')[0],
+          'p_delivery_slot': cart.selectedSlot,
+          'p_contact_name': activeAddress['contact_name'],
+          'p_contact_phone': activeAddress['contact_phone'],
+          'p_address_line_1': activeAddress['address_line_1'],
+          'p_address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
+          'p_landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
+          'p_label': activeAddress['label']?.toString().isNotEmpty == true ? activeAddress['label'] : 'Home',
+          'p_house_name': activeAddress['house_name'],
+          'p_village': activeAddress['village'],
+          'p_delivery_note': activeAddress['delivery_note']?.toString().isNotEmpty == true ? activeAddress['delivery_note'] : null,
+          'p_latitude': activeAddress['latitude'],
+          'p_longitude': activeAddress['longitude'],
+        });
+      } catch (rpcErr) {
+        final errString = rpcErr.toString();
+        if (errString.contains('PGRST202') || errString.contains('place_checkout_orders')) {
+          // Fallback to 10-parameter RPC signature expected by existing database schema
+          await supabase.rpc('place_checkout_orders', params: {
+            'p_order_ids': orderIds,
+            'p_payment_type': _paymentType == PaymentType.cod ? 'cod' : 'credit',
+            'p_delivery_date': cart.selectedDate.toIso8601String().split('T')[0],
+            'p_delivery_slot': cart.selectedSlot,
+            'p_contact_name': activeAddress['contact_name'],
+            'p_contact_phone': activeAddress['contact_phone'],
+            'p_address_line_1': activeAddress['address_line_1'],
+            'p_address_line_2': activeAddress['address_line_2']?.toString().isNotEmpty == true ? activeAddress['address_line_2'] : null,
+            'p_landmark': activeAddress['landmark']?.toString().isNotEmpty == true ? activeAddress['landmark'] : null,
+            'p_label': activeAddress['label']?.toString().isNotEmpty == true ? activeAddress['label'] : 'Home',
+          });
+
+          // Update extra address details directly if provided
+          final updateData = <String, dynamic>{};
+          if (activeAddress['house_name'] != null) updateData['house_name'] = activeAddress['house_name'];
+          if (activeAddress['village'] != null) updateData['village'] = activeAddress['village'];
+          if (activeAddress['delivery_note']?.toString().isNotEmpty == true) updateData['delivery_note'] = activeAddress['delivery_note'];
+          if (activeAddress['latitude'] != null) updateData['latitude'] = activeAddress['latitude'];
+          if (activeAddress['longitude'] != null) updateData['longitude'] = activeAddress['longitude'];
+
+          if (updateData.isNotEmpty) {
+            for (final oid in orderIds) {
+              try {
+                await supabase.from('order_addresses').update(updateData).eq('order_id', oid);
+              } catch (_) {}
+            }
+          }
+        } else {
+          rethrow;
+        }
+      }
 
       if (mounted) {
         await CartService.instance.clearCart();

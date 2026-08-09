@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { User, Session } from '@supabase/supabase-js'
-import { confirmNewUser } from '@/app/actions/auth'
+import { confirmNewUser, signOutAction } from '@/app/actions/auth'
 
 export type UserRole = 'customer' | 'shop_owner' | 'admin'
 
@@ -319,6 +319,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out (local session)
   async function signOut() {
     try {
+      await signOutAction()
+    } catch (_) {}
+    try {
       await supabase.auth.signOut()
     } catch (e) {
       console.error("Signout error:", e)
@@ -328,25 +331,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setRole('customer')
     try {
       // Clear all cookies starting with sb- or containing auth-token
-      const cookiesList = document.cookie.split(';')
-      for (let i = 0; i < cookiesList.length; i++) {
-        const cookie = cookiesList[i].trim()
-        const eqPos = cookie.indexOf('=')
-        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
-        if (name.startsWith('sb-') || name.includes('auth-token')) {
-          document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-          document.cookie = name + '=; Path=/; Domain=' + window.location.hostname + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      if (typeof document !== 'undefined') {
+        const cookiesList = document.cookie.split(';')
+        for (let i = 0; i < cookiesList.length; i++) {
+          const cookie = cookiesList[i].trim()
+          const eqPos = cookie.indexOf('=')
+          const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie
+          if (name.startsWith('sb-') || name.startsWith('sb:') || name.includes('auth-token')) {
+            document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax;`
+            document.cookie = `${name}=; Path=/; Domain=${window.location.hostname}; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax;`
+          }
         }
       }
       if (typeof window !== 'undefined') {
-        const keys = []
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i)
-          if (key && (key.includes('supabase') || key.includes('sb-'))) {
-            keys.push(key)
-          }
-        }
-        keys.forEach(k => localStorage.removeItem(k))
+        localStorage.clear()
+        sessionStorage.clear()
       }
     } catch (_) {}
     return { error: null }
@@ -354,6 +353,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Sign out from all devices
   async function signOutAll() {
+    try {
+      await signOutAction()
+    } catch (_) {}
     try {
       await supabase.auth.signOut({ scope: 'global' })
     } catch (e) {
@@ -363,26 +365,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setSession(null)
     setRole('customer')
     try {
-      // Clear all cookies starting with sb- or containing auth-token
-      const cookiesList = document.cookie.split(';')
-      for (let i = 0; i < cookiesList.length; i++) {
-        const cookie = cookiesList[i].trim()
-        const eqPos = cookie.indexOf('=')
-        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie
-        if (name.startsWith('sb-') || name.includes('auth-token')) {
-          document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-          document.cookie = name + '=; Path=/; Domain=' + window.location.hostname + '; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
+      if (typeof document !== 'undefined') {
+        const cookiesList = document.cookie.split(';')
+        for (let i = 0; i < cookiesList.length; i++) {
+          const cookie = cookiesList[i].trim()
+          const eqPos = cookie.indexOf('=')
+          const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie
+          if (name.startsWith('sb-') || name.startsWith('sb:') || name.includes('auth-token')) {
+            document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax;`
+            document.cookie = `${name}=; Path=/; Domain=${window.location.hostname}; Expires=Thu, 01 Jan 1970 00:00:01 GMT; SameSite=Lax;`
+          }
         }
       }
       if (typeof window !== 'undefined') {
-        const keys = []
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i)
-          if (key && (key.includes('supabase') || key.includes('sb-'))) {
-            keys.push(key)
-          }
-        }
-        keys.forEach(k => localStorage.removeItem(k))
+        localStorage.clear()
+        sessionStorage.clear()
       }
     } catch (_) {}
     return { error: null }

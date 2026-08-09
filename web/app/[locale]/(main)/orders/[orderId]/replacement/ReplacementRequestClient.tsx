@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ArrowLeft, CheckCircle2, AlertCircle, Camera, Trash2, Plus, Minus } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import { uploadImageAction } from '@/components/ImageUploaderActions'
+import BackButton from '@/components/BackButton'
 import { createReplacementRequestAction } from '@/app/actions/replacements'
 
 interface OrderItem {
@@ -112,24 +113,22 @@ export default function ReplacementRequestClient({ order, orderItems, locale }: 
     setErrorMsg('')
 
     try {
-      // Reason value mapping
-      const mappedReason = reason === 'wrong_item' ? 'Wrong Item'
-                         : reason === 'damaged' ? 'Damaged'
-                         : reason === 'poor_quality' ? 'Poor Quality'
-                         : reason === 'expired' ? 'Expired'
-                         : reason === 'missing_item' ? 'Missing Item'
-                         : 'Other'
+      const response = await fetch('/api/orders/replacement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: order.id,
+          reason,
+          description,
+          customerImages: imageUrls,
+          items: itemPayload
+        })
+      })
 
-      const res = await createReplacementRequestAction(
-        order.id,
-        mappedReason as any,
-        description,
-        imageUrls,
-        itemPayload
-      )
+      const res = await response.json()
 
-      if (res.error) {
-        setErrorMsg(res.error)
+      if (!response.ok || res.error) {
+        setErrorMsg(res.error || 'Failed to submit replacement request.')
       } else {
         setSuccess(true)
         setTimeout(() => {
@@ -138,7 +137,7 @@ export default function ReplacementRequestClient({ order, orderItems, locale }: 
         }, 2000)
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Submission failed.')
+      setErrorMsg(err.message || 'An unexpected error occurred.')
     } finally {
       setSubmitting(false)
     }
@@ -200,9 +199,9 @@ export default function ReplacementRequestClient({ order, orderItems, locale }: 
 
       <div className="page-container">
         <div className="header">
-          <Link href={`/${locale}/orders/${order.id}`} className="back-btn">
+          <BackButton fallbackHref={`/${locale}/orders/${order.id}`}>
             <ArrowLeft size={20} />
-          </Link>
+          </BackButton>
           <h1 className="title">{t('replacements.request_replacement')}</h1>
         </div>
 

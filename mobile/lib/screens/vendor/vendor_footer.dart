@@ -22,7 +22,7 @@ class VendorFooter extends StatelessWidget {
       _FooterItem(icon: HugeIcons.strokeRoundedReceiptText, label: l10n.vendorFooterOrders, route: '/vendor/orders'),
       _FooterItem(icon: HugeIcons.strokeRoundedPackage, label: l10n.vendorFooterProducts, route: '/vendor/items'),
       _FooterItem(icon: HugeIcons.strokeRoundedMoney03, label: l10n.vendorFooterCredit, route: '/vendor/credit'),
-      _FooterItem(icon: HugeIcons.strokeRoundedLogout01, label: l10n.vendorFooterExit, route: '/profile'),
+      _FooterItem(icon: HugeIcons.strokeRoundedLogout01, label: l10n.vendorFooterExit, route: '/home'),
     ];
 
     return Container(

@@ -30,11 +30,22 @@ function getLocale(request: NextRequest): string {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // 1. Locale Redirect Check
-  // Skip locale check for API routes, Next.js internals, and files containing extensions
-  const isApiOrAsset = pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')
+  // 1. Skip middleware completely for static assets & files
+  const isStaticAsset =
+    pathname.startsWith('/_next') ||
+    pathname === '/manifest.json' ||
+    pathname === '/favicon.ico' ||
+    pathname === '/sw.js' ||
+    /\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|js|css)$/.test(pathname)
 
-  if (!isApiOrAsset) {
+  if (isStaticAsset) {
+    return NextResponse.next()
+  }
+
+  // 2. Locale Redirect Check
+  const isApiRoute = pathname.startsWith('/api')
+
+  if (!isApiRoute) {
     const pathnameIsMissingLocale = locales.every(
       locale => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
     )
@@ -79,9 +90,13 @@ export async function proxy(request: NextRequest) {
             request.cookies.set(name, value)
           )
           supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, { ...options, maxAge: 3153600000 })
-          )
+          cookiesToSet.forEach(({ name, value, options }) => {
+            if (value === '' || options?.maxAge === 0) {
+              supabaseResponse.cookies.set(name, '', { ...options, maxAge: 0 })
+            } else {
+              supabaseResponse.cookies.set(name, value, { ...options, maxAge: options?.maxAge ?? 3153600000 })
+            }
+          })
         },
       },
     }
@@ -105,10 +120,7 @@ export async function proxy(request: NextRequest) {
   const isPublicRoute =
     publicRoutes.some((r) => cleanPathname.startsWith(r)) ||
     cleanPathname === '/' ||
-    pathname === '/api/search' ||
-    pathname.startsWith('/api/search') ||
-    pathname === '/api/translate' ||
-    pathname.startsWith('/api/translate')
+    pathname.startsWith('/api')
 
   // Unauthenticated user → redirect to login
   if (!user && !isPublicRoute) {
@@ -145,8 +157,9 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Already authenticated → don't allow accessing public auth pages (skip API routes)
-  if (user && isPublicRoute && !pathname.startsWith('/api')) {
+  // Already authenticated → don't allow accessing public auth pages (e.g. /login, /signup)
+  const isAuthPage = publicRoutes.some((r) => cleanPathname.startsWith(r))
+  if (user && isAuthPage && !pathname.startsWith('/api')) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/home`
     return redirect(homeUrl)
@@ -204,6 +217,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Skip Next.js internals and static assets
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest.json|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|js|css)$).*)',
   ],
 }

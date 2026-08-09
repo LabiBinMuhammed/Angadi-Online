@@ -328,6 +328,20 @@ export default function AdminReplacementsClient({ initialRequests, shops }: Prop
                               </div>
                             ))}
                           </div>
+                          {(() => {
+                            const raw = req.customer_images || req.proof_images || []
+                            const imgs = Array.isArray(raw) ? raw : typeof raw === 'string' && raw.startsWith('http') ? [raw] : []
+                            if (imgs.length === 0) return null
+                            return (
+                              <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' }}>
+                                {imgs.map((img: string, idx: number) => (
+                                  <a key={idx} href={img} target="_blank" rel="noopener noreferrer">
+                                    <img src={img} alt="proof" style={{ width: '40px', height: '40px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #cbd5e1' }} />
+                                  </a>
+                                ))}
+                              </div>
+                            )
+                          })()}
                         </td>
                         <td>
                           <span className={`admin-badge ${badgeClasses[req.status.toLowerCase()] || ''}`}>

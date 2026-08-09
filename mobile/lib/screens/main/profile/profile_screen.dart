@@ -52,13 +52,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     final userId = user.id;
     try {
-      final results = await Future.wait([
-        supabase.from('users').select('name, phone, role, phone_verified').eq('id', userId).maybeSingle(),
-        supabase.from('user_profiles').select('email, profile_image_url, gender, preferred_language, date_of_birth').eq('user_id', userId).maybeSingle(),
-      ]);
+      final userRes = await supabase.from('users').select('*, preferred_language').eq('id', userId).maybeSingle();
       return _Data(
-        user: (results[0] as Map<String, dynamic>?) ?? {'name': 'User', 'phone': ''},
-        profile: results[1] != null ? results[1] as Map<String, dynamic> : null,
+        user: userRes ?? {'name': 'User', 'phone': ''},
+        profile: userRes,
       );
     } catch (e) {
       return _Data(user: {'name': 'User', 'phone': ''}, profile: null);

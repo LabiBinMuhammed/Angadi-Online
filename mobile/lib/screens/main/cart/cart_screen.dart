@@ -5,7 +5,9 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:village_market/core/supabase_client.dart';
 import 'package:village_market/theme/theme_service.dart';
 import '../../../core/cart_service.dart';
+import '../../../core/language_service.dart';
 import '../../../models/models.dart';
+
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -18,6 +20,7 @@ class _CartScreenState extends State<CartScreen> {
   String? _userRole;
   List<dynamic> _deliverySettings = [];
   List<dynamic> _placedOrders = [];
+  List<Unit> _units = [];
   bool _loadingSettings = false;
 
   @override
@@ -25,9 +28,24 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     _loadUserRole();
     _loadDeliverySettings();
+    _loadUnits();
     CartService.instance.addListener(_onCartChanged);
     ThemeService.instance.addListener(_onThemeChanged);
   }
+
+  Future<void> _loadUnits() async {
+    try {
+      final res = await supabase.from('units').select('*');
+      if (mounted) {
+        setState(() {
+          _units = (res as List).map((u) => Unit.fromJson(u)).toList();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error loading units in CartScreen: $e');
+    }
+  }
+
 
   @override
   void dispose() {
@@ -630,141 +648,13 @@ class _CartScreenState extends State<CartScreen> {
                           children: [
                             ...cartItems.map((item) => Padding(
                                   padding: const EdgeInsets.only(bottom: 16),
-                                  child: Dismissible(
-                                    key: ValueKey(item.variant.id),
-                                    direction: DismissDirection.endToStart,
-                                    onDismissed: (_) => cart.removeItem(item.variant.id),
-                                    background: Container(
-                                      alignment: Alignment.centerRight,
-                                      padding: const EdgeInsets.only(right: 24),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFFF4757),
-                                        borderRadius: BorderRadius.circular(24),
-                                      ),
-                                      child: const Icon(Icons.delete, color: Colors.white),
-                                    ),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                                      decoration: BoxDecoration(
-                                        color: kCardBg,
-                                        borderRadius: BorderRadius.circular(24),
-                                        border: Border.all(color: kBorder),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.03),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 4),
-                                          )
-                                        ],
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            width: 70, height: 70,
-                                            alignment: Alignment.center,
-                                            child: item.variant.imageUrl != null && item.variant.imageUrl!.trim().isNotEmpty
-                                                ? Image.network(item.variant.imageUrl!, fit: BoxFit.cover)
-                                                : item.item.imageUrl != null
-                                                    ? Image.network(item.item.imageUrl!, fit: BoxFit.cover)
-                                                    : Text(_getFallbackEmoji(item.item), style: const TextStyle(fontSize: 40)),
-                                          ),
-                                          const SizedBox(width: 16),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  item.item.name,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: kText,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  item.variant.label,
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: kSubText,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 4),
-                                                Text(
-                                                  item.sellConfig?.sellMode == SellMode.manual
-                                                      ? '₹ ${(item.sellConfig?.pricePerBaseUnit ?? 0.0).toStringAsFixed(0)} / kg'
-                                                      : '₹ ${(item.variant.price ?? 0.0).toStringAsFixed(0)}',
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w800,
-                                                    color: kGreen,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () => cart.removeItem(item.variant.id),
-                                                child: Container(
-                                                  width: 24, height: 24,
-                                                  decoration: BoxDecoration(
-                                                    color: kCardBg,
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(color: kBorder),
-                                                  ),
-                                                  child: const Icon(Icons.delete_outline, color: Color(0xFFFF4757), size: 14),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 12),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                                decoration: BoxDecoration(
-                                                  color: kCardBg,
-                                                  borderRadius: BorderRadius.circular(12),
-                                                  border: Border.all(color: kBorder),
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black.withValues(alpha: 0.04),
-                                                      blurRadius: 8,
-                                                    )
-                                                  ],
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () => cart.updateQuantity(item.variant.id, item.quantity - 1.0),
-                                                      child: Icon(Icons.remove, size: 16, color: kSubText),
-                                                    ),
-                                                    const SizedBox(width: 12),
-                                                    Text(
-                                                      item.quantity % 1 == 0
-                                                          ? item.quantity.toInt().toString()
-                                                          : item.quantity.toStringAsFixed(1),
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.w600,
-                                                        color: kText,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 12),
-                                                    GestureDetector(
-                                                      onTap: () => cart.updateQuantity(item.variant.id, item.quantity + 1.0),
-                                                      child: const Icon(Icons.add, size: 16, color: kGreen),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    ),
+                                  child: _CartItemTile(
+                                    cartItem: item,
+                                    units: _units,
+                                    fallbackEmoji: _getFallbackEmoji(item.item),
                                   ),
                                 )),
+
 
                             _buildDeliveryScheduleCard(context, kCardBg, kBorder, kText, kSubText, kGreen),
 
@@ -809,6 +699,332 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 }
+
+class _CartItemTile extends StatefulWidget {
+  final CartItem cartItem;
+  final List<Unit> units;
+  final String fallbackEmoji;
+
+  const _CartItemTile({
+    required this.cartItem,
+    required this.units,
+    required this.fallbackEmoji,
+  });
+
+  @override
+  State<_CartItemTile> createState() => _CartItemTileState();
+}
+
+class _CartItemTileState extends State<_CartItemTile> {
+  late TextEditingController _qtyController;
+
+  @override
+  void initState() {
+    super.initState();
+    _qtyController = TextEditingController(text: _formatQty(widget.cartItem.quantity));
+  }
+
+  @override
+  void didUpdateWidget(covariant _CartItemTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.cartItem.quantity != widget.cartItem.quantity) {
+      final formatted = _formatQty(widget.cartItem.quantity);
+      if (_qtyController.text != formatted) {
+        _qtyController.text = formatted;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _qtyController.dispose();
+    super.dispose();
+  }
+
+  String _formatQty(double qty) {
+    if (qty == qty.toInt().toDouble()) {
+      return qty.toInt().toString();
+    } else {
+      return qty.toStringAsFixed(1);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = ThemeService.instance.isDarkMode;
+    final kCardBg = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final kText = isDark ? Colors.white : const Color(0xFF1A1A1A);
+    final kSubText = isDark ? const Color(0xFF94A3B8) : const Color(0xFF555555);
+    final kBorder = isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
+    const kGreen = Color(0xFF4CD964);
+    const kGreenDark = Color(0xFF1E4D1E);
+
+    final cartItem = widget.cartItem;
+    final item = cartItem.item;
+    final variant = cartItem.variant;
+    final config = cartItem.sellConfig;
+    final sellMode = config?.sellMode ?? SellMode.packed;
+
+    // Price calculation
+    double pricePerUnit;
+    String unitSymbol = '';
+    if (sellMode == SellMode.manual) {
+      pricePerUnit = config?.pricePerBaseUnit ?? 0.0;
+      unitSymbol = widget.units.firstWhere(
+        (u) => u.id == config?.baseUnitId,
+        orElse: () => const Unit(id: '', name: '', symbol: 'kg', unitGroupId: '', baseMultiplier: 1.0),
+      ).symbol;
+    } else if (sellMode == SellMode.dynamic) {
+      pricePerUnit = (config?.pricePerBaseUnit ?? 0.0) * (variant.value ?? 1.0);
+    } else {
+      pricePerUnit = variant.price ?? 0.0;
+    }
+
+    final lineTotal = pricePerUnit * cartItem.quantity;
+    final langCode = LanguageService.instance.locale.languageCode;
+
+    return Dismissible(
+      key: ValueKey(variant.id),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) => CartService.instance.removeItem(variant.id),
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 24),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFF4757),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: kCardBg,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: kBorder),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 70, height: 70,
+                  alignment: Alignment.center,
+                  child: variant.imageUrl != null && variant.imageUrl!.trim().isNotEmpty
+                      ? Image.network(variant.imageUrl!, fit: BoxFit.cover)
+                      : item.imageUrl != null
+                          ? Image.network(item.imageUrl!, fit: BoxFit.cover)
+                          : Text(widget.fallbackEmoji, style: const TextStyle(fontSize: 40)),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.getLocalizedName(langCode),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: kText,
+                        ),
+                      ),
+                      if (variant.getLocalizedLabel(langCode).isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          variant.getLocalizedLabel(langCode),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: kSubText,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            '₹ ${lineTotal.toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: kGreen,
+                            ),
+                          ),
+                          if (sellMode == SellMode.manual && unitSymbol.isNotEmpty) ...[
+                            const SizedBox(width: 4),
+                            Text(
+                              '(₹ ${pricePerUnit.toStringAsFixed(0)} / $unitSymbol)',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kSubText),
+                            ),
+                          ]
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () => CartService.instance.removeItem(variant.id),
+                  child: Container(
+                    width: 28, height: 28,
+                    decoration: BoxDecoration(
+                      color: kCardBg,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: kBorder),
+                    ),
+                    child: const Icon(Icons.delete_outline, color: Color(0xFFFF4757), size: 16),
+                  ),
+                ),
+              ],
+            ),
+
+            // Variant Selector Chips for dynamic, portion, or multi-variant packed items
+            if ((sellMode == SellMode.dynamic ||
+                    sellMode == SellMode.portion ||
+                    item.itemVariants.length > 1) &&
+                item.itemVariants.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: item.itemVariants.map((v) {
+                  final isActive = v.id == variant.id;
+                  return GestureDetector(
+                    onTap: () {
+                      if (!isActive) {
+                        CartService.instance.updateVariant(variant.id, v);
+                      }
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isActive ? kGreen : kBorder,
+                          width: isActive ? 1.5 : 1,
+                        ),
+                        color: isActive ? kGreen.withOpacity(0.15) : kCardBg,
+                      ),
+                      child: Text(
+                        v.getLocalizedLabel(langCode).isNotEmpty
+                            ? v.getLocalizedLabel(langCode)
+                            : v.variantType.name,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: isActive ? kGreenDark : kSubText,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ],
+
+            const SizedBox(height: 12),
+
+            // Quantity / Weight Editing Control
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  sellMode == SellMode.manual ? 'Weight / Qty:' : 'Quantity:',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kSubText),
+                ),
+                if (sellMode == SellMode.manual) ...[
+                  Container(
+                    height: 36,
+                    width: 120,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: kGreen.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: kGreen.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _qtyController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kGreenDark),
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.zero,
+                              isDense: true,
+                              border: InputBorder.none,
+                            ),
+                            onChanged: (val) {
+                              final parsed = double.tryParse(val) ?? 0.0;
+                              if (parsed > 0) {
+                                CartService.instance.updateQuantity(variant.id, parsed);
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          unitSymbol,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: kGreenDark),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: kCardBg,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: kBorder),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 8,
+                        )
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => CartService.instance.updateQuantity(variant.id, cartItem.quantity - 1.0),
+                          child: Icon(Icons.remove, size: 18, color: kSubText),
+                        ),
+                        const SizedBox(width: 14),
+                        Text(
+                          _formatQty(cartItem.quantity),
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: kText,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        GestureDetector(
+                          onTap: () => CartService.instance.updateQuantity(variant.id, cartItem.quantity + 1.0),
+                          child: const Icon(Icons.add, size: 18, color: kGreen),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 
 

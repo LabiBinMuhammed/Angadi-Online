@@ -14,9 +14,9 @@ html[lang="ml"] {
   /* WhatsApp Brand Palette */
   --wa-green:        #25d366;
   --wa-green-light:  #dcfce7;
-  --wa-green-dark:   #128c7e;
-  --wa-teal:         #075e54;
-  --wa-teal-dark:    #054c42;
+  --wa-green-dark:   #25d366;
+  --wa-teal:         #25d366;
+  --wa-teal-dark:    #25d366;
 
   /* Backgrounds */
   --wa-bg:           #f0f2f5;
@@ -82,9 +82,9 @@ html[lang="ml"] {
   /* WhatsApp Brand Palette */
   --wa-green:        #25d366;
   --wa-green-light:  #103629;
-  --wa-green-dark:   #128c7e;
-  --wa-teal:         #202c33;
-  --wa-teal-dark:    #111b21;
+  --wa-green-dark:   #25d366;
+  --wa-teal:         #25d366;
+  --wa-teal-dark:    #25d366;
 
   /* Backgrounds */
   --wa-bg:           #0b141a;

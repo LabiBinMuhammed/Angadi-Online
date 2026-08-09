@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Order } from '@/types'
 import { ArrowLeft, Package, Clock, Truck, CheckCircle2, XCircle, Store, ShieldCheck, Bell } from 'lucide-react'
 import { getServerTranslations } from '@/lib/i18n/server'
+import BackButton from '@/components/BackButton'
 
 export const metadata: Metadata = { title: 'My Orders' }
 
@@ -26,10 +27,25 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
   const filter = queryParams.filter || 'today'
   const slotFilter = queryParams.slot || 'all'
 
+  if (!user) {
+    return (
+      <div className="page-container">
+        <div className="empty-state" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', textAlign: 'center' }}>
+          <Package size={64} style={{ color: '#ccc', marginBottom: '24px' }} />
+          <h2 style={{ fontSize: '24px', fontWeight: 800, margin: '0 0 8px' }}>{t('orders.no_orders')}</h2>
+          <p style={{ fontSize: '15px', color: 'var(--text-muted)', margin: '0 0 32px' }}>Please log in to view your orders.</p>
+          <Link href={`/${activeLocale}/login`} className="browse-btn" style={{ background: 'var(--wa-green)', color: '#fff', padding: '14px 28px', borderRadius: '24px', textDecoration: 'none', fontWeight: 700 }}>
+            {t('auth.login')}
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   let ordersQuery = supabase
     .from('orders')
     .select('id, status, created_at, total_final_price, shop_id, shops(name), delivery_date, delivery_slot, order_number')
-    .eq('user_id', user!.id)
+    .eq('user_id', user.id)
     .not('payment_type', 'is', null)
 
   const now = new Date()
@@ -65,8 +81,8 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
     supabase
       .from('users')
       .select('role')
-      .eq('id', user!.id)
-      .single()
+      .eq('id', user.id)
+      .maybeSingle()
   ])
 
   const orders = ordersRes.data
@@ -103,9 +119,9 @@ export default async function OrdersPage({ params, searchParams }: { params: Pro
       <div className="page-container">
         <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Link href="/profile" className="back-btn">
+            <BackButton fallbackHref={`/${locale}/home`}>
               <ArrowLeft size={20} />
-            </Link>
+            </BackButton>
             <h1 className="title">{t('orders.title')}</h1>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
