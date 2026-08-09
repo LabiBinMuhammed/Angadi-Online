@@ -64,13 +64,21 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 100, height: 100,
+                  width: 120, height: 120,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 24, offset: Offset(0, 8))],
                   ),
-                  child: const Center(child: Text('🛒', style: TextStyle(fontSize: 52))),
+                  child: Center(
+                    child: Image.asset(
+                      'assets/images/logo.png',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 24),
                 const Text(

@@ -55,8 +55,9 @@ export default function VendorSidebar({ isCollapsed, onCloseMobile }: VendorSide
   return (
     <aside className="vp-sidebar">
       <div className="vp-sidebar-brand-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '1rem' }}>
-        <div className="vp-sidebar-brand">
-          <Shield size={24} color="#60a5fa" style={{ flexShrink: 0 }} /> <span>{t('vendor_nav.portal_title')}</span>
+        <div className="vp-sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src="/logo.png" alt="Angadi Vendor" style={{ height: '36px', maxWidth: '140px', objectFit: 'contain' }} />
+          <span style={{ fontSize: '11px', background: 'rgba(37,211,102,0.15)', color: '#25D366', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>VENDOR</span>
         </div>
         <button 
           onClick={onCloseMobile}

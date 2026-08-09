@@ -28,30 +28,25 @@ class AdminDrawer extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedShield01,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 36,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Admin Panel',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: kText,
-                      letterSpacing: -0.5,
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B5CF6).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'ADMIN',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF8B5CF6),
+                      ),
                     ),
                   ),
                 ],

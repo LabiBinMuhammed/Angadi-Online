@@ -205,7 +205,16 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  height: 48,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 16),
 
               // Title and Subtitle
               Text(

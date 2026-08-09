@@ -78,14 +78,9 @@ export default function Sidebar() {
 
       <div className="desktop-sidebar" style={{ zIndex: 100 }}>
         {/* Header Logo */}
-        <div style={{ marginBottom: '28px', padding: '0 8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #4cd964, #32b84a)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 12px rgba(76,217,100,0.3)', flexShrink: 0 }}>
-            <Home size={22} />
-          </div>
-          <span className="sidebar-text" style={{ fontSize: '19px', fontWeight: 900, color: 'var(--text-base)', letterSpacing: '-0.5px', margin: 0 }}>
-            Angadi Online
-          </span>
-        </div>
+        <Link href={`/${locale}/home`} style={{ marginBottom: '24px', padding: '0 8px', display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+          <img src="/logo.png" alt="Angadi Online" style={{ height: '44px', maxWidth: '180px', objectFit: 'contain' }} />
+        </Link>
 
         {/* Main Navigation Group */}
         <span className="sidebar-section-title">{t('nav.menu') || 'Menu'}</span>
