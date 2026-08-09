@@ -44,7 +44,7 @@ class TutorialOverlayPainter extends CustomPainter {
 
     // 3. Draw pulsating highlight border (subtle scale animation)
     final highlightPaint = Paint()
-      ..color = Colors.blue.withOpacity(0.8 - (0.4 * animationValue))
+      ..color = Colors.blue.withValues(alpha: 0.8 - (0.4 * animationValue))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0 + (2.0 * animationValue);
 

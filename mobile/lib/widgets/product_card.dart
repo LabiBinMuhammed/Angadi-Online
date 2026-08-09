@@ -175,7 +175,7 @@ class _ProductCardState extends State<ProductCard> {
             border: Border.all(color: _kBorder),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 24,
                 offset: const Offset(0, 8),
               )
@@ -296,7 +296,7 @@ class _ProductCardState extends State<ProductCard> {
                       border: Border.all(color: _kBorder),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 12,
                         )
                       ],
@@ -324,7 +324,7 @@ class _ProductCardState extends State<ProductCard> {
                                   height: 32,
                                   padding: const EdgeInsets.symmetric(horizontal: 8),
                                   decoration: BoxDecoration(
-                                    color: _kGreen.withOpacity(0.1),
+                                    color: _kGreen.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Row(
@@ -470,9 +470,9 @@ class _ProductCardState extends State<ProductCard> {
                             height: 32,
                             padding: const EdgeInsets.symmetric(horizontal: 8),
                             decoration: BoxDecoration(
-                              color: _kGreen.withOpacity(0.1),
+                              color: _kGreen.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: _kGreen.withOpacity(0.3)),
+                              border: Border.all(color: _kGreen.withValues(alpha: 0.3)),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

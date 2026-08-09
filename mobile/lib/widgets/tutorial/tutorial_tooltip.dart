@@ -137,7 +137,7 @@ class TutorialTooltip extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(isDark ? 0.4 : 0.15),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.15),
                 blurRadius: 16,
                 offset: const Offset(0, 8),
               ),
@@ -174,7 +174,7 @@ class TutorialTooltip extends StatelessWidget {
                       padding: const EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
                       child: Text(
                         l10n.tutorialSkip,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
                           color: kNeutral500,
                           fontWeight: FontWeight.w600,
@@ -204,7 +204,7 @@ class TutorialTooltip extends StatelessWidget {
                 children: [
                   Text(
                     progressText,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       color: kNeutral500,
                       fontWeight: FontWeight.w700,

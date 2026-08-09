@@ -387,7 +387,7 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
                           Text('Shop Type', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedType,
+                            initialValue: _selectedType,
                             dropdownColor: const Color(0xFF1E293B),
                             borderRadius: BorderRadius.circular(16),
                             style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
@@ -413,7 +413,7 @@ class _VendorShopsScreenState extends State<VendorShopsScreen> {
                           Text('Location', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: kVendorText)),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value: _selectedLocationId,
+                            initialValue: _selectedLocationId,
                             dropdownColor: const Color(0xFF1E293B),
                             borderRadius: BorderRadius.circular(16),
                             style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),

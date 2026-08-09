@@ -378,7 +378,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     margin: const EdgeInsets.only(right: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? Color(0xFF3B82F6) : kVendorTransparentBg,
+                      color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBg,
                       borderRadius: BorderRadius.circular(99),
                       border: Border.all(
                         color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
@@ -386,7 +386,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: const Color(0xFF3B82F6).withOpacity(0.3),
+                                color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               )
@@ -433,7 +433,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: isSelected ? Color(0xFF3B82F6) : kVendorTransparentBg,
+                      color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBg,
                       borderRadius: BorderRadius.circular(99),
                       border: Border.all(
                         color: isSelected ? const Color(0xFF3B82F6) : kVendorTransparentBorder,
@@ -441,7 +441,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                       boxShadow: isSelected
                           ? [
                               BoxShadow(
-                                color: const Color(0xFF3B82F6).withOpacity(0.3),
+                                color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
                               )
