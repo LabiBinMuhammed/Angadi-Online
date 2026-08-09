@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Angadi Online</string>
+    <string name="title_activity_main">Angadi Online</string>
+    <string name="package_name">com.angadi.online</string>
+    <string name="custom_url_scheme">com.angadi.online</string>
+</resources>

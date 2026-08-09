@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider'
 import { I18nProvider, Locale } from '@/lib/i18n/I18nContext'
 import { AuthProvider } from '@/lib/auth/AuthContext'
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister'
+import CapacitorInit from '@/components/CapacitorInit'
 
 export const viewport: Viewport = {
   themeColor: '#2e5b28',
@@ -60,6 +61,7 @@ export default async function RootLayout({
             <AuthProvider>
               <SessionListener />
               <ServiceWorkerRegister />
+              <CapacitorInit />
               {children}
             </AuthProvider>
           </ThemeProvider>

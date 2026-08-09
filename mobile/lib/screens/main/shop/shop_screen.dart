@@ -195,7 +195,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Row(
@@ -262,9 +262,9 @@ class _ShopScreenState extends State<ShopScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              l10n.catalogOpen,
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
+                            const Text(
+                              'Open',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF22C55E)),
                             ),
                           ],
                         ),
