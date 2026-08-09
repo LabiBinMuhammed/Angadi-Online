@@ -844,7 +844,7 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                         border: Border.all(color: kBorder),
                       ),
                       child: Column(
-                        crossAxisAlignment: CrossAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Rating Breakdown',
@@ -940,7 +940,7 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     _unreviewedOrderId != null ? 'Share Your Experience' : 'Your Orders',
@@ -1037,6 +1037,8 @@ class _ShopReviewsWidgetState extends State<ShopReviewsWidget> {
                                       fontWeight: FontWeight.bold,
                                       color: kWaGreen,
                                     ),
+                                  ),
+                                ),
                       ],
                     ),
                     const SizedBox(height: 16),
