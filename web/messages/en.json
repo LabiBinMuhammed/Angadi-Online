@@ -902,5 +902,14 @@
     "sign_out_all": "Sign Out From All Devices",
     "logging_out": "Logging out...",
     "confirm_sign_out_all": "Are you sure you want to sign out from all devices? You will need to log in again on all your active devices."
+  },
+  "shops": {
+    "shop_owners_title": "Shop Owners",
+    "add_co_owner": "Add Co-Owner",
+    "remove_co_owner": "Remove Co-Owner",
+    "max_owners_limit": "Max 3 Limit",
+    "delete_shop": "Delete Shop",
+    "primary_owner": "Primary Owner",
+    "co_owner": "Co-Owner"
   }
 }

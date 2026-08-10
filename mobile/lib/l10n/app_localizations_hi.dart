@@ -1408,4 +1408,25 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get tutorialShopOpenDesc =>
       'अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।';
+
+  @override
+  String get shopOwnersTitle => 'दुकान के मालिक';
+
+  @override
+  String get addCoOwner => 'सह-मालिक जोड़ें';
+
+  @override
+  String get removeCoOwner => 'सह-मालिक हटाएं';
+
+  @override
+  String get maxOwnersLimit => 'अधिकतम 3 सीमा';
+
+  @override
+  String get deleteShop => 'दुकान हटाएं';
+
+  @override
+  String get primaryOwner => 'मुख्य मालिक';
+
+  @override
+  String get coOwner => 'सह-मालिक';
 }

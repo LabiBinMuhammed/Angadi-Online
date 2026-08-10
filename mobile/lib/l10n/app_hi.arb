@@ -444,5 +444,12 @@
   "tutorialShopProductTitle": "उत्पाद देखें",
   "tutorialShopProductDesc": "सभी उपलब्ध वस्तुओं की कीमतें, चित्र और विवरण देखें।",
   "tutorialShopOpenTitle": "उत्पाद खोलें",
-  "tutorialShopOpenDesc": "अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।"
+  "tutorialShopOpenDesc": "अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।",
+  "shopOwnersTitle": "दुकान के मालिक",
+  "addCoOwner": "सह-मालिक जोड़ें",
+  "removeCoOwner": "सह-मालिक हटाएं",
+  "maxOwnersLimit": "अधिकतम 3 सीमा",
+  "deleteShop": "दुकान हटाएं",
+  "primaryOwner": "मुख्य मालिक",
+  "coOwner": "सह-मालिक"
 }

@@ -682,5 +682,12 @@
   "tutorialShopProductTitle": "View Products",
   "tutorialShopProductDesc": "See prices, images, and details of all available items.",
   "tutorialShopOpenTitle": "Open Product",
-  "tutorialShopOpenDesc": "Tap on any item card to see more details and add it to your bag."
+  "tutorialShopOpenDesc": "Tap on any item card to see more details and add it to your bag.",
+  "shopOwnersTitle": "Shop Owners",
+  "addCoOwner": "Add Co-Owner",
+  "removeCoOwner": "Remove Co-Owner",
+  "maxOwnersLimit": "Max 3 Limit",
+  "deleteShop": "Delete Shop",
+  "primaryOwner": "Primary Owner",
+  "coOwner": "Co-Owner"
 }

@@ -1395,4 +1395,25 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get tutorialShopOpenDesc =>
       'انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك.';
+
+  @override
+  String get shopOwnersTitle => 'مالكو المتاجر';
+
+  @override
+  String get addCoOwner => 'إضافة مالك مشارك';
+
+  @override
+  String get removeCoOwner => 'إزالة المالك المشارك';
+
+  @override
+  String get maxOwnersLimit => 'الحد الأقصى 3';
+
+  @override
+  String get deleteShop => 'حذف المتجر';
+
+  @override
+  String get primaryOwner => 'المالك الرئيسي';
+
+  @override
+  String get coOwner => 'مالك مشارك';
 }

@@ -444,5 +444,12 @@
   "tutorialShopProductTitle": "ഉൽപ്പന്നങ്ങൾ കാണുക",
   "tutorialShopProductDesc": "ലഭ്യമായ എല്ലാ സാധനങ്ങളുടെയും വിലയും ചിത്രങ്ങളും ഇവിടെ കാണാം.",
   "tutorialShopOpenTitle": "വിവരങ്ങൾ അറിയുക",
-  "tutorialShopOpenDesc": "സാധനങ്ങളുടെ കൂടുതൽ വിവരങ്ങൾ കാണാനും ബാഗിലേക്ക് ചേർക്കാനും ഇതിൽ ടാപ്പ് ചെയ്യുക."
+  "tutorialShopOpenDesc": "സാധനങ്ങളുടെ കൂടുതൽ വിവരങ്ങൾ കാണാനും ബാഗിലേക്ക് ചേർക്കാനും ഇതിൽ ടാപ്പ് ചെയ്യുക.",
+  "shopOwnersTitle": "കട ഉടമകൾ",
+  "addCoOwner": "സഹ-ഉടമയെ ചേർക്കുക",
+  "removeCoOwner": "സഹ-ഉടമയെ നീക്കം ചെയ്യുക",
+  "maxOwnersLimit": "പരമാവധി 3 ഉടമകൾ",
+  "deleteShop": "കട നീക്കം ചെയ്യുക",
+  "primaryOwner": "പ്രധാന ഉടമ",
+  "coOwner": "സഹ-ഉടമ"
 }

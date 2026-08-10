@@ -2687,6 +2687,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Tap on any item card to see more details and add it to your bag.'**
   String get tutorialShopOpenDesc;
+
+  /// No description provided for @shopOwnersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shop Owners'**
+  String get shopOwnersTitle;
+
+  /// No description provided for @addCoOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Co-Owner'**
+  String get addCoOwner;
+
+  /// No description provided for @removeCoOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Co-Owner'**
+  String get removeCoOwner;
+
+  /// No description provided for @maxOwnersLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'Max 3 Limit'**
+  String get maxOwnersLimit;
+
+  /// No description provided for @deleteShop.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Shop'**
+  String get deleteShop;
+
+  /// No description provided for @primaryOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Owner'**
+  String get primaryOwner;
+
+  /// No description provided for @coOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-Owner'**
+  String get coOwner;
 }
 
 class _AppLocalizationsDelegate

@@ -1399,4 +1399,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get tutorialShopOpenDesc =>
       'Tap on any item card to see more details and add it to your bag.';
+
+  @override
+  String get shopOwnersTitle => 'Shop Owners';
+
+  @override
+  String get addCoOwner => 'Add Co-Owner';
+
+  @override
+  String get removeCoOwner => 'Remove Co-Owner';
+
+  @override
+  String get maxOwnersLimit => 'Max 3 Limit';
+
+  @override
+  String get deleteShop => 'Delete Shop';
+
+  @override
+  String get primaryOwner => 'Primary Owner';
+
+  @override
+  String get coOwner => 'Co-Owner';
 }

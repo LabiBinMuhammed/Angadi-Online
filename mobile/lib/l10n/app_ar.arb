@@ -444,5 +444,12 @@
   "tutorialShopProductTitle": "عرض المنتجات",
   "tutorialShopProductDesc": "شاهد الأسعار والصور والتفاصيل لجميع المنتجات المتاحة.",
   "tutorialShopOpenTitle": "فتح المنتج",
-  "tutorialShopOpenDesc": "انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك."
+  "tutorialShopOpenDesc": "انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك.",
+  "shopOwnersTitle": "مالكو المتاجر",
+  "addCoOwner": "إضافة مالك مشارك",
+  "removeCoOwner": "إزالة المالك المشارك",
+  "maxOwnersLimit": "الحد الأقصى 3",
+  "deleteShop": "حذف المتجر",
+  "primaryOwner": "المالك الرئيسي",
+  "coOwner": "مالك مشارك"
 }

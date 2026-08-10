@@ -1424,4 +1424,25 @@ class AppLocalizationsMl extends AppLocalizations {
   @override
   String get tutorialShopOpenDesc =>
       'സാധനങ്ങളുടെ കൂടുതൽ വിവരങ്ങൾ കാണാനും ബാഗിലേക്ക് ചേർക്കാനും ഇതിൽ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get shopOwnersTitle => 'കട ഉടമകൾ';
+
+  @override
+  String get addCoOwner => 'സഹ-ഉടമയെ ചേർക്കുക';
+
+  @override
+  String get removeCoOwner => 'സഹ-ഉടമയെ നീക്കം ചെയ്യുക';
+
+  @override
+  String get maxOwnersLimit => 'പരമാവധി 3 ഉടമകൾ';
+
+  @override
+  String get deleteShop => 'കട നീക്കം ചെയ്യുക';
+
+  @override
+  String get primaryOwner => 'പ്രധാന ഉടമ';
+
+  @override
+  String get coOwner => 'സഹ-ഉടമ';
 }
