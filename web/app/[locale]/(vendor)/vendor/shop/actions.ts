@@ -166,3 +166,94 @@ export async function updateShopAction(
     return { error: err.message || 'An unexpected error occurred' }
   }
 }
+
+export async function addShopOwnerAction(shopId: string, userId: string) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  try {
+    // 1. Check current owners count
+    const { data: existingOwners, error: countErr } = await supabaseAdmin
+      .from('shop_owners')
+      .select('id, user_id')
+      .eq('shop_id', shopId)
+
+    if (countErr) return { error: countErr.message }
+
+    if (existingOwners && existingOwners.length >= 3) {
+      return { error: 'Maximum 3 owners allowed per shop. Limit reached.' }
+    }
+
+    if (existingOwners?.some(o => o.user_id === userId)) {
+      return { error: 'User is already an owner of this shop.' }
+    }
+
+    // 2. Ensure user exists in users table
+    const { data: userRecord } = await supabaseAdmin
+      .from('users')
+      .select('id, name, phone, role')
+      .eq('id', userId)
+      .maybeSingle()
+
+    if (!userRecord) {
+      return { error: 'Target user record not found in system.' }
+    }
+
+    // 3. Insert into shop_owners
+    const { error: insertErr } = await supabaseAdmin
+      .from('shop_owners')
+      .insert({ shop_id: shopId, user_id: userId })
+
+    if (insertErr) {
+      return { error: insertErr.message }
+    }
+
+    // 4. Upgrade user role to shop_owner if customer
+    if (userRecord.role === 'customer') {
+      await supabaseAdmin.from('users').update({ role: 'shop_owner' }).eq('id', userId)
+    }
+
+    return { success: true, user: userRecord }
+  } catch (err: any) {
+    return { error: err.message || 'Failed to add co-owner' }
+  }
+}
+
+export async function removeShopOwnerAction(shopId: string, userId: string) {
+  const supabaseAdmin = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+
+  try {
+    // 1. Check current owners count
+    const { data: existingOwners, error: countErr } = await supabaseAdmin
+      .from('shop_owners')
+      .select('id, user_id')
+      .eq('shop_id', shopId)
+
+    if (countErr) return { error: countErr.message }
+
+    if (!existingOwners || existingOwners.length <= 1) {
+      return { error: 'Cannot remove the only owner of a shop. Every shop must have at least 1 owner.' }
+    }
+
+    // 2. Delete from shop_owners
+    const { error: deleteErr } = await supabaseAdmin
+      .from('shop_owners')
+      .delete()
+      .eq('shop_id', shopId)
+      .eq('user_id', userId)
+
+    if (deleteErr) {
+      return { error: deleteErr.message }
+    }
+
+    return { success: true }
+  } catch (err: any) {
+    return { error: err.message || 'Failed to remove co-owner' }
+  }
+}
+

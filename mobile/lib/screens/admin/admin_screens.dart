@@ -355,7 +355,11 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
                           final type = shop['type'] as String? ?? 'general';
                           final isActive = !type.endsWith('_inactive');
                           final owners = (shop['shop_owners'] as List?) ?? [];
-                          final owner = owners.isNotEmpty ? (owners[0]['users'] as Map?) : null;
+                          final primaryOwner = owners.isNotEmpty ? (owners[0]['users'] as Map?) : null;
+                          final coOwnersCount = owners.length > 1 ? owners.length - 1 : 0;
+                          final ownersText = primaryOwner != null
+                              ? '${primaryOwner['name']}${coOwnersCount > 0 ? ' (+$coOwnersCount co-owner${coOwnersCount > 1 ? 's' : ''})' : ''}'
+                              : 'No owner';
                           final locName = (shop['locations'] as Map?)?['name'] as String?;
                           final displayType = type.replaceAll('_inactive', '');
 
@@ -388,10 +392,11 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
                                         Text(shop['name'] ?? '—',
                                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: textMain)),
                                         const SizedBox(height: 2),
-                                        Text(owner?['name'] ?? 'No owner',
-                                          style: TextStyle(fontSize: 13, color: textMuted)),
+                                        Text(ownersText,
+                                          style: TextStyle(fontSize: 13, fontWeight: coOwnersCount > 0 ? FontWeight.w600 : FontWeight.normal, color: textMuted)),
                                       ]),
                                     ),
+
                                     // Tappable status badge
                                     GestureDetector(
                                       onTap: () => _toggleShopActive(shop),
@@ -506,6 +511,90 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
     if (confirm != true) return;
     await supabase.from('users').delete().eq('id', user['id']);
     setState(() => _users.removeWhere((u) => u['id'] == user['id']));
+  }
+
+  Future<void> _changeUserRole(Map<String, dynamic> user, String newRole) async {
+    final currentRole = user['role'] as String? ?? 'customer';
+    if (currentRole == newRole) return;
+    try {
+      await supabase.from('users').update({'role': newRole}).eq('id', user['id']);
+      if (mounted) {
+        setState(() {
+          final idx = _users.indexWhere((u) => u['id'] == user['id']);
+          if (idx >= 0) _users[idx] = {..._users[idx], 'role': newRole};
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Updated ${user['name'] ?? "user"} to ${newRole == "shop_owner" ? "Shop Keeper" : newRole == "admin" ? "Admin" : "Customer"}'),
+            backgroundColor: const Color(0xFF166534),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error updating role: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showRolePickerForUser(Map<String, dynamic> user) {
+    final currentRole = user['role'] as String? ?? 'customer';
+    final isDark = ThemeService.instance.isDarkMode;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? kNeutral800 : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Change Role for ${user['name'] ?? "User"}',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : kNeutral900)),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.person_outline, color: Color(0xFF64748B)),
+                title: const Text('Customer'),
+                trailing: currentRole == 'customer' ? const Icon(Icons.check_circle, color: Color(0xFF64748B)) : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _changeUserRole(user, 'customer');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.storefront_outlined, color: Color(0xFF3B82F6)),
+                title: const Text('Shop Keeper'),
+                trailing: currentRole == 'shop_owner' ? const Icon(Icons.check_circle, color: Color(0xFF3B82F6)) : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _changeUserRole(user, 'shop_owner');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings_outlined, color: Color(0xFFF59E0B)),
+                title: const Text('Admin'),
+                trailing: currentRole == 'admin' ? const Icon(Icons.check_circle, color: Color(0xFFF59E0B)) : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _changeUserRole(user, 'admin');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _showCreateSheet() {
@@ -759,12 +848,21 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
                                         ]),
                                       ]),
                                     ),
-                                    _SmallBadge(
-                                      role.replaceAll('_', ' '),
-                                      color: roleColor.withAlpha(22),
-                                      textColor: roleColor,
+                                    GestureDetector(
+                                      onTap: () => _showRolePickerForUser(user),
+                                      child: _SmallBadge(
+                                        role.replaceAll('_', ' '),
+                                        color: roleColor.withAlpha(22),
+                                        textColor: roleColor,
+                                      ),
                                     ),
                                   ]),
+                                  const SizedBox(height: 10),
+                                  _RoleToggleBar(
+                                    currentRole: role,
+                                    isDark: isDark,
+                                    onRoleSelected: (newRole) => _changeUserRole(user, newRole),
+                                  ),
                                   const SizedBox(height: 10),
                                   Row(children: [
                                     GestureDetector(
@@ -1183,3 +1281,70 @@ class _StyledDropdown<T> extends StatelessWidget {
     ),
   );
 }
+
+class _RoleToggleBar extends StatelessWidget {
+  final String currentRole;
+  final bool isDark;
+  final Function(String newRole) onRoleSelected;
+
+  const _RoleToggleBar({
+    required this.currentRole,
+    required this.isDark,
+    required this.onRoleSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const roles = [
+      {'id': 'customer', 'label': 'Customer', 'color': Color(0xFF64748B)},
+      {'id': 'shop_owner', 'label': 'Shopkeeper', 'color': Color(0xFF3B82F6)},
+      {'id': 'admin', 'label': 'Admin', 'color': Color(0xFFF59E0B)},
+    ];
+
+    final bg = isDark ? kNeutral900 : const Color(0xFFF1F5F9);
+    final border = isDark ? kNeutral700 : kNeutral200;
+
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: border),
+      ),
+      child: Row(
+        children: roles.map((r) {
+          final id = r['id'] as String;
+          final label = r['label'] as String;
+          final color = r['color'] as Color;
+          final isSelected = currentRole == id;
+
+          return Expanded(
+            child: GestureDetector(
+              onTap: () => onRoleSelected(id),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(
+                  color: isSelected ? color : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark ? kNeutral400 : kNeutral600),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+

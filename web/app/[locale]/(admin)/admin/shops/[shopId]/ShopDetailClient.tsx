@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { 
   Store, User, Phone, MapPin, Tag, Calendar, ShoppingBag, Eye, EyeOff,
-  Coins, Clock, AlertTriangle, ShieldCheck, Check, X
+  Coins, Clock, AlertTriangle, ShieldCheck, Check, X, Users, UserPlus, UserMinus, Mail
 } from 'lucide-react'
 import { 
   extendTrialAction, 
@@ -13,6 +13,7 @@ import {
   toggleEnabledAction,
   waiveAction
 } from '@/app/actions/commission'
+import { addShopOwnerAction, removeShopOwnerAction } from '@/app/[locale]/(vendor)/vendor/shop/actions'
 
 type ItemRow = {
   id: string
@@ -24,14 +25,27 @@ type ItemRow = {
   item_variants: Array<{ price?: number }>
 }
 
+type ShopOwnerRow = {
+  user_id?: string
+  users: { id?: string; name: string; phone: string; email?: string } | null
+}
+
 type ShopRow = {
   id: string
   name: string
   type?: string
   is_active?: boolean
   created_at: string
-  shop_owners: Array<{ users: { name: string; phone: string } | null }> | null
+  shop_owners: ShopOwnerRow[] | null
   locations?: { name: string } | null
+}
+
+type UserRow = {
+  id: string
+  name: string
+  phone: string
+  email?: string
+  role?: string
 }
 
 export default function ShopDetailClient({
@@ -39,19 +53,28 @@ export default function ShopDetailClient({
   initialItems,
   categories,
   subscription: initialSubscription,
-  reports: initialReports
+  reports: initialReports,
+  allUsers = []
 }: {
   shop: ShopRow
   initialItems: ItemRow[]
   categories: Array<{ id: string; name: string }>
   subscription: any
   reports: any[]
+  allUsers?: UserRow[]
 }) {
   const router = useRouter()
   const [shop, setShop] = useState(initialShop)
   const [items, setItems] = useState(initialItems)
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
+  
+  // Co-owner state
+  const [showAddOwnerModal, setShowAddOwnerModal] = useState(false)
+  const [selectedUserIdToAdd, setSelectedUserIdToAdd] = useState('')
+  const [ownerActionLoading, setOwnerActionLoading] = useState(false)
+  const [ownerError, setOwnerError] = useState<string | null>(null)
+
   
   // Commission settings state
   const [sub, setSub] = useState(initialSubscription)
@@ -166,6 +189,70 @@ export default function ShopDetailClient({
     }
   }
 
+  // Co-owner handlers
+  async function handleAddOwner() {
+    if (!selectedUserIdToAdd) {
+      setOwnerError('Please select a user to add as co-owner.')
+      return
+    }
+
+    setOwnerActionLoading(true)
+    setOwnerError(null)
+
+    try {
+      const res = await addShopOwnerAction(shop.id, selectedUserIdToAdd)
+      if (res.error || !res.user) {
+        setOwnerError(res.error || 'Failed to add co-owner')
+      } else {
+        const addedUser = res.user
+        setShop(prev => ({
+          ...prev,
+          shop_owners: [
+            ...(prev.shop_owners || []),
+            { user_id: addedUser.id, users: { id: addedUser.id, name: addedUser.name, phone: addedUser.phone } }
+          ]
+        }))
+        setShowAddOwnerModal(false)
+        setSelectedUserIdToAdd('')
+        router.refresh()
+      }
+    } catch (err: any) {
+      setOwnerError(err.message || 'An error occurred')
+    } finally {
+      setOwnerActionLoading(false)
+    }
+  }
+
+  async function handleRemoveOwner(userId: string) {
+    if ((shop.shop_owners?.length || 0) <= 1) {
+      alert('Cannot remove the only owner of a shop. Every shop must have at least 1 owner.')
+      return
+    }
+
+    if (!confirm('Are you sure you want to remove this owner from the shop?')) return
+
+    setOwnerActionLoading(true)
+    try {
+      const res = await removeShopOwnerAction(shop.id, userId)
+      if (res.error) {
+        alert('Remove failed: ' + res.error)
+      } else {
+        setShop(prev => ({
+          ...prev,
+          shop_owners: (prev.shop_owners || []).filter(o => o.user_id !== userId && o.users?.id !== userId)
+        }))
+        router.refresh()
+      }
+    } catch (err: any) {
+      alert('Remove failed: ' + err.message)
+    } finally {
+      setOwnerActionLoading(false)
+    }
+  }
+
+  const ownersList = shop.shop_owners || []
+  const availableUsersToAdd = allUsers.filter(u => !ownersList.some(o => o.user_id === u.id || o.users?.id === u.id))
+
   return (
     <div className="shop-detail-grid">
       {/* Left Column Wrapper */}
@@ -186,22 +273,6 @@ export default function ShopDetailClient({
           <div className="divider" style={{ margin: '0.5rem 0' }} />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem' }}>
-              <User size={18} style={{ color: 'var(--wa-green-dark)' }} />
-              <div>
-                <p className="font-semibold" style={{ margin: 0 }}>Owner</p>
-                <p className="text-muted" style={{ margin: 0 }}>{owner?.name ?? '—'}</p>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem' }}>
-              <Phone size={18} style={{ color: 'var(--wa-green-dark)' }} />
-              <div>
-                <p className="font-semibold" style={{ margin: 0 }}>Contact</p>
-                <p className="text-muted" style={{ margin: 0 }}>{owner?.phone ?? '—'}</p>
-              </div>
-            </div>
-
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.9rem' }}>
               <MapPin size={18} style={{ color: 'var(--wa-green-dark)' }} />
               <div>
@@ -235,6 +306,65 @@ export default function ShopDetailClient({
             </button>
           </div>
         </div>
+
+        {/* Shop Owners & Collaborators Card (Up to 3 Max) */}
+        <div className="card card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Users size={18} style={{ color: 'var(--wa-green-dark)' }} />
+              Shop Owners ({ownersList.length}/3)
+            </h3>
+            {ownersList.length < 3 ? (
+              <button
+                type="button"
+                className="btn btn-sm btn-outline"
+                style={{ padding: '0.25rem 0.6rem', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}
+                onClick={() => { setOwnerError(null); setShowAddOwnerModal(true); }}
+              >
+                <UserPlus size={14} /> Add Co-Owner
+              </button>
+            ) : (
+              <span className="badge badge-neutral" style={{ fontSize: '0.75rem' }}>Max 3 Owners</span>
+            )}
+          </div>
+
+          <div className="divider" style={{ margin: '0.25rem 0' }} />
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+            {ownersList.map((o, idx) => {
+              const u = o.users
+              const uid = o.user_id || u?.id
+              return (
+                <div key={uid || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', background: 'var(--wa-bg-soft, #f8fafc)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span className="font-bold" style={{ fontSize: '0.9rem', color: '#0f172a' }}>{u?.name || 'Unknown User'}</span>
+                      {idx === 0 ? (
+                        <span className="badge badge-success" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>Primary</span>
+                      ) : (
+                        <span className="badge badge-neutral" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>Co-Owner {idx + 1}</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted" style={{ margin: '0.15rem 0 0' }}>📱 {u?.phone || 'No Phone'}</p>
+                  </div>
+                  {ownersList.length > 1 && uid && (
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: 'none', padding: '0.35rem 0.5rem' }}
+                      title="Remove Co-owner"
+                      disabled={ownerActionLoading}
+                      onClick={() => handleRemoveOwner(uid)}
+                    >
+                      <UserMinus size={15} />
+                    </button>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
 
         {/* Left Column: Commission & Trial settings */}
         {sub && (
@@ -591,6 +721,65 @@ export default function ShopDetailClient({
           </div>
         </div>
       )}
+
+      {/* Add Co-Owner Modal (Max 3 Owners) */}
+      {showAddOwnerModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem' }}>
+          <div className="card fade-up" style={{ width: '100%', maxWidth: 450, background: '#fff', borderRadius: '16px' }}>
+            <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 className="font-bold" style={{ margin: 0, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <UserPlus size={18} style={{ color: 'var(--wa-green-dark)' }} /> Add Shop Co-Owner ({ownersList.length}/3)
+              </h3>
+              <button onClick={() => setShowAddOwnerModal(false)} className="btn-ghost" style={{ padding: '.25rem' }}>
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {ownerError && (
+                <div style={{ padding: '0.75rem', background: '#fee2e2', color: '#991b1b', borderRadius: '8px', fontSize: '0.85rem' }}>
+                  ⚠️ {ownerError}
+                </div>
+              )}
+
+              <p className="text-sm text-muted">
+                Select an existing registered user to assign as co-owner for <strong>{shop.name}</strong>. Maximum 3 owners per shop allowed.
+              </p>
+
+              <div className="form-group">
+                <label className="form-label">Select Registered User *</label>
+                <select
+                  value={selectedUserIdToAdd}
+                  onChange={e => setSelectedUserIdToAdd(e.target.value)}
+                  className="form-input"
+                  style={{ width: '100%', padding: '0.6rem' }}
+                >
+                  <option value="">-- Choose User --</option>
+                  {availableUsersToAdd.map(u => (
+                    <option key={u.id} value={u.id}>
+                      {u.name} ({u.phone || u.email || 'No Contact'}) - Role: {u.role || 'customer'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                <button type="button" onClick={() => setShowAddOwnerModal(false)} className="btn btn-outline" style={{ flex: 1 }}>Cancel</button>
+                <button
+                  type="button"
+                  disabled={ownerActionLoading || !selectedUserIdToAdd}
+                  onClick={handleAddOwner}
+                  className="btn btn-primary"
+                  style={{ flex: 1, background: 'var(--wa-green-dark)' }}
+                >
+                  {ownerActionLoading ? 'Adding...' : 'Add Co-Owner'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+

@@ -18,6 +18,7 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
   List<Map<String, dynamic>> _orders = [];
   List<Map<String, dynamic>> _shops  = [];
   bool _loading = true;
+  bool _updatingRole = false;
 
   static const _roleColors = {
     'customer':  Color(0xFF64748B),
@@ -61,6 +62,95 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
     final next = !(_user!['is_active'] as bool? ?? true);
     await supabase.from('users').update({'is_active': next}).eq('id', widget.userId);
     setState(() => _user = {..._user!, 'is_active': next});
+  }
+
+  Future<void> _updateRole(String newRole) async {
+    if (_user == null || _updatingRole) return;
+    final currentRole = _user!['role'] as String? ?? 'customer';
+    if (currentRole == newRole) return;
+
+    setState(() => _updatingRole = true);
+    try {
+      await supabase.from('users').update({'role': newRole}).eq('id', widget.userId);
+      if (mounted) {
+        setState(() {
+          _user = {..._user!, 'role': newRole};
+          _updatingRole = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('User role updated to ${newRole == "shop_owner" ? "Shop Keeper" : newRole == "admin" ? "Admin" : "Customer"}'),
+            backgroundColor: const Color(0xFF166534),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _updatingRole = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update role: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showRolePicker() {
+    final currentRole = _user?['role'] as String? ?? 'customer';
+    final isDark = ThemeService.instance.isDarkMode;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? kNeutral800 : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Change User Role', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : kNeutral900)),
+              const SizedBox(height: 4),
+              Text('Select a new role for ${_user?['name'] ?? "user"}:', style: TextStyle(fontSize: 13, color: isDark ? kNeutral400 : kNeutral600)),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.person_outline, color: Color(0xFF64748B)),
+                title: const Text('Customer'),
+                trailing: currentRole == 'customer' ? const Icon(Icons.check_circle, color: Color(0xFF64748B)) : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _updateRole('customer');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.storefront_outlined, color: Color(0xFF3B82F6)),
+                title: const Text('Shop Keeper'),
+                trailing: currentRole == 'shop_owner' ? const Icon(Icons.check_circle, color: Color(0xFF3B82F6)) : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _updateRole('shop_owner');
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.admin_panel_settings_outlined, color: Color(0xFFF59E0B)),
+                title: const Text('Admin'),
+                trailing: currentRole == 'admin' ? const Icon(Icons.check_circle, color: Color(0xFFF59E0B)) : null,
+                onTap: () {
+                  Navigator.pop(context);
+                  _updateRole('admin');
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   String _formatDate(String? d) {
@@ -151,7 +241,10 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
                               Text(phone, style: TextStyle(color: textMuted, fontSize: 14)),
                               const SizedBox(height: 6),
                               Row(children: [
-                                _RoleBadge(role, color: roleColor),
+                                GestureDetector(
+                                  onTap: _showRolePicker,
+                                  child: _RoleBadge(role, color: roleColor),
+                                ),
                                 const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: _toggleStatus,
@@ -184,6 +277,88 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
                           textMain: textMain,
                           textMuted: textMuted,
                           valueColor: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // ─── Change Role Card ──────────────────────────────────
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: cardBorder),
+                      boxShadow: isDark ? [] : [
+                        BoxShadow(color: Colors.black.withAlpha(8), blurRadius: 4, offset: const Offset(0, 2))
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.shield_outlined, color: kBrand500, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Change User Role',
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: textMain),
+                            ),
+                            if (_updatingRole) ...[
+                              const Spacer(),
+                              const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
+                            ]
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Select a role below to change permissions for $name:',
+                          style: TextStyle(fontSize: 13, color: textMuted),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _RoleOptionChip(
+                                id: 'customer',
+                                label: 'Customer',
+                                icon: Icons.person_outline,
+                                isSelected: role == 'customer',
+                                color: const Color(0xFF64748B),
+                                isDark: isDark,
+                                onTap: () => _updateRole('customer'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _RoleOptionChip(
+                                id: 'shop_owner',
+                                label: 'Shop Keeper',
+                                icon: Icons.storefront_outlined,
+                                isSelected: role == 'shop_owner',
+                                color: const Color(0xFF3B82F6),
+                                isDark: isDark,
+                                onTap: () => _updateRole('shop_owner'),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: _RoleOptionChip(
+                                id: 'admin',
+                                label: 'Admin',
+                                icon: Icons.admin_panel_settings_outlined,
+                                isSelected: role == 'admin',
+                                color: const Color(0xFFF59E0B),
+                                isDark: isDark,
+                                onTap: () => _updateRole('admin'),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -403,3 +578,61 @@ class _StatusBadge extends StatelessWidget {
         color: isActive ? const Color(0xFF15803D) : const Color(0xFFB91C1C))),
   );
 }
+
+class _RoleOptionChip extends StatelessWidget {
+  final String id;
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final Color color;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _RoleOptionChip({
+    required this.id,
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.color,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? color.withAlpha(isDark ? 50 : 25)
+              : (isDark ? kNeutral800 : kNeutral100),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : (isDark ? kNeutral700 : kNeutral300),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? color : (isDark ? kNeutral400 : kNeutral600), size: 20),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? color : (isDark ? kNeutral300 : kNeutral700),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

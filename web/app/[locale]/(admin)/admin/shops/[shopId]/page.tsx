@@ -15,11 +15,11 @@ export default async function AdminShopDetailPage({
   const { shopId } = await params
   const supabase = await createClient()
 
-  // Fetch shop details, items, categories, subscription, and reports
-  const [{ data: shop }, { data: items }, { data: categories }, { data: subscription }, { data: reports }] = await Promise.all([
+  // Fetch shop details, items, categories, subscription, reports, and all users
+  const [{ data: shop }, { data: items }, { data: categories }, { data: subscription }, { data: reports }, { data: allUsers }] = await Promise.all([
     supabase
       .from('shops')
-      .select('*, shop_owners(users(name, phone)), locations(name)')
+      .select('*, shop_owners(user_id, users(id, name, phone, email)), locations(name)')
       .eq('id', shopId)
       .maybeSingle(),
     supabase
@@ -42,7 +42,11 @@ export default async function AdminShopDetailPage({
       .select('*')
       .eq('shop_id', shopId)
       .order('year', { ascending: false })
-      .order('month', { ascending: false })
+      .order('month', { ascending: false }),
+    supabase
+      .from('users')
+      .select('id, name, phone, email, role')
+      .order('name')
   ])
 
   if (!shop) {
@@ -66,7 +70,9 @@ export default async function AdminShopDetailPage({
         categories={(categories ?? []) as any[]}
         subscription={subscription}
         reports={reports || []}
+        allUsers={(allUsers || []) as any[]}
       />
     </>
   )
 }
+

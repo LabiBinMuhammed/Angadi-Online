@@ -21,6 +21,8 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
   String _statusFilter = 'all';
   bool _loading = true;
 
+  List<Map<String, dynamic>> _allUsers = [];
+
   @override
   void initState() {
     super.initState();
@@ -31,7 +33,7 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
     final results = await Future.wait([
       supabase
           .from('shops')
-          .select('*, shop_owners(users(name, phone)), locations(name)')
+          .select('*, shop_owners(user_id, users(id, name, phone)), locations(name)')
           .eq('id', widget.shopId)
           .maybeSingle(),
       supabase
@@ -43,6 +45,10 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
       supabase
           .from('categories')
           .select('id, name')
+          .order('name'),
+      supabase
+          .from('users')
+          .select('id, name, phone, role')
           .order('name'),
     ]);
 
@@ -56,10 +62,148 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
         _shop = shopData;
         _items = (results[1] as List).cast();
         _categories = (results[2] as List).cast();
+        _allUsers = (results[3] as List).cast();
         _loading = false;
       });
     }
   }
+
+  Future<void> _addCoOwner() async {
+    final currentOwners = (_shop?['shop_owners'] as List?) ?? [];
+    if (currentOwners.length >= 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('A shop can have at most 3 owners. Maximum limit reached.')),
+      );
+      return;
+    }
+
+    final existingUserIds = currentOwners.map((o) => o['user_id'] ?? o['users']?['id']).toSet();
+    final availableUsers = _allUsers.where((u) => !existingUserIds.contains(u['id'])).toList();
+
+    if (availableUsers.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No available users to add as co-owner.')),
+      );
+      return;
+    }
+
+    String? selectedUserId;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return StatefulWidgetBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: const Text('Add Shop Co-Owner (Max 3)'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Select a registered user to collaborate on this shop:'),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: selectedUserId,
+                    isExpanded: true,
+                    hint: const Text('-- Select User --'),
+                    items: availableUsers.map((u) {
+                      return DropdownMenuItem<String>(
+                        value: u['id'] as String,
+                        child: Text('${u['name']} (${u['phone'] ?? 'No phone'})'),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        selectedUserId = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: selectedUserId != null ? () => Navigator.pop(context, true) : null,
+                  style: ElevatedButton.styleFrom(backgroundColor: kWaGreenDark),
+                  child: const Text('Add Co-Owner'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (confirm == true && selectedUserId != null) {
+      try {
+        await supabase.from('shop_owners').insert({
+          'shop_id': widget.shopId,
+          'user_id': selectedUserId,
+        });
+
+        // Upgrade user role if needed
+        await supabase.from('users').update({'role': 'shop_owner'}).eq('id', selectedUserId!);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Co-owner added successfully!')),
+        );
+        _load();
+      } catch (err) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add co-owner: $err')),
+        );
+      }
+    }
+  }
+
+  Future<void> _removeCoOwner(String userId, String userName) async {
+    final currentOwners = (_shop?['shop_owners'] as List?) ?? [];
+    if (currentOwners.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cannot remove the only owner of a shop.')),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Remove Co-Owner'),
+        content: Text('Are you sure you want to remove $userName from this shop?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(backgroundColor: kDanger),
+            child: const Text('Remove'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await supabase
+            .from('shop_owners')
+            .delete()
+            .eq('shop_id', widget.shopId)
+            .eq('user_id', userId);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Co-owner removed successfully.')),
+        );
+        _load();
+      } catch (err) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove co-owner: $err')),
+        );
+      }
+    }
+  }
+
 
   Future<void> _toggleShopActive(bool val) async {
     final type = _shop!['type'] as String?;
@@ -290,7 +434,112 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+
+            // Shop Owners & Collaborators Card (Max 3)
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const HugeIcon(icon: HugeIcons.strokeRoundedUserGroup, size: 20, color: kWaGreenDark),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Shop Owners (${owners.length}/3)',
+                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                        if (owners.length < 3)
+                          OutlinedButton.icon(
+                            onPressed: _addCoOwner,
+                            icon: const HugeIcon(icon: HugeIcons.strokeRoundedUserAdd01, size: 16),
+                            label: const Text('Add Co-Owner', style: TextStyle(fontSize: 12)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: kWaGreenDark,
+                              side: const BorderSide(color: kWaGreenDark),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text('Max 3 Limit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black84)),
+                          ),
+                      ],
+                    ),
+                    const Divider(height: 20),
+                    ...List.generate(owners.length, (idx) {
+                      final u = owners[idx]['users'] as Map?;
+                      final uid = (owners[idx]['user_id'] ?? u?['id']) as String?;
+                      final uName = u?['name'] as String? ?? 'Unknown User';
+                      final uPhone = u?['phone'] as String? ?? 'No phone';
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isDark ? kNeutral800 : Colors.grey.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(uName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: idx == 0 ? Colors.green.shade100 : Colors.blue.shade100,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        idx == 0 ? 'Primary' : 'Co-Owner ${idx + 1}',
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: idx == 0 ? Colors.green.shade800 : Colors.blue.shade800,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text('📱 $uPhone', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              ],
+                            ),
+                            if (owners.length > 1 && uid != null)
+                              IconButton(
+                                icon: const HugeIcon(icon: HugeIcons.strokeRoundedUserRemove01, color: kDanger, size: 18),
+                                tooltip: 'Remove Co-Owner',
+                                onPressed: () => _removeCoOwner(uid, uName),
+                              ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 24),
+
 
             // Products list header
             Row(

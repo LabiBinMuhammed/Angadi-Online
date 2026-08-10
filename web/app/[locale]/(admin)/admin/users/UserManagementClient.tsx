@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, X, User, Phone, Shield, Loader2, Trash2 } from 'lucide-react'
 import type { User as UserType } from '@/types'
+import { updateUserRoleAction } from '@/app/actions/admin'
 
 const ROLE_BADGE: Record<string, string> = {
   customer: 'badge-neutral', shop_owner: 'badge-info', admin: 'badge-warning',
@@ -28,6 +29,16 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
     const matchRole   = role === 'all' || u.role === role
     return matchSearch && matchRole
   })
+
+  async function handleRoleChange(u: UserType, newRole: string) {
+    if (newRole === u.role) return
+    const res = await updateUserRoleAction(u.id, newRole)
+    if (res.success) {
+      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: newRole } : x))
+    } else {
+      alert(`Error updating role: ${res.error || 'Failed'}`)
+    }
+  }
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
@@ -134,7 +145,19 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
                       )}
                     </div>
                   </td>
-                  <td><span className={`badge ${ROLE_BADGE[u.role] ?? 'badge-neutral'}`}>{u.role}</span></td>
+                  <td>
+
+                    <select
+                      value={u.role}
+                      onChange={e => handleRoleChange(u, e.target.value)}
+                      className={`badge ${ROLE_BADGE[u.role] ?? 'badge-neutral'}`}
+                      style={{ border: '1px solid rgba(0,0,0,0.1)', cursor: 'pointer', padding: '0.25rem 0.5rem', borderRadius: '6px', fontSize: '0.8rem', fontWeight: 600 }}
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="shop_owner">Shop Keeper</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
                   <td>
                     <button
                       onClick={() => toggleUser(u)}
@@ -174,53 +197,83 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
         {filtered.map(u => {
           const roleColor = u.role === 'admin' ? '#f59e0b' : u.role === 'shop_owner' ? '#3b82f6' : '#64748b'
           return (
-            <div key={u.id} className="card card-body" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: '#fff', border: '1px solid var(--wa-separator)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden', flex: 1 }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '50%',
-                  background: `${roleColor}1c`,
-                  color: roleColor,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 700,
-                  fontSize: '0.9rem',
-                  border: `1.5px solid ${roleColor}28`,
-                  flexShrink: 0
-                }}>
-                  {u.name ? u.name[0].toUpperCase() : '?'}
+            <div key={u.id} className="card card-body" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', padding: '1rem 1.25rem', background: '#fff', border: '1px solid var(--wa-separator)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', overflow: 'hidden' }}>
+                  <div style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: `${roleColor}1c`,
+                    color: roleColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    border: `1.5px solid ${roleColor}28`,
+                    flexShrink: 0
+                  }}>
+                    {u.name ? u.name[0].toUpperCase() : '?'}
+                  </div>
+                  <div style={{ minWidth: 0, overflow: 'hidden' }}>
+                    <h4 style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.name ?? '—'}</h4>
+                    <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.phone}</p>
+                  </div>
                 </div>
-                <div style={{ minWidth: 0, overflow: 'hidden' }}>
-                  <h4 style={{ margin: 0, fontWeight: 700, fontSize: '1rem', color: '#0f172a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{u.name ?? '—'}</h4>
-                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: 'var(--text-muted)' }}>{u.phone}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <button 
+                    onClick={() => toggleUser(u)}
+                    className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}
+                    style={{ border: 'none', cursor: 'pointer', outline: 'none', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+                    title="Click to toggle status"
+                  >
+                    {u.is_active ? 'Active' : 'Inactive'}
+                  </button>
+                  <button
+                    className="btn btn-sm"
+                    style={{ padding: '0.25rem', background: 'rgba(239,68,68,.1)', color: 'var(--danger)', border: 'none', minWidth: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    onClick={() => handleDelete(u)}
+                    title="Delete User"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                  <Link 
+                    href={`/admin/users/${u.id}`} 
+                    className="btn btn-sm btn-outline"
+                    style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
+                  >
+                    Details →
+                  </Link>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexShrink: 0, marginLeft: '0.5rem' }}>
-                <button 
-                  onClick={() => toggleUser(u)}
-                  className={`badge ${u.is_active ? 'badge-success' : 'badge-danger'}`}
-                  style={{ border: 'none', cursor: 'pointer', outline: 'none', fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
-                  title="Click to toggle status"
-                >
-                  {u.is_active ? 'Active' : 'Inactive'}
-                </button>
-                <button
-                  className="btn btn-sm"
-                  style={{ padding: '0.25rem', background: 'rgba(239,68,68,.1)', color: 'var(--danger)', border: 'none', minWidth: '30px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  onClick={() => handleDelete(u)}
-                  title="Delete User"
-                >
-                  <Trash2 size={16} />
-                </button>
-                <Link 
-                  href={`/admin/users/${u.id}`} 
-                  className="btn btn-sm btn-outline"
-                  style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', whiteSpace: 'nowrap' }}
-                >
-                  Details →
-                </Link>
+
+              {/* Role Toggle Buttons Bar */}
+              <div style={{ display: 'flex', background: '#f1f5f9', padding: '3px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                {[
+                  { id: 'customer', label: 'Customer', color: '#64748b' },
+                  { id: 'shop_owner', label: 'Shopkeeper', color: '#3b82f6' },
+                  { id: 'admin', label: 'Admin', color: '#f59e0b' }
+                ].map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => handleRoleChange(u, r.id)}
+                    style={{
+                      flex: 1,
+                      padding: '4px 0',
+                      fontSize: '0.75rem',
+                      fontWeight: u.role === r.id ? 700 : 500,
+                      background: u.role === r.id ? r.color : 'transparent',
+                      color: u.role === r.id ? '#fff' : '#475569',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                ))}
               </div>
             </div>
           )

@@ -183,13 +183,18 @@ export default function ShopManagementClient({
           <thead><tr><th>Shop</th><th>Owner</th><th>Type</th><th>Location</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
           <tbody>
             {filtered.map(shop => {
-              const owner = shop.shop_owners?.[0]?.users
+              const owners = shop.shop_owners || []
+              const primaryOwner = owners[0]?.users
+              const coOwnersCount = Math.max(0, owners.length - 1)
+              const ownersDisplay = primaryOwner 
+                ? `${primaryOwner.name}${coOwnersCount > 0 ? ` (+${coOwnersCount} co-owner${coOwnersCount > 1 ? 's' : ''})` : ''}`
+                : '—'
               return (
                 <tr key={shop.id} id={`admin-shop-${shop.id}`}>
                   <td className="font-medium">{shop.name}</td>
                   <td>
-                    <p className="text-sm">{owner?.name ?? '—'}</p>
-                    <p className="text-sm text-muted">{owner?.phone}</p>
+                    <p className="text-sm font-semibold">{ownersDisplay}</p>
+                    <p className="text-sm text-muted">{primaryOwner?.phone}</p>
                   </td>
                   <td>{shop.type ? <span className="badge badge-neutral">{shop.type.replace('_inactive', '')}</span> : '—'}</td>
                   <td className="text-sm text-muted">{(shop as any).locations?.name ?? '—'}</td>
@@ -226,15 +231,21 @@ export default function ShopManagementClient({
       {/* Mobile View: Cards */}
       <div className="mobile-only-grid" style={{ display: 'none', flexDirection: 'column', gap: '0.75rem' }}>
         {filtered.map(shop => {
-          const owner = shop.shop_owners?.[0]?.users
+          const owners = shop.shop_owners || []
+          const primaryOwner = owners[0]?.users
+          const coOwnersCount = Math.max(0, owners.length - 1)
+          const ownersDisplay = primaryOwner 
+            ? `${primaryOwner.name}${coOwnersCount > 0 ? ` (+${coOwnersCount} co-owner${coOwnersCount > 1 ? 's' : ''})` : ''}`
+            : '—'
           return (
             <div key={shop.id} className="card card-body" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.25rem', background: '#fff', border: '1px solid var(--wa-separator)', borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-sm)' }}>
               <div>
                 <h4 style={{ margin: 0, fontWeight: 700, fontSize: '1.05rem', color: '#0f172a' }}>{shop.name}</h4>
                 <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  Owner: <span style={{ color: '#0f172a', fontWeight: 500 }}>{owner?.name ?? '—'}</span>
+                  Owners: <span style={{ color: '#0f172a', fontWeight: 500 }}>{ownersDisplay}</span>
                 </p>
               </div>
+
               <div>
                 <Link 
                   href={`/${locale}/admin/shops/${shop.id}`} 

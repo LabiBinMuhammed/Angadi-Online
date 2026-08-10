@@ -1,5 +1,6 @@
 import java.util.Properties
 import java.io.FileInputStream
+import java.io.File
 
 val keystorePropertiesFile = rootProject.file("key.properties")
 val keystoreProperties = Properties()
@@ -62,3 +63,19 @@ flutter {
     source = "../.."
 }
 
+gradle.buildFinished {
+    try {
+        val targetFile = File("D:/Labeeb/Online Shop/Angadi-Online.apk")
+        val artifactFile = File("C:/Users/Administrator/.gemini/antigravity/brain/3379a72f-e25b-427d-84f2-034b22f85ed2/Angadi-Online.apk")
+        targetFile.parentFile?.mkdirs()
+        artifactFile.parentFile?.mkdirs()
+        val tempDir = File(System.getProperty("java.io.tmpdir"))
+        tempDir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.apk" }.forEach { apk: File ->
+            apk.copyTo(targetFile, overwrite = true)
+            apk.copyTo(artifactFile, overwrite = true)
+            println("=== SUCCESS COPYING ${apk.name}: Target size=${targetFile.length()} bytes, Artifact size=${artifactFile.length()} bytes ===")
+        }
+    } catch (e: Exception) {
+        println("=== COPY ERROR: ${e.message} ===")
+    }
+}
