@@ -249,7 +249,10 @@ export default function ShopDetailClient({
     } finally {
       setOwnerActionLoading(false)
     }
+  }
+
   async function handleDeleteShop() {
+
     if (!window.confirm(`Are you sure you want to delete shop "${shop.name}"? This action cannot be undone and will permanently remove all associated products and settings.`)) return
 
     setLoading(true)
