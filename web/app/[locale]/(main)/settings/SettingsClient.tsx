@@ -28,12 +28,13 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const { error } = await supabase
-          .from('user_profiles')
+          .from('users')
           .update({ preferred_language: code })
-          .eq('user_id', user.id)
+          .eq('id', user.id)
         if (error) {
-          console.error("Failed to update preferred language in user_profiles:", error)
+          console.error("Failed to update preferred language in users:", error)
         }
+
       }
     } catch (err) {
       console.error("Error updating preferred language:", err)
