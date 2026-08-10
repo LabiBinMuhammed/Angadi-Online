@@ -34,11 +34,12 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
     if (newRole === u.role) return
     const res = await updateUserRoleAction(u.id, newRole)
     if (res.success) {
-      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: newRole } : x))
+      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, role: newRole as any } : x))
     } else {
       alert(`Error updating role: ${res.error || 'Failed'}`)
     }
   }
+
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault()
