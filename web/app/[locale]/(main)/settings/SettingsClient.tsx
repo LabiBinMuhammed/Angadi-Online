@@ -21,6 +21,7 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
   const { signOut } = useAuth()
 
   async function saveLang(code: string) {
+    if (code === locale && code === lang) return
     setLang(code)
     setSaving(true)
     try {
@@ -34,19 +35,17 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
         if (error) {
           console.error("Failed to update preferred language in users:", error)
         }
-
       }
     } catch (err) {
       console.error("Error updating preferred language:", err)
     } finally {
       setSaving(false)
       setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
-      
-      // Dynamically switch the locale (sets cookie, document direction, and re-routes path)
+      // Switch locale (updates cookie, dir, and re-routes path)
       setLocale(code as Locale)
     }
   }
+
 
   async function handleLogout() {
     setSaving(true)

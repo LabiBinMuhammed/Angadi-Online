@@ -55,12 +55,16 @@ export function I18nProvider({
     htmlEl.dir = newLocale === 'ar' ? 'rtl' : 'ltr'
     
     // Redirect preserving search parameters and hashes
-    const newPathname = window.location.pathname.replace(
-      /^\/(en|ml|hi|ar)/,
-      `/${newLocale}`
-    )
-    window.location.href = `${window.location.origin}${newPathname}${window.location.search}${window.location.hash}`
+    let targetPath = window.location.pathname
+    if (/^\/(en|ml|hi|ar)(\/|$)/.test(targetPath)) {
+      targetPath = targetPath.replace(/^\/(en|ml|hi|ar)/, `/${newLocale}`)
+    } else {
+      targetPath = `/${newLocale}${targetPath.startsWith('/') ? '' : '/'}${targetPath}`
+    }
+
+    window.location.href = `${window.location.origin}${targetPath}${window.location.search}${window.location.hash}`
   }
+
 
   // Load translations if locale changes client-side
   useEffect(() => {
