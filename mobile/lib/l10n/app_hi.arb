@@ -451,5 +451,18 @@
   "maxOwnersLimit": "अधिकतम 3 सीमा",
   "deleteShop": "दुकान हटाएं",
   "primaryOwner": "मुख्य मालिक",
-  "coOwner": "सह-मालिक"
+  "coOwner": "सह-मालिक",
+  "signInYourAccount": "अपने खाते में साइन इन करें",
+  "signUpYourAccount": "नया खाता बनाएं",
+  "emailAddress": "ईमेल पता",
+  "phoneNumber": "फ़ोन नंबर",
+  "rememberMe": "मुझे याद रखें",
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "completeRegistration": "पंजीकरण पूरा करें",
+  "alreadyHaveAccountQuestion": "क्या आपके पास पहले से एक खाता है?",
+  "dontHaveAccount": "क्या आपके पास खाता नहीं है?",
+  "usePhone": "फ़ोन",
+  "useEmail": "ईमेल",
+  "agreeTerms": "मैं सहमत हूँ",
+  "termsConditions": "नियम एवं शर्तें"
 }

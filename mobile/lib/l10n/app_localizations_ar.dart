@@ -1416,4 +1416,43 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get coOwner => 'مالك مشارك';
+
+  @override
+  String get signInYourAccount => 'تسجيل الدخول إلى حسابك';
+
+  @override
+  String get signUpYourAccount => 'إنشاء حساب جديد';
+
+  @override
+  String get emailAddress => 'البريد الإلكتروني';
+
+  @override
+  String get phoneNumber => 'رقم الهاتف';
+
+  @override
+  String get rememberMe => 'تذكرني';
+
+  @override
+  String get forgotPassword => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get completeRegistration => 'إكمال التسجيل';
+
+  @override
+  String get alreadyHaveAccountQuestion => 'هل لديك حساب بالفعل؟';
+
+  @override
+  String get dontHaveAccount => 'ليس لديك حساب؟';
+
+  @override
+  String get usePhone => 'الهاتف';
+
+  @override
+  String get useEmail => 'البريد الإلكتروني';
+
+  @override
+  String get agreeTerms => 'أوافق على';
+
+  @override
+  String get termsConditions => 'الشروط والأحكام';
 }

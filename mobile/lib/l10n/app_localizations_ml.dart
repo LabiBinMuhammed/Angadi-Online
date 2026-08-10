@@ -1445,4 +1445,43 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get coOwner => 'സഹ-ഉടമ';
+
+  @override
+  String get signInYourAccount => 'അക്കൗണ്ടിലേക്ക് സൈൻ ഇൻ ചെയ്യുക';
+
+  @override
+  String get signUpYourAccount => 'പുതിയ അക്കൗണ്ട് ഉണ്ടാക്കുക';
+
+  @override
+  String get emailAddress => 'ഇമെയിൽ വിലാസം';
+
+  @override
+  String get phoneNumber => 'ഫോൺ നമ്പർ';
+
+  @override
+  String get rememberMe => 'എന്നെ ഓർമ്മിക്കുക';
+
+  @override
+  String get forgotPassword => 'പാസ്‌വേഡ് മറന്നുപോയോ?';
+
+  @override
+  String get completeRegistration => 'രജിസ്ട്രേഷൻ പൂർത്തിയാക്കുക';
+
+  @override
+  String get alreadyHaveAccountQuestion => 'ഇതിനകം ഒരു അക്കൗണ്ട് ഉണ്ടോ?';
+
+  @override
+  String get dontHaveAccount => 'അക്കൗണ്ട് ഇല്ലേ?';
+
+  @override
+  String get usePhone => 'ഫോൺ';
+
+  @override
+  String get useEmail => 'ഇമെയിൽ';
+
+  @override
+  String get agreeTerms => 'ഞാൻ അംഗീകരിക്കുന്നു';
+
+  @override
+  String get termsConditions => 'വ്യവസ്ഥകളും നിബന്ധനകളും';
 }

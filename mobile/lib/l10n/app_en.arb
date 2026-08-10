@@ -689,5 +689,18 @@
   "maxOwnersLimit": "Max 3 Limit",
   "deleteShop": "Delete Shop",
   "primaryOwner": "Primary Owner",
-  "coOwner": "Co-Owner"
+  "coOwner": "Co-Owner",
+  "signInYourAccount": "Sign In Your Account",
+  "signUpYourAccount": "Sign Up Your Account",
+  "emailAddress": "Email Address",
+  "phoneNumber": "Phone Number",
+  "rememberMe": "Remember Me",
+  "forgotPassword": "Forgot Password?",
+  "completeRegistration": "Complete Registration",
+  "alreadyHaveAccountQuestion": "Already Have An Account?",
+  "dontHaveAccount": "Don't Have An Account?",
+  "usePhone": "Phone",
+  "useEmail": "Email",
+  "agreeTerms": "I agree to the",
+  "termsConditions": "terms & conditions"
 }

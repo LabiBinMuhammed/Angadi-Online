@@ -1429,4 +1429,43 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get coOwner => 'सह-मालिक';
+
+  @override
+  String get signInYourAccount => 'अपने खाते में साइन इन करें';
+
+  @override
+  String get signUpYourAccount => 'नया खाता बनाएं';
+
+  @override
+  String get emailAddress => 'ईमेल पता';
+
+  @override
+  String get phoneNumber => 'फ़ोन नंबर';
+
+  @override
+  String get rememberMe => 'मुझे याद रखें';
+
+  @override
+  String get forgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get completeRegistration => 'पंजीकरण पूरा करें';
+
+  @override
+  String get alreadyHaveAccountQuestion => 'क्या आपके पास पहले से एक खाता है?';
+
+  @override
+  String get dontHaveAccount => 'क्या आपके पास खाता नहीं है?';
+
+  @override
+  String get usePhone => 'फ़ोन';
+
+  @override
+  String get useEmail => 'ईमेल';
+
+  @override
+  String get agreeTerms => 'मैं सहमत हूँ';
+
+  @override
+  String get termsConditions => 'नियम एवं शर्तें';
 }

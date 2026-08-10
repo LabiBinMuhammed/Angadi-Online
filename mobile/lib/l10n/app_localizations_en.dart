@@ -1420,4 +1420,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coOwner => 'Co-Owner';
+
+  @override
+  String get signInYourAccount => 'Sign In Your Account';
+
+  @override
+  String get signUpYourAccount => 'Sign Up Your Account';
+
+  @override
+  String get emailAddress => 'Email Address';
+
+  @override
+  String get phoneNumber => 'Phone Number';
+
+  @override
+  String get rememberMe => 'Remember Me';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get completeRegistration => 'Complete Registration';
+
+  @override
+  String get alreadyHaveAccountQuestion => 'Already Have An Account?';
+
+  @override
+  String get dontHaveAccount => 'Don\'t Have An Account?';
+
+  @override
+  String get usePhone => 'Phone';
+
+  @override
+  String get useEmail => 'Email';
+
+  @override
+  String get agreeTerms => 'I agree to the';
+
+  @override
+  String get termsConditions => 'terms & conditions';
 }

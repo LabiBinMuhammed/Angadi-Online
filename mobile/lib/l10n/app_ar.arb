@@ -451,5 +451,18 @@
   "maxOwnersLimit": "الحد الأقصى 3",
   "deleteShop": "حذف المتجر",
   "primaryOwner": "المالك الرئيسي",
-  "coOwner": "مالك مشارك"
+  "coOwner": "مالك مشارك",
+  "signInYourAccount": "تسجيل الدخول إلى حسابك",
+  "signUpYourAccount": "إنشاء حساب جديد",
+  "emailAddress": "البريد الإلكتروني",
+  "phoneNumber": "رقم الهاتف",
+  "rememberMe": "تذكرني",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "completeRegistration": "إكمال التسجيل",
+  "alreadyHaveAccountQuestion": "هل لديك حساب بالفعل؟",
+  "dontHaveAccount": "ليس لديك حساب؟",
+  "usePhone": "الهاتف",
+  "useEmail": "البريد الإلكتروني",
+  "agreeTerms": "أوافق على",
+  "termsConditions": "الشروط والأحكام"
 }

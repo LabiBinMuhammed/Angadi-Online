@@ -2729,6 +2729,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Co-Owner'**
   String get coOwner;
+
+  /// No description provided for @signInYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign In Your Account'**
+  String get signInYourAccount;
+
+  /// No description provided for @signUpYourAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Up Your Account'**
+  String get signUpYourAccount;
+
+  /// No description provided for @emailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Email Address'**
+  String get emailAddress;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone Number'**
+  String get phoneNumber;
+
+  /// No description provided for @rememberMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember Me'**
+  String get rememberMe;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get forgotPassword;
+
+  /// No description provided for @completeRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Registration'**
+  String get completeRegistration;
+
+  /// No description provided for @alreadyHaveAccountQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Already Have An Account?'**
+  String get alreadyHaveAccountQuestion;
+
+  /// No description provided for @dontHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t Have An Account?'**
+  String get dontHaveAccount;
+
+  /// No description provided for @usePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get usePhone;
+
+  /// No description provided for @useEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get useEmail;
+
+  /// No description provided for @agreeTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'I agree to the'**
+  String get agreeTerms;
+
+  /// No description provided for @termsConditions.
+  ///
+  /// In en, this message translates to:
+  /// **'terms & conditions'**
+  String get termsConditions;
 }
 
 class _AppLocalizationsDelegate

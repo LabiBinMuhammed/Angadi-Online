@@ -451,5 +451,18 @@
   "maxOwnersLimit": "പരമാവധി 3 ഉടമകൾ",
   "deleteShop": "കട നീക്കം ചെയ്യുക",
   "primaryOwner": "പ്രധാന ഉടമ",
-  "coOwner": "സഹ-ഉടമ"
+  "coOwner": "സഹ-ഉടമ",
+  "signInYourAccount": "അക്കൗണ്ടിലേക്ക് സൈൻ ഇൻ ചെയ്യുക",
+  "signUpYourAccount": "പുതിയ അക്കൗണ്ട് ഉണ്ടാക്കുക",
+  "emailAddress": "ഇമെയിൽ വിലാസം",
+  "phoneNumber": "ഫോൺ നമ്പർ",
+  "rememberMe": "എന്നെ ഓർമ്മിക്കുക",
+  "forgotPassword": "പാസ്‌വേഡ് മറന്നുപോയോ?",
+  "completeRegistration": "രജിസ്ട്രേഷൻ പൂർത്തിയാക്കുക",
+  "alreadyHaveAccountQuestion": "ഇതിനകം ഒരു അക്കൗണ്ട് ഉണ്ടോ?",
+  "dontHaveAccount": "അക്കൗണ്ട് ഇല്ലേ?",
+  "usePhone": "ഫോൺ",
+  "useEmail": "ഇമെയിൽ",
+  "agreeTerms": "ഞാൻ അംഗീകരിക്കുന്നു",
+  "termsConditions": "വ്യവസ്ഥകളും നിബന്ധനകളും"
 }

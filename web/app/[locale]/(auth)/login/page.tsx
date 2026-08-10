@@ -307,7 +307,7 @@ export default function LoginPage() {
                         id="login-phone"
                         className="form-input input-with-icon"
                         type="tel"
-                        placeholder="Phone Number"
+                        placeholder={t('auth.placeholder_phone') || 'Phone Number'}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         required
@@ -327,7 +327,7 @@ export default function LoginPage() {
                       id="login-email"
                       className="form-input input-with-icon"
                       type="email"
-                      placeholder="Email Address"
+                      placeholder={t('auth.placeholder_email') || 'Email Address'}
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required
@@ -347,13 +347,14 @@ export default function LoginPage() {
                     id="login-password"
                     className="form-input input-with-icon"
                     type={showPw ? 'text' : 'password'}
-                    placeholder="Password"
+                    placeholder={t('auth.placeholder_password') || 'Password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     autoComplete="current-password"
                     disabled={loading}
                   />
+
                   <button
                     type="button"
                     className="input-eye"

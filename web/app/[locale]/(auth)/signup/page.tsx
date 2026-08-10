@@ -157,7 +157,7 @@ export default function SignupPage() {
               id="signup-name"
               className="form-input input-with-icon"
               type="text"
-              placeholder="Full Name"
+              placeholder={t('auth.placeholder_full_name') || 'Full Name'}
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
@@ -167,6 +167,7 @@ export default function SignupPage() {
             />
           </div>
         </div>
+
 
         {/* Preferred Language */}
         <div className="form-group">
@@ -288,7 +289,7 @@ export default function SignupPage() {
                   id="signup-phone"
                   className="form-input input-with-icon"
                   type="tel"
-                  placeholder="Phone Number"
+                  placeholder={t('auth.placeholder_phone') || 'Phone Number'}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
@@ -306,7 +307,7 @@ export default function SignupPage() {
                 id="signup-email"
                 className="form-input input-with-icon"
                 type="email"
-                placeholder="Email Address"
+                placeholder={t('auth.placeholder_email') || 'Email Address'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -324,13 +325,14 @@ export default function SignupPage() {
               id="signup-password"
               className="form-input input-with-icon"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
+              placeholder={t('auth.placeholder_password') || 'Password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={loading}
               autoComplete="new-password"
             />
+
             <button
               type="button"
               className="input-eye"
