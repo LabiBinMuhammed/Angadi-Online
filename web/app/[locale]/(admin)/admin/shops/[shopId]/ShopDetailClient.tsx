@@ -314,12 +314,12 @@ export default function ShopDetailClient({
 
           <div className="divider" style={{ margin: '0.5rem 0' }} />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div className="shop-status-bar">
             <div>
               <p className="font-semibold" style={{ margin: 0 }}>Shop Status</p>
               <p className="text-sm text-muted" style={{ margin: 0 }}>Allow customers to order</p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div className="shop-status-bar-actions">
               <button 
                 onClick={toggleShopActive}
                 className={`badge ${shopActive ? 'badge-success' : 'badge-danger'}`}
@@ -345,7 +345,7 @@ export default function ShopDetailClient({
 
         {/* Shop Owners & Collaborators Card (Up to 3 Max) */}
         <div className="card card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Users size={18} style={{ color: 'var(--wa-green-dark)' }} />
               Shop Owners ({ownersList.length}/3)
@@ -371,9 +371,9 @@ export default function ShopDetailClient({
               const u = o.users
               const uid = o.user_id || u?.id
               return (
-                <div key={uid || idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.6rem 0.75rem', background: 'var(--wa-bg-soft, #f8fafc)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)' }}>
+                <div key={uid || idx} className="owner-card-item">
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
                       <span className="font-bold" style={{ fontSize: '0.9rem', color: '#0f172a' }}>{u?.name || 'Unknown User'}</span>
                       {idx === 0 ? (
                         <span className="badge badge-success" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>Primary</span>
@@ -384,22 +384,25 @@ export default function ShopDetailClient({
                     <p className="text-xs text-muted" style={{ margin: '0.15rem 0 0' }}>📱 {u?.phone || 'No Phone'}</p>
                   </div>
                   {ownersList.length > 1 && uid && (
-                    <button
-                      type="button"
-                      className="btn btn-sm"
-                      style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: 'none', padding: '0.35rem 0.5rem' }}
-                      title="Remove Co-owner"
-                      disabled={ownerActionLoading}
-                      onClick={() => handleRemoveOwner(uid)}
-                    >
-                      <UserMinus size={15} />
-                    </button>
+                    <div className="owner-card-item-actions">
+                      <button
+                        type="button"
+                        className="btn btn-sm"
+                        style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: 'none', padding: '0.35rem 0.5rem' }}
+                        title="Remove Co-owner"
+                        disabled={ownerActionLoading}
+                        onClick={() => handleRemoveOwner(uid)}
+                      >
+                        <UserMinus size={15} />
+                      </button>
+                    </div>
                   )}
                 </div>
               )
             })}
           </div>
         </div>
+
 
 
         {/* Left Column: Commission & Trial settings */}
@@ -525,13 +528,13 @@ export default function ShopDetailClient({
         
         {/* Right Column: Products List */}
         <div className="card card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <div className="shop-detail-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <ShoppingBag size={22} style={{ color: 'var(--wa-green-dark)' }} />
               <h2 className="font-bold text-lg" style={{ margin: 0 }}>Products List ({filteredItems.length})</h2>
             </div>
             
-            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <div className="shop-detail-filter-bar">
               <select
                 className="form-input"
                 style={{ width: '160px', background: '#fff', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', padding: '.35rem .5rem', fontSize: '0.85rem' }}
@@ -556,6 +559,7 @@ export default function ShopDetailClient({
               </select>
             </div>
           </div>
+
 
           {filteredItems.length === 0 ? (
             <div className="empty-state">

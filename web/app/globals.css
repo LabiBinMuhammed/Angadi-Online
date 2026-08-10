@@ -583,6 +583,69 @@ select:focus-visible {
     gap: 2rem;
   }
 }
+
+/* Shop Detail Responsive Enhancements */
+.shop-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.shop-status-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.shop-detail-filter-bar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.owner-card-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  background: var(--wa-bg-soft, #f8fafc);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .shop-status-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .shop-status-bar-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .shop-detail-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .shop-detail-filter-bar select {
+    width: 100% !important;
+  }
+  .owner-card-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .owner-card-item-actions {
+    align-self: flex-end;
+  }
+  .shop-detail-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
 .panel-nav-item {
   display: flex; align-items: center; gap: .85rem;
   padding: .75rem 1.5rem;
