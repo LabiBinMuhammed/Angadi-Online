@@ -36,7 +36,8 @@ class VillageMarketApp extends StatelessWidget {
         return MaterialApp.router(
           title: 'Angadi',
           debugShowCheckedModeBanner: false,
-          theme: buildAppTheme(isDarkMode: isDark),
+          theme: buildAppTheme(isDarkMode: isDark, localeCode: currentLocale.languageCode),
+
           routerConfig: buildRouter(),
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,

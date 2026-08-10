@@ -1,13 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Anek+Malayalam:wght@300;400;500;600;700;800&display=swap');
 
-/* Malayalam Font Size Adjustment */
-html[lang="ml"] body {
-  font-family: 'Anek Malayalam', 'Inter', system-ui, -apple-system, sans-serif !important;
+/* Malayalam Font Size & Strict Anek Malayalam Enforcement */
+html[lang="ml"],
+html[lang="ml"] body,
+html[lang="ml"] button,
+html[lang="ml"] input,
+html[lang="ml"] select,
+html[lang="ml"] textarea,
+html[lang="ml"] table,
+html[lang="ml"] p,
+html[lang="ml"] h1,
+html[lang="ml"] h2,
+html[lang="ml"] h3,
+html[lang="ml"] h4,
+html[lang="ml"] h5,
+html[lang="ml"] h6,
+html[lang="ml"] span,
+html[lang="ml"] a,
+html[lang="ml"] label,
+html[lang="ml"] div,
+html[lang="ml"] * {
+  font-family: 'Anek Malayalam', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 html[lang="ml"] {
   font-size: 80% !important;
   zoom: 0.9;
 }
+
 
 /* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 :root {

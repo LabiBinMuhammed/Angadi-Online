@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'theme_service.dart';
 
 // ─── Color Palette ────────────────────────────────────────────────────────────
@@ -34,15 +35,16 @@ Color get kWaBg        => ThemeService.instance.isDarkMode ? const Color(0xFF0F1
 
 // ─── Theme ────────────────────────────────────────────────────────────────────
 
-ThemeData buildAppTheme({bool isDarkMode = false}) {
-  return ThemeData(
+ThemeData buildAppTheme({bool isDarkMode = false, String localeCode = 'en'}) {
+  final isMalayalam = localeCode == 'ml';
+  ThemeData base = ThemeData(
     useMaterial3: true,
     brightness: isDarkMode ? Brightness.dark : Brightness.light,
     colorScheme: ColorScheme.fromSeed(
       seedColor: kBrand500,
       brightness: isDarkMode ? Brightness.dark : Brightness.light,
     ),
-    fontFamily: 'Inter',
+    fontFamily: isMalayalam ? GoogleFonts.anekMalayalam().fontFamily : 'Inter',
     scaffoldBackgroundColor: isDarkMode ? kNeutral900 : kNeutral50,
     appBarTheme: AppBarTheme(
       backgroundColor: isDarkMode ? kNeutral800 : Colors.white,
@@ -50,7 +52,7 @@ ThemeData buildAppTheme({bool isDarkMode = false}) {
       elevation: 0,
       centerTitle: false,
       titleTextStyle: TextStyle(
-        fontFamily: 'Inter',
+        fontFamily: isMalayalam ? GoogleFonts.anekMalayalam().fontFamily : 'Inter',
         fontSize: 18,
         fontWeight: FontWeight.w700,
         color: isDarkMode ? Colors.white : kNeutral900,
@@ -59,6 +61,7 @@ ThemeData buildAppTheme({bool isDarkMode = false}) {
         color: isDarkMode ? Colors.white : kNeutral900,
       ),
     ),
+
     cardTheme: CardThemeData(
       color: isDarkMode ? kNeutral800 : Colors.white,
       elevation: 0,
@@ -115,4 +118,12 @@ ThemeData buildAppTheme({bool isDarkMode = false}) {
       elevation: 12,
     ),
   );
+
+  if (isMalayalam) {
+    return base.copyWith(
+      textTheme: GoogleFonts.anekMalayalamTextTheme(base.textTheme),
+    );
+  }
+  return base;
 }
+
