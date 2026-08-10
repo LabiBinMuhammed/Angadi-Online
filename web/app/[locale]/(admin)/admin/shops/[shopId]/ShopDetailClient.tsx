@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { 
   Store, User, Phone, MapPin, Tag, Calendar, ShoppingBag, Eye, EyeOff,
-  Coins, Clock, AlertTriangle, ShieldCheck, Check, X, Users, UserPlus, UserMinus, Mail
+  Coins, Clock, AlertTriangle, ShieldCheck, Check, X, Users, UserPlus, UserMinus, Mail, Trash2
 } from 'lucide-react'
+
 import { 
   extendTrialAction, 
   changeRateAction, 
@@ -248,6 +249,24 @@ export default function ShopDetailClient({
     } finally {
       setOwnerActionLoading(false)
     }
+  async function handleDeleteShop() {
+    if (!window.confirm(`Are you sure you want to delete shop "${shop.name}"? This action cannot be undone and will permanently remove all associated products and settings.`)) return
+
+    setLoading(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.from('shops').delete().eq('id', shop.id)
+      if (error) {
+        alert('Failed to delete shop: ' + error.message)
+      } else {
+        router.push('/admin/shops')
+        router.refresh()
+      }
+    } catch (err: any) {
+      alert('Delete failed: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const ownersList = shop.shop_owners || []
@@ -292,20 +311,34 @@ export default function ShopDetailClient({
 
           <div className="divider" style={{ margin: '0.5rem 0' }} />
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
             <div>
               <p className="font-semibold" style={{ margin: 0 }}>Shop Status</p>
               <p className="text-sm text-muted" style={{ margin: 0 }}>Allow customers to order</p>
             </div>
-            <button 
-              onClick={toggleShopActive}
-              className={`badge ${shopActive ? 'badge-success' : 'badge-danger'}`}
-              style={{ border: 'none', padding: '0.4rem 1rem', fontSize: '0.85rem', cursor: 'pointer' }}
-            >
-              {shopActive ? 'Active' : 'Inactive'}
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <button 
+                onClick={toggleShopActive}
+                className={`badge ${shopActive ? 'badge-success' : 'badge-danger'}`}
+                style={{ border: 'none', padding: '0.4rem 0.85rem', fontSize: '0.85rem', cursor: 'pointer' }}
+              >
+                {shopActive ? 'Active' : 'Inactive'}
+              </button>
+              <button
+                type="button"
+                id="btn-delete-shop-status-bar"
+                onClick={handleDeleteShop}
+                disabled={loading}
+                className="btn btn-sm"
+                style={{ background: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '0.35rem 0.65rem', display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.8rem' }}
+                title="Delete Shop (Admin Only)"
+              >
+                <Trash2 size={14} /> Delete Shop
+              </button>
+            </div>
           </div>
         </div>
+
 
         {/* Shop Owners & Collaborators Card (Up to 3 Max) */}
         <div className="card card-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
