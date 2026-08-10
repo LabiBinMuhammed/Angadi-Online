@@ -13,15 +13,17 @@ const LANGUAGES = [
 ]
 
 export default function SettingsClient({ preferredLanguage }: { preferredLanguage: string }) {
-  const [lang, setLang] = useState(preferredLanguage)
+  const { setLocale, t, locale } = useTranslation()
+  const [lang, setLang] = useState(locale || preferredLanguage || 'en')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const router = useRouter()
-  const { setLocale, t, locale } = useTranslation()
   const { signOut } = useAuth()
 
+  const activeLang = locale || lang
+
   async function saveLang(code: string) {
-    if (code === locale && code === lang) return
+    if (code === activeLang) return
     setLang(code)
     setSaving(true)
     try {
@@ -45,7 +47,6 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
       setLocale(code as Locale)
     }
   }
-
 
   async function handleLogout() {
     setSaving(true)
@@ -72,7 +73,7 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
                 style={{
                   display: 'flex', alignItems: 'center', gap: '.75rem',
                   padding: '.5rem .75rem', borderRadius: 'var(--radius-md)',
-                  cursor: 'pointer', background: lang === l.code ? 'var(--wa-bg)' : 'transparent',
+                  cursor: 'pointer', background: activeLang === l.code ? 'var(--wa-bg)' : 'transparent',
                   transition: 'background .12s',
                 }}
               >
@@ -80,17 +81,18 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
                   type="radio"
                   name="language"
                   value={l.code}
-                  checked={lang === l.code}
+                  checked={activeLang === l.code}
                   onChange={() => saveLang(l.code)}
                   style={{ accentColor: 'var(--wa-green-dark)' }}
                 />
                 <span>{l.label}</span>
-                {lang === l.code && saving && <span className="spinner" style={{ width: 14, height: 14 }} />}
-                {lang === l.code && saved && <span style={{ color: 'var(--wa-green)', fontSize: '.85rem' }}>✓ Saved</span>}
+                {activeLang === l.code && saving && <span className="spinner" style={{ width: 14, height: 14 }} />}
+                {activeLang === l.code && saved && <span style={{ color: 'var(--wa-green)', fontSize: '.85rem' }}>✓ Saved</span>}
               </label>
             ))}
           </div>
         </div>
+
 
         {/* App info */}
         <div className="wa-list-item" style={{ cursor: 'default' }}>
