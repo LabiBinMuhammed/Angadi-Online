@@ -14,7 +14,7 @@ const LANGUAGES = [
 
 export default function SettingsClient({ preferredLanguage }: { preferredLanguage: string }) {
   const { setLocale, t, locale } = useTranslation()
-  const [lang, setLang] = useState(locale || preferredLanguage || 'en')
+  const [lang, setLang] = useState<string>(locale || preferredLanguage || 'en')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const router = useRouter()
@@ -25,6 +25,7 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
   async function saveLang(code: string) {
     if (code === activeLang) return
     setLang(code)
+
     setSaving(true)
     try {
       const supabase = createClient()
