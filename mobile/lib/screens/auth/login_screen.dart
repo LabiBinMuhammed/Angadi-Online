@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import '../../core/auth_service.dart';
+import '../../core/language_service.dart';
 import '../../core/supabase_client.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/theme_service.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -121,29 +123,48 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Circular Back Arrow Button
-              GestureDetector(
-                onTap: () {
-                  if (Navigator.of(context).canPop()) {
-                    context.pop();
-                  } else {
-                    context.go('/intro');
-                  }
-                },
-                child: Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
-                    shape: BoxShape.circle,
+              // Top Bar: Back Button & Language Selector
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (Navigator.of(context).canPop()) {
+                        context.pop();
+                      } else {
+                        context.go('/intro');
+                      }
+                    },
+                    child: Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 20,
+                        color: isDark ? Colors.white : const Color(0xFF1E293B),
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.arrow_back,
-                    size: 20,
-                    color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  PopupMenuButton<String>(
+                    tooltip: 'Select Language',
+                    icon: Icon(Icons.language, color: kWaGreen),
+                    onSelected: (code) {
+                      LanguageService.instance.setLocale(Locale(code));
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(value: 'ml', child: Text('🇮🇳 മലയാളം')),
+                      PopupMenuItem(value: 'en', child: Text('🇬🇧 English')),
+                      PopupMenuItem(value: 'ar', child: Text('🇸🇦 العربية')),
+                      PopupMenuItem(value: 'hi', child: Text('🇮🇳 हिंदी')),
+                    ],
                   ),
-                ),
+                ],
               ),
+
               const SizedBox(height: 16),
               Align(
                 alignment: Alignment.centerLeft,

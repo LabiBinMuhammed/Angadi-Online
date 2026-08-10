@@ -23,7 +23,8 @@ export function normalizePhone(phone: string, defaultCountryCode: string = '+91'
 }
 
 export default function LoginPage() {
-  const { t } = useTranslation()
+  const { t, setLocale } = useTranslation()
+
   const { user, session, signInWithPassword, completeRegistration } = useAuth()
   const router = useRouter()
   const params = useParams()
@@ -219,11 +220,33 @@ export default function LoginPage() {
     <div className="auth-page-wrap">
       {step !== 'complete_registration' ? (
         <>
-          <div className="auth-top-bar">
+          <div className="auth-top-bar" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
             <button type="button" className="auth-back-btn" onClick={() => router.back()} aria-label="Go back">
               <ArrowLeft size={18} />
             </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', background: '#f1f5f9', padding: '0.2rem 0.6rem', borderRadius: '999px', border: '1px solid var(--border)' }}>
+              <Globe size={15} style={{ color: 'var(--wa-green-dark)' }} />
+              <select
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as any)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  color: '#334155',
+                  cursor: 'pointer',
+                  outline: 'none'
+                }}
+              >
+                <option value="ml">🇮🇳 മലയാളം</option>
+                <option value="en">🇬🇧 English</option>
+                <option value="ar">🇸🇦 العربية</option>
+                <option value="hi">🇮🇳 हिंदी</option>
+              </select>
+            </div>
           </div>
+
 
           <div className="auth-page-header">
             <h1 className="auth-page-title">{t('auth.sign_in_your_account') || 'Sign In Your Account'}</h1>
