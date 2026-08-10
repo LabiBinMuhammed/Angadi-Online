@@ -6,7 +6,7 @@ class LanguageService extends ChangeNotifier {
   LanguageService._();
   static final instance = LanguageService._();
 
-  Locale _locale = const Locale('en');
+  Locale _locale = const Locale('ml');
   Locale get locale => _locale;
 
   static const String _prefKey = 'selected_language';
@@ -18,7 +18,10 @@ class LanguageService extends ChangeNotifier {
     final cachedLang = prefs.getString(_prefKey);
     if (cachedLang != null && ['en', 'ml', 'hi', 'ar'].contains(cachedLang)) {
       _locale = Locale(cachedLang);
+    } else {
+      _locale = const Locale('ml');
     }
+
 
     // 2. Fetch from Supabase (runs asynchronously in background)
     _syncWithSupabase();

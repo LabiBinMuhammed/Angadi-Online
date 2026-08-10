@@ -33,14 +33,15 @@ export default async function RootLayout({
   // Safely check and cast the active locale
   const activeLocale: Locale = ['en', 'ml', 'hi', 'ar'].includes(locale)
     ? (locale as Locale)
-    : 'en'
+    : 'ml'
 
   let messages = {}
   try {
     messages = require(`../../messages/${activeLocale}.json`)
   } catch (e) {
-    messages = require('../../messages/en.json')
+    messages = require('../../messages/ml.json')
   }
+
 
   const dir = activeLocale === 'ar' ? 'rtl' : 'ltr'
 

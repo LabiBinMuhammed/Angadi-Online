@@ -32,7 +32,8 @@ function getNestedValue(obj: any, path: string): string | undefined {
 
 export function I18nProvider({
   children,
-  initialLocale = 'en',
+  initialLocale = 'ml',
+
   messages
 }: {
   children: React.ReactNode
