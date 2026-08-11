@@ -26,10 +26,11 @@ class VendorDrawer extends StatelessWidget {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/images/logo.png',
+                    isDark ? 'assets/images/logo_dark.png' : 'assets/images/logo_light.png',
                     height: 36,
                     fit: BoxFit.contain,
                   ),
+
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

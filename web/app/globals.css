@@ -27,6 +27,28 @@ html[lang="ml"] {
   zoom: 0.9;
 }
 
+/* Logo Dark & Light Mode Responsive Classes */
+.logo-dark-mode { display: none !important; }
+.logo-light-mode { display: block !important; }
+
+@media (prefers-color-scheme: dark) {
+  .logo-dark-mode { display: block !important; }
+  .logo-light-mode { display: none !important; }
+}
+
+[data-theme="dark"] .logo-dark-mode,
+.dark .logo-dark-mode,
+body.dark-mode .logo-dark-mode {
+  display: block !important;
+}
+
+[data-theme="dark"] .logo-light-mode,
+.dark .logo-light-mode,
+body.dark-mode .logo-light-mode {
+  display: none !important;
+}
+
+
 
 /* ─── Design Tokens ─────────────────────────────────────────────────────────── */
 :root {

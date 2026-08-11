@@ -73,11 +73,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   child: Center(
                     child: Image.asset(
-                      'assets/images/logo.png',
+                      Theme.of(context).brightness == Brightness.dark
+                          ? 'assets/images/logo_dark.png'
+                          : 'assets/images/logo_light.png',
                       width: 90,
                       height: 90,
                       fit: BoxFit.contain,
                     ),
+
                   ),
                 ),
                 const SizedBox(height: 24),

@@ -79,7 +79,9 @@ export default function Sidebar() {
       <div className="desktop-sidebar" style={{ zIndex: 100 }}>
         {/* Header Logo */}
         <Link href={`/${locale}/home`} style={{ marginBottom: '24px', padding: '0 8px', display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-          <img src="/logo.png" alt="Angadi Online" style={{ height: '44px', maxWidth: '180px', objectFit: 'contain' }} />
+          <img src="/logo_dark.png" className="logo-dark-mode" alt="Angadi Online" style={{ height: '44px', maxWidth: '180px', objectFit: 'contain' }} />
+          <img src="/logo_light.png" className="logo-light-mode" alt="Angadi Online" style={{ height: '44px', maxWidth: '180px', objectFit: 'contain' }} />
+
         </Link>
 
         {/* Main Navigation Group */}

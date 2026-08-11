@@ -230,10 +230,11 @@ class _SignupScreenState extends State<SignupScreen> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Image.asset(
-                  'assets/images/logo.png',
+                  isDark ? 'assets/images/logo_dark.png' : 'assets/images/logo_light.png',
                   height: 48,
                   fit: BoxFit.contain,
                 ),
+
               ),
               const SizedBox(height: 16),
 

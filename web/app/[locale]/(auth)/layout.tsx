@@ -37,9 +37,10 @@ export default async function AuthLayout({
       {/* Left hero panel */}
       <div className="auth-hero">
         <div className="auth-hero-inner">
-          <div className="auth-hero-logo">
-            <Store size={36} strokeWidth={1.5} color="#fff" />
+          <div className="auth-hero-logo" style={{ background: 'transparent', padding: 0 }}>
+            <img src="/logo_dark.png" alt="Angadi Logo" style={{ height: '60px', width: 'auto', objectFit: 'contain' }} />
           </div>
+
           <h1 className="auth-hero-title">{t('auth_layout.hero_title')}</h1>
           <p className="auth-hero-subtitle">
             {t('auth_layout.hero_subtitle')}

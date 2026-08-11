@@ -51,7 +51,9 @@ export default function AdminSidebar() {
   return (
     <aside className="panel-sidebar">
       <div className="panel-sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <img src="/logo.png" alt="Angadi Admin" style={{ height: '36px', maxWidth: '140px', objectFit: 'contain' }} />
+        <img src="/logo_dark.png" className="logo-dark-mode" alt="Angadi Admin" style={{ height: '36px', maxWidth: '140px', objectFit: 'contain' }} />
+        <img src="/logo_light.png" className="logo-light-mode" alt="Angadi Admin" style={{ height: '36px', maxWidth: '140px', objectFit: 'contain' }} />
+
         <span style={{ fontSize: '11px', background: 'rgba(59,130,246,0.15)', color: '#60a5fa', padding: '2px 8px', borderRadius: '12px', fontWeight: 800 }}>ADMIN</span>
       </div>
 
