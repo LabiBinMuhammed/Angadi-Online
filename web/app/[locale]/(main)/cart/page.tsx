@@ -17,7 +17,7 @@ export default async function CartPage() {
     const { data, error } = await supabase
       .from('orders')
       .select(`
-        id, shop_id, total_estimated_price, total_final_price, status, created_at, delivery_date, delivery_slot,
+        id, shop_id, total_estimated_price, total_final_price, status, created_at, delivery_date, delivery_slot, payment_type,
         shops (id, name),
         order_items (
           id, item_id, variant_id, requested_value, estimated_price, actual_value, final_price, status,
@@ -39,6 +39,8 @@ export default async function CartPage() {
         )
       `)
       .eq('user_id', user.id)
+      .eq('status', 'pending')
+      .is('payment_type', null)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -50,6 +52,7 @@ export default async function CartPage() {
     console.error(err)
     return <div className="p-4">Exception: {err.message}</div>
   }
+
 
   let units: any[] = []
   try {

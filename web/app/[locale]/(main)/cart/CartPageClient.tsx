@@ -201,7 +201,12 @@ export default function CartPageClient({
   const handleModeChange = (newMode: string) => {
     handleScheduleChange(deliveryDate, newMode)
   }
-  const cartItems = pendingOrders.flatMap(o => o.order_items?.map((item: any) => ({ ...item, orderId: o.id })) || [])
+  const cartItems = pendingOrders.flatMap(o => 
+    o.order_items
+      ?.filter((item: any) => !item.status || item.status === 'pending')
+      .map((item: any) => ({ ...item, orderId: o.id })) || []
+  )
+
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.final_price ?? (item.requested_value * item.estimated_price)), 0)
   const discount = 0
