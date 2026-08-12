@@ -1178,24 +1178,52 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         child: Container(
                           key: index == 0 ? _shopCardKey : null,
-                          padding: EdgeInsets.all(isNarrow ? 16 : 20),
+                          padding: EdgeInsets.all(isNarrow ? 14 : 18),
                           decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(24), border: Border.all(color: _kBorder)),
-                          child: isNarrow
-                              ? Column(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: isNarrow ? 56 : 72,
+                                height: isNarrow ? 56 : 72,
+                                decoration: BoxDecoration(
+                                  color: _kCardBg,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: _kBorder),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.08),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    )
+                                  ],
+                                ),
+                                child: shop.logoUrl != null
+                                    ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
+                                    : Center(child: Text(_initials(shop.name), style: TextStyle(fontSize: isNarrow ? 18 : 22, fontWeight: FontWeight.bold, color: Colors.grey))),
+                              ),
+                              SizedBox(width: isNarrow ? 12 : 16),
+                              Expanded(
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Container(
-                                          width: 64,
-                                          height: 64,
-                                          decoration: BoxDecoration(color: _kCardBg, shape: BoxShape.circle, border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 4))]),
-                                          child: shop.logoUrl != null
-                                              ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
-                                              : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey))),
+                                        Expanded(
+                                          child: Text(
+                                            shop.name,
+                                            style: TextStyle(
+                                              fontSize: isNarrow ? 15 : 17,
+                                              fontWeight: FontWeight.w800,
+                                              color: _kText,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                         IconButton(
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
                                           icon: Icon(
                                             _pinnedShopIds.contains(shop.id) ? Icons.bookmark : Icons.bookmark_outline,
                                             color: _pinnedShopIds.contains(shop.id) ? const Color(0xFFEC4899) : Colors.grey,
@@ -1205,60 +1233,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 16),
-                                    Text(shop.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kText)),
-                                    const SizedBox(height: 6),
-                                    Text('$shopItemsCount ${l10n.productsLabel}', style: TextStyle(fontSize: 14, color: _kSub, fontWeight: FontWeight.w500)),
-                                    const SizedBox(height: 8),
-                                    Container(height: 1, color: ThemeService.instance.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
-                                    const SizedBox(height: 8),
-                                    Text(subtitle, style: TextStyle(fontSize: 13, color: ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : Colors.grey[800], fontWeight: FontWeight.w500)),
-                                  ],
-                                )
-                              : Row(
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(color: _kCardBg, shape: BoxShape.circle, border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 6))]),
-                                      child: shop.logoUrl != null
-                                          ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
-                                          : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.grey))),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      '$shopItemsCount ${l10n.productsLabel}',
+                                      style: TextStyle(fontSize: isNarrow ? 12 : 13, color: _kSub, fontWeight: FontWeight.w500),
                                     ),
-                                    const SizedBox(width: 20),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(shop.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: _kText)),
-                                              ),
-                                              IconButton(
-                                                icon: Icon(
-                                                  _pinnedShopIds.contains(shop.id) ? Icons.bookmark : Icons.bookmark_outline,
-                                                  color: _pinnedShopIds.contains(shop.id) ? const Color(0xFFEC4899) : Colors.grey,
-                                                  size: 20,
-                                                ),
-                                                onPressed: () => _togglePinShop(shop.id, shop.name),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 6),
-                                          Text('$shopItemsCount ${l10n.productsLabel}', style: TextStyle(fontSize: 14, color: _kSub, fontWeight: FontWeight.w500)),
-                                          const SizedBox(height: 8),
-                                          Container(height: 1, color: ThemeService.instance.isDarkMode ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05)),
-                                          const SizedBox(height: 8),
-                                          Text(subtitle, style: TextStyle(fontSize: 13, color: ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : Colors.grey[800], fontWeight: FontWeight.w500)),
-                                        ],
+                                    if (subtitle.isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        subtitle,
+                                        style: TextStyle(fontSize: isNarrow ? 11 : 12, color: ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : Colors.grey[700], fontWeight: FontWeight.w500),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    )
+                                    ],
                                   ],
                                 ),
+                              )
+                            ],
+                          ),
                         ),
                       );
+
                     },
                   ),
               ],
