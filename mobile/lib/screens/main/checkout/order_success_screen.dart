@@ -18,9 +18,9 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   late Animation<double> _checkScale;
 
   late AnimationController _rippleController;
-  late AnimationController _confettiLoopController;
+  late AnimationController _confettiBurstController;
 
-  final List<_ConfettiPiece> _pieces = [];
+  final List<_SingleBurstParticle> _particles = [];
   final Random _rand = Random();
 
   @override
@@ -40,25 +40,27 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
       ),
     );
 
-    // 2. Ripple Rings Pulsing Animation
+    // 2. Ripple Rings Pulsing Animation (runs for 3 seconds then stops to settle static)
     _rippleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2200),
-    )..repeat();
+      duration: const Duration(milliseconds: 1800),
+    );
 
-    // 3. Continuous Cascading Confetti Animation Loop
-    _confettiLoopController = AnimationController(
+    // 3. Single Celebration Burst Physics Controller (3.5s duration)
+    _confettiBurstController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 6),
-    )..repeat();
+      duration: const Duration(milliseconds: 3500),
+    );
 
-    _generateConfettiPieces();
+    _spawnCelebrationBurst();
 
     _checkController.forward();
+    _rippleController.forward(from: 0.0);
+    _confettiBurstController.forward(from: 0.0);
   }
 
-  void _generateConfettiPieces() {
-    _pieces.clear();
+  void _spawnCelebrationBurst() {
+    _particles.clear();
     final colors = [
       const Color(0xFF22C55E), // Vivid Green
       const Color(0xFF3B82F6), // Bright Blue
@@ -66,22 +68,26 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
       const Color(0xFFEC4899), // Pink
       const Color(0xFF8B5CF6), // Purple
       const Color(0xFF10B981), // Emerald
-      const Color(0xFFEF4444), // Red
     ];
 
-    for (int i = 0; i < 75; i++) {
-      _pieces.add(
-        _ConfettiPiece(
-          x: _rand.nextDouble(),
-          y: _rand.nextDouble() * 1.2 - 0.2, // Spread vertically
-          fallSpeed: _rand.nextDouble() * 1.2 + 0.8,
-          swayAmp: _rand.nextDouble() * 0.08 + 0.02,
-          swayFreq: _rand.nextDouble() * 1.5 + 0.5,
-          phase: _rand.nextDouble() * pi * 2,
-          size: _rand.nextDouble() * 10 + 6,
+    // Spawn 90 particles bursting upwards & outwards from checkmark center
+    for (int i = 0; i < 90; i++) {
+      final angle = _rand.nextDouble() * pi * 2;
+      final speed = _rand.nextDouble() * 320 + 120;
+
+      _particles.add(
+        _SingleBurstParticle(
+          startX: 0.5,
+          startY: 0.3,
+          vx: cos(angle) * speed,
+          vy: sin(angle) * speed - 220, // Initial upward burst
+          size: _rand.nextDouble() * 9 + 5,
           color: colors[_rand.nextInt(colors.length)],
-          rotationSpeed: (_rand.nextDouble() - 0.5) * 8,
+          rotation: _rand.nextDouble() * pi * 2,
+          rotationSpeed: (_rand.nextDouble() - 0.5) * 10,
           isCircle: _rand.nextBool(),
+          drag: _rand.nextDouble() * 0.04 + 0.94,
+          gravity: _rand.nextDouble() * 280 + 320,
         ),
       );
     }
@@ -91,7 +97,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   void dispose() {
     _checkController.dispose();
     _rippleController.dispose();
-    _confettiLoopController.dispose();
+    _confettiBurstController.dispose();
     super.dispose();
   }
 
@@ -117,15 +123,15 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // Background Continuous Confetti Animation Layer
+          // Single Celebration Confetti Burst Layer (Settles clean & static)
           AnimatedBuilder(
-            animation: _confettiLoopController,
+            animation: _confettiBurstController,
             builder: (context, child) {
               return CustomPaint(
                 size: Size.infinite,
-                painter: _ContinuousConfettiPainter(
-                  pieces: _pieces,
-                  progress: _confettiLoopController.value,
+                painter: _SingleBurstConfettiPainter(
+                  particles: _particles,
+                  progress: _confettiBurstController.value,
                 ),
               );
             },
@@ -142,18 +148,19 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Ripple Ring 1
+                        // Ripple Ring
                         AnimatedBuilder(
                           animation: _rippleController,
                           builder: (context, child) {
                             final value = _rippleController.value;
+                            if (value >= 1.0) return const SizedBox.shrink();
                             return Container(
-                              width: 100 + (value * 65),
-                              height: 100 + (value * 65),
+                              width: 100 + (value * 60),
+                              height: 100 + (value * 60),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: const Color(0xFF22C55E).withOpacity((1 - value) * 0.45),
+                                  color: const Color(0xFF22C55E).withOpacity((1 - value) * 0.4),
                                   width: 2.5,
                                 ),
                               ),
@@ -161,33 +168,14 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                           },
                         ),
 
-                        // Ripple Ring 2 (Offset Phase)
-                        AnimatedBuilder(
-                          animation: _rippleController,
-                          builder: (context, child) {
-                            final value = (_rippleController.value + 0.5) % 1.0;
-                            return Container(
-                              width: 100 + (value * 65),
-                              height: 100 + (value * 65),
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFF22C55E).withOpacity((1 - value) * 0.3),
-                                  width: 2.0,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-
-                        // Elastic Checkmark Badge
+                        // Elastic Checkmark Badge (Tap to re-trigger celebration burst)
                         ScaleTransition(
                           scale: _checkScale,
                           child: GestureDetector(
                             onTap: () {
-                              setState(() {
-                                _generateConfettiPieces();
-                              });
+                              _spawnCelebrationBurst();
+                              _rippleController.forward(from: 0.0);
+                              _confettiBurstController.forward(from: 0.0);
                             },
                             child: Container(
                               width: 104,
@@ -413,57 +401,64 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   }
 }
 
-class _ConfettiPiece {
-  final double x;
-  final double y;
-  final double fallSpeed;
-  final double swayAmp;
-  final double swayFreq;
-  final double phase;
+class _SingleBurstParticle {
+  final double startX;
+  final double startY;
+  final double vx;
+  final double vy;
   final double size;
   final Color color;
+  final double rotation;
   final double rotationSpeed;
   final bool isCircle;
+  final double drag;
+  final double gravity;
 
-  _ConfettiPiece({
-    required this.x,
-    required this.y,
-    required this.fallSpeed,
-    required this.swayAmp,
-    required this.swayFreq,
-    required this.phase,
+  _SingleBurstParticle({
+    required this.startX,
+    required this.startY,
+    required this.vx,
+    required this.vy,
     required this.size,
     required this.color,
+    required this.rotation,
     required this.rotationSpeed,
     required this.isCircle,
+    required this.drag,
+    required this.gravity,
   });
 }
 
-class _ContinuousConfettiPainter extends CustomPainter {
-  final List<_ConfettiPiece> pieces;
+class _SingleBurstConfettiPainter extends CustomPainter {
+  final List<_SingleBurstParticle> particles;
   final double progress;
 
-  _ContinuousConfettiPainter({required this.pieces, required this.progress});
+  _SingleBurstConfettiPainter({required this.particles, required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (var p in pieces) {
-      // Calculate normalized cascading position
-      final rawY = p.y + (progress * p.fallSpeed);
-      final normalizedY = (rawY % 1.4) - 0.2; // Loop vertically from -0.2 to 1.2
-      final posY = normalizedY * size.height;
+    if (progress >= 1.0) return; // Clean static state after burst ends
 
-      // Swaying horizontal motion
-      final sway = sin((progress * pi * 2 * p.swayFreq) + p.phase) * p.swayAmp;
-      final posX = (p.x + sway) * size.width;
+    final dt = progress * 3.5; // Seconds elapsed
+
+    for (var p in particles) {
+      final currentVx = p.vx * pow(p.drag, dt * 60);
+      final currentVy = (p.vy + p.gravity * dt) * pow(p.drag, dt * 60);
+
+      final posX = (p.startX * size.width) + (currentVx * dt * 0.4);
+      final posY = (p.startY * size.height) + (currentVy * dt * 0.4);
+
+      // Fade out smoothly towards the end of 3.5s
+      final opacity = (1.0 - (progress * 1.25)).clamp(0.0, 1.0);
+      if (opacity <= 0 || posY > size.height + 60) continue;
 
       final paint = Paint()
-        ..color = p.color.withOpacity(0.85)
+        ..color = p.color.withOpacity(opacity)
         ..style = PaintingStyle.fill;
 
       canvas.save();
       canvas.translate(posX, posY);
-      canvas.rotate((progress * pi * 2 * p.rotationSpeed) + p.phase);
+      canvas.rotate(p.rotation + (p.rotationSpeed * dt));
 
       if (p.isCircle) {
         canvas.drawCircle(Offset.zero, p.size / 2, paint);
@@ -478,5 +473,5 @@ class _ContinuousConfettiPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _ContinuousConfettiPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _SingleBurstConfettiPainter oldDelegate) => true;
 }
