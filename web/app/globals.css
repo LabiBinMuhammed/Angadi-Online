@@ -22,10 +22,7 @@ html[lang="ml"] div,
 html[lang="ml"] * {
   font-family: 'Anek Malayalam', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
-html[lang="ml"] {
-  font-size: 80% !important;
-  zoom: 0.9;
-}
+
 
 /* Logo Dark & Light Mode Responsive Classes */
 .logo-dark-mode { display: none !important; }
