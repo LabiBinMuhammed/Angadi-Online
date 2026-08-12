@@ -87,18 +87,40 @@ export default function AddressFormClient({ address }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.contact_name.trim()) {
+    const name = form.contact_name.trim()
+    const phone = form.contact_phone.trim()
+    const house = form.house_name.trim()
+    const line1 = form.address_line_1.trim()
+    const line2 = form.address_line_2.trim()
+    const village = form.village.trim()
+    const landmark = form.landmark.trim()
+
+    if (!name) {
       setError(t('address.err_name_required') || 'Contact name is required')
       return
     }
-    if (!form.contact_phone.trim()) {
+    if (!phone) {
       setError(t('address.err_phone_required') || 'Contact phone is required')
       return
     }
-    if (!form.address_line_1.trim() && !form.house_name.trim()) {
+    
+    // Construct address_line_1 (MUST NOT BE EMPTY for Supabase NOT NULL constraint)
+    let fullLine1 = line1
+    if (house) {
+      fullLine1 = fullLine1 ? `${house}, ${fullLine1}` : house
+    }
+    fullLine1 = fullLine1.replace(/^,\s*|,\s*$/g, '')
+
+    if (!fullLine1) {
       setError(t('address.err_fields_required') || 'Street address or House/Building name is required')
       return
     }
+
+    let fullLine2 = line2
+    if (village) {
+      fullLine2 = fullLine2 ? `${fullLine2}, ${village}` : village
+    }
+    fullLine2 = fullLine2.replace(/^,\s*|,\s*$/g, '')
 
     setSaving(true)
     setError(null)
@@ -110,26 +132,21 @@ export default function AddressFormClient({ address }: Props) {
       }
 
       if (form.is_default) {
-        await supabase.from('user_addresses').update({ is_default: false }).eq('user_id', user.id)
-      }
-
-      let fullLine1 = form.address_line_1.trim()
-      if (form.house_name.trim()) {
-        fullLine1 = fullLine1 ? `${form.house_name.trim()}, ${fullLine1}` : form.house_name.trim()
-      }
-      let fullLine2 = form.address_line_2.trim()
-      if (form.village.trim()) {
-        fullLine2 = fullLine2 ? `${fullLine2}, ${form.village.trim()}` : form.village.trim()
+        try {
+          await supabase.from('user_addresses').update({ is_default: false }).eq('user_id', user.id)
+        } catch (e) {
+          console.warn('Failed to reset default addresses:', e)
+        }
       }
 
       const payload = {
         user_id: user.id,
         label: form.label,
-        contact_name: form.contact_name.trim(),
-        contact_phone: form.contact_phone.trim(),
-        address_line_1: fullLine1 || null,
+        contact_name: name,
+        contact_phone: phone,
+        address_line_1: fullLine1,
         address_line_2: fullLine2 || null,
-        landmark: form.landmark.trim() || null,
+        landmark: landmark || null,
         latitude: form.latitude,
         longitude: form.longitude,
         is_default: form.is_default,
@@ -181,7 +198,8 @@ export default function AddressFormClient({ address }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 580, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+    <form onSubmit={handleSubmit} noValidate style={{ maxWidth: 580, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+
       {error && (
         <div style={{ padding: '0.85rem 1rem', borderRadius: '12px', background: '#fee2e2', color: '#dc2626', fontSize: '0.875rem', fontWeight: 500, border: '1px solid #fca5a5' }}>
           ⚠️ {error}
@@ -232,7 +250,6 @@ export default function AddressFormClient({ address }: Props) {
             value={form.contact_name}
             onChange={e => set('contact_name', e.target.value)}
             placeholder={t('checkout.placeholder_fullname') || 'e.g. Muhammed Labeeb'}
-            required
           />
         </div>
 
@@ -248,7 +265,6 @@ export default function AddressFormClient({ address }: Props) {
             value={form.contact_phone}
             onChange={e => set('contact_phone', e.target.value)}
             placeholder={t('checkout.placeholder_phone') || 'e.g. 9876543210'}
-            required
           />
         </div>
       </div>
@@ -279,9 +295,9 @@ export default function AddressFormClient({ address }: Props) {
           value={form.address_line_1}
           onChange={e => set('address_line_1', e.target.value)}
           placeholder={t('checkout.placeholder_street') || 'e.g. Main Street, Near Mosque'}
-          required
         />
       </div>
+
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
         <div className="form-group">

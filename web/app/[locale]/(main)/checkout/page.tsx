@@ -185,22 +185,31 @@ function CheckoutForm() {
         if (formHouse.trim()) {
           fullLine1 = fullLine1 ? `${formHouse.trim()}, ${fullLine1}` : formHouse.trim()
         }
+        fullLine1 = fullLine1.replace(/^,\s*|,\s*$/g, '')
+
+        if (!fullLine1) {
+          setFormError(t('checkout.err_fields_required') || 'Street address or House/Building name is required')
+          return
+        }
+
         let fullLine2 = formLine2.trim()
         if (formVillage.trim()) {
           fullLine2 = fullLine2 ? `${fullLine2}, ${formVillage.trim()}` : formVillage.trim()
         }
+        fullLine2 = fullLine2.replace(/^,\s*|,\s*$/g, '')
 
         const payload = {
           user_id: user.id,
           label: formLabel.trim() || 'Home',
           contact_name: name,
           contact_phone: phone,
-          address_line_1: fullLine1 || null,
+          address_line_1: fullLine1,
           address_line_2: fullLine2 || null,
           landmark: formLandmark.trim() || null,
           is_active: true,
           is_default: addresses.length === 0
         }
+
 
         const { data: newAddr, error: insertErr } = await supabase
           .from('user_addresses')
