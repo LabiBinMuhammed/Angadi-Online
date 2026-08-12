@@ -100,8 +100,9 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           background: 'linear-gradient(135deg, #22c55e, #16a34a)',
           display: 'flex',
           alignItems: 'center',
-          justify: 'center',
+          justifyContent: 'center',
           boxShadow: '0 12px 28px -6px rgba(34, 197, 94, 0.45)',
+
           animation: 'pulseGlow 2s infinite ease-in-out'
         }}>
           <CheckCircle2 size={56} strokeWidth={2.2} color="#ffffff" />
