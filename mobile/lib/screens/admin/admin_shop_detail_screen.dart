@@ -92,8 +92,9 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) {
-        return StatefulWidgetBuilder(
+        return StatefulBuilder(
           builder: (context, setDialogState) {
+
             return AlertDialog(
               title: const Text('Add Shop Co-Owner (Max 3)'),
               content: Column(
@@ -448,7 +449,7 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
                       children: [
                         Row(
                           children: [
-                            const HugeIcon(icon: HugeIcons.strokeRoundedUserGroup, size: 20, color: kWaGreenDark),
+                            HugeIcon(icon: HugeIcons.strokeRoundedUserGroup, size: 20, color: kWaGreenDark),
                             const SizedBox(width: 8),
                             Text(
                               'Shop Owners (${owners.length}/3)',
@@ -463,7 +464,7 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
                             label: const Text('Add Co-Owner', style: TextStyle(fontSize: 12)),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: kWaGreenDark,
-                              side: const BorderSide(color: kWaGreenDark),
+                              side: BorderSide(color: kWaGreenDark),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                             ),
                           )
@@ -474,8 +475,9 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
                               color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: const Text('Max 3 Limit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black84)),
+                            child: const Text('Max 3 Limit', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87)),
                           ),
+
                       ],
                     ),
                     const Divider(height: 20),
