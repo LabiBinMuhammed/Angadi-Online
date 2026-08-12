@@ -62,8 +62,9 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
       minHeight: '80vh',
       display: 'flex',
       alignItems: 'center',
-      justify: 'center',
+      justifyContent: 'center',
       padding: '2.5rem 1rem'
+
     }}>
       <div className="order-success-card fade-up" style={{
         maxWidth: '560px',
