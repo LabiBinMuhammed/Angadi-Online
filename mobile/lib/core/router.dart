@@ -260,11 +260,18 @@ GoRouter buildRouter() {
                 ),
                 routes: [
                   GoRoute(
+                    path: 'success',
+                    builder: (_, state) => OrderSuccessScreen(
+                      orderId: state.pathParameters['orderId'] ?? state.uri.queryParameters['orderId'] ?? '',
+                    ),
+                  ),
+                  GoRoute(
                     path: 'review',
                     builder: (_, state) => LeaveReviewScreen(
                       orderId: state.pathParameters['orderId']!,
                     ),
                   ),
+
                   GoRoute(
                     path: 'replacement',
                     builder: (_, state) => ReplacementRequestScreen(

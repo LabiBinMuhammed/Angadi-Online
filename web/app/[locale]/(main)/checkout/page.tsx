@@ -331,9 +331,9 @@ function CheckoutForm() {
         }
       }
 
-      if (rpcErr) throw rpcErr
+      const firstOrderId = orderIds[0] || 'success'
+      router.push(`/${locale}/orders/${firstOrderId}/success`)
 
-      router.push('/orders')
     } catch (err: any) {
       if (paymentType === 'credit' && (
         err.message.includes('credit') ||
