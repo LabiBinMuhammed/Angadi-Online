@@ -13,7 +13,9 @@
     "pinned_shops": "पिन की गई दुकानें",
     "recent_purchases": "हाल की खरीदारी",
     "purchase_history": "खरीद का इतिहास",
-    "favorites": "पसंदीदा"
+    "favorites": "पसंदीदा",
+    "menu": "Menu",
+    "explore": "Explore"
   },
   "common": {
     "search": "उत्पादों, श्रेणियों की खोज करें...",
@@ -32,7 +34,8 @@
     "error": "त्रुटि हुई",
     "success": "सफलता",
     "no_items": "कोई आइटम नहीं मिला",
-    "view_details": "विवरण देखें"
+    "view_details": "विवरण देखें",
+    "on": "On"
   },
   "auth": {
     "login": "लॉगिन",
@@ -268,7 +271,8 @@
     "filter_year": "वर्ष",
     "filter_all": "सभी",
     "export_csv": "CSV निर्यात करें",
-    "print_pdf": "PDF प्रिंट करें"
+    "print_pdf": "PDF प्रिंट करें",
+    "of": "Of"
   },
   "favorites": {
     "title": "पसंदीदा उत्पाद",
@@ -310,7 +314,14 @@
     "saving": "सहेजा जा रहा है...",
     "update_address": "पता अपडेट करें",
     "err_location_denied": "स्थान की अनुमति अस्वीकृत",
-    "err_fields_required": "संपर्क नाम और पता आवश्यक हैं"
+    "err_fields_required": "संपर्क नाम और पता आवश्यक हैं",
+    "house_name_label": "House Name Label",
+    "village_label": "Village Label",
+    "err_name_required": "Err Name Required",
+    "err_phone_required": "Err Phone Required",
+    "err_not_logged_in": "Err Not Logged In",
+    "confirm_delete": "Confirm Delete",
+    "delivery_note_label": "Delivery Note Label"
   },
   "footer": {
     "description": "आपके समुदाय का विश्वसनीय बाज़ार। तेज़ डिलीवरी, ताज़ी उपज, और स्थानीय सहायता, सीधे आपके द्वार पर।",
@@ -423,7 +434,8 @@
     "vendor_panel": "विक्रेता पैनल",
     "vendor_panel_sub": "अपनी दुकान और ऑर्डर्स प्रबंधित करें",
     "admin_panel": "व्यवस्थापक पैनल",
-    "admin_panel_sub": "सिस्टम प्रशासन"
+    "admin_panel_sub": "सिस्टम प्रशासन",
+    "security_settings": "Security Settings"
   },
   "vendor_nav": {
     "sec_overview": "अवलोकन",
@@ -507,7 +519,18 @@
     "delivered_term_desc": "कमीशन केवल उन ऑर्डरों पर गिना जाता है जो पूरी तरह से वितरित हो चुके हैं। रद्द या वापस किए गए आइटम बाहर रखे गए हैं।",
     "dues_settlement": "बकाया निपटान और निलंबन",
     "settlement_term_title": "भुगतान छूट अवधि:",
-    "settlement_term_desc": "चालान जनरेट होने से आपके पास भुगतान करने के लिए 10 दिन होते हैं। बकाया खातों को दृश्यता और ऑर्डर ब्लॉक का सामना करना पड़ता है।"
+    "settlement_term_desc": "चालान जनरेट होने से आपके पास भुगतान करने के लिए 10 दिन होते हैं। बकाया खातों को दृश्यता और ऑर्डर ब्लॉक का सामना करना पड़ता है।",
+    "calc_term_title": "Calc Term Title",
+    "calc_term_desc": "Calc Term Desc",
+    "cancel_term_title": "Cancel Term Title",
+    "cancel_term_desc": "Cancel Term Desc",
+    "late_payment": "Late Payment",
+    "l1_term_title": "L1 Term Title",
+    "l1_term_desc": "L1 Term Desc",
+    "l2_term_title": "L2 Term Title",
+    "l2_term_desc": "L2 Term Desc",
+    "l3_term_title": "L3 Term Title",
+    "l3_term_desc": "L3 Term Desc"
   },
   "vendor_dashboard": {
     "vendor_panel_title": "विक्रेता पैनल",
@@ -586,7 +609,8 @@
     "today_runs": "आज की रन",
     "tomorrow_runs": "कल की रन",
     "today_label": "आज",
-    "tomorrow_label": "कल"
+    "tomorrow_label": "कल",
+    "showing_orders_for": "Showing Orders For"
   },
   "vendor_order_processing": {
     "unknown_customer": "अज्ञात ग्राहक",
@@ -870,7 +894,9 @@
     "resolve_replacement_request": "प्रतिस्थापन अनुरोध का समाधान करें",
     "action_decision": "कार्रवाई निर्णय",
     "complete_resolved": "पूर्ण (समाधान हो गया)",
-    "general_resolution_explanation": "सामान्य समाधान स्पष्टीकरण"
+    "general_resolution_explanation": "सामान्य समाधान स्पष्टीकरण",
+    "reason_explanation": "Reason Explanation",
+    "item_resolutions": "Item Resolutions"
   },
   "auth_layout": {
     "hero_title": "अंगाडी ऑनलाइन मार्केटप्लेस",
@@ -939,5 +965,34 @@
     "view_order_btn": "ऑर्डर विवरण देखें",
     "shop_again_btn": "दोबारा खरीदारी करें",
     "copied_toast": "ऑर्डर आईडी कॉपी की गई!"
+  },
+  "": {
+    "": "."
+  },
+  "vendor_report": {
+    "back_dashboard": "Back Dashboard",
+    "print_pdf": "Print Pdf",
+    "central_system": "Central System",
+    "invoice_title": "Invoice Title",
+    "billing_period": "Billing Period",
+    "billed_to": "Billed To",
+    "owner": "Owner",
+    "phone": "Phone",
+    "details": "Details",
+    "issue_date": "Issue Date",
+    "status": "Status",
+    "description": "Description",
+    "qty_rate": "Qty Rate",
+    "total_sales": "Total Sales",
+    "commission_amount": "Commission Amount",
+    "delivered_orders": "Delivered Orders",
+    "charges_compiled": "Charges Compiled",
+    "orders_count": "Orders Count",
+    "rate_at": "Rate At",
+    "total_commission": "Total Commission",
+    "amount_settled": "Amount Settled",
+    "balance_due": "Balance Due",
+    "footer_note_1": "Footer Note 1",
+    "footer_note_2": "Footer Note 2"
   }
 }

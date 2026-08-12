@@ -13,7 +13,9 @@
     "pinned_shops": "المتاجر المثبتة",
     "recent_purchases": "المشتريات الأخيرة",
     "purchase_history": "سجل المشتريات",
-    "favorites": "المفضلة"
+    "favorites": "المفضلة",
+    "menu": "Menu",
+    "explore": "Explore"
   },
   "common": {
     "search": "البحث عن المنتجات والفئات...",
@@ -32,7 +34,8 @@
     "error": "حدث خطأ",
     "success": "تم بنجاح",
     "no_items": "لم يتم العثور على عناصر",
-    "view_details": "عرض التفاصيل"
+    "view_details": "عرض التفاصيل",
+    "on": "On"
   },
   "auth": {
     "login": "تسجيل الدخول",
@@ -268,7 +271,8 @@
     "filter_year": "السنة",
     "filter_all": "الكل",
     "export_csv": "تصدير CSV",
-    "print_pdf": "طباعة PDF"
+    "print_pdf": "طباعة PDF",
+    "of": "Of"
   },
   "favorites": {
     "title": "المنتجات المفضلة",
@@ -310,7 +314,14 @@
     "saving": "جاري الحفظ...",
     "update_address": "تحديث العنوان",
     "err_location_denied": "تم رفض إذن تحديد الموقع",
-    "err_fields_required": "اسم جهة الاتصال والعنوان مطلوبان"
+    "err_fields_required": "اسم جهة الاتصال والعنوان مطلوبان",
+    "house_name_label": "House Name Label",
+    "village_label": "Village Label",
+    "err_name_required": "Err Name Required",
+    "err_phone_required": "Err Phone Required",
+    "err_not_logged_in": "Err Not Logged In",
+    "confirm_delete": "Confirm Delete",
+    "delivery_note_label": "Delivery Note Label"
   },
   "footer": {
     "description": "سوق مجتمعك الموثوق. توصيل سريع، منتجات طازجة، ودعم محلي، تصل مباشرة إلى باب منزلك.",
@@ -423,7 +434,8 @@
     "vendor_panel": "لوحة البائع",
     "vendor_panel_sub": "إدارة متجرك وطلباتك",
     "admin_panel": "لوحة المدير",
-    "admin_panel_sub": "إدارة النظام"
+    "admin_panel_sub": "إدارة النظام",
+    "security_settings": "Security Settings"
   },
   "vendor_nav": {
     "sec_overview": "نظرة عامة",
@@ -507,7 +519,18 @@
     "delivered_term_desc": "يتم احتساب العمولات فقط على الطلبات التي تم تسليمها بالكامل للعميل. العناصر الملغاة أو المرجعة مستثناة.",
     "dues_settlement": "تسوية المستحقات والتعليق",
     "settlement_term_title": "فترة السماح بالسداد:",
-    "settlement_term_desc": "لديك 10 أيام من تاريخ إصدار الفاتورة للسداد. الحسابات المتأخرة تواجه قيود تدريجية في الظهور واستقبال الطلبات."
+    "settlement_term_desc": "لديك 10 أيام من تاريخ إصدار الفاتورة للسداد. الحسابات المتأخرة تواجه قيود تدريجية في الظهور واستقبال الطلبات.",
+    "calc_term_title": "Calc Term Title",
+    "calc_term_desc": "Calc Term Desc",
+    "cancel_term_title": "Cancel Term Title",
+    "cancel_term_desc": "Cancel Term Desc",
+    "late_payment": "Late Payment",
+    "l1_term_title": "L1 Term Title",
+    "l1_term_desc": "L1 Term Desc",
+    "l2_term_title": "L2 Term Title",
+    "l2_term_desc": "L2 Term Desc",
+    "l3_term_title": "L3 Term Title",
+    "l3_term_desc": "L3 Term Desc"
   },
   "vendor_dashboard": {
     "vendor_panel_title": "لوحة البائع",
@@ -586,7 +609,8 @@
     "today_runs": "جولات اليوم",
     "tomorrow_runs": "جولات الغد",
     "today_label": "اليوم",
-    "tomorrow_label": "غداً"
+    "tomorrow_label": "غداً",
+    "showing_orders_for": "Showing Orders For"
   },
   "vendor_order_processing": {
     "unknown_customer": "عميل غير معروف",
@@ -870,7 +894,9 @@
     "resolve_replacement_request": "حل طلب الاستبدال",
     "action_decision": "قرار الإجراء",
     "complete_resolved": "مكتمل (محلول)",
-    "general_resolution_explanation": "تفسير عام للحل"
+    "general_resolution_explanation": "تفسير عام للحل",
+    "reason_explanation": "Reason Explanation",
+    "item_resolutions": "Item Resolutions"
   },
   "auth_layout": {
     "hero_title": "سوق أنغادي عبر الإنترنت",
@@ -939,5 +965,34 @@
     "view_order_btn": "عرض تفاصيل الطلب",
     "shop_again_btn": "التسوق مرة أخرى",
     "copied_toast": "تم نسخ رقم الطلب!"
+  },
+  "": {
+    "": "."
+  },
+  "vendor_report": {
+    "back_dashboard": "Back Dashboard",
+    "print_pdf": "Print Pdf",
+    "central_system": "Central System",
+    "invoice_title": "Invoice Title",
+    "billing_period": "Billing Period",
+    "billed_to": "Billed To",
+    "owner": "Owner",
+    "phone": "Phone",
+    "details": "Details",
+    "issue_date": "Issue Date",
+    "status": "Status",
+    "description": "Description",
+    "qty_rate": "Qty Rate",
+    "total_sales": "Total Sales",
+    "commission_amount": "Commission Amount",
+    "delivered_orders": "Delivered Orders",
+    "charges_compiled": "Charges Compiled",
+    "orders_count": "Orders Count",
+    "rate_at": "Rate At",
+    "total_commission": "Total Commission",
+    "amount_settled": "Amount Settled",
+    "balance_due": "Balance Due",
+    "footer_note_1": "Footer Note 1",
+    "footer_note_2": "Footer Note 2"
   }
 }

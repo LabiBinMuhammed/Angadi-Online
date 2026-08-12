@@ -13,7 +13,9 @@
     "pinned_shops": "Pinned Shops",
     "recent_purchases": "Recent Purchases",
     "purchase_history": "Purchase History",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "menu": "Menu",
+    "explore": "Explore"
   },
   "common": {
     "search": "Search products, categories...",
@@ -32,7 +34,8 @@
     "error": "Error occurred",
     "success": "Success",
     "no_items": "No items found",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "on": "On"
   },
   "auth": {
     "login": "Login",
@@ -268,7 +271,8 @@
     "filter_year": "Year",
     "filter_all": "All",
     "export_csv": "Export CSV",
-    "print_pdf": "Print PDF"
+    "print_pdf": "Print PDF",
+    "of": "Of"
   },
   "favorites": {
     "title": "Favorite Products",
@@ -310,7 +314,14 @@
     "saving": "Saving…",
     "update_address": "Update Address",
     "err_location_denied": "Location permission denied",
-    "err_fields_required": "Contact name and address are required"
+    "err_fields_required": "Contact name and address are required",
+    "house_name_label": "House Name Label",
+    "village_label": "Village Label",
+    "err_name_required": "Err Name Required",
+    "err_phone_required": "Err Phone Required",
+    "err_not_logged_in": "Err Not Logged In",
+    "confirm_delete": "Confirm Delete",
+    "delivery_note_label": "Delivery Note Label"
   },
   "footer": {
     "description": "Your community's trusted marketplace. Fast delivery, fresh produce, and local support, brought directly to your doorstep.",
@@ -423,7 +434,8 @@
     "vendor_panel": "Vendor Panel",
     "vendor_panel_sub": "Manage your shop & orders",
     "admin_panel": "Admin Panel",
-    "admin_panel_sub": "System administration"
+    "admin_panel_sub": "System administration",
+    "security_settings": "Security Settings"
   },
   "vendor_nav": {
     "sec_overview": "Overview",
@@ -507,7 +519,18 @@
     "delivered_term_desc": "Commissions are only calculated on orders that are fully delivered. Cancelled or returned items are excluded.",
     "dues_settlement": "Dues Settlement & Suspensions",
     "settlement_term_title": "Settlement Grace period:",
-    "settlement_term_desc": "You have 10 days from invoice generation to pay. Overdue accounts face graduated visibility and ordering blocks."
+    "settlement_term_desc": "You have 10 days from invoice generation to pay. Overdue accounts face graduated visibility and ordering blocks.",
+    "calc_term_title": "Calc Term Title",
+    "calc_term_desc": "Calc Term Desc",
+    "cancel_term_title": "Cancel Term Title",
+    "cancel_term_desc": "Cancel Term Desc",
+    "late_payment": "Late Payment",
+    "l1_term_title": "L1 Term Title",
+    "l1_term_desc": "L1 Term Desc",
+    "l2_term_title": "L2 Term Title",
+    "l2_term_desc": "L2 Term Desc",
+    "l3_term_title": "L3 Term Title",
+    "l3_term_desc": "L3 Term Desc"
   },
   "vendor_dashboard": {
     "vendor_panel_title": "Vendor Panel",
@@ -586,7 +609,8 @@
     "today_runs": "Today's Runs",
     "tomorrow_runs": "Tomorrow's Runs",
     "today_label": "Today",
-    "tomorrow_label": "Tomorrow"
+    "tomorrow_label": "Tomorrow",
+    "showing_orders_for": "Showing Orders For"
   },
   "vendor_order_processing": {
     "unknown_customer": "Unknown Customer",
@@ -870,7 +894,9 @@
     "resolve_replacement_request": "Resolve Replacement Request",
     "action_decision": "Action Decision",
     "complete_resolved": "Complete (Resolved)",
-    "general_resolution_explanation": "General Resolution Explanation"
+    "general_resolution_explanation": "General Resolution Explanation",
+    "reason_explanation": "Reason Explanation",
+    "item_resolutions": "Item Resolutions"
   },
   "auth_layout": {
     "hero_title": "Angadi Online Marketplace",
@@ -939,5 +965,34 @@
     "view_order_btn": "View Order Details",
     "shop_again_btn": "Shop Again",
     "copied_toast": "Order ID copied to clipboard!"
+  },
+  "": {
+    "": "."
+  },
+  "vendor_report": {
+    "back_dashboard": "Back Dashboard",
+    "print_pdf": "Print Pdf",
+    "central_system": "Central System",
+    "invoice_title": "Invoice Title",
+    "billing_period": "Billing Period",
+    "billed_to": "Billed To",
+    "owner": "Owner",
+    "phone": "Phone",
+    "details": "Details",
+    "issue_date": "Issue Date",
+    "status": "Status",
+    "description": "Description",
+    "qty_rate": "Qty Rate",
+    "total_sales": "Total Sales",
+    "commission_amount": "Commission Amount",
+    "delivered_orders": "Delivered Orders",
+    "charges_compiled": "Charges Compiled",
+    "orders_count": "Orders Count",
+    "rate_at": "Rate At",
+    "total_commission": "Total Commission",
+    "amount_settled": "Amount Settled",
+    "balance_due": "Balance Due",
+    "footer_note_1": "Footer Note 1",
+    "footer_note_2": "Footer Note 2"
   }
 }

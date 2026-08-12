@@ -2,6 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useTranslation } from '@/lib/i18n/I18nContext'
+import { formatOrderStatus } from '@/lib/utils/formatters'
+
 
 type OrderRow = {
   id: string; status: string; created_at: string
@@ -22,7 +25,9 @@ const STATUS_BADGE: Record<string, string> = {
 }
 
 export default function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
+
   const [status, setStatus] = useState('all')
 
   const filtered = orders.filter(o => {
@@ -118,7 +123,8 @@ export default function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
                     )}
                   </td>
                   <td className="font-semibold">₹{o.total_final_price ?? o.total_estimated_price ?? '—'}</td>
-                  <td><span className={`badge ${STATUS_BADGE[o.status] ?? 'badge-neutral'}`}>{o.status}</span></td>
+                  <td><span className={`badge ${STATUS_BADGE[o.status] ?? 'badge-neutral'}`}>{formatOrderStatus(o.status, t)}</span></td>
+
                   <td>
                     <Link href={`/admin/orders/${o.id}`} id={`admin-order-detail-${o.id}`} className="btn btn-sm btn-outline">
                       View →

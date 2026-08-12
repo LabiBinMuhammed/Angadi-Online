@@ -6,6 +6,8 @@ import { ArrowLeft, Bookmark, Store, ExternalLink, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import BackButton from '@/components/BackButton'
 import { togglePinnedShop } from '@/app/actions/newFeatures'
+import { formatShopType } from '@/lib/utils/formatters'
+
 
 interface PinnedShopItem {
   id: string
@@ -124,7 +126,9 @@ export default function PinnedShopsClient({ initialPinned }: Props) {
                     </div>
                     <div className="details-box">
                       <h3 className="shop-name">{shop.name}</h3>
-                      <p className="shop-type">{shop.type}</p>
+                      <p className="shop-type">{formatShopType(shop.type, t)}</p>
+
+
                     </div>
                     <div className="actions-box" onClick={(e) => e.preventDefault()}>
                       <button 

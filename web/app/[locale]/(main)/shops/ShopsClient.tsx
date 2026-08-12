@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import type { Shop } from '@/types'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import { formatShopType } from '@/lib/utils/formatters'
 
 type Props = { initialShops: Shop[] }
 type ViewMode = 'grid' | 'list'
@@ -18,73 +19,74 @@ export default function ShopsClient({ initialShops }: Props) {
 
   const filtered = initialShops.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase())
-    const matchType = activeType === 'all' || (s.type ?? '').toLowerCase().includes(activeType)
+    const matchType = activeType === 'all' || s.type === activeType
     return matchSearch && matchType
   })
 
   return (
-    <>
-      {/* Search + toggle */}
-      <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center', marginBottom: '1rem' }}>
-        <div className="search-bar" style={{ flex: 1 }}>
-          <span className="search-bar-icon">🔍</span>
-          <input
-            id="shops-search"
-            placeholder={t('shops_page.filter_placeholder')}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="toggle-group">
+    <div style={{ paddingBottom: '2rem' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h1 className="text-xl font-bold" style={{ marginBottom: '0.25rem' }}>
+          {t('shops.all_shops') || 'All Shops'}
+        </h1>
+        <p className="text-sm text-muted">
+          {t('shops.subtitle') || 'Explore local shops in your village'}
+        </p>
+      </div>
+
+      {/* Filter Bar */}
+      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+        <input
+          type="text"
+          id="shops-search-input"
+          className="wa-input"
+          placeholder={t('shops.search_placeholder') || 'Search shops...'}
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ flex: 1, minWidth: 200 }}
+        />
+        <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--card-bg)', padding: '0.25rem', borderRadius: 'var(--radius-md)' }}>
           <button
-            className={`toggle-btn${view === 'grid' ? ' active' : ''}`}
-            id="view-grid"
+            type="button"
+            className={`btn btn-sm ${view === 'grid' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setView('grid')}
-          >⊞</button>
+          >
+            Grid
+          </button>
           <button
-            className={`toggle-btn${view === 'list' ? ' active' : ''}`}
-            id="view-list"
+            type="button"
+            className={`btn btn-sm ${view === 'list' ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setView('list')}
-          >☰</button>
+          >
+            List
+          </button>
         </div>
       </div>
 
-      {/* Category chips */}
-      <div className="chip-row">
+      {/* Category Pills */}
+      <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.5rem', marginBottom: '1.5rem' }}>
         {TYPES.map(type => (
           <button
             key={type}
-            className={`chip${activeType === type ? ' active' : ''}`}
-            id={`chip-${type}`}
+            type="button"
+            className={`btn btn-sm ${activeType === type ? 'btn-primary' : 'btn-outline'}`}
             onClick={() => setActiveType(type)}
+            style={{ textTransform: 'capitalize', flexShrink: 0 }}
           >
-            {t('shops_page.types.' + type)}
+            {type === 'all' ? (t('shops.all') || 'All') : formatShopType(type, t)}
           </button>
         ))}
       </div>
 
-      {/* Count */}
-      <p className="text-sm text-muted" style={{ marginBottom: '1rem' }}>
-        {filtered.length === 1
-          ? t('shops_page.shop_found').replace('{count}', filtered.length.toString())
-          : t('shops_page.shops_found').replace('{count}', filtered.length.toString())}
-      </p>
-
-      {/* Results */}
-      {filtered.length === 0 ? (
-        <div className="empty-state">
-          <span className="empty-state-icon">🏪</span>
-          <p className="font-semibold">{t('shops_page.no_shops_match')}</p>
-        </div>
-      ) : view === 'grid' ? (
-        <div className="grid-3">
+      {/* Grid or List */}
+      {view === 'grid' ? (
+        <div className="grid grid-2">
           {filtered.map(shop => (
             <Link
               key={shop.id}
               href={`/home/shop/${shop.id}`}
               id={`shop-grid-${shop.id}`}
-              className="card"
-              style={{ display: 'block' }}
+              className="card text-center overflow-hidden"
             >
               <div style={{
                 height: 120,
@@ -93,7 +95,7 @@ export default function ShopsClient({ initialShops }: Props) {
               }}>🏪</div>
               <div className="card-body">
                 <p className="font-semibold">{shop.name}</p>
-                {shop.type && <p className="text-sm text-muted">{shop.type}</p>}
+                {shop.type && <p className="text-sm text-muted">{formatShopType(shop.type, t)}</p>}
               </div>
             </Link>
           ))}

@@ -13,7 +13,9 @@
     "pinned_shops": "പിൻ ചെയ്ത കടകൾ",
     "recent_purchases": "സമീപകാല വാങ്ങലുകൾ",
     "purchase_history": "വാങ്ങൽ ചരിത്രം",
-    "favorites": "പ്രിയപ്പെട്ടവ"
+    "favorites": "പ്രിയപ്പെട്ടവ",
+    "menu": "Menu",
+    "explore": "Explore"
   },
   "common": {
     "search": "ഉൽപ്പന്നങ്ങളും വിഭാഗങ്ങളും തിരയുക...",
@@ -32,7 +34,8 @@
     "error": "പിശക് സംഭവിച്ചു",
     "success": "വിജയം",
     "no_items": "ഇനങ്ങൾ ഒന്നും കണ്ടെത്തിയില്ല",
-    "view_details": "വിവരങ്ങൾ കാണുക"
+    "view_details": "വിവരങ്ങൾ കാണുക",
+    "on": "On"
   },
   "auth": {
     "login": "ലോഗിൻ",
@@ -268,7 +271,8 @@
     "filter_year": "വർഷം",
     "filter_all": "എല്ലാം",
     "export_csv": "CSV എക്സ്പോർട്ട് ചെയ്യുക",
-    "print_pdf": "PDF പ്രിന്റ് ചെയ്യുക"
+    "print_pdf": "PDF പ്രിന്റ് ചെയ്യുക",
+    "of": "Of"
   },
   "favorites": {
     "title": "പ്രിയപ്പെട്ട ഉൽപ്പന്നങ്ങൾ",
@@ -310,7 +314,14 @@
     "saving": "സംരക്ഷിക്കുന്നു...",
     "update_address": "വിലാസം പുതുക്കുക",
     "err_location_denied": "ലൊക്കേഷൻ അനുമതി നിഷേധിച്ചു",
-    "err_fields_required": "ബന്ധപ്പെടേണ്ട ആളുടെ പേരും വിലാസവും ആവശ്യമാണ്"
+    "err_fields_required": "ബന്ധപ്പെടേണ്ട ആളുടെ പേരും വിലാസവും ആവശ്യമാണ്",
+    "house_name_label": "House Name Label",
+    "village_label": "Village Label",
+    "err_name_required": "Err Name Required",
+    "err_phone_required": "Err Phone Required",
+    "err_not_logged_in": "Err Not Logged In",
+    "confirm_delete": "Confirm Delete",
+    "delivery_note_label": "Delivery Note Label"
   },
   "footer": {
     "description": "നിങ്ങളുടെ കമ്മ്യൂണിറ്റിയുടെ വിശ്വസനീയമായ മാർക്കറ്റ് പ്ലേസ്. വേഗത്തിലുള്ള ഡെലിവറി, പുതിയ ഉൽപ്പന്നങ്ങൾ, പ്രാദേശിക പിന്തുണ എന്നിവ നിങ്ങളുടെ പടിവാതിൽക്കൽ നേരിട്ടെത്തിക്കുന്നു.",
@@ -423,7 +434,8 @@
     "vendor_panel": "വെണ്ടർ പാനൽ",
     "vendor_panel_sub": "നിങ്ങളുടെ കടയും ഓർഡറുകളും നിയന്ത്രിക്കുക",
     "admin_panel": "അഡ്മിൻ പാനൽ",
-    "admin_panel_sub": "സിസ്റ്റം അഡ്മിനിസ്ട്രേഷൻ"
+    "admin_panel_sub": "സിസ്റ്റം അഡ്മിനിസ്ട്രേഷൻ",
+    "security_settings": "Security Settings"
   },
   "vendor_nav": {
     "sec_overview": "അവലോകനം",
@@ -507,7 +519,18 @@
     "delivered_term_desc": "ഡെലിവറി ചെയ്ത ഓർഡറുകൾക്ക് മാത്രമേ കമ്മീഷൻ ഈടാക്കൂ. റദ്ദാക്കിയതോ മടക്കിയതോ ആയ ഓർഡറുകൾ ഒഴിവാക്കിയിരിക്കുന്നു.",
     "dues_settlement": "കുടിശ്ശിക തീർക്കലും താൽക്കാലികമായി നിർത്തലും",
     "settlement_term_title": "ഗ്രേസ് പിരീഡ്:",
-    "settlement_term_desc": "ഇൻവോയ്സ് ജനറേറ്റ് ചെയ്ത് 10 ദിവസത്തിനകം പണമടയ്ക്കണം. കുടിശ്ശിക വരുത്തിയാൽ വിസിബിലിറ്റി നിയന്ത്രണങ്ങളും ഓർഡർ ബ്ലോക്കുകളും നേരിടേണ്ടിവരും."
+    "settlement_term_desc": "ഇൻവോയ്സ് ജനറേറ്റ് ചെയ്ത് 10 ദിവസത്തിനകം പണമടയ്ക്കണം. കുടിശ്ശിക വരുത്തിയാൽ വിസിബിലിറ്റി നിയന്ത്രണങ്ങളും ഓർഡർ ബ്ലോക്കുകളും നേരിടേണ്ടിവരും.",
+    "calc_term_title": "Calc Term Title",
+    "calc_term_desc": "Calc Term Desc",
+    "cancel_term_title": "Cancel Term Title",
+    "cancel_term_desc": "Cancel Term Desc",
+    "late_payment": "Late Payment",
+    "l1_term_title": "L1 Term Title",
+    "l1_term_desc": "L1 Term Desc",
+    "l2_term_title": "L2 Term Title",
+    "l2_term_desc": "L2 Term Desc",
+    "l3_term_title": "L3 Term Title",
+    "l3_term_desc": "L3 Term Desc"
   },
   "vendor_dashboard": {
     "vendor_panel_title": "വിൽപ്പനക്കാരന്റെ പാനൽ",
@@ -586,7 +609,8 @@
     "today_runs": "ഇന്നത്തെ റണ്ണുകൾ",
     "tomorrow_runs": "നാളത്തെ റണ്ണുകൾ",
     "today_label": "ഇന്ന്",
-    "tomorrow_label": "നാളെ"
+    "tomorrow_label": "നാളെ",
+    "showing_orders_for": "Showing Orders For"
   },
   "vendor_order_processing": {
     "unknown_customer": "അജ്ഞാത ഉപഭോക്താവ്",
@@ -870,7 +894,9 @@
     "resolve_replacement_request": "റീപ്ലേസ്‌മെന്റ് അപേക്ഷ പരിഹരിക്കുക",
     "action_decision": "തീരുമാനം",
     "complete_resolved": "പൂർത്തിയായി (പരിഹരിച്ചു)",
-    "general_resolution_explanation": "പൊതുവായ വിശദീകരണം"
+    "general_resolution_explanation": "പൊതുവായ വിശദീകരണം",
+    "reason_explanation": "Reason Explanation",
+    "item_resolutions": "Item Resolutions"
   },
   "auth_layout": {
     "hero_title": "അങ്ങാടി ഓൺലൈൻ മാർക്കറ്റ്പ്ലേസ്",
@@ -939,5 +965,34 @@
     "view_order_btn": "ഓർഡർ വിവരങ്ങൾ കാണുക",
     "shop_again_btn": "വീണ്ടും ഷോപ്പ് ചെയ്യുക",
     "copied_toast": "ഓർഡർ ഐഡി പകർത്തി!"
+  },
+  "": {
+    "": "."
+  },
+  "vendor_report": {
+    "back_dashboard": "Back Dashboard",
+    "print_pdf": "Print Pdf",
+    "central_system": "Central System",
+    "invoice_title": "Invoice Title",
+    "billing_period": "Billing Period",
+    "billed_to": "Billed To",
+    "owner": "Owner",
+    "phone": "Phone",
+    "details": "Details",
+    "issue_date": "Issue Date",
+    "status": "Status",
+    "description": "Description",
+    "qty_rate": "Qty Rate",
+    "total_sales": "Total Sales",
+    "commission_amount": "Commission Amount",
+    "delivered_orders": "Delivered Orders",
+    "charges_compiled": "Charges Compiled",
+    "orders_count": "Orders Count",
+    "rate_at": "Rate At",
+    "total_commission": "Total Commission",
+    "amount_settled": "Amount Settled",
+    "balance_due": "Balance Due",
+    "footer_note_1": "Footer Note 1",
+    "footer_note_2": "Footer Note 2"
   }
 }
