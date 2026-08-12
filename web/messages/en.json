@@ -710,7 +710,14 @@
     "manage_catalog_action": "Manage Catalog",
     "manage_orders_action": "Manage Orders",
     "customer_credit_action": "Customer Credit",
-    "shop_updated_success_msg": "Shop updated successfully!"
+    "shop_updated_success_msg": "Shop updated successfully!",
+    "shop_owners_title": "Shop Owners / Co-Owners",
+    "co_owners_desc": "Collaborate up to 3 owners on a single shop with full vendor access.",
+    "add_co_owner_btn": "+ Add Co-Owner",
+    "add_co_owner_modal_title": "Add Shop Co-Owner (Max 3)",
+    "select_registered_user": "Select Registered User",
+    "cancel_btn": "Cancel",
+    "max_owners_reached": "Max 3 Owners Limit Reached"
   },
   "vendor_items": {
     "step_indicator": "Step {currentStep} of {totalSteps}",
@@ -921,5 +928,16 @@
     "delete_shop": "Delete Shop",
     "primary_owner": "Primary Owner",
     "co_owner": "Co-Owner"
+  },
+  "order_success": {
+    "title": "Order Placed Successfully! 🎉",
+    "subtitle": "Thank you for your order. The shop vendor has been notified and is preparing your items.",
+    "order_id": "Order ID",
+    "delivery_estimate": "Estimated Delivery",
+    "delivery_time": "Within 30–45 mins",
+    "total_amount": "Total Paid / Due",
+    "view_order_btn": "View Order Details",
+    "shop_again_btn": "Shop Again",
+    "copied_toast": "Order ID copied to clipboard!"
   }
 }

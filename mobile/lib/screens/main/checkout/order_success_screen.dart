@@ -102,15 +102,17 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   }
 
   void _copyOrderId(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     Clipboard.setData(ClipboardData(text: widget.orderId));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Order ID copied to clipboard!'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(l10n.orderIdCopiedToast),
+        duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +225,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
 
                     // Subtitle / Description
                     Text(
-                      'Thank you for your order! The shop vendor has been notified and is preparing your delivery.',
+                      l10n.orderSuccessSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -308,7 +310,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                                   const Icon(Icons.timer_outlined, size: 18, color: Color(0xFF3B82F6)),
                                   const SizedBox(width: 6),
                                   Text(
-                                    'Est. Delivery:',
+                                    l10n.estimatedDeliveryLabel,
                                     style: TextStyle(
                                       fontSize: 13,
                                       color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
@@ -316,9 +318,9 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                                   ),
                                 ],
                               ),
-                              const Text(
-                                'Within 30–45 mins',
-                                style: TextStyle(
+                              Text(
+                                l10n.estimatedDeliveryValue,
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
                                   color: Color(0xFF3B82F6),
@@ -329,6 +331,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                         ],
                       ),
                     ),
+
                     const SizedBox(height: 36),
 
                     // BUTTON 1: View Order Details

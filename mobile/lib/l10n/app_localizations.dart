@@ -2807,6 +2807,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'terms & conditions'**
   String get termsConditions;
+
+  /// No description provided for @orderSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your order! The shop vendor has been notified and is preparing your delivery.'**
+  String get orderSuccessSubtitle;
+
+  /// No description provided for @estimatedDeliveryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Est. Delivery:'**
+  String get estimatedDeliveryLabel;
+
+  /// No description provided for @estimatedDeliveryValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Within 30–45 mins'**
+  String get estimatedDeliveryValue;
+
+  /// No description provided for @orderIdCopiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Order ID copied to clipboard!'**
+  String get orderIdCopiedToast;
 }
 
 class _AppLocalizationsDelegate

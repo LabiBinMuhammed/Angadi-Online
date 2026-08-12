@@ -1484,4 +1484,17 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get termsConditions => 'വ്യവസ്ഥകളും നിബന്ധനകളും';
+
+  @override
+  String get orderSuccessSubtitle =>
+      'നിങ്ങളുടെ ഓർഡറിന് നന്ദി! കടയുടമയെ വിവരമറിയിച്ചിട്ടുണ്ട്, നിങ്ങളുടെ സാധനങ്ങൾ തയ്യാറാക്കുകയാണ്.';
+
+  @override
+  String get estimatedDeliveryLabel => 'പ്രതീക്ഷിക്കുന്ന ഡെലിവറി:';
+
+  @override
+  String get estimatedDeliveryValue => '30-45 മിനിറ്റിനുള്ളിൽ';
+
+  @override
+  String get orderIdCopiedToast => 'ഓർഡർ ഐഡി പകർത്തി!';
 }

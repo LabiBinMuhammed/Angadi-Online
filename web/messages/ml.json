@@ -710,7 +710,14 @@
     "manage_catalog_action": "കാറ്റലോഗ് കാണുക",
     "manage_orders_action": "ഓർഡറുകൾ കാണുക",
     "customer_credit_action": "ഉപഭോക്തൃ ക്രെഡിറ്റ്",
-    "shop_updated_success_msg": "കട വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!"
+    "shop_updated_success_msg": "കട വിജയകരമായി അപ്‌ഡേറ്റ് ചെയ്തു!",
+    "shop_owners_title": "കട ഉടമസ്ഥർ / സഹ-ഉടമകൾ",
+    "co_owners_desc": "ഒരു കടയിൽ പരമാവധി 3 ഉടമകൾക്ക് ഒന്നിച്ച് പ്രവർത്തിക്കാം.",
+    "add_co_owner_btn": "+ സഹ-ഉടമയെ ചേർക്കുക",
+    "add_co_owner_modal_title": "കട സഹ-ഉടമയെ ചേർക്കുക (പരമാവധി 3)",
+    "select_registered_user": "രജിസ്റ്റർ ചെയ്ത ഉപയോക്താവിനെ തിരഞ്ഞെടുക്കുക",
+    "cancel_btn": "റദ്ദാക്കുക",
+    "max_owners_reached": "പരമാവധി 3 ഉടമകളുടെ പരിധിയിലെത്തി"
   },
   "vendor_items": {
     "step_indicator": "{currentStep} / {totalSteps} ഘട്ടം",
@@ -921,5 +928,16 @@
     "delete_shop": "കട നീക്കം ചെയ്യുക",
     "primary_owner": "പ്രധാന ഉടമ",
     "co_owner": "സഹ-ഉടമ"
+  },
+  "order_success": {
+    "title": "ഓർഡർ വിജയകരമായി സമർപ്പിച്ചു! 🎉",
+    "subtitle": "നിങ്ങളുടെ ഓർഡറിന് നന്ദി. കടയുടമയെ വിവരമറിയിച്ചിട്ടുണ്ട്, നിങ്ങളുടെ സാധനങ്ങൾ തയ്യാറാക്കുകയാണ്.",
+    "order_id": "ഓർഡർ ഐഡി",
+    "delivery_estimate": "പ്രതീക്ഷിക്കുന്ന ഡെലിവറി",
+    "delivery_time": "30-45 മിനിറ്റിനുള്ളിൽ",
+    "total_amount": "ആകെ തുക",
+    "view_order_btn": "ഓർഡർ വിവരങ്ങൾ കാണുക",
+    "shop_again_btn": "വീണ്ടും ഷോപ്പ് ചെയ്യുക",
+    "copied_toast": "ഓർഡർ ഐഡി പകർത്തി!"
   }
 }

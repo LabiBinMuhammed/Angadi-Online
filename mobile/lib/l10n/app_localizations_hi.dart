@@ -1468,4 +1468,17 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get termsConditions => 'नियम एवं शर्तें';
+
+  @override
+  String get orderSuccessSubtitle =>
+      'आपके ऑर्डर के लिए धन्यवाद! विक्रेता को सूचित कर दिया गया है और आपकी डिलीवरी तैयार की जा रही है।';
+
+  @override
+  String get estimatedDeliveryLabel => 'अनुमानित डिलीवरी:';
+
+  @override
+  String get estimatedDeliveryValue => '30-45 मिनट के भीतर';
+
+  @override
+  String get orderIdCopiedToast => 'ऑर्डर आईडी कॉपी की गई!';
 }

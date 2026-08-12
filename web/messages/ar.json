@@ -710,7 +710,14 @@
     "manage_catalog_action": "إدارة الكتالوج",
     "manage_orders_action": "إدارة الطلبات",
     "customer_credit_action": "ائتمان العملاء",
-    "shop_updated_success_msg": "تم تحديث المحل بنجاح!"
+    "shop_updated_success_msg": "تم تحديث المحل بنجاح!",
+    "shop_owners_title": "مالكو المتاجر / المالكين المشاركين",
+    "co_owners_desc": "التعاون مع ما يصل إلى 3 مالكين في متجر واحد مع صلاحيات كاملة.",
+    "add_co_owner_btn": "+ إضافة مالك مشارك",
+    "add_co_owner_modal_title": "إضافة مالك مشارك للمتجر (حد أقصى 3)",
+    "select_registered_user": "اختر مستخدم مسجل",
+    "cancel_btn": "إلغاء",
+    "max_owners_reached": "تم الوصول إلى الحد الأقصى 3 مالكين"
   },
   "vendor_items": {
     "step_indicator": "الخطوة {currentStep} من {totalSteps}",
@@ -921,5 +928,16 @@
     "delete_shop": "حذف المتجر",
     "primary_owner": "المالك الرئيسي",
     "co_owner": "مالك مشارك"
+  },
+  "order_success": {
+    "title": "تم تسجيل الطلب بنجاح! 🎉",
+    "subtitle": "شكرا لطلبك. تم إخطار البائع وجاري تجهيز طلبك.",
+    "order_id": "رقم الطلب",
+    "delivery_estimate": "التوصيل المتوقع",
+    "delivery_time": "خلال 30-45 دقيقة",
+    "total_amount": "المبلغ الإجمالي",
+    "view_order_btn": "عرض تفاصيل الطلب",
+    "shop_again_btn": "التسوق مرة أخرى",
+    "copied_toast": "تم نسخ رقم الطلب!"
   }
 }

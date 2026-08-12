@@ -1455,4 +1455,17 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get termsConditions => 'الشروط والأحكام';
+
+  @override
+  String get orderSuccessSubtitle =>
+      'شكرا لطلبك! تم إخطار البائع وجاري تجهيز التوصيل.';
+
+  @override
+  String get estimatedDeliveryLabel => 'التوصيل المتوقع:';
+
+  @override
+  String get estimatedDeliveryValue => 'خلال 30-45 دقيقة';
+
+  @override
+  String get orderIdCopiedToast => 'تم نسخ رقم الطلب!';
 }

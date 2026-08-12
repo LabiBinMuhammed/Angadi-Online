@@ -710,7 +710,14 @@
     "manage_catalog_action": "कैटलॉग प्रबंधित करें",
     "manage_orders_action": "ऑर्डर प्रबंधित करें",
     "customer_credit_action": "ग्राहक क्रेडिट",
-    "shop_updated_success_msg": "दुकान सफलतापूर्वक अपडेट की गई!"
+    "shop_updated_success_msg": "दुकान सफलतापूर्वक अपडेट की गई!",
+    "shop_owners_title": "दुकान के मालिक / सह-मालिक",
+    "co_owners_desc": "एक ही दुकान पर अधिकतम 3 मालिक मिलकर काम कर सकते हैं।",
+    "add_co_owner_btn": "+ सह-मालिक जोड़ें",
+    "add_co_owner_modal_title": "दुकान सह-मालिक जोड़ें (अधिकतम 3)",
+    "select_registered_user": "पंजीकृत उपयोगकर्ता चुनें",
+    "cancel_btn": "रद्द करें",
+    "max_owners_reached": "अधिकतम 3 मालिकों की सीमा पूरी हुई"
   },
   "vendor_items": {
     "step_indicator": "चरण {currentStep} / {totalSteps}",
@@ -921,5 +928,16 @@
     "delete_shop": "दुकान हटाएं",
     "primary_owner": "मुख्य मालिक",
     "co_owner": "सह-मालिक"
+  },
+  "order_success": {
+    "title": "ऑर्डर सफलतापूर्वक दिया गया! 🎉",
+    "subtitle": "आपके ऑर्डर के लिए धन्यवाद। विक्रेता को सूचित कर दिया गया है और वह आपका सामान तैयार कर रहा है।",
+    "order_id": "ऑर्डर आईडी",
+    "delivery_estimate": "अनुमानित डिलीवरी",
+    "delivery_time": "30-45 मिनट के भीतर",
+    "total_amount": "कुल राशि",
+    "view_order_btn": "ऑर्डर विवरण देखें",
+    "shop_again_btn": "दोबारा खरीदारी करें",
+    "copied_toast": "ऑर्डर आईडी कॉपी की गई!"
   }
 }

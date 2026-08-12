@@ -464,5 +464,9 @@
   "usePhone": "फ़ोन",
   "useEmail": "ईमेल",
   "agreeTerms": "मैं सहमत हूँ",
-  "termsConditions": "नियम एवं शर्तें"
+  "termsConditions": "नियम एवं शर्तें",
+  "orderSuccessSubtitle": "आपके ऑर्डर के लिए धन्यवाद! विक्रेता को सूचित कर दिया गया है और आपकी डिलीवरी तैयार की जा रही है।",
+  "estimatedDeliveryLabel": "अनुमानित डिलीवरी:",
+  "estimatedDeliveryValue": "30-45 मिनट के भीतर",
+  "orderIdCopiedToast": "ऑर्डर आईडी कॉपी की गई!"
 }

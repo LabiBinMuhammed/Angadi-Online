@@ -464,5 +464,9 @@
   "usePhone": "ഫോൺ",
   "useEmail": "ഇമെയിൽ",
   "agreeTerms": "ഞാൻ അംഗീകരിക്കുന്നു",
-  "termsConditions": "വ്യവസ്ഥകളും നിബന്ധനകളും"
+  "termsConditions": "വ്യവസ്ഥകളും നിബന്ധനകളും",
+  "orderSuccessSubtitle": "നിങ്ങളുടെ ഓർഡറിന് നന്ദി! കടയുടമയെ വിവരമറിയിച്ചിട്ടുണ്ട്, നിങ്ങളുടെ സാധനങ്ങൾ തയ്യാറാക്കുകയാണ്.",
+  "estimatedDeliveryLabel": "പ്രതീക്ഷിക്കുന്ന ഡെലിവറി:",
+  "estimatedDeliveryValue": "30-45 മിനിറ്റിനുള്ളിൽ",
+  "orderIdCopiedToast": "ഓർഡർ ഐഡി പകർത്തി!"
 }

@@ -702,5 +702,9 @@
   "usePhone": "Phone",
   "useEmail": "Email",
   "agreeTerms": "I agree to the",
-  "termsConditions": "terms & conditions"
+  "termsConditions": "terms & conditions",
+  "orderSuccessSubtitle": "Thank you for your order! The shop vendor has been notified and is preparing your delivery.",
+  "estimatedDeliveryLabel": "Est. Delivery:",
+  "estimatedDeliveryValue": "Within 30–45 mins",
+  "orderIdCopiedToast": "Order ID copied to clipboard!"
 }

@@ -464,5 +464,9 @@
   "usePhone": "الهاتف",
   "useEmail": "البريد الإلكتروني",
   "agreeTerms": "أوافق على",
-  "termsConditions": "الشروط والأحكام"
+  "termsConditions": "الشروط والأحكام",
+  "orderSuccessSubtitle": "شكرا لطلبك! تم إخطار البائع وجاري تجهيز التوصيل.",
+  "estimatedDeliveryLabel": "التوصيل المتوقع:",
+  "estimatedDeliveryValue": "خلال 30-45 دقيقة",
+  "orderIdCopiedToast": "تم نسخ رقم الطلب!"
 }

@@ -1459,4 +1459,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get termsConditions => 'terms & conditions';
+
+  @override
+  String get orderSuccessSubtitle =>
+      'Thank you for your order! The shop vendor has been notified and is preparing your delivery.';
+
+  @override
+  String get estimatedDeliveryLabel => 'Est. Delivery:';
+
+  @override
+  String get estimatedDeliveryValue => 'Within 30–45 mins';
+
+  @override
+  String get orderIdCopiedToast => 'Order ID copied to clipboard!';
 }
