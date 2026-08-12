@@ -112,13 +112,15 @@ export default function ShopsClient({ initialShops }: Props) {
               <div className="wa-avatar">🏪</div>
               <div className="wa-item-body">
                 <p className="wa-item-title">{shop.name}</p>
-                <p className="wa-item-sub">{shop.type ?? t('shops_page.general_store')}</p>
+                <p className="wa-item-sub">{formatShopType(shop.type, t)}</p>
+
               </div>
               <span style={{ fontSize: '1.1rem', color: 'var(--text-muted)' }}>›</span>
             </Link>
           ))}
         </div>
       )}
-    </>
+    </div>
   )
 }
+
