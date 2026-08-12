@@ -18,16 +18,16 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   late Animation<double> _checkScale;
 
   late AnimationController _rippleController;
+  late AnimationController _confettiLoopController;
 
-  late AnimationController _confettiController;
-  final List<_ConfettiParticle> _particles = [];
+  final List<_ConfettiPiece> _pieces = [];
   final Random _rand = Random();
 
   @override
   void initState() {
     super.initState();
 
-    // 1. Elastic Checkmark Pop
+    // 1. Elastic Checkmark Pop Animation
     _checkController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
@@ -40,54 +40,48 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
       ),
     );
 
-    // 2. Continuous Pulsing Ripple Rings
+    // 2. Ripple Rings Pulsing Animation
     _rippleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2200),
     )..repeat();
 
-    // 3. Explosive Confetti Physics Controller
-    _confettiController = AnimationController(
+    // 3. Continuous Cascading Confetti Animation Loop
+    _confettiLoopController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3500),
-    );
+      duration: const Duration(seconds: 6),
+    )..repeat();
 
-    _spawnConfettiExplosion();
+    _generateConfettiPieces();
 
     _checkController.forward();
-    _confettiController.forward();
   }
 
-  void _spawnConfettiExplosion() {
-    _particles.clear();
+  void _generateConfettiPieces() {
+    _pieces.clear();
     final colors = [
-      const Color(0xFF22C55E), // Green
-      const Color(0xFF3B82F6), // Blue
-      const Color(0xFFF59E0B), // Amber
+      const Color(0xFF22C55E), // Vivid Green
+      const Color(0xFF3B82F6), // Bright Blue
+      const Color(0xFFF59E0B), // Amber Gold
       const Color(0xFFEC4899), // Pink
       const Color(0xFF8B5CF6), // Purple
       const Color(0xFF10B981), // Emerald
-      const Color(0xFFF43F5E), // Rose
+      const Color(0xFFEF4444), // Red
     ];
 
-    // Spawn 100 particles bursting from center and top
-    for (int i = 0; i < 110; i++) {
-      final angle = _rand.nextDouble() * pi * 2;
-      final speed = _rand.nextDouble() * 450 + 150; // Radial velocity
-
-      _particles.add(
-        _ConfettiParticle(
-          x: 0.5 + (_rand.nextDouble() - 0.5) * 0.2, // Near center
-          y: 0.35 + (_rand.nextDouble() - 0.5) * 0.1,
-          vx: cos(angle) * speed,
-          vy: sin(angle) * speed - 200, // Initial upward pop
-          size: _rand.nextDouble() * 9 + 5,
+    for (int i = 0; i < 75; i++) {
+      _pieces.add(
+        _ConfettiPiece(
+          x: _rand.nextDouble(),
+          y: _rand.nextDouble() * 1.2 - 0.2, // Spread vertically
+          fallSpeed: _rand.nextDouble() * 1.2 + 0.8,
+          swayAmp: _rand.nextDouble() * 0.08 + 0.02,
+          swayFreq: _rand.nextDouble() * 1.5 + 0.5,
+          phase: _rand.nextDouble() * pi * 2,
+          size: _rand.nextDouble() * 10 + 6,
           color: colors[_rand.nextInt(colors.length)],
-          rotation: _rand.nextDouble() * pi * 2,
-          rotationSpeed: (_rand.nextDouble() - 0.5) * 12,
+          rotationSpeed: (_rand.nextDouble() - 0.5) * 8,
           isCircle: _rand.nextBool(),
-          drag: _rand.nextDouble() * 0.05 + 0.94,
-          gravity: _rand.nextDouble() * 350 + 250,
         ),
       );
     }
@@ -97,7 +91,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   void dispose() {
     _checkController.dispose();
     _rippleController.dispose();
-    _confettiController.dispose();
+    _confettiLoopController.dispose();
     super.dispose();
   }
 
@@ -123,15 +117,15 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // Physics Confetti Canvas Layer
+          // Background Continuous Confetti Animation Layer
           AnimatedBuilder(
-            animation: _confettiController,
+            animation: _confettiLoopController,
             builder: (context, child) {
               return CustomPaint(
                 size: Size.infinite,
-                painter: _PhysicsConfettiPainter(
-                  particles: _particles,
-                  progress: _confettiController.value,
+                painter: _ContinuousConfettiPainter(
+                  pieces: _pieces,
+                  progress: _confettiLoopController.value,
                 ),
               );
             },
@@ -154,8 +148,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                           builder: (context, child) {
                             final value = _rippleController.value;
                             return Container(
-                              width: 100 + (value * 60),
-                              height: 100 + (value * 60),
+                              width: 100 + (value * 65),
+                              height: 100 + (value * 65),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -166,14 +160,15 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                             );
                           },
                         ),
-                        // Ripple Ring 2 (Offset phase)
+
+                        // Ripple Ring 2 (Offset Phase)
                         AnimatedBuilder(
                           animation: _rippleController,
                           builder: (context, child) {
                             final value = (_rippleController.value + 0.5) % 1.0;
                             return Container(
-                              width: 100 + (value * 60),
-                              height: 100 + (value * 60),
+                              width: 100 + (value * 65),
+                              height: 100 + (value * 65),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
@@ -185,13 +180,14 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                           },
                         ),
 
-                        // Elastic Checkmark Circle
+                        // Elastic Checkmark Badge
                         ScaleTransition(
                           scale: _checkScale,
                           child: GestureDetector(
                             onTap: () {
-                              _spawnConfettiExplosion();
-                              _confettiController.forward(from: 0);
+                              setState(() {
+                                _generateConfettiPieces();
+                              });
                             },
                             child: Container(
                               width: 104,
@@ -417,70 +413,63 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   }
 }
 
-class _ConfettiParticle {
-  double x;
-  double y;
-  double vx;
-  double vy;
-  double size;
-  Color color;
-  double rotation;
-  double rotationSpeed;
-  bool isCircle;
-  double drag;
-  double gravity;
+class _ConfettiPiece {
+  final double x;
+  final double y;
+  final double fallSpeed;
+  final double swayAmp;
+  final double swayFreq;
+  final double phase;
+  final double size;
+  final Color color;
+  final double rotationSpeed;
+  final bool isCircle;
 
-  _ConfettiParticle({
+  _ConfettiPiece({
     required this.x,
     required this.y,
-    required this.vx,
-    required this.vy,
+    required this.fallSpeed,
+    required this.swayAmp,
+    required this.swayFreq,
+    required this.phase,
     required this.size,
     required this.color,
-    required this.rotation,
     required this.rotationSpeed,
     required this.isCircle,
-    required this.drag,
-    required this.gravity,
   });
 }
 
-class _PhysicsConfettiPainter extends CustomPainter {
-  final List<_ConfettiParticle> particles;
+class _ContinuousConfettiPainter extends CustomPainter {
+  final List<_ConfettiPiece> pieces;
   final double progress;
 
-  _PhysicsConfettiPainter({required this.particles, required this.progress});
+  _ContinuousConfettiPainter({required this.pieces, required this.progress});
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (progress >= 1.0) return;
+    for (var p in pieces) {
+      // Calculate normalized cascading position
+      final rawY = p.y + (progress * p.fallSpeed);
+      final normalizedY = (rawY % 1.4) - 0.2; // Loop vertically from -0.2 to 1.2
+      final posY = normalizedY * size.height;
 
-    final dt = progress * 3.5; // Seconds elapsed
-
-    for (var p in particles) {
-      // Physics calculations
-      final currentVx = p.vx * pow(p.drag, dt * 60);
-      final currentVy = (p.vy + p.gravity * dt) * pow(p.drag, dt * 60);
-
-      final posX = (p.x * size.width) + (currentVx * dt * 0.4);
-      final posY = (p.y * size.height) + (currentVy * dt * 0.4);
-      final opacity = (1.0 - (progress * 1.15)).clamp(0.0, 1.0);
-
-      if (opacity <= 0 || posY > size.height + 50) continue;
+      // Swaying horizontal motion
+      final sway = sin((progress * pi * 2 * p.swayFreq) + p.phase) * p.swayAmp;
+      final posX = (p.x + sway) * size.width;
 
       final paint = Paint()
-        ..color = p.color.withOpacity(opacity)
+        ..color = p.color.withOpacity(0.85)
         ..style = PaintingStyle.fill;
 
       canvas.save();
       canvas.translate(posX, posY);
-      canvas.rotate(p.rotation + (p.rotationSpeed * dt));
+      canvas.rotate((progress * pi * 2 * p.rotationSpeed) + p.phase);
 
       if (p.isCircle) {
         canvas.drawCircle(Offset.zero, p.size / 2, paint);
       } else {
         canvas.drawRect(
-          Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.6),
+          Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.65),
           paint,
         );
       }
@@ -489,5 +478,5 @@ class _PhysicsConfettiPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _PhysicsConfettiPainter oldDelegate) => true;
+  bool shouldRepaint(covariant _ContinuousConfettiPainter oldDelegate) => true;
 }
