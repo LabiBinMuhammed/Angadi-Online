@@ -9,7 +9,8 @@ import { ArrowLeft, MapPin, Calendar, CreditCard, Receipt, Sun, Moon, X, Check, 
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 function CheckoutForm() {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
+
   const router = useRouter()
   const searchParams = useSearchParams()
   const [paymentType, setPaymentType] = useState<PaymentType>('cod')
