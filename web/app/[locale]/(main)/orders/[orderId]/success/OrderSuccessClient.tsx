@@ -142,7 +142,7 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justify: 'space-between',
+            justifyContent: 'space-between',
             paddingBottom: '0.9rem',
             borderBottom: '1px solid var(--border, #e2e8f0)'
           }}>
@@ -224,7 +224,7 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
               borderRadius: '16px',
               display: 'flex',
               alignItems: 'center',
-              justify: 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
               background: 'linear-gradient(135deg, #2e5b28, #22c55e)',
               boxShadow: '0 8px 20px -4px rgba(46, 91, 40, 0.35)',
@@ -247,7 +247,7 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
               borderRadius: '16px',
               display: 'flex',
               alignItems: 'center',
-              justify: 'center',
+              justifyContent: 'center',
               gap: '0.5rem',
               borderColor: 'var(--border, #cbd5e1)',
               color: 'var(--fg, #334155)',
