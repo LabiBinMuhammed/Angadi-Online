@@ -3,12 +3,22 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { updateShopAction } from '../actions'
-import { Store, Tag, MapPin, Rocket, AlertCircle, CheckCircle, ArrowLeft, Eye, EyeOff, Plus, ShoppingBag, CreditCard, LayoutGrid } from 'lucide-react'
+import { updateShopAction, addShopOwnerAction, removeShopOwnerAction } from '../actions'
+import { Store, Tag, MapPin, Rocket, AlertCircle, CheckCircle, ArrowLeft, Eye, EyeOff, Plus, ShoppingBag, CreditCard, LayoutGrid, Users, UserPlus, Trash2, X } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import FileUploadInput from '@/components/FileUploadInput'
 
 type Location = { id: string; name: string }
+
+type ShopOwnerRow = {
+  user_id?: string
+  users: {
+    id: string
+    name: string
+    phone?: string | null
+    email?: string | null
+  } | null
+}
 
 type Shop = {
   id: string
@@ -23,11 +33,20 @@ type Shop = {
   created_at: string
   updated_at: string
   locations: { id: string; name: string } | null
+  shop_owners?: ShopOwnerRow[] | null
+}
+
+type UserOption = {
+  id: string
+  name: string
+  phone: string | null
+  email: string | null
 }
 
 type Props = {
   shop: Shop
   locations: Location[]
+  allUsers?: UserOption[]
 }
 
 const SHOP_TYPES = [
@@ -35,21 +54,90 @@ const SHOP_TYPES = [
   'fruit', 'spice', 'oil', 'general',
 ]
 
-export default function ShopDetailClient({ shop, locations }: Props) {
+export default function ShopDetailClient({ shop: initialShop, locations, allUsers = [] }: Props) {
   const { t, locale } = useTranslation()
   const router = useRouter()
-  const [name, setName]               = useState(shop.name || '')
-  const [type, setType]               = useState(shop.type ? shop.type.replace('_inactive', '') : '')
-  const [locationId, setLocationId]   = useState(shop.location_id || '')
-  const [logoUrl, setLogoUrl]         = useState(shop.logo_url || '')
-  const [bannerUrl, setBannerUrl]     = useState(shop.banner_url || '')
-  const [description, setDescription] = useState(shop.description || '')
-  const [openingTime, setOpeningTime] = useState(shop.opening_time || '')
-  const [closingTime, setClosingTime] = useState(shop.closing_time || '')
-  const [isActive, setIsActive]       = useState(!shop.type?.endsWith('_inactive'))
+  const [shop, setShop]               = useState<Shop>(initialShop)
+  const [name, setName]               = useState(initialShop.name || '')
+  const [type, setType]               = useState(initialShop.type ? initialShop.type.replace('_inactive', '') : '')
+  const [locationId, setLocationId]   = useState(initialShop.location_id || '')
+  const [logoUrl, setLogoUrl]         = useState(initialShop.logo_url || '')
+  const [bannerUrl, setBannerUrl]     = useState(initialShop.banner_url || '')
+  const [description, setDescription] = useState(initialShop.description || '')
+  const [openingTime, setOpeningTime] = useState(initialShop.opening_time || '')
+  const [closingTime, setClosingTime] = useState(initialShop.closing_time || '')
+  const [isActive, setIsActive]       = useState(!initialShop.type?.endsWith('_inactive'))
   const [saving, setSaving]           = useState(false)
   const [success, setSuccess]         = useState('')
   const [error, setError]             = useState('')
+
+  // Co-owner state
+  const [showAddOwnerModal, setShowAddOwnerModal]   = useState(false)
+  const [selectedUserIdToAdd, setSelectedUserIdToAdd] = useState('')
+  const [ownerActionLoading, setOwnerActionLoading]   = useState(false)
+  const [ownerError, setOwnerError]                 = useState<string | null>(null)
+
+  async function handleAddOwner(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedUserIdToAdd) return
+
+    setOwnerActionLoading(true)
+    setOwnerError(null)
+
+    try {
+      const res = await addShopOwnerAction(shop.id, selectedUserIdToAdd)
+      if (res.error || !res.user) {
+        setOwnerError(res.error || 'Failed to add co-owner')
+      } else {
+        const addedUser = res.user
+        setShop(prev => ({
+          ...prev,
+          shop_owners: [
+            ...(prev.shop_owners || []),
+            { user_id: addedUser.id, users: { id: addedUser.id, name: addedUser.name, phone: addedUser.phone } }
+          ]
+        }))
+        setShowAddOwnerModal(false)
+        setSelectedUserIdToAdd('')
+        router.refresh()
+      }
+    } catch (err: any) {
+      setOwnerError(err.message || 'An error occurred')
+    } finally {
+      setOwnerActionLoading(false)
+    }
+  }
+
+  async function handleRemoveOwner(userId: string) {
+    if ((shop.shop_owners?.length || 0) <= 1) {
+      alert('Cannot remove the only owner of a shop. Every shop must have at least 1 owner.')
+      return
+    }
+
+    if (!confirm('Are you sure you want to remove this co-owner from the shop?')) return
+
+    setOwnerActionLoading(true)
+    try {
+      const res = await removeShopOwnerAction(shop.id, userId)
+      if (res.error) {
+        alert('Remove failed: ' + res.error)
+      } else {
+        setShop(prev => ({
+          ...prev,
+          shop_owners: (prev.shop_owners || []).filter(o => o.user_id !== userId && o.users?.id !== userId)
+        }))
+        router.refresh()
+      }
+    } catch (err: any) {
+      alert('Remove failed: ' + err.message)
+    } finally {
+      setOwnerActionLoading(false)
+    }
+  }
+
+  const ownersList = shop.shop_owners || []
+  const availableUsersToAdd = allUsers.filter(u => !ownersList.some(o => o.user_id === u.id || o.users?.id === u.id))
+
 
   const shopInitials = name
     ? name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
@@ -352,7 +440,163 @@ export default function ShopDetailClient({ shop, locations }: Props) {
             </Link>
           </div>
         </div>
+
+        {/* Shop Co-Owners Section */}
+        <div className="vp-card" style={{ marginTop: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div>
+              <h2 className="vp-title" style={{ fontSize: '1.3rem', margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Users size={20} color="#34d399" />
+                {t('vendor_shop.shop_owners_title') || 'Shop Owners / Co-Owners'}
+                <span className="vp-badge vp-badge-info" style={{ fontSize: '0.8rem', padding: '0.15rem 0.6rem' }}>
+                  {ownersList.length}/3
+                </span>
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: '#94a3b8', margin: '0.25rem 0 0 0' }}>
+                {t('vendor_shop.co_owners_desc') || 'Collaborate up to 3 owners on a single shop with full vendor access.'}
+              </p>
+            </div>
+            {ownersList.length < 3 ? (
+              <button
+                type="button"
+                className="vp-btn vp-btn-primary"
+                onClick={() => { setShowAddOwnerModal(true); setOwnerError(null); }}
+                style={{ width: 'auto', padding: '0.5rem 1rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+              >
+                <UserPlus size={16} /> {t('vendor_shop.add_co_owner_btn') || '+ Add Co-Owner'}
+              </button>
+            ) : (
+              <span className="vp-badge" style={{ background: 'rgba(234, 179, 8, 0.15)', color: '#fde047', border: '1px solid rgba(234, 179, 8, 0.3)', padding: '0.3rem 0.75rem' }}>
+                Max 3 Owners Limit Reached
+              </span>
+            )}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {ownersList.length === 0 ? (
+              <div style={{ padding: '1rem', color: '#94a3b8', fontSize: '0.9rem', textAlign: 'center' }}>
+                No registered owners recorded.
+              </div>
+            ) : (
+              ownersList.map((owner, idx) => {
+                const u = owner.users
+                const uid = owner.user_id || u?.id
+                return (
+                  <div key={uid || idx} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '0.9rem 1.1rem', borderRadius: '12px',
+                    background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{
+                        width: 38, height: 38, borderRadius: '50%', background: '#3b82f6',
+                        color: '#fff', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem'
+                      }}>
+                        {u?.name ? u.name[0].toUpperCase() : 'U'}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--fg)' }}>
+                          {u?.name || 'Owner User'} {idx === 0 && <span style={{ fontSize: '0.75rem', background: '#22c55e', color: '#fff', padding: '0.1rem 0.4rem', borderRadius: '4px', marginLeft: '0.35rem' }}>Primary Owner</span>}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                          {u?.phone || u?.email || 'Registered User'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {ownersList.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveOwner(uid!)}
+                        disabled={ownerActionLoading}
+                        style={{
+                          background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.2)',
+                          padding: '0.35rem 0.75rem', borderRadius: '8px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
+                          display: 'inline-flex', alignItems: 'center', gap: '0.35rem'
+                        }}
+                      >
+                        <Trash2 size={14} /> Remove
+                      </button>
+                    )}
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </div>
+
+        {/* Modal to Add Co-Owner */}
+        {showAddOwnerModal && (
+          <div style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem'
+          }}>
+            <div className="vp-card" style={{ width: '100%', maxWidth: '480px', position: 'relative' }}>
+              <button
+                type="button"
+                onClick={() => setShowAddOwnerModal(false)}
+                style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={20} />
+              </button>
+
+              <h3 className="vp-title" style={{ fontSize: '1.25rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <UserPlus size={20} color="#34d399" /> Add Shop Co-Owner (Max 3)
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '1.25rem' }}>
+                Select a registered user to collaborate on managing this shop.
+              </p>
+
+              {ownerError && (
+                <div style={{ padding: '0.75rem 1rem', borderRadius: '10px', background: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', border: '1px solid rgba(239, 68, 68, 0.3)', marginBottom: '1rem', fontSize: '0.85rem' }}>
+                  {ownerError}
+                </div>
+              )}
+
+              <form onSubmit={handleAddOwner}>
+                <div className="vp-form-group">
+                  <label className="vp-label" htmlFor="select-co-owner">Select Registered User</label>
+                  <select
+                    id="select-co-owner"
+                    className="vp-input"
+                    value={selectedUserIdToAdd}
+                    onChange={(e) => setSelectedUserIdToAdd(e.target.value)}
+                    required
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <option value="">-- Choose User --</option>
+                    {availableUsersToAdd.map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.name} ({u.phone || u.email || 'No contact info'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1.5rem' }}>
+                  <button
+                    type="button"
+                    className="vp-btn vp-btn-outline"
+                    onClick={() => setShowAddOwnerModal(false)}
+                    style={{ width: 'auto' }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="vp-btn vp-btn-primary"
+                    disabled={ownerActionLoading || !selectedUserIdToAdd}
+                    style={{ width: 'auto' }}
+                  >
+                    {ownerActionLoading ? 'Adding...' : 'Add Co-Owner'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
 }
+
