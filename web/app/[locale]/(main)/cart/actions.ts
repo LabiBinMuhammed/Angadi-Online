@@ -263,13 +263,14 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
     else dbVariantType = 'Fixed'
   }
 
-  // Find or create pending order
+  // Find or create pending draft cart order (must not have payment_type set)
   let { data: order } = await supabase
     .from('orders')
     .select('id, total_estimated_price')
     .eq('user_id', user.id)
     .eq('shop_id', shopId)
     .eq('status', 'pending')
+    .is('payment_type', null)
     .limit(1)
     .maybeSingle()
 
@@ -286,6 +287,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
         user_id: user.id,
         shop_id: shopId,
         status: 'pending',
+        payment_type: null,
         total_estimated_price: 0,
         total_final_price: 0,
         delivery_date: todayStr,
@@ -297,6 +299,7 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
     if (orderError) throw new Error(orderError.message)
     order = newOrder
   }
+
 
   // Upsert item in order
   const { data: existingItem } = await supabase

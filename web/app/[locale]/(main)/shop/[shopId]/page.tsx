@@ -44,8 +44,9 @@ export default async function ShopPage({ params }: Props) {
     supabase.from('shop_subscription').select('restriction_level').eq('shop_id', shopId).maybeSingle(),
     supabase.from('shop_rating_summary').select('*').eq('shop_id', shopId).maybeSingle(),
     supabase.from('shop_reviews').select('*, users(name)').eq('shop_id', shopId).order('created_at', { ascending: false }),
-    user ? supabase.from('orders').select('id, order_items(*)').eq('user_id', user.id).eq('status', 'pending') : Promise.resolve({ data: null })
+    user ? supabase.from('orders').select('id, order_items(*)').eq('user_id', user.id).eq('shop_id', shopId).eq('status', 'pending').is('payment_type', null) : Promise.resolve({ data: null })
   ])
+
 
   if (!shop || shop.type?.endsWith('_inactive')) notFound()
 
