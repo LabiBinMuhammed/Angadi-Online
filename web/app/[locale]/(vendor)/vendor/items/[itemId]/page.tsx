@@ -13,9 +13,9 @@ export default async function EditItemPage({ params }: { params: Promise<{ itemI
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const [{ data: item }, { data: shopOwner }, { data: categories }] = await Promise.all([
+  const [{ data: item }, { data: shopOwners }, { data: categories }] = await Promise.all([
     supabase.from('items').select('*, item_images(*), item_variants(*), item_sell_config(*)').eq('id', itemId).single(),
-    supabase.from('shop_owners').select('shop_id').eq('user_id', user!.id).maybeSingle(),
+    supabase.from('shop_owners').select('shop_id').eq('user_id', user!.id),
     supabase.from('categories').select('id, name').eq('is_active', true).order('display_order', { ascending: true }),
   ])
 
@@ -34,9 +34,10 @@ export default async function EditItemPage({ params }: { params: Promise<{ itemI
       </div>
       <ItemFormClient
         item={item as Item}
-        shopId={(shopOwner as any)?.shop_id ?? ''}
+        shopId={shopOwners?.[0]?.shop_id ?? ''}
         categories={(categories ?? []) as Category[]}
       />
     </div>
   )
+
 }

@@ -11,9 +11,10 @@ export default async function AddItemPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: shopOwner } = await supabase
-    .from('shop_owners').select('shop_id').eq('user_id', user!.id).maybeSingle()
-  const shopId = (shopOwner as any)?.shop_id ?? ''
+  const { data: shopOwners } = await supabase
+    .from('shop_owners').select('shop_id').eq('user_id', user!.id)
+  const shopId = shopOwners?.[0]?.shop_id ?? ''
+
 
   const [categoriesRes, demoItemsRes, unitsRes, demoConfigsRes, demoVariantsRes] = await Promise.all([
     supabase.from('categories').select('id, name').eq('is_active', true).order('display_order', { ascending: true }),

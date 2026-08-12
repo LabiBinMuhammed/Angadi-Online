@@ -62,9 +62,10 @@ export default async function UserCreditPage({ params }: { params: Promise<{ loc
 
   const supabase = await createClient()
   const { data: authUser } = await supabase.auth.getUser()
-  const { data: shopOwner } = await supabase
-    .from('shop_owners').select('shop_id').eq('user_id', authUser.user!.id).maybeSingle()
-  const shopId = (shopOwner as any)?.shop_id
+  const { data: shopOwners } = await supabase
+    .from('shop_owners').select('shop_id').eq('user_id', authUser.user!.id)
+  const shopId = shopOwners?.[0]?.shop_id ?? ''
+
 
   const [{ data: credit }, { data: userRow }, { data: orders }, { data: repayments }] = await Promise.all([
     supabase.from('shop_user_credit').select('*').eq('shop_id', shopId).eq('user_id', userId).maybeSingle(),
