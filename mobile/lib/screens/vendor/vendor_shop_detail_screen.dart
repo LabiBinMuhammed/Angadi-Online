@@ -304,7 +304,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                 return Container(
                                   margin: const EdgeInsets.only(bottom: 6),
                                   decoration: BoxDecoration(
-                                    color: isSelected ? const Color(0xFF2563EB).withOpacity(0.2) : const Color(0xFF0F172A),
+                                    color: isSelected ? const Color(0xFF2563EB).withValues(alpha: 0.2) : const Color(0xFF0F172A),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
                                       color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFF334155),
@@ -512,7 +512,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF6366F1).withOpacity(0.4),
+                                color: const Color(0xFF6366F1).withValues(alpha: 0.4),
                                 blurRadius: 16,
                                 offset: const Offset(0, 6),
                               ),
@@ -876,9 +876,9 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF3B82F6).withOpacity(0.15),
+                                      color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3)),
+                                      border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
                                     ),
                                     child: Text(
                                       '${_shopOwners.length}/3 Owners',
@@ -912,7 +912,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                     child: Row(
                                       children: [
                                         CircleAvatar(
-                                          backgroundColor: const Color(0xFF3B82F6).withOpacity(0.2),
+                                          backgroundColor: const Color(0xFF3B82F6).withValues(alpha: 0.2),
                                           radius: 18,
                                           child: Text(
                                             uName.isNotEmpty ? uName[0].toUpperCase() : 'O',
@@ -939,7 +939,7 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                                                     Container(
                                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                                                       decoration: BoxDecoration(
-                                                        color: const Color(0xFF22C55E).withOpacity(0.15),
+                                                        color: const Color(0xFF22C55E).withValues(alpha: 0.15),
                                                         borderRadius: BorderRadius.circular(6),
                                                       ),
                                                       child: const Text(
