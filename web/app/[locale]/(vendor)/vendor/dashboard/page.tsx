@@ -117,13 +117,16 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
       <div className="vp-header">
         <div>
           <h1 className="vp-title">{t('vendor_dashboard.vendor_panel_title') || 'Dashboard'}</h1>
-          <p className="vp-subtitle">{(t('vendor_dashboard.welcome_back_to') || 'Welcome back to ')}<strong>{shopName}</strong></p>
+          <p className="vp-subtitle">
+            {(t('vendor_dashboard.welcome_back_to') || 'Welcome back to ')}
+            <Link href={firstShopId && !hasMultiple ? `/vendor/shop/${firstShopId}` : '/vendor/shop'} style={{ textDecoration: 'underline', color: 'inherit' }}>
+              <strong>{shopName}</strong>
+            </Link>
+          </p>
         </div>
-        {firstShopId && !hasMultiple && (
-          <Link href={`/home/shop/${firstShopId}`} className="vp-btn vp-btn-outline" id="view-my-shop">
-            <Store size={18} /> {t('vendor_dashboard.view_my_shop_button') || 'View My Shop'}
-          </Link>
-        )}
+        <Link href={firstShopId && !hasMultiple ? `/vendor/shop/${firstShopId}` : '/vendor/shop'} className="vp-btn vp-btn-outline" id="view-my-shop">
+          <Store size={18} /> {t('vendor_dashboard.view_my_shop_button') || 'View My Shop'}
+        </Link>
       </div>
 
       {maxRestLevel >= 1 && (
@@ -197,7 +200,7 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
           </div>
           <span className="vp-quick-label">{t('vendor_dashboard.customer_credit_action') || 'Customer Credit'}</span>
         </Link>
-        <Link href="/vendor/shop" id="dashboard-shop-settings" className="vp-card vp-quick-action">
+        <Link href={firstShopId && !hasMultiple ? `/vendor/shop/${firstShopId}` : '/vendor/shop'} id="dashboard-shop-settings" className="vp-card vp-quick-action">
           <div className="vp-quick-icon">
             <Store size={40} color="#34d399" />
           </div>
