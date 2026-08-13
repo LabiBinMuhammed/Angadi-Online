@@ -445,7 +445,7 @@
   "tutorialShopProductDesc": "شاهد الأسعار والصور والتفاصيل لجميع المنتجات المتاحة.",
   "tutorialShopOpenTitle": "فتح المنتج",
   "tutorialShopOpenDesc": "انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك.",
-  "shopOwnersTitle": "مالكو المتاجر",
+  "shopOwnersTitle": "مالكو المتاجر / المالكين المشاركين",
   "addCoOwner": "إضافة مالك مشارك",
   "removeCoOwner": "إزالة المالك المشارك",
   "maxOwnersLimit": "الحد الأقصى 3",
@@ -468,5 +468,14 @@
   "orderSuccessSubtitle": "شكرا لطلبك! تم إخطار البائع وجاري تجهيز التوصيل.",
   "estimatedDeliveryLabel": "التوصيل المتوقع:",
   "estimatedDeliveryValue": "خلال 30-45 دقيقة",
-  "orderIdCopiedToast": "تم نسخ رقم الطلب!"
+  "orderIdCopiedToast": "تم نسخ رقم الطلب!",
+  "coOwnersDesc": "التعاون مع ما يصل إلى 3 مالكين في متجر واحد مع صلاحيات كاملة.",
+  "addCoOwnerBtn": "+ إضافة مالك مشارك",
+  "addCoOwnerModalTitle": "إضافة مالك مشارك للمتجر (حد أقصى 3)",
+  "selectRegisteredUser": "اختر مستخدم مسجل",
+  "maxOwnersReached": "تم الوصول إلى الحد الأقصى 3 مالكين",
+  "cannotRemoveOnlyOwner": "لا يمكن إزالة المالك الوحيد للمتجر.",
+  "confirmRemoveCoOwner": "هل أنت تأكد من إزالة هذا المالك المشارك؟",
+  "coOwnerAddedSuccess": "تمت إضافة المالك المشارك بنجاح!",
+  "coOwnerRemovedSuccess": "تمت إزالة المالك المشارك بنجاح!"
 }

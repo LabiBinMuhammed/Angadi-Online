@@ -1426,7 +1426,7 @@ class AppLocalizationsMl extends AppLocalizations {
       'സാധനങ്ങളുടെ കൂടുതൽ വിവരങ്ങൾ കാണാനും ബാഗിലേക്ക് ചേർക്കാനും ഇതിൽ ടാപ്പ് ചെയ്യുക.';
 
   @override
-  String get shopOwnersTitle => 'കട ഉടമകൾ';
+  String get shopOwnersTitle => 'കട ഉടമസ്ഥർ / സഹ-ഉടമകൾ';
 
   @override
   String get addCoOwner => 'സഹ-ഉടമയെ ചേർക്കുക';
@@ -1497,4 +1497,34 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get orderIdCopiedToast => 'ഓർഡർ ഐഡി പകർത്തി!';
+
+  @override
+  String get coOwnersDesc =>
+      'ഒരു കടയിൽ പരമാവധി 3 ഉടമകൾക്ക് ഒന്നിച്ച് പ്രവർത്തിക്കാം.';
+
+  @override
+  String get addCoOwnerBtn => '+ സഹ-ഉടമയെ ചേർക്കുക';
+
+  @override
+  String get addCoOwnerModalTitle => 'കട സഹ-ഉടമയെ ചേർക്കുക (പരമാവധി 3)';
+
+  @override
+  String get selectRegisteredUser =>
+      'രജിസ്റ്റർ ചെയ്ത ഉപയോക്താവിനെ തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get maxOwnersReached => 'പരമാവധി 3 ഉടമകളുടെ പരിധിയിലെത്തി';
+
+  @override
+  String get cannotRemoveOnlyOwner =>
+      'കടയുടെ ഏക ഉടമയെ നീക്കം ചെയ്യാൻ കഴിയില്ല.';
+
+  @override
+  String get confirmRemoveCoOwner => 'ഈ സഹ-ഉടമയെ നീക്കം ചെയ്യണമെന്ന് ഉറപ്പാണോ?';
+
+  @override
+  String get coOwnerAddedSuccess => 'സഹ-ഉടമയെ വിജയകരമായി ചേർത്തു!';
+
+  @override
+  String get coOwnerRemovedSuccess => 'സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!';
 }

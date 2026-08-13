@@ -445,7 +445,7 @@
   "tutorialShopProductDesc": "सभी उपलब्ध वस्तुओं की कीमतें, चित्र और विवरण देखें।",
   "tutorialShopOpenTitle": "उत्पाद खोलें",
   "tutorialShopOpenDesc": "अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।",
-  "shopOwnersTitle": "दुकान के मालिक",
+  "shopOwnersTitle": "दुकान के मालिक / सह-मालिक",
   "addCoOwner": "सह-मालिक जोड़ें",
   "removeCoOwner": "सह-मालिक हटाएं",
   "maxOwnersLimit": "अधिकतम 3 सीमा",
@@ -468,5 +468,14 @@
   "orderSuccessSubtitle": "आपके ऑर्डर के लिए धन्यवाद! विक्रेता को सूचित कर दिया गया है और आपकी डिलीवरी तैयार की जा रही है।",
   "estimatedDeliveryLabel": "अनुमानित डिलीवरी:",
   "estimatedDeliveryValue": "30-45 मिनट के भीतर",
-  "orderIdCopiedToast": "ऑर्डर आईडी कॉपी की गई!"
+  "orderIdCopiedToast": "ऑर्डर आईडी कॉपी की गई!",
+  "coOwnersDesc": "एक ही दुकान पर अधिकतम 3 मालिक मिलकर काम कर सकते हैं।",
+  "addCoOwnerBtn": "+ सह-मालिक जोड़ें",
+  "addCoOwnerModalTitle": "दुकान सह-मालिक जोड़ें (अधिकतम 3)",
+  "selectRegisteredUser": "पंजीकृत उपयोगकर्ता चुनें",
+  "maxOwnersReached": "अधिकतम 3 मालिकों की सीमा पूरी हुई",
+  "cannotRemoveOnlyOwner": "दुकान के एकमात्र मालिक को हटाया नहीं जा सकता।",
+  "confirmRemoveCoOwner": "क्या आप इस सह-मालिक को हटाना चाहते हैं?",
+  "coOwnerAddedSuccess": "सह-मालिक सफलतापूर्वक जोड़ा गया!",
+  "coOwnerRemovedSuccess": "सह-मालिक सफलतापूर्वक हटाया गया!"
 }

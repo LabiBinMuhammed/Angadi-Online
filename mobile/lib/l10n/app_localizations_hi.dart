@@ -1410,7 +1410,7 @@ class AppLocalizationsHi extends AppLocalizations {
       'अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।';
 
   @override
-  String get shopOwnersTitle => 'दुकान के मालिक';
+  String get shopOwnersTitle => 'दुकान के मालिक / सह-मालिक';
 
   @override
   String get addCoOwner => 'सह-मालिक जोड़ें';
@@ -1481,4 +1481,33 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get orderIdCopiedToast => 'ऑर्डर आईडी कॉपी की गई!';
+
+  @override
+  String get coOwnersDesc =>
+      'एक ही दुकान पर अधिकतम 3 मालिक मिलकर काम कर सकते हैं।';
+
+  @override
+  String get addCoOwnerBtn => '+ सह-मालिक जोड़ें';
+
+  @override
+  String get addCoOwnerModalTitle => 'दुकान सह-मालिक जोड़ें (अधिकतम 3)';
+
+  @override
+  String get selectRegisteredUser => 'पंजीकृत उपयोगकर्ता चुनें';
+
+  @override
+  String get maxOwnersReached => 'अधिकतम 3 मालिकों की सीमा पूरी हुई';
+
+  @override
+  String get cannotRemoveOnlyOwner =>
+      'दुकान के एकमात्र मालिक को हटाया नहीं जा सकता।';
+
+  @override
+  String get confirmRemoveCoOwner => 'क्या आप इस सह-मालिक को हटाना चाहते हैं?';
+
+  @override
+  String get coOwnerAddedSuccess => 'सह-मालिक सफलतापूर्वक जोड़ा गया!';
+
+  @override
+  String get coOwnerRemovedSuccess => 'सह-मालिक सफलतापूर्वक हटाया गया!';
 }

@@ -2691,7 +2691,7 @@ abstract class AppLocalizations {
   /// No description provided for @shopOwnersTitle.
   ///
   /// In en, this message translates to:
-  /// **'Shop Owners'**
+  /// **'Shop Owners / Co-Owners'**
   String get shopOwnersTitle;
 
   /// No description provided for @addCoOwner.
@@ -2831,6 +2831,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Order ID copied to clipboard!'**
   String get orderIdCopiedToast;
+
+  /// No description provided for @coOwnersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Collaborate up to 3 owners on a single shop with full vendor access.'**
+  String get coOwnersDesc;
+
+  /// No description provided for @addCoOwnerBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'+ Add Co-Owner'**
+  String get addCoOwnerBtn;
+
+  /// No description provided for @addCoOwnerModalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Shop Co-Owner (Max 3)'**
+  String get addCoOwnerModalTitle;
+
+  /// No description provided for @selectRegisteredUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Registered User'**
+  String get selectRegisteredUser;
+
+  /// No description provided for @maxOwnersReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Max 3 Owners Limit Reached'**
+  String get maxOwnersReached;
+
+  /// No description provided for @cannotRemoveOnlyOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot remove the only owner of a shop.'**
+  String get cannotRemoveOnlyOwner;
+
+  /// No description provided for @confirmRemoveCoOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove this co-owner?'**
+  String get confirmRemoveCoOwner;
+
+  /// No description provided for @coOwnerAddedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-owner added successfully!'**
+  String get coOwnerAddedSuccess;
+
+  /// No description provided for @coOwnerRemovedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-owner removed successfully!'**
+  String get coOwnerRemovedSuccess;
 }
 
 class _AppLocalizationsDelegate

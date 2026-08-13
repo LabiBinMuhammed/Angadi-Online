@@ -20,8 +20,11 @@ class VendorShopDetailScreen extends StatefulWidget {
 class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
   bool _loading = true;
   bool _saving = false;
+  bool _addingOwner = false;
   Map<String, dynamic> _shop = {};
   List<Map<String, dynamic>> _locations = [];
+  List<Map<String, dynamic>> _shopOwners = [];
+  List<Map<String, dynamic>> _allUsers = [];
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -77,6 +80,28 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
           .single();
       _shop = shopRes;
 
+      // 3. Fetch shop owners
+      try {
+        final ownersRes = await supabase
+            .from('shop_owners')
+            .select('user_id, users(id, name, phone, email, role)')
+            .eq('shop_id', widget.shopId);
+        _shopOwners = List<Map<String, dynamic>>.from(ownersRes as List);
+      } catch (e) {
+        debugPrint('Error fetching shop owners: $e');
+      }
+
+      // 4. Fetch all registered users for co-owner selection
+      try {
+        final usersRes = await supabase
+            .from('users')
+            .select('id, name, phone, email, role')
+            .order('name');
+        _allUsers = List<Map<String, dynamic>>.from(usersRes as List);
+      } catch (e) {
+        debugPrint('Error fetching users: $e');
+      }
+
       _nameController.text = _shop['name'] as String? ?? '';
       _logoController.text = _shop['logo_url'] as String? ?? '';
       _bannerController.text = _shop['banner_url'] as String? ?? '';
@@ -98,6 +123,245 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
       if (mounted) setState(() => _loading = false);
     }
   }
+
+  Future<void> _addCoOwner(String userId) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (_shopOwners.length >= 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.maxOwnersReached), backgroundColor: Colors.orangeAccent),
+      );
+      return;
+    }
+
+    setState(() => _addingOwner = true);
+    try {
+      final isAlready = _shopOwners.any((o) => o['user_id'] == userId || (o['users'] != null && o['users']['id'] == userId));
+      if (isAlready) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User is already an owner of this shop.'), backgroundColor: Colors.orangeAccent),
+        );
+        return;
+      }
+
+      await supabase.from('shop_owners').insert({
+        'shop_id': widget.shopId,
+        'user_id': userId,
+      });
+
+      final targetUser = _allUsers.firstWhere((u) => u['id'] == userId, orElse: () => {});
+      if (targetUser['role'] == 'customer') {
+        await supabase.from('users').update({'role': 'shop_owner'}).eq('id', userId);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.coOwnerAddedSuccess), backgroundColor: Colors.green),
+        );
+        Navigator.of(context, rootNavigator: true).pop();
+        _fetchData();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add co-owner: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _addingOwner = false);
+    }
+  }
+
+  Future<void> _removeCoOwner(String userId, String userName) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (_shopOwners.length <= 1) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.cannotRemoveOnlyOwner), backgroundColor: Colors.orangeAccent),
+      );
+      return;
+    }
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1E293B),
+        title: const Text('Remove Co-Owner', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to remove $userName as co-owner?', style: const TextStyle(color: Color(0xFF94A3B8))),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Remove', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    try {
+      await supabase
+          .from('shop_owners')
+          .delete()
+          .eq('shop_id', widget.shopId)
+          .eq('user_id', userId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.coOwnerRemovedSuccess), backgroundColor: Colors.green),
+        );
+        _fetchData();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove co-owner: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    }
+  }
+
+  void _showAddCoOwnerDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    String? selectedUserId;
+    String searchFilter = '';
+
+    final currentOwnerIds = _shopOwners.map((o) => o['user_id'] as String?).whereType<String>().toSet();
+    final availableUsers = _allUsers.where((u) => !currentOwnerIds.contains(u['id'])).toList();
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final filteredList = availableUsers.where((u) {
+              final n = (u['name'] ?? '').toString().toLowerCase();
+              final p = (u['phone'] ?? '').toString().toLowerCase();
+              final e = (u['email'] ?? '').toString().toLowerCase();
+              final q = searchFilter.toLowerCase().trim();
+              return n.contains(q) || p.contains(q) || e.contains(q);
+            }).toList();
+
+            return AlertDialog(
+              backgroundColor: const Color(0xFF1E293B),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              title: Row(
+                children: [
+                  const Icon(Icons.group_add_rounded, color: Color(0xFF60A5FA), size: 24),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.addCoOwnerModalTitle,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Select a registered user from the platform to grant full co-owner management access to this shop.',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF94A3B8), height: 1.4),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      onChanged: (val) => setModalState(() => searchFilter = val),
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: 'Search by name or phone...',
+                        hintStyle: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        prefixIcon: const Icon(Icons.search, color: Color(0xFF64748B), size: 18),
+                        filled: true,
+                        fillColor: const Color(0xFF0F172A),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.all(12),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 220),
+                      child: filteredList.isEmpty
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 24),
+                              child: Center(child: Text('No users found', style: TextStyle(color: Color(0xFF64748B)))),
+                            )
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: filteredList.length,
+                              itemBuilder: (context, idx) {
+                                final u = filteredList[idx];
+                                final isSelected = selectedUserId == u['id'];
+                                final uName = u['name'] ?? 'Unnamed User';
+                                final uPhone = u['phone'] ?? u['email'] ?? 'No contact';
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 6),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? const Color(0xFF2563EB).withOpacity(0.2) : const Color(0xFF0F172A),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFF334155),
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                    dense: true,
+                                    leading: CircleAvatar(
+                                      backgroundColor: const Color(0xFF334155),
+                                      radius: 16,
+                                      child: Text(
+                                        uName.isNotEmpty ? uName[0].toUpperCase() : '?',
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                                      ),
+                                    ),
+                                    title: Text(uName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                                    subtitle: Text(uPhone, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+                                    trailing: isSelected
+                                        ? const Icon(Icons.check_circle, color: Color(0xFF3B82F6), size: 20)
+                                        : null,
+                                    onTap: () => setModalState(() => selectedUserId = u['id'] as String?),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF22C55E),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: selectedUserId == null || _addingOwner
+                      ? null
+                      : () {
+                          _addCoOwner(selectedUserId!);
+                        },
+                  child: _addingOwner
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Text('Add Co-Owner', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
 
   Future<void> _saveShop() async {
     if (!_formKey.currentState!.validate()) return;
@@ -589,7 +853,150 @@ class _VendorShopDetailScreenState extends State<VendorShopDetailScreen> {
                         ),
                         const SizedBox(height: 32),
 
+                        // Shop Owners / Co-Owners Card
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          decoration: vendorCardDecoration(radius: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.group, color: Color(0xFF60A5FA), size: 22),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        l10n.shopOwnersTitle,
+                                        style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: kVendorText),
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF3B82F6).withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: Border.all(color: const Color(0xFF3B82F6).withOpacity(0.3)),
+                                    ),
+                                    child: Text(
+                                      '${_shopOwners.length}/3 Owners',
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF60A5FA)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                l10n.coOwnersDesc,
+                                style: TextStyle(fontSize: 12, color: kVendorSubText, height: 1.4),
+                              ),
+                              const SizedBox(height: 18),
+                              Column(
+                                children: _shopOwners.map((ownerRow) {
+                                  final uData = ownerRow['users'] as Map<String, dynamic>? ?? {};
+                                  final uId = ownerRow['user_id'] as String? ?? uData['id'] as String? ?? '';
+                                  final uName = uData['name'] as String? ?? 'Shop Owner';
+                                  final uPhone = uData['phone'] as String? ?? uData['email'] as String? ?? 'No contact';
+                                  final isCurrentUser = supabase.auth.currentUser?.id == uId;
+
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: kVendorTransparentBg,
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(color: kVendorCardBorder),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          backgroundColor: const Color(0xFF3B82F6).withOpacity(0.2),
+                                          radius: 18,
+                                          child: Text(
+                                            uName.isNotEmpty ? uName[0].toUpperCase() : 'O',
+                                            style: const TextStyle(color: Color(0xFF60A5FA), fontWeight: FontWeight.bold, fontSize: 14),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
+                                                      uName,
+                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: kVendorText),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (isCurrentUser) ...[
+                                                    const SizedBox(width: 6),
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xFF22C55E).withOpacity(0.15),
+                                                        borderRadius: BorderRadius.circular(6),
+                                                      ),
+                                                      child: const Text(
+                                                        'You',
+                                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF22C55E)),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                uPhone,
+                                                style: TextStyle(fontSize: 12, color: kVendorSubText),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        if (_shopOwners.length > 1)
+                                          IconButton(
+                                            icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
+                                            tooltip: 'Remove co-owner',
+                                            onPressed: () => _removeCoOwner(uId, uName),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              const SizedBox(height: 12),
+                              VendorOutlineButton(
+                                width: double.infinity,
+                                borderColor: _shopOwners.length >= 3 ? Colors.grey : const Color(0xFF60A5FA),
+                                onPressed: _shopOwners.length >= 3 ? null : _showAddCoOwnerDialog,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.person_add_alt_1_rounded, color: _shopOwners.length >= 3 ? Colors.grey : const Color(0xFF60A5FA), size: 18),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      _shopOwners.length >= 3 ? l10n.maxOwnersReached : l10n.addCoOwnerBtn,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: _shopOwners.length >= 3 ? Colors.grey : const Color(0xFF60A5FA),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
                         // Operations Grid
+
                         Text(
                           'Shop Operations',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: kVendorText),

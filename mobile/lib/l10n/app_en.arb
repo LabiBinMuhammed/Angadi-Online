@@ -683,7 +683,7 @@
   "tutorialShopProductDesc": "See prices, images, and details of all available items.",
   "tutorialShopOpenTitle": "Open Product",
   "tutorialShopOpenDesc": "Tap on any item card to see more details and add it to your bag.",
-  "shopOwnersTitle": "Shop Owners",
+  "shopOwnersTitle": "Shop Owners / Co-Owners",
   "addCoOwner": "Add Co-Owner",
   "removeCoOwner": "Remove Co-Owner",
   "maxOwnersLimit": "Max 3 Limit",
@@ -706,5 +706,14 @@
   "orderSuccessSubtitle": "Thank you for your order! The shop vendor has been notified and is preparing your delivery.",
   "estimatedDeliveryLabel": "Est. Delivery:",
   "estimatedDeliveryValue": "Within 30–45 mins",
-  "orderIdCopiedToast": "Order ID copied to clipboard!"
+  "orderIdCopiedToast": "Order ID copied to clipboard!",
+  "coOwnersDesc": "Collaborate up to 3 owners on a single shop with full vendor access.",
+  "addCoOwnerBtn": "+ Add Co-Owner",
+  "addCoOwnerModalTitle": "Add Shop Co-Owner (Max 3)",
+  "selectRegisteredUser": "Select Registered User",
+  "maxOwnersReached": "Max 3 Owners Limit Reached",
+  "cannotRemoveOnlyOwner": "Cannot remove the only owner of a shop.",
+  "confirmRemoveCoOwner": "Are you sure you want to remove this co-owner?",
+  "coOwnerAddedSuccess": "Co-owner added successfully!",
+  "coOwnerRemovedSuccess": "Co-owner removed successfully!"
 }

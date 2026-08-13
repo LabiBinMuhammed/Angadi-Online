@@ -1401,7 +1401,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap on any item card to see more details and add it to your bag.';
 
   @override
-  String get shopOwnersTitle => 'Shop Owners';
+  String get shopOwnersTitle => 'Shop Owners / Co-Owners';
 
   @override
   String get addCoOwner => 'Add Co-Owner';
@@ -1472,4 +1472,33 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orderIdCopiedToast => 'Order ID copied to clipboard!';
+
+  @override
+  String get coOwnersDesc =>
+      'Collaborate up to 3 owners on a single shop with full vendor access.';
+
+  @override
+  String get addCoOwnerBtn => '+ Add Co-Owner';
+
+  @override
+  String get addCoOwnerModalTitle => 'Add Shop Co-Owner (Max 3)';
+
+  @override
+  String get selectRegisteredUser => 'Select Registered User';
+
+  @override
+  String get maxOwnersReached => 'Max 3 Owners Limit Reached';
+
+  @override
+  String get cannotRemoveOnlyOwner => 'Cannot remove the only owner of a shop.';
+
+  @override
+  String get confirmRemoveCoOwner =>
+      'Are you sure you want to remove this co-owner?';
+
+  @override
+  String get coOwnerAddedSuccess => 'Co-owner added successfully!';
+
+  @override
+  String get coOwnerRemovedSuccess => 'Co-owner removed successfully!';
 }

@@ -1397,7 +1397,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك.';
 
   @override
-  String get shopOwnersTitle => 'مالكو المتاجر';
+  String get shopOwnersTitle => 'مالكو المتاجر / المالكين المشاركين';
 
   @override
   String get addCoOwner => 'إضافة مالك مشارك';
@@ -1468,4 +1468,32 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get orderIdCopiedToast => 'تم نسخ رقم الطلب!';
+
+  @override
+  String get coOwnersDesc =>
+      'التعاون مع ما يصل إلى 3 مالكين في متجر واحد مع صلاحيات كاملة.';
+
+  @override
+  String get addCoOwnerBtn => '+ إضافة مالك مشارك';
+
+  @override
+  String get addCoOwnerModalTitle => 'إضافة مالك مشارك للمتجر (حد أقصى 3)';
+
+  @override
+  String get selectRegisteredUser => 'اختر مستخدم مسجل';
+
+  @override
+  String get maxOwnersReached => 'تم الوصول إلى الحد الأقصى 3 مالكين';
+
+  @override
+  String get cannotRemoveOnlyOwner => 'لا يمكن إزالة المالك الوحيد للمتجر.';
+
+  @override
+  String get confirmRemoveCoOwner => 'هل أنت تأكد من إزالة هذا المالك المشارك؟';
+
+  @override
+  String get coOwnerAddedSuccess => 'تمت إضافة المالك المشارك بنجاح!';
+
+  @override
+  String get coOwnerRemovedSuccess => 'تمت إزالة المالك المشارك بنجاح!';
 }
