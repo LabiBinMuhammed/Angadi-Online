@@ -168,16 +168,26 @@ export async function proxy(request: NextRequest) {
 
   // Role-based route guard
   if (user && (cleanPathname.startsWith('/vendor') || cleanPathname.startsWith('/admin'))) {
-    const metadataRole = user.user_metadata?.role as string | undefined
-    let role = metadataRole
+    // Query public.users table first for authoritative role
+    const { data: userRow } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single()
 
-    if (!role) {
-      const { data: userRow } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-      role = userRow?.role
+    let role = userRow?.role || (user.user_metadata?.role as string | undefined)
+
+    // Fallback: If user is listed in shop_owners table, treat them as shop_owner!
+    if (role !== 'shop_owner' && role !== 'admin') {
+      const { data: isOwner } = await supabase
+        .from('shop_owners')
+        .select('id')
+        .eq('user_id', user.id)
+        .limit(1)
+        .maybeSingle()
+      if (isOwner) {
+        role = 'shop_owner'
+      }
     }
 
     // Access control

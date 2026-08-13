@@ -12,10 +12,21 @@ export default async function VendorLayout({ children }: { children: React.React
   }
 
   const { data } = await supabase.from('users').select('role').eq('id', user.id).single()
-  const role = (data as { role?: string })?.role || user.user_metadata?.role
+  let role = (data as { role?: string })?.role || user.user_metadata?.role
 
   if (role !== 'shop_owner' && role !== 'admin') {
-    redirect('/home')
+    const { data: isOwner } = await supabase
+      .from('shop_owners')
+      .select('id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle()
+
+    if (isOwner) {
+      role = 'shop_owner'
+    } else {
+      redirect('/home')
+    }
   }
 
   return (

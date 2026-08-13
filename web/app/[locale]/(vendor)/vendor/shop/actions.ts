@@ -213,6 +213,13 @@ export async function addShopOwnerAction(shopId: string, userId: string) {
     // 4. Upgrade user role to shop_owner if customer
     if (userRecord.role === 'customer') {
       await supabaseAdmin.from('users').update({ role: 'shop_owner' }).eq('id', userId)
+      try {
+        await supabaseAdmin.auth.admin.updateUserById(userId, {
+          user_metadata: { role: 'shop_owner' }
+        })
+      } catch (authErr) {
+        console.error('Failed to update auth metadata for user:', authErr)
+      }
     }
 
     return { success: true, user: userRecord }
