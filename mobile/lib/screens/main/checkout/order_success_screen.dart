@@ -162,7 +162,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: const Color(0xFF22C55E).withOpacity((1 - value) * 0.4),
+                                  color: const Color(0xFF22C55E).withValues(alpha: (1 - value) * 0.4),
                                   width: 2.5,
                                 ),
                               ),
@@ -191,7 +191,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF22C55E).withOpacity(0.45),
+                                    color: const Color(0xFF22C55E).withValues(alpha: 0.45),
                                     blurRadius: 30,
                                     spreadRadius: 4,
                                     offset: const Offset(0, 10),
@@ -246,7 +246,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.2 : 0.04),
+                            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
                             blurRadius: 16,
                             offset: const Offset(0, 6),
                           ),
@@ -271,7 +271,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF22C55E).withOpacity(0.12),
+                                      color: const Color(0xFF22C55E).withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
@@ -343,7 +343,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                           backgroundColor: const Color(0xFF22C55E),
                           foregroundColor: Colors.white,
                           elevation: 3,
-                          shadowColor: const Color(0xFF22C55E).withOpacity(0.45),
+                          shadowColor: const Color(0xFF22C55E).withValues(alpha: 0.45),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -456,7 +456,7 @@ class _SingleBurstConfettiPainter extends CustomPainter {
       if (opacity <= 0 || posY > size.height + 60) continue;
 
       final paint = Paint()
-        ..color = p.color.withOpacity(opacity)
+        ..color = p.color.withValues(alpha: opacity)
         ..style = PaintingStyle.fill;
 
       canvas.save();
