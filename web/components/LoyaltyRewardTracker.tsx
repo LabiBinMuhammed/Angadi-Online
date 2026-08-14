@@ -184,12 +184,12 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
     <div className="loyalty-card-wrap" style={{
       background: 'var(--bg-surface, #ffffff)',
       border: '1px solid var(--border, #e2e8f0)',
-      borderRadius: '20px',
-      padding: '0.85rem 1.1rem',
-      marginBottom: '0.85rem',
+      borderRadius: '22px',
+      padding: '0.8rem 1.1rem',
+      marginBottom: '1.25rem',
       position: 'relative',
       overflow: 'hidden',
-      boxShadow: '0 6px 20px -8px rgba(0, 0, 0, 0.05)'
+      boxShadow: '0 8px 24px -8px rgba(0, 0, 0, 0.05)'
     }}>
       {/* Background Decorative Radial Glow */}
       <div style={{
@@ -209,25 +209,41 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <div style={{
-            width: '36px',
-            height: '36px',
+            width: '38px',
+            height: '38px',
             borderRadius: '12px',
             background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 3px 10px rgba(245, 158, 11, 0.45)'
+            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.4)'
           }}>
-            <Star size={20} color="#ffffff" fill="#ffffff" />
+            <Star size={22} color="#ffffff" fill="#ffffff" />
           </div>
           <div>
-            <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: 'var(--fg, #0f172a)' }}>
+            <h3 style={{ fontSize: '1.02rem', fontWeight: 800, margin: 0, color: 'var(--fg, #0f172a)', lineHeight: 1.2 }}>
               {t('loyalty.club_title') || '5-Star Rewards Club ⭐'}
             </h3>
-            <p style={{ fontSize: '0.78rem', color: 'var(--fg-muted, #64748b)', margin: 0, fontWeight: 700 }}>
+            <p style={{ fontSize: '0.78rem', color: 'var(--fg-muted, #64748b)', margin: '0.15rem 0 0 0', fontWeight: 600 }}>
               {t('loyalty.progress_label', { stars: Math.min(loyalty.starsCount, 5) }) || `${Math.min(loyalty.starsCount, 5)} / 5 Stars Collected`}
             </p>
           </div>
+        </div>
+
+        <div style={{
+          background: isUnlocked ? 'rgba(34, 197, 94, 0.15)' : 'rgba(245, 158, 11, 0.12)',
+          color: isUnlocked ? '#16a34a' : '#d97706',
+          border: `1px solid ${isUnlocked ? 'rgba(34, 197, 94, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`,
+          padding: '0.25rem 0.65rem',
+          borderRadius: '99px',
+          fontSize: '0.78rem',
+          fontWeight: 800,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.3rem'
+        }}>
+          <Star size={13} fill={isUnlocked ? '#16a34a' : '#d97706'} />
+          <span>{Math.min(loyalty.starsCount, 5)} / 5</span>
         </div>
       </div>
 
@@ -236,14 +252,14 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
         <div style={{
           background: isOrderEligible ? 'rgba(34, 197, 94, 0.12)' : 'var(--bg-soft, #f8fafc)',
           border: `1px solid ${isOrderEligible ? 'rgba(34, 197, 94, 0.3)' : 'var(--border, #e2e8f0)'}`,
-          borderRadius: '12px',
+          borderRadius: '14px',
           padding: '0.5rem 0.75rem',
-          fontSize: '0.8rem',
+          fontSize: '0.82rem',
           color: isOrderEligible ? '#15803d' : 'var(--fg-muted, #64748b)',
           marginBottom: '0.75rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.4rem',
+          gap: '0.45rem',
           fontWeight: 600
         }}>
           <Sparkles size={15} color={isOrderEligible ? '#22c55e' : '#f59e0b'} />
@@ -255,12 +271,12 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
         </div>
       )}
 
-      {/* 5-Star Visual Progress Bar (Clean compact stars only, no text) */}
+      {/* 5-Star Visual Progress Bar (Compact without text labels) */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
-        gap: '0.45rem',
-        marginBottom: '0.75rem'
+        gap: '0.5rem',
+        marginBottom: '0.85rem'
       }}>
         {[1, 2, 3, 4, 5].map(step => {
           const filled = loyalty.starsCount >= step
@@ -293,22 +309,22 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
       {isUnlocked ? (
         <div style={{
           background: 'linear-gradient(135deg, #16a34a 0%, #15803d 100%)',
-          borderRadius: '14px',
-          padding: '0.65rem 0.95rem',
+          borderRadius: '20px',
+          padding: '1.1rem 1.35rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          boxShadow: '0 6px 18px -4px rgba(22, 163, 74, 0.4)',
+          boxShadow: '0 8px 24px -4px rgba(22, 163, 74, 0.45)',
           animation: 'pulseGlow 2s infinite ease-in-out'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Gift size={26} color="#ffffff" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <Gift size={34} color="#ffffff" />
             <div>
-              <div style={{ fontWeight: 800, fontSize: '0.88rem', color: '#ffffff' }}>
+              <div style={{ fontWeight: 800, fontSize: '1rem', color: '#ffffff' }}>
                 {t('loyalty.scratch_card_unlocked_title') || '🎉 Lucky Scratch Card Unlocked!'}
               </div>
-              <div style={{ fontSize: '0.75rem', color: '#dcfce7', fontWeight: 500 }}>
-                {t('loyalty.scratch_card_unlocked_desc') || 'Scratch to reveal your guaranteed ₹2–₹15 reward!'}
+              <div style={{ fontSize: '0.82rem', color: '#dcfce7', fontWeight: 500 }}>
+                {t('loyalty.scratch_card_unlocked_desc') || 'Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!'}
               </div>
             </div>
           </div>
