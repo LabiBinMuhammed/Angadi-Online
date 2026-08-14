@@ -263,6 +263,14 @@ GoRouter buildRouter() {
                     path: 'success',
                     builder: (_, state) => OrderSuccessScreen(
                       orderId: state.pathParameters['orderId'] ?? state.uri.queryParameters['orderId'] ?? '',
+                      isDelivered: state.uri.queryParameters['delivered'] == 'true',
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'delivered',
+                    builder: (_, state) => OrderSuccessScreen(
+                      orderId: state.pathParameters['orderId']!,
+                      isDelivered: true,
                     ),
                   ),
                   GoRoute(

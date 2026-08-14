@@ -106,6 +106,16 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
         await supabase.from('orders').update({ status: nextStatus }).eq('id', order.id)
         setOrder(o => ({ ...o, status: nextStatus }))
       }
+
+      if (nextStatus === 'delivered') {
+        try {
+          await fetch('/api/loyalty', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'award_order', orderId: order.id })
+          })
+        } catch (e) {}
+      }
     } catch (err: any) {
       console.error('Failed to update order status:', err)
       const supabase = createClient()
@@ -280,10 +290,34 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
             </p>
           </div>
         </div>
-        <span className={`vp-badge vp-badge-${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'info'}`} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.5rem 1rem' }}>
-          {STATUS_ICONS[order.status] ?? <XCircle size={16} />}
-          {getStatusLabel(order.status)}
-        </span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+          <span className={`vp-badge vp-badge-${order.status === 'delivered' ? 'success' : order.status === 'cancelled' ? 'danger' : 'info'}`} style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', padding: '0.5rem 1rem' }}>
+            {STATUS_ICONS[order.status] ?? <XCircle size={16} />}
+            {getStatusLabel(order.status)}
+          </span>
+          {order.status === 'delivered' && (
+            <a
+              href={`/${locale}/orders/${order.id}/delivered`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                color: '#4ade80',
+                background: 'rgba(34, 197, 94, 0.15)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+                padding: '0.3rem 0.75rem',
+                borderRadius: '8px',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.35rem'
+              }}
+            >
+              <span>View Delivered Celebration Page 📦🎉</span>
+            </a>
+          )}
+        </div>
       </div>
 
       {/* Delivery Schedule */}

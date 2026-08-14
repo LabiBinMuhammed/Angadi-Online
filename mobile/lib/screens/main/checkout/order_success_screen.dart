@@ -7,7 +7,8 @@ import 'package:village_market/widgets/loyalty_tracker_widget.dart';
 
 class OrderSuccessScreen extends StatefulWidget {
   final String orderId;
-  const OrderSuccessScreen({super.key, required this.orderId});
+  final bool isDelivered;
+  const OrderSuccessScreen({super.key, required this.orderId, this.isDelivered = false});
 
   @override
   State<OrderSuccessScreen> createState() => _OrderSuccessScreenState();
@@ -249,24 +250,21 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                             child: Container(
                               width: 104,
                               height: 104,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFF22C55E), Color(0xFF16A34A)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                                gradient: LinearGradient(
+                                  colors: [Color(0xFF22C55E), Color(0xFF15803D)],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: const Color(0xFF22C55E).withValues(alpha: 0.45),
-                                    blurRadius: 30,
-                                    spreadRadius: 4,
-                                    offset: const Offset(0, 10),
+                                    color: Color(0x6622C55E),
+                                    blurRadius: 28,
+                                    offset: Offset(0, 10),
                                   ),
                                 ],
                               ),
-                              child: const Icon(
-                                Icons.check_circle_rounded,
+                              child: Icon(
+                                widget.isDelivered ? Icons.local_shipping_rounded : Icons.check_circle_rounded,
                                 size: 68,
                                 color: Colors.white,
                               ),
@@ -279,7 +277,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
 
                     // Success Title
                     Text(
-                      l10n.orderPlacedTitle,
+                      widget.isDelivered ? 'Order Delivered! 📦🎉' : l10n.orderPlacedTitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 26,
@@ -292,7 +290,9 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
 
                     // Subtitle / Description
                     Text(
-                      l10n.orderSuccessSubtitle,
+                      widget.isDelivered
+                          ? 'Your package has been safely delivered. Thank you for shopping with us!'
+                          : l10n.orderSuccessSubtitle,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 14,
@@ -404,6 +404,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                     // 5-STAR LOYALTY REWARD TRACKER & LUCKY SCRATCH CARD WIDGET
                     LoyaltyTrackerWidget(
                       orderId: widget.orderId,
+                      orderStatus: widget.isDelivered ? 'delivered' : 'placed',
                     ),
 
                     const SizedBox(height: 20),

@@ -360,6 +360,60 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildCardTitle(
+                                  icon: Icons.card_giftcard_rounded,
+                                  iconColor: const Color(0xFF22C55E),
+                                  title: 'Order Delivered Celebration 🎉',
+                                  textBase: textBase,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Your order has been delivered! View your celebration summary and earned 5-Star loyalty rewards.',
+                                  style: TextStyle(fontSize: 13, color: textMuted, fontWeight: FontWeight.w500),
+                                ),
+                                const SizedBox(height: 14),
+                                GestureDetector(
+                                  onTap: () {
+                                    context.push('/orders/${widget.orderId}/delivered');
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(vertical: 14),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF22C55E), Color(0xFF15803D)],
+                                      ),
+                                      borderRadius: BorderRadius.circular(16),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF22C55E).withValues(alpha: 0.3),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'View Delivered Celebration & Rewards ⭐',
+                                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white),
+                                        ),
+                                        SizedBox(width: 6),
+                                        Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildSectionCard(
+                            surface: surface, border: border,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildCardTitle(
                                   icon: Icons.assignment_return_rounded,
                                   iconColor: const Color(0xFFF59E0B),
                                   title: 'Request Replacement / Complaint',
