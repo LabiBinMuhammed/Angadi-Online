@@ -1078,7 +1078,7 @@ class _AdminCommissionScreenState extends State<AdminCommissionScreen> with Sing
             title: 'Trial & Payouts',
             bullets: [
               '30-Day Free Trial: 0% commission is charged on orders generated during trial.',
-              '5% Commission: Default rate applied automatically after trial period ends.',
+              'Category Commission (2.5% / 4%): Applied automatically per line item after trial period ends.',
               'Billing Cycle: Reports and balances are generated on the 1st of every month.',
             ],
             kSubText: kSubText,

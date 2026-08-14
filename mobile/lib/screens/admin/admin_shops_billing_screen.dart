@@ -187,7 +187,7 @@ class _AdminShopsBillingScreenState extends State<AdminShopsBillingScreen> {
           'year': _selectedYear,
           'total_orders': shop['totalOrders'] ?? 0,
           'total_sales': totalSales,
-          'commission_rate': shop['commissionRate'] ?? 5.0,
+          'commission_rate': shop['commissionRate'] ?? 4.0,
           'total_commission': totalCommission,
           'amount_paid': amountPaid,
           'balance_due': balanceDue,

@@ -81,7 +81,7 @@ export default function ShopDetailClient({
   const [sub, setSub] = useState(initialSubscription)
   const [reports, setReports] = useState(initialReports)
   const [rateEdit, setRateEdit] = useState(false)
-  const [newRate, setNewRate] = useState(sub ? sub.commission_rate.toString() : '5.0')
+  const [newRate, setNewRate] = useState(sub ? sub.commission_rate.toString() : '4.0')
   const [extDays, setExtDays] = useState('7')
   
   // Waive state

@@ -526,7 +526,7 @@
     "trial_term_title": "Free Trial period:",
     "trial_term_desc": "New shops get a 30-day commission-free period.",
     "rate_term_title": "Standard Commission rate:",
-    "rate_term_desc": "A flat rate of 5.0% applies to all successfully delivered orders after the trial.",
+    "rate_term_desc": "Category-based commission rates (2.5% for low margin, 4.0% standard) apply to delivered orders after trial.",
     "cycle_term_title": "Billing cycle:",
     "cycle_term_desc": "Invoices are generated on the 1st of every calendar month for the preceding month's orders.",
     "delivered_trigger": "Delivered Trigger & Overdues",

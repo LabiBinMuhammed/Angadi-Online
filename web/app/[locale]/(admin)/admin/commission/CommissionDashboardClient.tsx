@@ -883,7 +883,7 @@ export default function CommissionDashboardClient({
             <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#4f46e5', textTransform: 'uppercase', display: 'block', marginBottom: '0.25rem' }}>Trial & Rates</span>
             <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: '#334155', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               <li><strong>30-Day Free Trial:</strong> All new shops start with 30 days of 0% commission.</li>
-              <li><strong>5% Commission:</strong> Default rate applied on delivered orders after the trial expires.</li>
+              <li><strong>Category Commission (2.5% / 4%):</strong> Category-based margin rates apply on delivered orders after trial expires.</li>
               <li><strong>Custom Shop Rates:</strong> Rates can be overridden by admins on individual shop detail cards.</li>
             </ul>
           </div>

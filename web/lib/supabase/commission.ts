@@ -110,7 +110,7 @@ export async function getCommissionSettings() {
     // Return defaults if table query fails (fallback)
     return {
       id: 1,
-      default_commission_rate: 5.0,
+      default_commission_rate: 4.0,
       free_trial_duration: 30,
       calculation_trigger: 'delivered',
       auto_generate_reports: true,
@@ -307,7 +307,7 @@ export async function generateMonthlyReports(month: number, year: number) {
       .eq('shop_id', shop.id)
       .maybeSingle()
       
-    const rate = sub ? sub.commission_rate : 5.0
+    const rate = sub ? sub.commission_rate : 4.0
     
     // 2. Fetch all delivered orders for this shop in the month
     const { data: orders } = await adminClient

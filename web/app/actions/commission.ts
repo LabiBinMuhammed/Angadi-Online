@@ -179,7 +179,7 @@ export async function toggleMonthlyReportPaidAction(shopId: string, month: numbe
     .select('commission_rate')
     .eq('shop_id', shopId)
     .maybeSingle()
-  const rate = sub?.commission_rate ?? 5.0
+  const rate = sub?.commission_rate ?? 4.0
 
   // 2. Fetch stats for the month if we need to create/update
   const startDate = new Date(year, month - 1, 1).toISOString()
