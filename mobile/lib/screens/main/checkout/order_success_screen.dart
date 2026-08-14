@@ -517,15 +517,15 @@ class _SingleBurstConfettiPainter extends CustomPainter {
       if (currentTime < p.delay) continue;
 
       final dt = currentTime - p.delay;
-      final currentVx = p.vx * pow(p.drag, dt * 60);
-      final currentVy = (p.vy + p.gravity * dt) * pow(p.drag, dt * 60);
 
-      final posX = (p.startX * size.width) + (currentVx * dt * 0.4);
-      final posY = (p.startY * size.height) + (currentVy * dt * 0.4);
+      // Realistic projectile physics equation across full screen
+      final posX = (p.startX * size.width) + (p.vx * dt);
+      final posY = (p.startY * size.height) + (p.vy * dt) + (0.5 * p.gravity * dt * dt);
 
-      // Fade out smoothly near end of 4.0s
-      final opacity = (1.0 - ((dt / (totalDuration - p.delay)) * 1.15)).clamp(0.0, 1.0);
-      if (opacity <= 0 || posY > size.height + 60 || posX < -40 || posX > size.width + 40) continue;
+      // Fade out smoothly near end of animation lifetime
+      final activeRatio = dt / (totalDuration - p.delay);
+      final opacity = (1.0 - (activeRatio * 1.2)).clamp(0.0, 1.0);
+      if (opacity <= 0 || posY > size.height + 60 || posX < -60 || posX > size.width + 60) continue;
 
       final paint = Paint()
         ..color = p.color.withValues(alpha: opacity)
