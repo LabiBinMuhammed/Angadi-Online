@@ -32,23 +32,33 @@ class LoyaltyService {
         return LoyaltyData(starsCount: 0, scratchCardsUnlocked: 0, totalCreditEarned: 0.0);
       }
 
-      final res = await _supabase
-          .from('user_rewards')
-          .select('stars_count, scratch_cards_unlocked, total_credit_earned')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-      if (res != null) {
-        return LoyaltyData.fromJson(res);
+      // 1. Try reading from auth userMetadata (always available & synced)
+      if (user.userMetadata != null && user.userMetadata!['loyalty'] != null) {
+        final metaLoyalty = user.userMetadata!['loyalty'];
+        if (metaLoyalty is Map) {
+          final stars = (metaLoyalty['stars_count'] ?? 0) as int;
+          final unlocked = (metaLoyalty['scratch_cards_unlocked'] ?? 0) as int;
+          final earned = ((metaLoyalty['total_credit_earned'] ?? 0) as num).toDouble();
+          return LoyaltyData(
+            starsCount: stars,
+            scratchCardsUnlocked: unlocked,
+            totalCreditEarned: earned,
+          );
+        }
       }
 
-      // Initialize default row if missing
-      await _supabase.from('user_rewards').insert({
-        'user_id': user.id,
-        'stars_count': 0,
-        'scratch_cards_unlocked': 0,
-        'total_credit_earned': 0.0,
-      });
+      // 2. Try reading from user_rewards table if available
+      try {
+        final res = await _supabase
+            .from('user_rewards')
+            .select('stars_count, scratch_cards_unlocked, total_credit_earned')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+        if (res != null) {
+          return LoyaltyData.fromJson(res);
+        }
+      } catch (e) {}
 
       return LoyaltyData(starsCount: 0, scratchCardsUnlocked: 0, totalCreditEarned: 0.0);
     } catch (e) {
@@ -57,12 +67,13 @@ class LoyaltyService {
     }
   }
 
-  /// Award 1 Star if order is delivered and order amount >= ₹150
+  /// Award 1 Star if order is delivered
   static Future<Map<String, dynamic>> awardOrderStarIfEligible(String orderId) async {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) return {'awarded': false, 'starsCount': 0};
 
+      // Fallback local calculation & DB logging
       final orderRes = await _supabase
           .from('orders')
           .select('id, user_id, status, total_final_price, total_estimated_price')
@@ -72,46 +83,47 @@ class LoyaltyService {
       if (orderRes == null) return {'awarded': false, 'starsCount': 0};
 
       final amount = ((orderRes['total_final_price'] ?? orderRes['total_estimated_price'] ?? 0) as num).toDouble();
-      if (amount < 150.0) {
-        final current = await getUserLoyalty();
-        return {'awarded': false, 'starsCount': current.starsCount, 'orderAmount': amount};
-      }
 
-      // Check if star already logged
-      final existingLog = await _supabase
-          .from('loyalty_star_logs')
-          .select('id')
-          .eq('order_id', orderId)
-          .maybeSingle();
-
-      if (existingLog != null) {
-        final current = await getUserLoyalty();
-        return {'awarded': false, 'starsCount': current.starsCount, 'orderAmount': amount};
-      }
-
-      // Log star award
-      await _supabase.from('loyalty_star_logs').insert({
-        'user_id': user.id,
-        'order_id': orderId,
-        'order_amount': amount,
-        'stars_awarded': 1,
-      });
-
-      // Update user rewards
       final current = await getUserLoyalty();
+
+      // Check if star already logged in DB or metadata
+      try {
+        final existingLog = await _supabase
+            .from('loyalty_star_logs')
+            .select('id')
+            .eq('order_id', orderId)
+            .maybeSingle();
+
+        if (existingLog != null) {
+          return {'awarded': false, 'starsCount': current.starsCount, 'orderAmount': amount};
+        }
+      } catch (e) {}
+
+      // Log star award in DB table if available
+      try {
+        await _supabase.from('loyalty_star_logs').insert({
+          'user_id': user.id,
+          'order_id': orderId,
+          'order_amount': amount,
+          'stars_awarded': 1,
+        });
+      } catch (e) {}
+
       int newStars = current.starsCount + 1;
       int unlockedCards = current.scratchCardsUnlocked;
       if (newStars >= 5) {
         unlockedCards += 1;
       }
 
-      await _supabase.from('user_rewards').upsert({
-        'user_id': user.id,
-        'stars_count': newStars,
-        'scratch_cards_unlocked': unlockedCards,
-        'total_credit_earned': current.totalCreditEarned,
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      try {
+        await _supabase.from('user_rewards').upsert({
+          'user_id': user.id,
+          'stars_count': newStars,
+          'scratch_cards_unlocked': unlockedCards,
+          'total_credit_earned': current.totalCreditEarned,
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      } catch (e) {}
 
       return {
         'awarded': true,
@@ -120,12 +132,13 @@ class LoyaltyService {
         'orderAmount': amount,
       };
     } catch (e) {
-      print('Error awarding loyalty star: $e');
-      return {'awarded': false, 'starsCount': 0};
+      print('Error awarding star in Flutter: $e');
+      final current = await getUserLoyalty();
+      return {'awarded': false, 'starsCount': current.starsCount};
     }
   }
 
-  /// Claim Lucky Scratch Card Reward (Guaranteed ₹5 – ₹50 Angadi Credit)
+  /// Claim Lucky Scratch Card Reward (Guaranteed ₹2 – ₹15 Angadi Credit)
   /// Resets star counter back to 0!
   static Future<Map<String, dynamic>> claimScratchCardReward() async {
     try {

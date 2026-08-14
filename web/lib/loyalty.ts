@@ -1,8 +1,10 @@
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabaseAdmin = createAdminClient(supabaseUrl, supabaseServiceKey)
+function getAdminClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+  return createAdminClient(supabaseUrl, supabaseServiceKey)
+}
 
 export type LoyaltyData = {
   starsCount: number
@@ -11,40 +13,87 @@ export type LoyaltyData = {
 }
 
 /**
+ * Helper to fetch loyalty state from auth user_metadata (fail-safe fallback)
+ */
+async function getAuthMetadataLoyalty(userId: string): Promise<{
+  stars_count: number
+  scratch_cards_unlocked: number
+  total_credit_earned: number
+  processed_orders: string[]
+} | null> {
+  try {
+    const supabaseAdmin = getAdminClient()
+    const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
+    if (user && user.user_metadata?.loyalty) {
+      return {
+        stars_count: Number(user.user_metadata.loyalty.stars_count || 0),
+        scratch_cards_unlocked: Number(user.user_metadata.loyalty.scratch_cards_unlocked || 0),
+        total_credit_earned: Number(user.user_metadata.loyalty.total_credit_earned || 0),
+        processed_orders: Array.isArray(user.user_metadata.loyalty.processed_orders)
+          ? user.user_metadata.loyalty.processed_orders
+          : []
+      }
+    }
+  } catch (e) {
+    console.error('Error reading auth user_metadata loyalty:', e)
+  }
+  return null
+}
+
+/**
+ * Helper to save loyalty state to auth user_metadata (fail-safe persistence)
+ */
+async function saveAuthMetadataLoyalty(userId: string, loyaltyData: {
+  stars_count: number
+  scratch_cards_unlocked: number
+  total_credit_earned: number
+  processed_orders: string[]
+}) {
+  try {
+    const supabaseAdmin = getAdminClient()
+    const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId)
+    if (user) {
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          ...user.user_metadata,
+          loyalty: loyaltyData
+        }
+      })
+    }
+  } catch (e) {
+    console.error('Error saving auth user_metadata loyalty:', e)
+  }
+}
+
+/**
  * Get or initialize user loyalty reward progress.
  */
 export async function getUserLoyalty(userId: string): Promise<LoyaltyData> {
   try {
-    const { data: reward } = await supabaseAdmin
-      .from('user_rewards')
-      .select('stars_count, scratch_cards_unlocked, total_credit_earned')
-      .eq('user_id', userId)
-      .maybeSingle()
+    const supabaseAdmin = getAdminClient()
+    // 1. Try reading from auth user_metadata first (always available)
+    const meta = await getAuthMetadataLoyalty(userId)
 
-    if (reward) {
-      return {
-        starsCount: reward.stars_count || 0,
-        scratchCardsUnlocked: reward.scratch_cards_unlocked || 0,
-        totalCreditEarned: Number(reward.total_credit_earned || 0),
-      }
+    // 2. Try reading from user_rewards table if available
+    let tableReward = null
+    try {
+      const { data } = await supabaseAdmin
+        .from('user_rewards')
+        .select('stars_count, scratch_cards_unlocked, total_credit_earned')
+        .eq('user_id', userId)
+        .maybeSingle()
+      tableReward = data
+    } catch (e) {}
+
+    const starsCount = tableReward?.stars_count ?? meta?.stars_count ?? 0
+    const scratchCardsUnlocked = tableReward?.scratch_cards_unlocked ?? meta?.scratch_cards_unlocked ?? 0
+    const totalCreditEarned = Number(tableReward?.total_credit_earned ?? meta?.total_credit_earned ?? 0)
+
+    return {
+      starsCount,
+      scratchCardsUnlocked,
+      totalCreditEarned
     }
-
-    // Fallback: Check user_profiles or user_metadata
-    const { data: profile } = await supabaseAdmin
-      .from('user_profiles')
-      .select('date_of_birth')
-      .eq('user_id', userId)
-      .maybeSingle()
-
-    // Initialize user_rewards record
-    await supabaseAdmin.from('user_rewards').insert({
-      user_id: userId,
-      stars_count: 0,
-      scratch_cards_unlocked: 0,
-      total_credit_earned: 0,
-    })
-
-    return { starsCount: 0, scratchCardsUnlocked: 0, totalCreditEarned: 0 }
   } catch (err) {
     console.error('Error fetching user loyalty:', err)
     return { starsCount: 0, scratchCardsUnlocked: 0, totalCreditEarned: 0 }
@@ -52,7 +101,7 @@ export async function getUserLoyalty(userId: string): Promise<LoyaltyData> {
 }
 
 /**
- * Award 1 Star if order is delivered and order amount >= ₹150.
+ * Award 1 Star if order is delivered.
  * Automatically unlocks 1 Scratch Card when 5 Stars are accumulated.
  */
 export async function awardOrderStarIfEligible(orderId: string): Promise<{
@@ -62,6 +111,8 @@ export async function awardOrderStarIfEligible(orderId: string): Promise<{
   orderAmount: number
 }> {
   try {
+    const supabaseAdmin = getAdminClient()
+
     // 1. Fetch order details
     const { data: order } = await supabaseAdmin
       .from('orders')
@@ -75,59 +126,76 @@ export async function awardOrderStarIfEligible(orderId: string): Promise<{
 
     const orderAmount = Number(order.total_final_price ?? order.total_estimated_price ?? 0)
 
-    // Check minimum threshold ₹150
-    if (orderAmount < 150) {
+    // 2. Fetch user metadata loyalty state
+    const meta = (await getAuthMetadataLoyalty(order.user_id)) || {
+      stars_count: 0,
+      scratch_cards_unlocked: 0,
+      total_credit_earned: 0,
+      processed_orders: []
+    }
+
+    // 3. Check if star already logged for this order (in metadata or DB table)
+    let isLogged = meta.processed_orders.includes(orderId)
+
+    if (!isLogged) {
+      try {
+        const { data: existingLog } = await supabaseAdmin
+          .from('loyalty_star_logs')
+          .select('id')
+          .eq('order_id', orderId)
+          .maybeSingle()
+        if (existingLog) isLogged = true
+      } catch (e) {}
+    }
+
+    if (isLogged) {
       const currentLoyalty = await getUserLoyalty(order.user_id)
       return {
         awarded: false,
         newStarsCount: currentLoyalty.starsCount,
-        unlockedScratchCard: currentLoyalty.scratchCardsUnlocked > 0,
+        unlockedScratchCard: currentLoyalty.scratchCardsUnlocked > 0 || currentLoyalty.starsCount >= 5,
         orderAmount,
       }
     }
 
-    // 2. Check if star already logged for this order
-    const { data: existingLog } = await supabaseAdmin
-      .from('loyalty_star_logs')
-      .select('id')
-      .eq('order_id', orderId)
-      .maybeSingle()
-
-    if (existingLog) {
-      const currentLoyalty = await getUserLoyalty(order.user_id)
-      return {
-        awarded: false,
-        newStarsCount: currentLoyalty.starsCount,
-        unlockedScratchCard: currentLoyalty.scratchCardsUnlocked > 0,
-        orderAmount,
-      }
-    }
-
-    // 3. Log the star award
-    await supabaseAdmin.from('loyalty_star_logs').insert({
-      user_id: order.user_id,
-      order_id: orderId,
-      order_amount: orderAmount,
-      stars_awarded: 1,
-    })
-
-    // 4. Update user rewards
-    const current = await getUserLoyalty(order.user_id)
-    let newStars = current.starsCount + 1
-    let unlockedCards = current.scratchCardsUnlocked
+    // 4. Calculate updated stars and scratch cards
+    const currentStars = meta.stars_count || 0
+    const newStars = currentStars + 1
+    let unlockedCards = meta.scratch_cards_unlocked || 0
 
     if (newStars >= 5) {
       unlockedCards += 1
-      // Keep stars counter at 5 until scratch card is claimed, or let it accumulate
     }
 
-    await supabaseAdmin.from('user_rewards').upsert({
-      user_id: order.user_id,
+    const updatedProcessedOrders = [...meta.processed_orders, orderId]
+
+    const newLoyaltyState = {
       stars_count: newStars,
       scratch_cards_unlocked: unlockedCards,
-      total_credit_earned: current.totalCreditEarned,
-      updated_at: new Date().toISOString(),
-    })
+      total_credit_earned: meta.total_credit_earned || 0,
+      processed_orders: updatedProcessedOrders
+    }
+
+    // 5. Persist to Auth user_metadata (fail-safe)
+    await saveAuthMetadataLoyalty(order.user_id, newLoyaltyState)
+
+    // 6. Persist to DB tables if existing
+    try {
+      await supabaseAdmin.from('loyalty_star_logs').insert({
+        user_id: order.user_id,
+        order_id: orderId,
+        order_amount: orderAmount,
+        stars_awarded: 1,
+      })
+
+      await supabaseAdmin.from('user_rewards').upsert({
+        user_id: order.user_id,
+        stars_count: newStars,
+        scratch_cards_unlocked: unlockedCards,
+        total_credit_earned: meta.total_credit_earned || 0,
+        updated_at: new Date().toISOString(),
+      })
+    } catch (e) {}
 
     return {
       awarded: true,
@@ -142,7 +210,7 @@ export async function awardOrderStarIfEligible(orderId: string): Promise<{
 }
 
 /**
- * Claim Lucky Scratch Card Reward (Guaranteed ₹5 – ₹50 Angadi Credit).
+ * Claim Lucky Scratch Card Reward (Guaranteed ₹2 – ₹15 Angadi Credit).
  * Resets 5-star counter back to 0 after reward is claimed!
  */
 export async function claimScratchCardReward(userId: string): Promise<{
@@ -153,14 +221,21 @@ export async function claimScratchCardReward(userId: string): Promise<{
   message?: string
 }> {
   try {
-    const current = await getUserLoyalty(userId)
+    const supabaseAdmin = getAdminClient()
 
-    if (current.starsCount < 5 && current.scratchCardsUnlocked <= 0) {
+    const meta = (await getAuthMetadataLoyalty(userId)) || {
+      stars_count: 0,
+      scratch_cards_unlocked: 0,
+      total_credit_earned: 0,
+      processed_orders: []
+    }
+
+    if (meta.stars_count < 5 && meta.scratch_cards_unlocked <= 0) {
       return {
         success: false,
         rewardAmount: 0,
-        remainingStars: current.starsCount,
-        totalCreditEarned: current.totalCreditEarned,
+        remainingStars: meta.stars_count,
+        totalCreditEarned: meta.total_credit_earned,
         message: 'You need 5 stars to unlock a Lucky Scratch Card!',
       }
     }
@@ -191,53 +266,67 @@ export async function claimScratchCardReward(userId: string): Promise<{
     const rewardAmount = generateRewardAmount()
 
     // Reset star count by 5 and update rewards
-    const remainingStars = Math.max(0, current.starsCount - 5)
-    const remainingScratchCards = Math.max(0, (current.scratchCardsUnlocked || 1) - 1)
-    const newTotalCredit = current.totalCreditEarned + rewardAmount
+    const remainingStars = Math.max(0, meta.stars_count - 5)
+    const remainingScratchCards = Math.max(0, (meta.scratch_cards_unlocked || 1) - 1)
+    const newTotalCredit = meta.total_credit_earned + rewardAmount
 
-    await supabaseAdmin.from('user_rewards').upsert({
-      user_id: userId,
+    const newLoyaltyState = {
       stars_count: remainingStars,
       scratch_cards_unlocked: remainingScratchCards,
       total_credit_earned: newTotalCredit,
-      updated_at: new Date().toISOString(),
-    })
+      processed_orders: meta.processed_orders
+    }
 
-    // Log claimed card
-    await supabaseAdmin.from('claimed_scratch_cards').insert({
-      user_id: userId,
-      reward_amount: rewardAmount,
-    })
+    // Save to Auth user_metadata
+    await saveAuthMetadataLoyalty(userId, newLoyaltyState)
+
+    // Save to user_rewards DB table if available
+    try {
+      await supabaseAdmin.from('user_rewards').upsert({
+        user_id: userId,
+        stars_count: remainingStars,
+        scratch_cards_unlocked: remainingScratchCards,
+        total_credit_earned: newTotalCredit,
+        updated_at: new Date().toISOString(),
+      })
+
+      await supabaseAdmin.from('claimed_scratch_cards').insert({
+        user_id: userId,
+        reward_amount: rewardAmount,
+      })
+    } catch (e) {}
 
     // Add reward credit to shop_user_credit wallet or user credit
-    const { data: shops } = await supabaseAdmin.from('shops').select('id').limit(1)
-    if (shops && shops.length > 0) {
-      const defaultShopId = shops[0].id
-      const { data: existingCredit } = await supabaseAdmin
-        .from('shop_user_credit')
-        .select('id, credit_limit, credit_balance')
-        .eq('user_id', userId)
-        .eq('shop_id', defaultShopId)
-        .maybeSingle()
-
-      if (existingCredit) {
-        await supabaseAdmin
+    try {
+      const { data: shops } = await supabaseAdmin.from('shops').select('id').limit(1)
+      if (shops && shops.length > 0) {
+        const defaultShopId = shops[0].id
+        const { data: existingCredit } = await supabaseAdmin
           .from('shop_user_credit')
-          .update({
-            credit_limit: (Number(existingCredit.credit_limit || 0) + rewardAmount),
-            credit_balance: (Number(existingCredit.credit_balance || 0) + rewardAmount),
+          .select('id, credit_limit, credit_balance')
+          .eq('user_id', userId)
+          .eq('shop_id', defaultShopId)
+          .maybeSingle()
+
+        if (existingCredit) {
+          await supabaseAdmin
+            .from('shop_user_credit')
+            .update({
+              credit_limit: (Number(existingCredit.credit_limit || 0) + rewardAmount),
+              credit_balance: (Number(existingCredit.credit_balance || 0) + rewardAmount),
+            })
+            .eq('id', existingCredit.id)
+        } else {
+          await supabaseAdmin.from('shop_user_credit').insert({
+            shop_id: defaultShopId,
+            user_id: userId,
+            is_active: true,
+            credit_limit: rewardAmount,
+            credit_balance: rewardAmount,
           })
-          .eq('id', existingCredit.id)
-      } else {
-        await supabaseAdmin.from('shop_user_credit').insert({
-          shop_id: defaultShopId,
-          user_id: userId,
-          is_active: true,
-          credit_limit: rewardAmount,
-          credit_balance: rewardAmount,
-        })
+        }
       }
-    }
+    } catch (e) {}
 
     return {
       success: true,
