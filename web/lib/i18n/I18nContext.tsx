@@ -13,7 +13,7 @@ interface Translations {
 interface I18nContextProps {
   locale: Locale
   setLocale: (locale: Locale) => void
-  t: (key: string) => string
+  t: (key: string, replacements?: Record<string, string | number>) => string
   isRtl: boolean
 }
 
@@ -33,7 +33,6 @@ function getNestedValue(obj: any, path: string): string | undefined {
 export function I18nProvider({
   children,
   initialLocale = 'ml',
-
   messages
 }: {
   children: React.ReactNode
@@ -66,7 +65,6 @@ export function I18nProvider({
     window.location.href = `${window.location.origin}${targetPath}${window.location.search}${window.location.hash}`
   }
 
-
   // Load translations if locale changes client-side
   useEffect(() => {
     if (locale !== initialLocale) {
@@ -80,26 +78,31 @@ export function I18nProvider({
     }
   }, [locale, initialLocale])
 
-  // Translation function with English fallback
-  const t = (key: string): string => {
+  // Translation function with English fallback & placeholder interpolation
+  const t = (key: string, replacements?: Record<string, string | number>): string => {
     // 1. Check in the current active locale's translations
     let val = getNestedValue(activeMessages, key)
-    if (val) return val
 
     // 2. Fall back to English translations if not found in active locale
-    if (locale !== 'en') {
+    if (!val && locale !== 'en') {
       try {
-        // We require the English translations as the universal fallback
         const enMessages = require('../../messages/en.json')
         val = getNestedValue(enMessages, key)
-        if (val) return val
       } catch (e) {
         console.error('Failed to load fallback English messages:', e)
       }
     }
 
-    // 3. Fall back to key itself if all fails
-    return key
+    let result = val || key
+
+    // 3. Interpolate replacements if passed
+    if (replacements) {
+      Object.entries(replacements).forEach(([k, v]) => {
+        result = result.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v))
+      })
+    }
+
+    return result
   }
 
   return (
