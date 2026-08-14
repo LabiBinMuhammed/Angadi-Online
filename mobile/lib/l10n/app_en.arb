@@ -715,5 +715,18 @@
   "cannotRemoveOnlyOwner": "Cannot remove the only owner of a shop.",
   "confirmRemoveCoOwner": "Are you sure you want to remove this co-owner?",
   "coOwnerAddedSuccess": "Co-owner added successfully!",
-  "coOwnerRemovedSuccess": "Co-owner removed successfully!"
+  "coOwnerRemovedSuccess": "Co-owner removed successfully!",
+  "loyaltyClubTitle": "5-Star Rewards Club",
+  "loyaltyProgressLabel": "{stars} / 5 Stars Collected",
+  "loyaltyStarEarnedNotice": "🎉 +1 Star Earned on this delivered order!",
+  "loyaltyKeepCollectingNotice": "⭐ Collect {remaining} more Star to unlock your next Lucky Scratch Card!",
+  "loyaltyScratchCardUnlockedTitle": "🎉 Lucky Scratch Card Unlocked!",
+  "loyaltyScratchCardUnlockedDesc": "Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!",
+  "loyaltyScratchNowBtn": "Scratch Now 🎟️",
+  "loyaltyScratchDialogTitle": "🎟️ Lucky Scratch Card",
+  "loyaltyScratchDialogSubtitle": "Rub the metallic surface to reveal your guaranteed reward!",
+  "loyaltyClaimRewardBtn": "Claim Reward 🎁",
+  "loyaltyRewardClaimedTitle": "🎉 Congratulations!",
+  "loyaltyRewardClaimedSubtitle": "₹{amount} Angadi Credit added to your wallet!",
+  "loyaltyCloseBtn": "Close"
 }

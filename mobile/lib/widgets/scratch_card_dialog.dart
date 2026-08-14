@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:village_market/l10n/app_localizations.dart';
 import 'package:village_market/services/loyalty_service.dart';
 
 class ScratchCardDialog extends StatefulWidget {
@@ -44,6 +45,7 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Dialog(
@@ -74,7 +76,9 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
             const SizedBox(height: 16),
 
             Text(
-              _claimedAmount != null ? '🎉 Reward Unlocked!' : 'Scratch Your Lucky Card 🎟️',
+              _claimedAmount != null
+                  ? (l10n?.loyaltyRewardClaimedTitle ?? '🎉 Congratulations!')
+                  : (l10n?.loyaltyScratchDialogTitle ?? '🎟️ Lucky Scratch Card'),
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w800,
@@ -85,8 +89,10 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
 
             Text(
               _claimedAmount != null
-                  ? '₹${_claimedAmount!.toStringAsFixed(0)} Angadi Credit added to your account! Star counter reset to 0.'
-                  : 'Rub your finger over the card or tap below to reveal your guaranteed reward!',
+                  ? (l10n?.loyaltyRewardClaimedSubtitle(_claimedAmount!.toStringAsFixed(0)) ??
+                      '₹${_claimedAmount!.toStringAsFixed(0)} Angadi Credit added to your wallet!')
+                  : (l10n?.loyaltyScratchDialogSubtitle ??
+                      'Rub the metallic surface to reveal your guaranteed reward!'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -192,8 +198,8 @@ class _ScratchCardDialogState extends State<ScratchCardDialog> {
                       )
                     : Text(
                         _claimedAmount != null
-                            ? 'Claimed! Continue 🛍️'
-                            : 'Tap to Reveal Reward ⭐',
+                            ? (l10n?.loyaltyCloseBtn ?? 'Close')
+                            : (l10n?.loyaltyClaimRewardBtn ?? 'Claim Reward 🎁'),
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
               ),

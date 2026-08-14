@@ -17,6 +17,21 @@
     "menu": "Menu",
     "explore": "Explore"
   },
+  "loyalty": {
+    "club_title": "5-Star Rewards Club",
+    "progress_label": "{stars} / 5 Stars Collected",
+    "star_earned_notice": "🎉 +1 Star Earned on this delivered order!",
+    "keep_collecting_notice": "Collect {remaining} more Star{plural} to unlock your next Lucky Scratch Card!",
+    "scratch_card_unlocked_title": "🎉 Lucky Scratch Card Unlocked!",
+    "scratch_card_unlocked_desc": "Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!",
+    "scratch_now_btn": "Scratch Now 🎟️",
+    "scratch_dialog_title": "🎟️ Lucky Scratch Card",
+    "scratch_dialog_subtitle": "Rub the metallic surface to reveal your guaranteed reward!",
+    "claim_reward_btn": "Claim Reward 🎁",
+    "reward_claimed_title": "🎉 Congratulations!",
+    "reward_claimed_subtitle": "₹{amount} Angadi Credit added to your wallet!",
+    "close_btn": "Close"
+  },
   "common": {
     "search": "Search products, categories...",
     "add_to_cart": "Add to Cart",

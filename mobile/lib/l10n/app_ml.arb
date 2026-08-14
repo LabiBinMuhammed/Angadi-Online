@@ -477,5 +477,18 @@
   "cannotRemoveOnlyOwner": "കടയുടെ ഏക ഉടമയെ നീക്കം ചെയ്യാൻ കഴിയില്ല.",
   "confirmRemoveCoOwner": "ഈ സഹ-ഉടമയെ നീക്കം ചെയ്യണമെന്ന് ഉറപ്പാണോ?",
   "coOwnerAddedSuccess": "സഹ-ഉടമയെ വിജയകരമായി ചേർത്തു!",
-  "coOwnerRemovedSuccess": "സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!"
+  "coOwnerRemovedSuccess": "സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!",
+  "loyaltyClubTitle": "5-സ്റ്റാർ റിവാർഡ്സ് ക്ലബ്",
+  "loyaltyProgressLabel": "{stars} / 5 നക്ഷത്രങ്ങൾ ശേഖരിച്ചു",
+  "loyaltyStarEarnedNotice": "🎉 ഈ വിതരണം ചെയ്ത ഓർഡറിൽ +1 നക്ഷത്രം നേടി!",
+  "loyaltyKeepCollectingNotice": "⭐ അടുത്ത ലക്കി സ്ക്രാച്ച് കാർഡ് അൺലോക്ക് ചെയ്യാൻ {remaining} കൂടുതൽ നക്ഷത്രങ്ങൾ ശേഖരിക്കുക!",
+  "loyaltyScratchCardUnlockedTitle": "🎉 ലക്കി സ്ക്രാച്ച് കാർഡ് അൺലോക്ക് ചെയ്തു!",
+  "loyaltyScratchCardUnlockedDesc": "ഉറപ്പുള്ള ₹2–₹15 അങ്ങാടി ക്രെഡിറ്റ് റിവാർഡ് വെളിപ്പെടുത്താൻ സ്ക്രാച്ച് ചെയ്യുക!",
+  "loyaltyScratchNowBtn": "ഇപ്പോൾ സ്ക്രാച്ച് ചെയ്യുക 🎟️",
+  "loyaltyScratchDialogTitle": "🎟️ ലക്കി സ്ക്രാച്ച് കാർഡ്",
+  "loyaltyScratchDialogSubtitle": "നിങ്ങളുടെ ഉറപ്പുള്ള റിവാർഡ് കണ്ടെത്താൻ മെറ്റാലിക് പ്രതലത്തിൽ തിരുമ്മുക!",
+  "loyaltyClaimRewardBtn": "റിവാർഡ് ക്ലെയിം ചെയ്യുക 🎁",
+  "loyaltyRewardClaimedTitle": "🎉 അഭിനന്ദനങ്ങൾ!",
+  "loyaltyRewardClaimedSubtitle": "₹{amount} അങ്ങാടി ക്രെഡിറ്റ് നിങ്ങളുടെ വാലറ്റിൽ ചേർത്തു!",
+  "loyaltyCloseBtn": "അടയ്ക്കുക"
 }

@@ -477,5 +477,18 @@
   "cannotRemoveOnlyOwner": "لا يمكن إزالة المالك الوحيد للمتجر.",
   "confirmRemoveCoOwner": "هل أنت تأكد من إزالة هذا المالك المشارك؟",
   "coOwnerAddedSuccess": "تمت إضافة المالك المشارك بنجاح!",
-  "coOwnerRemovedSuccess": "تمت إزالة المالك المشارك بنجاح!"
+  "coOwnerRemovedSuccess": "تمت إزالة المالك المشارك بنجاح!",
+  "loyaltyClubTitle": "نادي المكافآت 5 نجوم",
+  "loyaltyProgressLabel": "{stars} / 5 نجوم تم جمعها",
+  "loyaltyStarEarnedNotice": "🎉 كسبت نجمة +1 على هذا الطلب المُسلّم!",
+  "loyaltyKeepCollectingNotice": "⭐ إجمع {remaining} نجوم إضافية لفتح بطاقة الحظ الكشط التالية!",
+  "loyaltyScratchCardUnlockedTitle": "🎉 تم فتح بطاقة الحظ الكشط!",
+  "loyaltyScratchCardUnlockedDesc": "اكشط لتكشف عن مكافأة رصيد أنغادي المضمونة بقيمة ₹2–₹15!",
+  "loyaltyScratchNowBtn": "إكشط الآن 🎟️",
+  "loyaltyScratchDialogTitle": "🎟️ بطاقة الحظ الكشط",
+  "loyaltyScratchDialogSubtitle": "إحك السطح المعدني لتكشف عن مكافأتك المضمونة!",
+  "loyaltyClaimRewardBtn": "مطالبة بالمكافأة 🎁",
+  "loyaltyRewardClaimedTitle": "🎉 تهانينا!",
+  "loyaltyRewardClaimedSubtitle": "تمت إضافة رصيد أنغادي بقيمة ₹{amount} إلى محفظتك!",
+  "loyaltyCloseBtn": "إغلاق"
 }

@@ -2885,6 +2885,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Co-owner removed successfully!'**
   String get coOwnerRemovedSuccess;
+
+  /// No description provided for @loyaltyClubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'5-Star Rewards Club'**
+  String get loyaltyClubTitle;
+
+  /// No description provided for @loyaltyProgressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{stars} / 5 Stars Collected'**
+  String loyaltyProgressLabel(Object stars);
+
+  /// No description provided for @loyaltyStarEarnedNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 +1 Star Earned on this delivered order!'**
+  String get loyaltyStarEarnedNotice;
+
+  /// No description provided for @loyaltyKeepCollectingNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'⭐ Collect {remaining} more Star to unlock your next Lucky Scratch Card!'**
+  String loyaltyKeepCollectingNotice(Object remaining);
+
+  /// No description provided for @loyaltyScratchCardUnlockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 Lucky Scratch Card Unlocked!'**
+  String get loyaltyScratchCardUnlockedTitle;
+
+  /// No description provided for @loyaltyScratchCardUnlockedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!'**
+  String get loyaltyScratchCardUnlockedDesc;
+
+  /// No description provided for @loyaltyScratchNowBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Scratch Now 🎟️'**
+  String get loyaltyScratchNowBtn;
+
+  /// No description provided for @loyaltyScratchDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎟️ Lucky Scratch Card'**
+  String get loyaltyScratchDialogTitle;
+
+  /// No description provided for @loyaltyScratchDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rub the metallic surface to reveal your guaranteed reward!'**
+  String get loyaltyScratchDialogSubtitle;
+
+  /// No description provided for @loyaltyClaimRewardBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim Reward 🎁'**
+  String get loyaltyClaimRewardBtn;
+
+  /// No description provided for @loyaltyRewardClaimedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 Congratulations!'**
+  String get loyaltyRewardClaimedTitle;
+
+  /// No description provided for @loyaltyRewardClaimedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'₹{amount} Angadi Credit added to your wallet!'**
+  String loyaltyRewardClaimedSubtitle(Object amount);
+
+  /// No description provided for @loyaltyCloseBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get loyaltyCloseBtn;
 }
 
 class _AppLocalizationsDelegate

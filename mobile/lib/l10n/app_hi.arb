@@ -477,5 +477,18 @@
   "cannotRemoveOnlyOwner": "दुकान के एकमात्र मालिक को हटाया नहीं जा सकता।",
   "confirmRemoveCoOwner": "क्या आप इस सह-मालिक को हटाना चाहते हैं?",
   "coOwnerAddedSuccess": "सह-मालिक सफलतापूर्वक जोड़ा गया!",
-  "coOwnerRemovedSuccess": "सह-मालिक सफलतापूर्वक हटाया गया!"
+  "coOwnerRemovedSuccess": "सह-मालिक सफलतापूर्वक हटाया गया!",
+  "loyaltyClubTitle": "5-स्टार रिवार्ड्स क्लब",
+  "loyaltyProgressLabel": "{stars} / 5 स्टार एकत्रित",
+  "loyaltyStarEarnedNotice": "🎉 इस डिलीवर किए गए ऑर्डर पर +1 स्टार मिला!",
+  "loyaltyKeepCollectingNotice": "⭐ अपना अगला लकी स्क्रैच कार्ड अनलॉक करने के लिए {remaining} और स्टार एकत्र करें!",
+  "loyaltyScratchCardUnlockedTitle": "🎉 लकी स्क्रैच कार्ड अनलॉक हो गया!",
+  "loyaltyScratchCardUnlockedDesc": "अपना गारंटीकृत ₹2–₹15 अंगाडी क्रेडिट इनाम पाने के लिए स्क्रैच करें!",
+  "loyaltyScratchNowBtn": "अभी स्क्रैच करें 🎟️",
+  "loyaltyScratchDialogTitle": "🎟️ लकी स्क्रैच कार्ड",
+  "loyaltyScratchDialogSubtitle": "अपना गारंटीकृत इनाम देखने के लिए धातु की सतह को रगड़ें!",
+  "loyaltyClaimRewardBtn": "इनाम का दावा करें 🎁",
+  "loyaltyRewardClaimedTitle": "🎉 बधाई हो!",
+  "loyaltyRewardClaimedSubtitle": "आपके वॉलेट में ₹{amount} अंगाडी क्रेडिट जोड़ा गया!",
+  "loyaltyCloseBtn": "बंद करें"
 }

@@ -1527,4 +1527,53 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get coOwnerRemovedSuccess => 'സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!';
+
+  @override
+  String get loyaltyClubTitle => '5-സ്റ്റാർ റിവാർഡ്സ് ക്ലബ്';
+
+  @override
+  String loyaltyProgressLabel(Object stars) {
+    return '$stars / 5 നക്ഷത്രങ്ങൾ ശേഖരിച്ചു';
+  }
+
+  @override
+  String get loyaltyStarEarnedNotice =>
+      '🎉 ഈ വിതരണം ചെയ്ത ഓർഡറിൽ +1 നക്ഷത്രം നേടി!';
+
+  @override
+  String loyaltyKeepCollectingNotice(Object remaining) {
+    return '⭐ അടുത്ത ലക്കി സ്ക്രാച്ച് കാർഡ് അൺലോക്ക് ചെയ്യാൻ $remaining കൂടുതൽ നക്ഷത്രങ്ങൾ ശേഖരിക്കുക!';
+  }
+
+  @override
+  String get loyaltyScratchCardUnlockedTitle =>
+      '🎉 ലക്കി സ്ക്രാച്ച് കാർഡ് അൺലോക്ക് ചെയ്തു!';
+
+  @override
+  String get loyaltyScratchCardUnlockedDesc =>
+      'ഉറപ്പുള്ള ₹2–₹15 അങ്ങാടി ക്രെഡിറ്റ് റിവാർഡ് വെളിപ്പെടുത്താൻ സ്ക്രാച്ച് ചെയ്യുക!';
+
+  @override
+  String get loyaltyScratchNowBtn => 'ഇപ്പോൾ സ്ക്രാച്ച് ചെയ്യുക 🎟️';
+
+  @override
+  String get loyaltyScratchDialogTitle => '🎟️ ലക്കി സ്ക്രാച്ച് കാർഡ്';
+
+  @override
+  String get loyaltyScratchDialogSubtitle =>
+      'നിങ്ങളുടെ ഉറപ്പുള്ള റിവാർഡ് കണ്ടെത്താൻ മെറ്റാലിക് പ്രതലത്തിൽ തിരുമ്മുക!';
+
+  @override
+  String get loyaltyClaimRewardBtn => 'റിവാർഡ് ക്ലെയിം ചെയ്യുക 🎁';
+
+  @override
+  String get loyaltyRewardClaimedTitle => '🎉 അഭിനന്ദനങ്ങൾ!';
+
+  @override
+  String loyaltyRewardClaimedSubtitle(Object amount) {
+    return '₹$amount അങ്ങാടി ക്രെഡിറ്റ് നിങ്ങളുടെ വാലറ്റിൽ ചേർത്തു!';
+  }
+
+  @override
+  String get loyaltyCloseBtn => 'അടയ്ക്കുക';
 }

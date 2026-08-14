@@ -17,6 +17,21 @@
     "menu": "Menu",
     "explore": "Explore"
   },
+  "loyalty": {
+    "club_title": "5-स्टार रिवार्ड्स क्लब",
+    "progress_label": "{stars} / 5 स्टार एकत्रित",
+    "star_earned_notice": "🎉 इस डिलीवर किए गए ऑर्डर पर +1 स्टार मिला!",
+    "keep_collecting_notice": "अपना अगला लकी स्क्रैच कार्ड अनलॉक करने के लिए {remaining} और स्टार एकत्र करें!",
+    "scratch_card_unlocked_title": "🎉 लकी स्क्रैच कार्ड अनलॉक हो गया!",
+    "scratch_card_unlocked_desc": "अपना गारंटीकृत ₹2–₹15 अंगाडी क्रेडिट इनाम पाने के लिए स्क्रैच करें!",
+    "scratch_now_btn": "अभी स्क्रैच करें 🎟️",
+    "scratch_dialog_title": "🎟️ लकी स्क्रैach कार्ड",
+    "scratch_dialog_subtitle": "अपना गारंटीकृत इनाम देखने के लिए धातु की सतह को रगड़ें!",
+    "claim_reward_btn": "इनाम का दावा करें 🎁",
+    "reward_claimed_title": "🎉 बधाई हो!",
+    "reward_claimed_subtitle": "आपके वॉलेट में ₹{amount} अंगाडी क्रेडिट जोड़ा गया!",
+    "close_btn": "बंद करें"
+  },
   "common": {
     "search": "उत्पादों, श्रेणियों की खोज करें...",
     "add_to_cart": "कार्ट में जोड़ें",

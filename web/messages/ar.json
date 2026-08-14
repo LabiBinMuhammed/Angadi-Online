@@ -17,6 +17,21 @@
     "menu": "Menu",
     "explore": "Explore"
   },
+  "loyalty": {
+    "club_title": "نادي المكافآت 5 نجوم",
+    "progress_label": "{stars} / 5 نجوم تم جمعها",
+    "star_earned_notice": "🎉 كسبت نجمة +1 على هذا الطلب المُسلّم!",
+    "keep_collecting_notice": "إجمع {remaining} نجوم إضافية لفتح بطاقة الحظ الكشط التالية!",
+    "scratch_card_unlocked_title": "🎉 تم فتح بطاقة الحظ الكشط!",
+    "scratch_card_unlocked_desc": "اكشط لتكشف عن مكافأة رصيد أنغادي المضمونة بقيمة ₹2–₹15!",
+    "scratch_now_btn": "إكشط الآن 🎟️",
+    "scratch_dialog_title": "🎟️ بطاقة الحظ الكشط",
+    "scratch_dialog_subtitle": "إحك السطح المعدني لتكشف عن مكافأتك المضمونة!",
+    "claim_reward_btn": "مطالبة بالمكافأة 🎁",
+    "reward_claimed_title": "🎉 تهانينا!",
+    "reward_claimed_subtitle": "تمت إضافة رصيد أنغادي بقيمة ₹{amount} إلى محفظتك!",
+    "close_btn": "إغلاق"
+  },
   "common": {
     "search": "البحث عن المنتجات والفئات...",
     "add_to_cart": "إضافة إلى السلة",

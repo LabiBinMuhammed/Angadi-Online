@@ -1501,4 +1501,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coOwnerRemovedSuccess => 'Co-owner removed successfully!';
+
+  @override
+  String get loyaltyClubTitle => '5-Star Rewards Club';
+
+  @override
+  String loyaltyProgressLabel(Object stars) {
+    return '$stars / 5 Stars Collected';
+  }
+
+  @override
+  String get loyaltyStarEarnedNotice =>
+      '🎉 +1 Star Earned on this delivered order!';
+
+  @override
+  String loyaltyKeepCollectingNotice(Object remaining) {
+    return '⭐ Collect $remaining more Star to unlock your next Lucky Scratch Card!';
+  }
+
+  @override
+  String get loyaltyScratchCardUnlockedTitle =>
+      '🎉 Lucky Scratch Card Unlocked!';
+
+  @override
+  String get loyaltyScratchCardUnlockedDesc =>
+      'Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!';
+
+  @override
+  String get loyaltyScratchNowBtn => 'Scratch Now 🎟️';
+
+  @override
+  String get loyaltyScratchDialogTitle => '🎟️ Lucky Scratch Card';
+
+  @override
+  String get loyaltyScratchDialogSubtitle =>
+      'Rub the metallic surface to reveal your guaranteed reward!';
+
+  @override
+  String get loyaltyClaimRewardBtn => 'Claim Reward 🎁';
+
+  @override
+  String get loyaltyRewardClaimedTitle => '🎉 Congratulations!';
+
+  @override
+  String loyaltyRewardClaimedSubtitle(Object amount) {
+    return '₹$amount Angadi Credit added to your wallet!';
+  }
+
+  @override
+  String get loyaltyCloseBtn => 'Close';
 }
