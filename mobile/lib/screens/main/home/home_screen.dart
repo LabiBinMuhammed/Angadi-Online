@@ -15,6 +15,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../widgets/tutorial/tutorial_manager.dart';
 import '../../../widgets/tutorial/tutorial_step.dart';
 import '../../../widgets/product_card.dart';
+import '../../../widgets/loyalty_tracker_widget.dart';
 import 'package:intl/intl.dart';
 
 // ── Colors ────────────────────────────────────────────────────────────────────
@@ -1095,6 +1096,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                ),
+
+                // 5-STAR REWARDS CLUB TRACKER & SCRATCH CARD WIDGET
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  child: LoyaltyTrackerWidget(),
                 ),
 
                 // Search Shops

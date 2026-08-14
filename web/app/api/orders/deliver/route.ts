@@ -38,7 +38,16 @@ export async function POST(req: Request) {
 
     if (updateErr) throw updateErr
 
-    return NextResponse.json({ success: true })
+    // Automatically award 1 Star if order >= ₹150
+    let starResult = null
+    try {
+      const { awardOrderStarIfEligible } = await import('@/lib/loyalty')
+      starResult = await awardOrderStarIfEligible(orderId)
+    } catch (starErr) {
+      console.error('Error awarding star on delivery:', starErr)
+    }
+
+    return NextResponse.json({ success: true, starResult })
   } catch (err: any) {
     console.error('Confirm delivery API error:', err)
     return NextResponse.json({ error: err.message || 'Failed to update order status' }, { status: 500 })

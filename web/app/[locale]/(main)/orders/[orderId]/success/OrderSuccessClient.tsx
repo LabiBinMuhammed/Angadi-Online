@@ -6,6 +6,8 @@ import confetti from 'canvas-confetti'
 import { CheckCircle2, ArrowRight, ShoppingBag, Copy, Check, Clock, ShieldCheck, MapPin, Store } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
+import LoyaltyRewardTracker from '@/components/LoyaltyRewardTracker'
+
 type Props = {
   orderId: string
   order?: {
@@ -55,7 +57,8 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
   }
 
   const shortId = orderId.substring(0, 8).toUpperCase()
-  const totalAmount = order?.total_amount ? Number(order.total_amount).toFixed(2) : '0.00'
+  const totalAmountNum = order?.total_amount ? Number(order.total_amount) : 0
+  const totalAmount = totalAmountNum.toFixed(2)
 
   return (
     <div className="order-success-wrap" style={{
@@ -116,7 +119,9 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           margin: '0 0 0.5rem 0',
           letterSpacing: '-0.02em'
         }}>
-          {t('order_success.title') || 'Order Placed Successfully! 🎉'}
+          {order?.status === 'delivered'
+            ? (t('order_success.delivered_title') || 'Order Delivered Successfully! 📦🎉')
+            : (t('order_success.title') || 'Order Placed Successfully! 🎉')}
         </h1>
 
         <p style={{
@@ -126,7 +131,9 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           margin: '0 auto 1.75rem auto',
           maxWidth: '440px'
         }}>
-          {t('order_success.subtitle') || 'Thank you for your order. The shop vendor has been notified and is preparing your items.'}
+          {order?.status === 'delivered'
+            ? (t('order_success.delivered_subtitle') || 'Your items have been safely delivered! Hope you enjoy your purchase.')
+            : (t('order_success.subtitle') || 'Thank you for your order. The shop vendor has been notified and is preparing your items.')}
         </p>
 
         {/* Order Details Badge Card */}
@@ -135,7 +142,7 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           borderRadius: '20px',
           padding: '1.25rem 1.5rem',
           border: '1px solid var(--border, #e2e8f0)',
-          marginBottom: '2rem',
+          marginBottom: '1.5rem',
           textAlign: 'left'
         }}>
           {/* Order ID Row */}
@@ -188,11 +195,11 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           }}>
             <div>
               <div style={{ fontSize: '0.78rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '0.2rem' }}>
-                {t('order_success.delivery_estimate') || 'Estimated Delivery'}
+                {t('order_success.delivery_estimate') || 'Status'}
               </div>
-              <div style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--fg)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                <Clock size={15} color="#3b82f6" />
-                {t('order_success.delivery_time') || 'Within 30–45 mins'}
+              <div style={{ fontSize: '0.92rem', fontWeight: 700, color: order?.status === 'delivered' ? '#22c55e' : 'var(--fg)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Clock size={15} color={order?.status === 'delivered' ? '#22c55e' : '#3b82f6'} />
+                {order?.status === 'delivered' ? 'Delivered 📦' : (t('order_success.delivery_time') || 'Within 30–45 mins')}
               </div>
             </div>
             <div>
@@ -205,6 +212,13 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
             </div>
           </div>
         </div>
+
+        {/* 5-STAR LOYALTY REWARD TRACKER & LUCKY SCRATCH CARD WIDGET */}
+        <LoyaltyRewardTracker
+          orderAmount={totalAmountNum}
+          orderStatus={order?.status}
+          orderId={orderId}
+        />
 
         {/* TWO PRIMARY ACTION BUTTONS */}
         <div style={{

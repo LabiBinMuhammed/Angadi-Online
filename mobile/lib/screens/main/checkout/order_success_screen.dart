@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:village_market/l10n/app_localizations.dart';
+import 'package:village_market/widgets/loyalty_tracker_widget.dart';
 
 class OrderSuccessScreen extends StatefulWidget {
   final String orderId;
@@ -398,7 +399,14 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                       ),
                     ),
 
-                    const SizedBox(height: 36),
+                    const SizedBox(height: 20),
+
+                    // 5-STAR LOYALTY REWARD TRACKER & LUCKY SCRATCH CARD WIDGET
+                    LoyaltyTrackerWidget(
+                      orderId: widget.orderId,
+                    ),
+
+                    const SizedBox(height: 20),
 
                     // BUTTON 1: View Order Details
                     SizedBox(
