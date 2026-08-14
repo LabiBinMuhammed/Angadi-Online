@@ -8,6 +8,7 @@ import { ArrowLeft, Clock, Package, Truck, CheckCircle2, XCircle, MapPin, Credit
 import MarkAsDeliveredButton from '@/components/MarkAsDeliveredButton'
 import CancelOrderButton from '@/components/CancelOrderButton'
 import BackButton from '@/components/BackButton'
+import LoyaltyRewardTracker from '@/components/LoyaltyRewardTracker'
 
 type Props = { params: Promise<{ locale: string; orderId: string }> }
 
@@ -196,6 +197,13 @@ export default async function OrderDetailPage({ params }: Props) {
             <CancelOrderButton orderId={o.id} />
           </div>
         )}
+
+        {/* 5-Star Rewards Club Loyalty Tracker & Scratch Card */}
+        <LoyaltyRewardTracker
+          orderAmount={Number(o.total_final_price ?? o.total_estimated_price ?? 0)}
+          orderStatus={o.status}
+          orderId={o.id}
+        />
 
         {replacements && replacements.length > 0 && (
           <div className="card">
