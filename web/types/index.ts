@@ -111,6 +111,7 @@ export interface Category {
   description?: string
   is_active: boolean
   display_order?: number
+  commission_percentage?: number
   updated_at: string
 }
 

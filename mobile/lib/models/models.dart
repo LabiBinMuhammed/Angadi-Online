@@ -70,14 +70,22 @@ class Category {
   final String id;
   final String name;
   final bool isActive;
+  final double commissionPercentage;
   final List<Map<String, dynamic>>? categoryTranslations;
 
-  const Category({required this.id, required this.name, this.isActive = true, this.categoryTranslations});
+  const Category({
+    required this.id,
+    required this.name,
+    this.isActive = true,
+    this.commissionPercentage = 4.0,
+    this.categoryTranslations,
+  });
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
         id: json['id'] as String,
         name: json['name'] as String,
         isActive: json['is_active'] as bool? ?? true,
+        commissionPercentage: (json['commission_percentage'] as num?)?.toDouble() ?? 4.0,
         categoryTranslations: (json['category_translations'] as List?)
             ?.map((e) => Map<String, dynamic>.from(e as Map))
             .toList(),

@@ -11,7 +11,8 @@ import {
   recordCommissionPayment, 
   waiveCommission,
   generateMonthlyReports,
-  updateShopsRestrictionLevels
+  updateShopsRestrictionLevels,
+  updateCategoryCommissionRate
 } from '@/lib/supabase/commission'
 
 export async function saveSettingsAction(formData: FormData) {
@@ -277,5 +278,21 @@ export async function toggleMonthlyReportPaidAction(shopId: string, month: numbe
 
   revalidatePath('/admin/commission/shops')
   revalidatePath('/admin/commission')
+  return { success: true }
+}
+
+export async function updateCategoryCommissionAction(categoryId: string, rate: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not logged in')
+
+  const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (profile?.role !== 'admin') throw new Error('Unauthorized')
+
+  await updateCategoryCommissionRate(categoryId, rate, user.id)
+
+  revalidatePath('/admin/commission')
+  revalidatePath('/admin/commission/settings')
+  revalidatePath('/admin/categories')
   return { success: true }
 }

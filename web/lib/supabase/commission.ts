@@ -1,7 +1,103 @@
 import { createClient as createServerClient } from './server'
 import { createAdminClient } from './admin'
 
-// Global Settings Functions
+// Category Commission Tiers Map & Defaults
+export const LOW_MARGIN_CATEGORIES = ['Vegetables', 'Fruits', 'Grocery', 'Dairy & Beverages']
+export const MEDIUM_HIGH_MARGIN_CATEGORIES = ['Bakery', 'Meat & Fish', 'Household Essentials', 'Stationery']
+
+export const DEFAULT_CATEGORY_COMMISSION_RATES: Record<string, number> = {
+  'Vegetables': 2.5,
+  'Fruits': 2.5,
+  'Grocery': 2.5,
+  'Dairy & Beverages': 2.5,
+  'Bakery': 4.0,
+  'Meat & Fish': 4.0,
+  'Household Essentials': 4.0,
+  'Stationery': 4.0,
+}
+
+export function getCategoryCommissionRate(categoryName?: string | null, customRate?: number | null): number {
+  if (customRate !== undefined && customRate !== null && !isNaN(Number(customRate))) {
+    return Number(customRate)
+  }
+  if (!categoryName) return 4.0
+  const normalized = categoryName.trim()
+  if (normalized in DEFAULT_CATEGORY_COMMISSION_RATES) {
+    return DEFAULT_CATEGORY_COMMISSION_RATES[normalized]
+  }
+  const lower = normalized.toLowerCase()
+  if (lower.includes('veg') || lower.includes('fruit') || lower.includes('groc') || lower.includes('dair') || lower.includes('bever')) {
+    return 2.5
+  }
+  return 4.0
+}
+
+export function calculateOrderCategoryCommission(orderItems: Array<{
+  final_price?: number | null
+  estimated_price?: number | null
+  category_name?: string | null
+  category_commission_percentage?: number | null
+}>): { totalCommission: number; effectiveRate: number; totalSales: number } {
+  let totalCommission = 0
+  let totalSales = 0
+
+  for (const item of orderItems) {
+    const itemPrice = Number(item.final_price ?? item.estimated_price ?? 0)
+    const rate = getCategoryCommissionRate(item.category_name, item.category_commission_percentage)
+    const itemCommission = Math.round((itemPrice * (rate / 100)) * 100) / 100
+    
+    totalCommission += itemCommission
+    totalSales += itemPrice
+  }
+
+  totalCommission = Math.round(totalCommission * 100) / 100
+  totalSales = Math.round(totalSales * 100) / 100
+  const effectiveRate = totalSales > 0 ? Math.round((totalCommission / totalSales) * 10000) / 100 : 4.0
+
+  return { totalCommission, effectiveRate, totalSales }
+}
+
+export async function getCategoriesWithCommission() {
+  const supabase = await createServerClient()
+  const { data, error } = await supabase
+    .from('categories')
+    .select('id, name, description, is_active, display_order, commission_percentage')
+    .order('display_order')
+
+  if (error) throw error
+
+  return (data || []).map(cat => ({
+    ...cat,
+    commission_percentage: getCategoryCommissionRate(cat.name, cat.commission_percentage)
+  }))
+}
+
+export async function updateCategoryCommissionRate(categoryId: string, rate: number, adminUserId: string | null = null) {
+  const supabase = await createServerClient()
+  const { data: oldCat } = await supabase.from('categories').select('name, commission_percentage').eq('id', categoryId).maybeSingle()
+  
+  const oldRate = getCategoryCommissionRate(oldCat?.name, oldCat?.commission_percentage)
+
+  const { data, error } = await supabase
+    .from('categories')
+    .update({ commission_percentage: rate, updated_at: new Date().toISOString() })
+    .eq('id', categoryId)
+    .select()
+    .single()
+
+  if (error) throw error
+
+  await logCommissionAudit(
+    'Category Commission Rate Updated',
+    null,
+    adminUserId,
+    `${oldCat?.name || 'Category'}: ${oldRate}%`,
+    `${oldCat?.name || 'Category'}: ${rate}%`,
+    `Updated category commission rate for ${oldCat?.name || categoryId}`
+  )
+
+  return data
+}
 export async function getCommissionSettings() {
   const supabase = await createServerClient()
   const { data, error } = await supabase

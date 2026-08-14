@@ -1,13 +1,14 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft, Save, HelpCircle } from 'lucide-react'
-import { getCommissionSettings } from '@/lib/supabase/commission'
+import { getCommissionSettings, getCategoriesWithCommission } from '@/lib/supabase/commission'
 import { saveSettingsAction } from '@/app/actions/commission'
 
 export const metadata: Metadata = { title: 'Admin - Commission Settings' }
 
 export default async function CommissionSettingsPage() {
   const settings = await getCommissionSettings()
+  const categories = await getCategoriesWithCommission()
 
   return (
     <div style={{ maxWidth: '700px', margin: '0 auto', paddingBottom: '3rem' }}>
@@ -178,6 +179,32 @@ export default async function CommissionSettingsPage() {
               <span className="text-xs text-muted" style={{ marginTop: '0.25rem', display: 'block' }}>
                 Level 3: Block new orders
               </span>
+            </div>
+          </div>
+
+          {/* Category Commission Rates Summary */}
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px dashed var(--border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <div>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0 }}>Category Commission Rates</h3>
+                <p className="text-xs text-muted" style={{ margin: 0 }}>
+                  2.5% for Low Margin categories (Vegetables, Fruits, Grocery, Dairy & Beverages) · 4.0% for Medium/High Margin categories
+                </p>
+              </div>
+              <Link href="/admin/categories" className="btn btn-sm btn-outline" style={{ fontSize: '0.8rem', fontWeight: 700 }}>
+                Manage Categories ⚙️
+              </Link>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+              {categories.map(cat => (
+                <div key={cat.id} style={{ padding: '0.75rem 1rem', background: 'var(--bg-base)', borderRadius: '12px', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--fg)' }}>{cat.name}</span>
+                  <span className="badge" style={{ background: cat.commission_percentage <= 2.5 ? 'rgba(34, 197, 94, 0.15)' : 'rgba(59, 130, 246, 0.15)', color: cat.commission_percentage <= 2.5 ? '#16a34a' : '#2563eb', fontWeight: 800 }}>
+                    {cat.commission_percentage}%
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 

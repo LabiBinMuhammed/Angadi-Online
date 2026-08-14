@@ -9,31 +9,35 @@ export default function CategoriesClient({ categories: initial }: { categories: 
   const [categories, setCategories] = useState(initial)
 
   // Add form
-  const [newName, setNewName]         = useState('')
-  const [newDesc, setNewDesc]         = useState('')
-  const [newOrder, setNewOrder]       = useState('')
-  const [newIsActive, setNewIsActive] = useState(true)
-  const [saving, setSaving]           = useState(false)
-  const [addErr, setAddErr]           = useState('')
+  const [newName, setNewName]               = useState('')
+  const [newDesc, setNewDesc]               = useState('')
+  const [newOrder, setNewOrder]             = useState('')
+  const [newCommission, setNewCommission]   = useState('4.0')
+  const [newIsActive, setNewIsActive]       = useState(true)
+  const [saving, setSaving]                 = useState(false)
+  const [addErr, setAddErr]                 = useState('')
 
   // Edit inline
-  const [editingId, setEditingId]   = useState<string | null>(null)
-  const [editName, setEditName]     = useState('')
-  const [editDesc, setEditDesc]     = useState('')
-  const [editOrder, setEditOrder]   = useState('')
-  const [editSaving, setEditSaving] = useState(false)
+  const [editingId, setEditingId]         = useState<string | null>(null)
+  const [editName, setEditName]           = useState('')
+  const [editDesc, setEditDesc]           = useState('')
+  const [editOrder, setEditOrder]         = useState('')
+  const [editCommission, setEditCommission] = useState('')
+  const [editSaving, setEditSaving]       = useState(false)
 
   async function addCategory() {
     if (!newName.trim()) return
     setSaving(true)
     setAddErr('')
     const supabase = createClient()
+    const parsedCommission = newCommission ? parseFloat(newCommission) : 4.0
     const { data, error } = await supabase
       .from('categories')
       .insert({
         name: newName.trim(),
         description: newDesc.trim() || null,
         display_order: newOrder ? parseInt(newOrder, 10) : null,
+        commission_percentage: parsedCommission,
         is_active: newIsActive
       })
       .select('*')
@@ -49,6 +53,7 @@ export default function CategoriesClient({ categories: initial }: { categories: 
     setNewName('')
     setNewDesc('')
     setNewOrder('')
+    setNewCommission('4.0')
     setNewIsActive(true)
   }
 
@@ -64,6 +69,7 @@ export default function CategoriesClient({ categories: initial }: { categories: 
     setEditName(cat.name)
     setEditDesc(cat.description ?? '')
     setEditOrder(cat.display_order !== undefined && cat.display_order !== null ? cat.display_order.toString() : '')
+    setEditCommission(cat.commission_percentage !== undefined && cat.commission_percentage !== null ? cat.commission_percentage.toString() : '4.0')
   }
 
   async function saveEdit(id: string) {
@@ -71,12 +77,14 @@ export default function CategoriesClient({ categories: initial }: { categories: 
     setEditSaving(true)
     const supabase = createClient()
     const parsedOrder = editOrder ? parseInt(editOrder, 10) : null
+    const parsedCommission = editCommission ? parseFloat(editCommission) : 4.0
     const { error } = await supabase
       .from('categories')
       .update({
         name: editName.trim(),
         description: editDesc.trim() || null,
-        display_order: parsedOrder
+        display_order: parsedOrder,
+        commission_percentage: parsedCommission
       })
       .eq('id', id)
     setEditSaving(false)
@@ -86,7 +94,8 @@ export default function CategoriesClient({ categories: initial }: { categories: 
         ...c,
         name: editName.trim(),
         description: editDesc.trim() || undefined,
-        display_order: parsedOrder !== null ? parsedOrder : undefined
+        display_order: parsedOrder !== null ? parsedOrder : undefined,
+        commission_percentage: parsedCommission
       } as Category : c)
       return updated.sort((a, b) => (a.display_order ?? 999) - (b.display_order ?? 999))
     })
@@ -162,6 +171,17 @@ export default function CategoriesClient({ categories: initial }: { categories: 
             onChange={e => setNewOrder(e.target.value)}
             style={{ width: 120 }}
           />
+          <input
+            id="new-cat-commission"
+            type="number"
+            step="0.1"
+            className="form-input"
+            value={newCommission}
+            placeholder="Comm %"
+            onChange={e => setNewCommission(e.target.value)}
+            style={{ width: 110 }}
+            title="Category Commission Percentage"
+          />
           <label style={{ display: 'flex', alignItems: 'center', gap: '.4rem', fontSize: '.9rem', cursor: 'pointer', userSelect: 'none', color: 'var(--text-base)' }}>
             <input
               type="checkbox"
@@ -191,6 +211,7 @@ export default function CategoriesClient({ categories: initial }: { categories: 
             <tr>
               <th>Name</th>
               <th>Order</th>
+              <th>Commission %</th>
               <th className="hide-sm">Description</th>
               <th className="hide-sm">Status</th>
               <th className="hide-sm">Last Updated</th>
@@ -218,6 +239,16 @@ export default function CategoriesClient({ categories: initial }: { categories: 
                         value={editOrder}
                         onChange={e => setEditOrder(e.target.value)}
                         style={{ padding: '.4rem .6rem', fontSize: '.9rem', width: 80 }}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        step="0.1"
+                        className="form-input"
+                        value={editCommission}
+                        onChange={e => setEditCommission(e.target.value)}
+                        style={{ padding: '.4rem .6rem', fontSize: '.9rem', width: 90 }}
                       />
                     </td>
                     <td className="hide-sm">
@@ -250,6 +281,11 @@ export default function CategoriesClient({ categories: initial }: { categories: 
                   <>
                     <td className="font-medium">{cat.name}</td>
                     <td className="text-sm font-semibold">{cat.display_order ?? '—'}</td>
+                    <td>
+                      <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', fontWeight: 800 }}>
+                        {cat.commission_percentage !== undefined && cat.commission_percentage !== null ? `${cat.commission_percentage}%` : '4.0%'}
+                      </span>
+                    </td>
                     <td className="text-sm text-muted hide-sm">{cat.description ?? '—'}</td>
                     <td className="hide-sm">
                       <span className={`badge ${cat.is_active ? 'badge-success' : 'badge-danger'}`}>

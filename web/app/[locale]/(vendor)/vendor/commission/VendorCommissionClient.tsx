@@ -183,6 +183,36 @@ export default function VendorCommissionClient({
         </div>
       )}
 
+      {/* Category Commission Tier Breakdown Notice */}
+      <div className="vp-card" style={{
+        background: 'rgba(59, 130, 246, 0.08)',
+        border: '1px solid rgba(59, 130, 246, 0.2)',
+        padding: '1.25rem 1.5rem',
+        borderRadius: '16px',
+        marginBottom: '1.5rem',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: '1rem'
+      }}>
+        <div style={{ width: 40, height: 40, borderRadius: '12px', background: 'rgba(59, 130, 246, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', flexShrink: 0 }}>
+          <Coins size={20} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#60a5fa' }}>Category-Based Commission Rates</h3>
+          <p style={{ margin: '0.25rem 0 0.5rem', fontSize: '0.88rem', color: '#93c5fd', lineHeight: 1.4 }}>
+            Platform commission is calculated per item based on product category margins:
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.5rem', fontSize: '0.82rem', color: '#e0f2fe' }}>
+            <div style={{ padding: '0.4rem 0.75rem', background: 'rgba(34, 197, 94, 0.12)', borderRadius: '8px', border: '1px solid rgba(34, 197, 94, 0.2)' }}>
+              <strong style={{ color: '#4ade80' }}>2.5% Low Margin:</strong> Vegetables, Fruits, Grocery, Dairy & Beverages
+            </div>
+            <div style={{ padding: '0.4rem 0.75rem', background: 'rgba(59, 130, 246, 0.12)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+              <strong style={{ color: '#60a5fa' }}>4.0% Standard Margin:</strong> Bakery, Meat & Fish, Household Essentials, Stationery
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Overdue Warning Banner */}
       {subscription && subscription.restriction_level >= 1 && (
         <div 

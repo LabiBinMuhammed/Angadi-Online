@@ -274,6 +274,73 @@ class _VendorCommissionScreenState extends State<VendorCommissionScreen> {
                   ),
                   const SizedBox(height: 16),
 
+                  // Category Commission Tiers Breakdown Banner
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.monetization_on_outlined, size: 18, color: Color(0xFF60A5FA)),
+                            SizedBox(width: 8),
+                            Text(
+                              'Category-Based Commission Rates',
+                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF60A5FA)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Commission is calculated per line item according to category margins:',
+                          style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.7)),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF22C55E).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFF22C55E).withValues(alpha: 0.3)),
+                                ),
+                                child: const Text(
+                                  '2.5% Low Margin\nVeg, Fruit, Groc, Dairy',
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF4ADE80)),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
+                                ),
+                                child: const Text(
+                                  '4.0% Standard Margin\nBakery, Meat, Household',
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF60A5FA)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   // Date Filter selectors row
                   Row(
                     children: [
