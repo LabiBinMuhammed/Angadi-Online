@@ -46,10 +46,10 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
       duration: const Duration(milliseconds: 1800),
     );
 
-    // 3. Single Celebration Burst Physics Controller (3.5s duration)
+    // 3. Single Celebration Burst Physics Controller (4.0s duration)
     _confettiBurstController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 3500),
+      duration: const Duration(milliseconds: 4000),
     );
 
     _spawnCelebrationBurst();
@@ -68,26 +68,92 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
       const Color(0xFFEC4899), // Pink
       const Color(0xFF8B5CF6), // Purple
       const Color(0xFF10B981), // Emerald
+      const Color(0xFFFF4757), // Coral Red
+      const Color(0xFF00D2D3), // Cyan
     ];
 
-    // Spawn 90 particles bursting upwards & outwards from checkmark center
-    for (int i = 0; i < 90; i++) {
+    // Stage 1: Center Big Explosion (80 particles)
+    for (int i = 0; i < 80; i++) {
       final angle = _rand.nextDouble() * pi * 2;
-      final speed = _rand.nextDouble() * 320 + 120;
-
+      final speed = _rand.nextDouble() * 380 + 150;
       _particles.add(
         _SingleBurstParticle(
           startX: 0.5,
-          startY: 0.3,
+          startY: 0.32,
           vx: cos(angle) * speed,
-          vy: sin(angle) * speed - 220, // Initial upward burst
-          size: _rand.nextDouble() * 9 + 5,
+          vy: sin(angle) * speed - 260,
+          size: _rand.nextDouble() * 10 + 6,
           color: colors[_rand.nextInt(colors.length)],
           rotation: _rand.nextDouble() * pi * 2,
-          rotationSpeed: (_rand.nextDouble() - 0.5) * 10,
-          isCircle: _rand.nextBool(),
-          drag: _rand.nextDouble() * 0.04 + 0.94,
-          gravity: _rand.nextDouble() * 280 + 320,
+          rotationSpeed: (_rand.nextDouble() - 0.5) * 12,
+          shapeType: _rand.nextInt(3),
+          drag: _rand.nextDouble() * 0.03 + 0.95,
+          gravity: _rand.nextDouble() * 260 + 340,
+          delay: 0.0,
+        ),
+      );
+    }
+
+    // Stage 2: Left Side Cannon (45 particles, fired at t = 0.2s)
+    for (int i = 0; i < 45; i++) {
+      final angle = (-pi / 3) + (_rand.nextDouble() - 0.5) * 0.45; // ~60 degrees upwards right
+      final speed = _rand.nextDouble() * 450 + 250;
+      _particles.add(
+        _SingleBurstParticle(
+          startX: 0.02,
+          startY: 0.8,
+          vx: cos(angle) * speed,
+          vy: sin(angle) * speed,
+          size: _rand.nextDouble() * 10 + 6,
+          color: colors[_rand.nextInt(colors.length)],
+          rotation: _rand.nextDouble() * pi * 2,
+          rotationSpeed: (_rand.nextDouble() - 0.5) * 14,
+          shapeType: _rand.nextInt(3),
+          drag: _rand.nextDouble() * 0.03 + 0.95,
+          gravity: _rand.nextDouble() * 260 + 340,
+          delay: 0.2,
+        ),
+      );
+    }
+
+    // Stage 3: Right Side Cannon (45 particles, fired at t = 0.2s)
+    for (int i = 0; i < 45; i++) {
+      final angle = (-2 * pi / 3) + (_rand.nextDouble() - 0.5) * 0.45; // ~120 degrees upwards left
+      final speed = _rand.nextDouble() * 450 + 250;
+      _particles.add(
+        _SingleBurstParticle(
+          startX: 0.98,
+          startY: 0.8,
+          vx: cos(angle) * speed,
+          vy: sin(angle) * speed,
+          size: _rand.nextDouble() * 10 + 6,
+          color: colors[_rand.nextInt(colors.length)],
+          rotation: _rand.nextDouble() * pi * 2,
+          rotationSpeed: (_rand.nextDouble() - 0.5) * 14,
+          shapeType: _rand.nextInt(3),
+          drag: _rand.nextDouble() * 0.03 + 0.95,
+          gravity: _rand.nextDouble() * 260 + 340,
+          delay: 0.2,
+        ),
+      );
+    }
+
+    // Stage 4: Top Cascade Rain (30 particles, fired at t = 0.4s)
+    for (int i = 0; i < 30; i++) {
+      _particles.add(
+        _SingleBurstParticle(
+          startX: _rand.nextDouble(),
+          startY: -0.05,
+          vx: (_rand.nextDouble() - 0.5) * 100,
+          vy: _rand.nextDouble() * 120 + 80,
+          size: _rand.nextDouble() * 8 + 5,
+          color: colors[_rand.nextInt(colors.length)],
+          rotation: _rand.nextDouble() * pi * 2,
+          rotationSpeed: (_rand.nextDouble() - 0.5) * 8,
+          shapeType: _rand.nextInt(3),
+          drag: 0.97,
+          gravity: 220,
+          delay: 0.4,
         ),
       );
     }
@@ -413,9 +479,10 @@ class _SingleBurstParticle {
   final Color color;
   final double rotation;
   final double rotationSpeed;
-  final bool isCircle;
+  final int shapeType; // 0: rectangle, 1: circle, 2: star/diamond
   final double drag;
   final double gravity;
+  final double delay;
 
   _SingleBurstParticle({
     required this.startX,
@@ -426,9 +493,10 @@ class _SingleBurstParticle {
     required this.color,
     required this.rotation,
     required this.rotationSpeed,
-    required this.isCircle,
+    required this.shapeType,
     required this.drag,
     required this.gravity,
+    required this.delay,
   });
 }
 
@@ -442,18 +510,22 @@ class _SingleBurstConfettiPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (progress >= 1.0) return; // Clean static state after burst ends
 
-    final dt = progress * 3.5; // Seconds elapsed
+    const totalDuration = 4.0;
+    final currentTime = progress * totalDuration;
 
     for (var p in particles) {
+      if (currentTime < p.delay) continue;
+
+      final dt = currentTime - p.delay;
       final currentVx = p.vx * pow(p.drag, dt * 60);
       final currentVy = (p.vy + p.gravity * dt) * pow(p.drag, dt * 60);
 
       final posX = (p.startX * size.width) + (currentVx * dt * 0.4);
       final posY = (p.startY * size.height) + (currentVy * dt * 0.4);
 
-      // Fade out smoothly towards the end of 3.5s
-      final opacity = (1.0 - (progress * 1.25)).clamp(0.0, 1.0);
-      if (opacity <= 0 || posY > size.height + 60) continue;
+      // Fade out smoothly near end of 4.0s
+      final opacity = (1.0 - ((dt / (totalDuration - p.delay)) * 1.15)).clamp(0.0, 1.0);
+      if (opacity <= 0 || posY > size.height + 60 || posX < -40 || posX > size.width + 40) continue;
 
       final paint = Paint()
         ..color = p.color.withValues(alpha: opacity)
@@ -461,13 +533,29 @@ class _SingleBurstConfettiPainter extends CustomPainter {
 
       canvas.save();
       canvas.translate(posX, posY);
-      canvas.rotate(p.rotation + (p.rotationSpeed * dt));
 
-      if (p.isCircle) {
+      // 3D rotation flip effect
+      final rotAngle = p.rotation + (p.rotationSpeed * dt);
+      final scaleX = cos(rotAngle);
+      canvas.scale(scaleX.abs().clamp(0.15, 1.0), 1.0);
+      canvas.rotate(rotAngle * 0.5);
+
+      if (p.shapeType == 1) {
         canvas.drawCircle(Offset.zero, p.size / 2, paint);
+      } else if (p.shapeType == 2) {
+        // Diamond / Star
+        final path = Path();
+        final s = p.size;
+        path.moveTo(0, -s / 2);
+        path.lineTo(s / 3, 0);
+        path.lineTo(0, s / 2);
+        path.lineTo(-s / 3, 0);
+        path.close();
+        canvas.drawPath(path, paint);
       } else {
+        // Rectangle ribbon strip
         canvas.drawRect(
-          Rect.fromCenter(center: Offset.zero, width: p.size, height: p.size * 0.65),
+          Rect.fromCenter(center: Offset.zero, width: p.size * 1.2, height: p.size * 0.6),
           paint,
         );
       }
