@@ -165,10 +165,30 @@ export async function claimScratchCardReward(userId: string): Promise<{
       }
     }
 
-    // Generate random guaranteed reward between ₹5 and ₹50
-    // Options: ₹5, ₹10, ₹15, ₹20, ₹25, ₹30, ₹40, ₹50
-    const rewards = [5, 10, 15, 20, 25, 30, 40, 50]
-    const rewardAmount = rewards[Math.floor(Math.random() * rewards.length)]
+    // Generate weighted reward based on probability tiers:
+    // ₹3 -> Most common reward (38%)
+    // ₹2–₹5 -> Most customers receive these (78% total)
+    // ₹7–₹10 -> Occasional pleasant surprise (16% total)
+    // ₹12–₹15 -> Rare exciting rewards (6% total)
+    const generateRewardAmount = (): number => {
+      const rand = Math.random() * 100
+      if (rand < 1.5) return 15
+      if (rand < 3.0) return 14
+      if (rand < 4.5) return 13
+      if (rand < 6.0) return 12
+
+      if (rand < 10.0) return 10
+      if (rand < 14.0) return 9
+      if (rand < 18.0) return 8
+      if (rand < 22.0) return 7
+
+      if (rand < 60.0) return 3 // ₹3 is most common!
+      if (rand < 73.0) return 4
+      if (rand < 86.0) return 5
+      return 2
+    }
+
+    const rewardAmount = generateRewardAmount()
 
     // Reset star count by 5 and update rewards
     const remainingStars = Math.max(0, current.starsCount - 5)

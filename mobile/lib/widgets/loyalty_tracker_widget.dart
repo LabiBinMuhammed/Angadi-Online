@@ -316,7 +316,7 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
                           ),
                         ),
                         Text(
-                          'Scratch to win ₹5–₹50 Angadi Credit!',
+                          'Scratch to win ₹2–₹15 Angadi Credit!',
                           style: TextStyle(fontSize: 11, color: Colors.white70),
                         ),
                       ],
@@ -343,7 +343,7 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
           else
             Center(
               child: Text(
-                '⭐ Collect ${5 - _loyalty.starsCount} more Star${(5 - _loyalty.starsCount) > 1 ? 's' : ''} to unlock your next Lucky Scratch Card (₹5–₹50 Credit)!',
+                '⭐ Collect ${5 - _loyalty.starsCount} more Star${(5 - _loyalty.starsCount) > 1 ? 's' : ''} to unlock your next Lucky Scratch Card (₹2–₹15 Credit)!',
                 style: const TextStyle(fontSize: 11, color: Colors.white60),
                 textAlign: TextAlign.center,
               ),

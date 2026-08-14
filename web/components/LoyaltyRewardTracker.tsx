@@ -302,7 +302,7 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
                 {t('loyalty.scratch_card_ready') || '🎉 Lucky Scratch Card Unlocked!'}
               </div>
               <div style={{ fontSize: '0.8rem', color: '#dcfce7' }}>
-                {t('loyalty.scratch_card_desc') || 'Scratch to reveal your guaranteed ₹5–₹50 Angadi Credit reward!'}
+                {t('loyalty.scratch_card_desc') || 'Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!'}
               </div>
             </div>
           </div>
@@ -332,7 +332,7 @@ export default function LoyaltyRewardTracker({ initialLoyalty, orderAmount, orde
         </div>
       ) : (
         <div style={{ fontSize: '0.8rem', color: '#94a3b8', textAlign: 'center' }}>
-          ⭐ Collect <strong>{5 - loyalty.starsCount} more Star{5 - loyalty.starsCount > 1 ? 's' : ''}</strong> to unlock your next <strong>Lucky Scratch Card (₹5–₹50 Guaranteed Credit)</strong>!
+          ⭐ Collect <strong>{5 - loyalty.starsCount} more Star{5 - loyalty.starsCount > 1 ? 's' : ''}</strong> to unlock your next <strong>Lucky Scratch Card (₹2–₹15 Guaranteed Credit)</strong>!
         </div>
       )}
 

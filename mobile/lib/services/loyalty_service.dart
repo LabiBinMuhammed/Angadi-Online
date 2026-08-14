@@ -139,9 +139,34 @@ class LoyaltyService {
         return {'success': false, 'message': '5 stars required'};
       }
 
-      final rewards = [5, 10, 15, 20, 25, 30, 40, 50];
-      final rand = Random();
-      final rewardAmount = rewards[rand.nextInt(rewards.length)].toDouble();
+      final randVal = Random().nextDouble() * 100;
+      double rewardAmount = 3.0;
+
+      if (randVal < 1.5) {
+        rewardAmount = 15.0;
+      } else if (randVal < 3.0) {
+        rewardAmount = 14.0;
+      } else if (randVal < 4.5) {
+        rewardAmount = 13.0;
+      } else if (randVal < 6.0) {
+        rewardAmount = 12.0;
+      } else if (randVal < 10.0) {
+        rewardAmount = 10.0;
+      } else if (randVal < 14.0) {
+        rewardAmount = 9.0;
+      } else if (randVal < 18.0) {
+        rewardAmount = 8.0;
+      } else if (randVal < 22.0) {
+        rewardAmount = 7.0;
+      } else if (randVal < 60.0) {
+        rewardAmount = 3.0; // ₹3 is most common (38% chance!)
+      } else if (randVal < 73.0) {
+        rewardAmount = 4.0;
+      } else if (randVal < 86.0) {
+        rewardAmount = 5.0;
+      } else {
+        rewardAmount = 2.0;
+      }
 
       final remainingStars = max(0, current.starsCount - 5);
       final remainingCards = max(0, current.scratchCardsUnlocked - 1);
