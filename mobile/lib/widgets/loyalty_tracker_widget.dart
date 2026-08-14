@@ -103,18 +103,18 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
     final borderTileColor = isDark ? Colors.white12 : const Color(0xFFE2E8F0);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         gradient: cardBg,
         boxShadow: [
           BoxShadow(
             color: isDark
-                ? const Color(0xFF0F172A).withValues(alpha: 0.35)
-                : const Color(0xFF64748B).withValues(alpha: 0.08),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+                ? const Color(0xFF0F172A).withValues(alpha: 0.3)
+                : const Color(0xFF64748B).withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(color: borderTileColor),
@@ -122,47 +122,47 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Row
+          // Sleek Header Row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 34,
+                    height: 34,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(10),
                       gradient: const LinearGradient(
                         colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFF59E0B).withValues(alpha: 0.45),
-                          blurRadius: 12,
+                          color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
+                          blurRadius: 8,
                         ),
                       ],
                     ),
-                    child: const Icon(Icons.star_rounded, size: 24, color: Colors.white),
+                    child: const Icon(Icons.star_rounded, size: 20, color: Colors.white),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         l10n?.loyaltyClubTitle ?? '5-Star Rewards Club ⭐',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 14,
                           fontWeight: FontWeight.w800,
                           color: titleColor,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 1),
                       Text(
                         l10n?.loyaltyProgressLabel('${_loyalty.starsCount.clamp(0, 5)}') ??
                             '${_loyalty.starsCount.clamp(0, 5)} / 5 Stars Collected',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
                           color: subColor,
                         ),
@@ -171,51 +171,38 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: isUnlocked
-                      ? const Color(0xFF22C55E).withValues(alpha: 0.18)
-                      : const Color(0xFFF59E0B).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isUnlocked ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
+              if (isUnlocked)
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF16A34A),
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  ),
+                  onPressed: _openScratchCard,
+                  child: Text(
+                    l10n?.loyaltyScratchNowBtn ?? 'Scratch Now 🎟️',
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.star_rounded,
-                      size: 14,
-                      color: isUnlocked ? const Color(0xFF22C55E) : const Color(0xFFD97706),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${_loyalty.starsCount.clamp(0, 5)} / 5',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        color: isUnlocked ? const Color(0xFF16A34A) : const Color(0xFFD97706),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
 
           if (widget.orderAmount != null) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
                 color: isOrderEligible
-                    ? const Color(0xFF22C55E).withValues(alpha: 0.12)
-                    : (isDark ? Colors.white.withValues(alpha: 0.06) : const Color(0xFFF1F5F9)),
-                borderRadius: BorderRadius.circular(12),
+                    ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                    : (isDark ? Colors.white.withValues(alpha: 0.05) : const Color(0xFFF1F5F9)),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: isOrderEligible
-                      ? const Color(0xFF22C55E).withValues(alpha: 0.3)
+                      ? const Color(0xFF22C55E).withValues(alpha: 0.25)
                       : borderTileColor,
                 ),
               ),
@@ -223,15 +210,15 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
                 children: [
                   Icon(
                     Icons.auto_awesome_rounded,
-                    size: 16,
+                    size: 14,
                     color: isOrderEligible ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       l10n?.loyaltyStarEarnedNotice ?? '🎉 +1 Star Earned on this delivered order!',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: isOrderEligible
                             ? (isDark ? const Color(0xFF86EFAC) : const Color(0xFF15803D))
@@ -244,9 +231,9 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
             ),
           ],
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 10),
 
-          // 5-Star Visual Progress Bar
+          // Compact 5-Star Visual Progress Bar (NO Star Text Labels!)
           Row(
             children: List.generate(5, (index) {
               final step = index + 1;
@@ -254,10 +241,10 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
 
               return Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(right: index < 4 ? 6 : 0),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  height: 36,
+                  margin: EdgeInsets.only(right: index < 4 ? 5 : 0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(10),
                     gradient: filled
                         ? const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFB45309)])
                         : null,
@@ -269,96 +256,26 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
                     boxShadow: filled
                         ? [
                             BoxShadow(
-                              color: const Color(0xFFF59E0B).withValues(alpha: 0.35),
-                              blurRadius: 8,
+                              color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                              blurRadius: 6,
                             )
                           ]
                         : null,
                   ),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.star_rounded,
-                        size: 20,
-                        color: filled ? Colors.white : (isDark ? Colors.white38 : const Color(0xFF94A3B8)),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Star $step',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: filled ? Colors.white : (isDark ? Colors.white38 : const Color(0xFF94A3B8)),
-                        ),
-                      ),
-                    ],
+                  child: Center(
+                    child: Icon(
+                      Icons.star_rounded,
+                      size: 20,
+                      color: filled ? Colors.white : (isDark ? Colors.white38 : const Color(0xFF94A3B8)),
+                    ),
                   ),
                 ),
               );
             }),
           ),
 
-          const SizedBox(height: 14),
-
-          // Unlocked Scratch Card Banner or Info
-          if (isUnlocked)
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF22C55E), Color(0xFF15803D)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF22C55E).withValues(alpha: 0.4),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.card_giftcard_rounded, size: 28, color: Colors.white),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n?.loyaltyScratchCardUnlockedTitle ?? '🎉 Lucky Scratch Card Unlocked!',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          l10n?.loyaltyScratchCardUnlockedDesc ?? 'Scratch to reveal your guaranteed ₹2–₹15 Angadi Credit reward!',
-                          style: const TextStyle(fontSize: 11, color: Colors.white70),
-                        ),
-                      ],
-                    ),
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF15803D),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    onPressed: _openScratchCard,
-                    child: Text(
-                      l10n?.loyaltyScratchNowBtn ?? 'Scratch Now 🎟️',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          else
+          if (!isUnlocked) ...[
+            const SizedBox(height: 8),
             Center(
               child: Text(
                 l10n?.loyaltyKeepCollectingNotice('${5 - _loyalty.starsCount}') ??
@@ -367,6 +284,7 @@ class _LoyaltyTrackerWidgetState extends State<LoyaltyTrackerWidget> {
                 textAlign: TextAlign.center,
               ),
             ),
+          ],
         ],
       ),
     );
