@@ -16,7 +16,6 @@ import { addToCart, removeOrderItem, updateOrderItemQty } from '../cart/actions'
 import AddressDropdownClient from '../AddressDropdownClient'
 import { useTheme } from '@/components/ThemeProvider'
 import { useTranslation } from '@/lib/i18n/I18nContext'
-import LoyaltyRewardTracker from '@/components/LoyaltyRewardTracker'
 
 // Helpers
 function initials(name?: string) {
@@ -611,10 +610,7 @@ export default function HomeClient({
 
 
 
-          {/* 5-STAR REWARDS CLUB TRACKER & SCRATCH CARD WIDGET */}
-          <div style={{ padding: '0 24px 8px' }}>
-            <LoyaltyRewardTracker />
-          </div>
+
 
           {/* Shops */}
           <div className="marketplace-shops-container">

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
-import '../../../widgets/loyalty_tracker_widget.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -351,11 +350,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ),
                         ),
 
-                        // ─── 5-Star Rewards Club Loyalty Tracker ──────────────
-                        LoyaltyTrackerWidget(
-                          orderId: widget.orderId,
-                          orderStatus: status,
-                        ),
+
 
                         // ─── Request Replacement / Complaint Quick Action Card ─────
                         if (status == 'delivered') ...[

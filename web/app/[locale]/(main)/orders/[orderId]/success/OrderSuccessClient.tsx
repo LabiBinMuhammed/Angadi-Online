@@ -6,8 +6,6 @@ import confetti from 'canvas-confetti'
 import { CheckCircle2, ArrowRight, ShoppingBag, Copy, Check, Clock, ShieldCheck, MapPin, Store } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
-import LoyaltyRewardTracker from '@/components/LoyaltyRewardTracker'
-
 type Props = {
   orderId: string
   order?: {
@@ -213,12 +211,7 @@ export default function OrderSuccessClient({ orderId, order }: Props) {
           </div>
         </div>
 
-        {/* 5-STAR LOYALTY REWARD TRACKER & LUCKY SCRATCH CARD WIDGET */}
-        <LoyaltyRewardTracker
-          orderAmount={totalAmountNum}
-          orderStatus={order?.status}
-          orderId={orderId}
-        />
+
 
         {/* TWO PRIMARY ACTION BUTTONS */}
         <div style={{

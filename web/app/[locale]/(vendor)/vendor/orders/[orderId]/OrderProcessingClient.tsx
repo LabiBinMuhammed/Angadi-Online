@@ -107,15 +107,6 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
         setOrder(o => ({ ...o, status: nextStatus }))
       }
 
-      if (nextStatus === 'delivered') {
-        try {
-          await fetch('/api/loyalty', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'award_order', orderId: order.id })
-          })
-        } catch (e) {}
-      }
     } catch (err: any) {
       console.error('Failed to update order status:', err)
       const supabase = createClient()
