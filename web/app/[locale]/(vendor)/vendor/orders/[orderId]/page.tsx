@@ -57,11 +57,33 @@ export default async function OrderProcessingPage({ params }: { params: Promise<
     return key
   }
 
-  const { data: order } = await supabase
+  // 1. Try fetching with user client first
+  let { data: order } = await supabase
     .from('orders')
     .select('*, users(name, phone), order_items(*, items(name), item_variants:vw_item_variants_with_fallback(label, value, unit_id, image_url))')
     .eq('id', orderId)
-    .single()
+    .maybeSingle()
+
+  // 2. Fallback to admin client if RLS returned null
+  if (!order) {
+    try {
+      const { createClient: createAdminClient } = await import('@supabase/supabase-js')
+      const supabaseAdmin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      )
+
+      const { data: adminOrder } = await supabaseAdmin
+        .from('orders')
+        .select('*, users(name, phone), order_items(*, items(name), item_variants:vw_item_variants_with_fallback(label, value, unit_id, image_url))')
+        .eq('id', orderId)
+        .maybeSingle()
+
+      order = adminOrder
+    } catch (e) {
+      console.error('Admin order fetch error:', e)
+    }
+  }
 
   if (!order) notFound()
 
