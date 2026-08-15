@@ -961,11 +961,17 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              children: ['all','pending','accepted','packing','ready','out_for_delivery','delivered','cancelled'].map((s) =>
+              children: ['all','pending','delivering','packing','delivered','cancelled'].map((s) =>
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(s == 'all' ? 'All Statuses' : s[0].toUpperCase() + s.substring(1).replaceAll('_', ' ')),
+                    label: Text(s == 'all'
+                        ? 'All Statuses'
+                        : s == 'packing'
+                            ? 'Completed Transaction'
+                            : s == 'delivering'
+                                ? 'Out for Delivery'
+                                : s[0].toUpperCase() + s.substring(1).replaceAll('_', ' ')),
                     selected: _status == s,
                     selectedColor: kWaGreen,
                     onSelected: (_) => setState(() => _status = s),
@@ -1043,7 +1049,15 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('ID: ${(o['id'] as String).substring(0, 8)} · ${o['status'].toString().toUpperCase()}'),
+                            Text(() {
+                              final st = o['status'].toString();
+                              final displaySt = st == 'packing'
+                                  ? 'COMPLETED TRANSACTION'
+                                  : st == 'delivering'
+                                      ? 'OUT FOR DELIVERY'
+                                      : st.toUpperCase();
+                              return 'ID: ${(o['id'] as String).substring(0, 8)} · $displaySt';
+                            }()),
                             if (o['delivery_date'] != null && o['delivery_slot'] != null)
                               Padding(
                                 padding: const EdgeInsets.only(top: 4),

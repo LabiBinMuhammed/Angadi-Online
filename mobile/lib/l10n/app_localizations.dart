@@ -2885,6 +2885,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Co-owner removed successfully!'**
   String get coOwnerRemovedSuccess;
+
+  /// No description provided for @loyaltyRewardClaimedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎉 Congratulations!'**
+  String get loyaltyRewardClaimedTitle;
+
+  /// No description provided for @loyaltyScratchDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'🎟️ Lucky Scratch Card'**
+  String get loyaltyScratchDialogTitle;
+
+  /// No description provided for @loyaltyRewardClaimedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'₹{amount} Angadi Credit added to your wallet!'**
+  String loyaltyRewardClaimedSubtitle(String amount);
+
+  /// No description provided for @loyaltyScratchDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rub the metallic surface to reveal your guaranteed reward!'**
+  String get loyaltyScratchDialogSubtitle;
+
+  /// No description provided for @loyaltyCloseBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get loyaltyCloseBtn;
+
+  /// No description provided for @loyaltyClaimRewardBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Claim Reward 🎁'**
+  String get loyaltyClaimRewardBtn;
 }
 
 class _AppLocalizationsDelegate

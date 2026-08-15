@@ -477,5 +477,18 @@
   "cannotRemoveOnlyOwner": "لا يمكن إزالة المالك الوحيد للمتجر.",
   "confirmRemoveCoOwner": "هل أنت تأكد من إزالة هذا المالك المشارك؟",
   "coOwnerAddedSuccess": "تمت إضافة المالك المشارك بنجاح!",
-  "coOwnerRemovedSuccess": "تمت إزالة المالك المشارك بنجاح!"
+  "coOwnerRemovedSuccess": "تمت إزالة المالك المشارك بنجاح!",
+  "loyaltyRewardClaimedTitle": "🎉 تهانينا!",
+  "loyaltyScratchDialogTitle": "🎟️ بطاقة امسح واربح المحظوظة",
+  "loyaltyRewardClaimedSubtitle": "تم إضافة ₹{amount} من رصيد أنغادي إلى محفظتك!",
+  "@loyaltyRewardClaimedSubtitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "loyaltyScratchDialogSubtitle": "امسح السطح المعدني للكشف عن جائزتك المضمونة!",
+  "loyaltyCloseBtn": "إغلاق",
+  "loyaltyClaimRewardBtn": "المطالبة بالمكافأة 🎁"
 }

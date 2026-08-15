@@ -112,7 +112,7 @@ export default function VendorItemsClient({
         </div>
 
         <span style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-          {filtered.length} {t('purchase_history.of') || 'of'} {items.length} {t('vendor_dashboard.orders_count_label') || 'items'}
+          {filtered.length} {t('purchase_history.of') || 'of'} {items.length} {t('vendor_dashboard.products_count_label') || 'products'}
         </span>
       </div>
 

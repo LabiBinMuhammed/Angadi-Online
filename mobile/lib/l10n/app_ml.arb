@@ -477,5 +477,18 @@
   "cannotRemoveOnlyOwner": "കടയുടെ ഏക ഉടമയെ നീക്കം ചെയ്യാൻ കഴിയില്ല.",
   "confirmRemoveCoOwner": "ഈ സഹ-ഉടമയെ നീക്കം ചെയ്യണമെന്ന് ഉറപ്പാണോ?",
   "coOwnerAddedSuccess": "സഹ-ഉടമയെ വിജയകരമായി ചേർത്തു!",
-  "coOwnerRemovedSuccess": "സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!"
+  "coOwnerRemovedSuccess": "സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!",
+  "loyaltyRewardClaimedTitle": "🎉 അഭിനന്ദനങ്ങൾ!",
+  "loyaltyScratchDialogTitle": "🎟️ ലക്കി സ്ക്രാച്ച് കാർഡ്",
+  "loyaltyRewardClaimedSubtitle": "₹{amount} അങ്ങാടി ക്രെഡിറ്റ് നിങ്ങളുടെ വാലറ്റിൽ ചേർത്തു!",
+  "@loyaltyRewardClaimedSubtitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "loyaltyScratchDialogSubtitle": "നിങ്ങളുടെ ഉറപ്പായ സമ്മാനം കാണാൻ ഈ പ്രതലം സ്ക്രാച്ച് ചെയ്യുക!",
+  "loyaltyCloseBtn": "അടയ്ക്കുക",
+  "loyaltyClaimRewardBtn": "സമ്മാനം നേടുക 🎁"
 }

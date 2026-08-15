@@ -65,15 +65,18 @@ flutter {
 
 gradle.buildFinished {
     try {
-        val targetFile = File("D:/Labeeb/Online Shop/Angadi-Online.apk")
-        val artifactFile = File("C:/Users/Administrator/.gemini/antigravity/brain/3379a72f-e25b-427d-84f2-034b22f85ed2/Angadi-Online.apk")
-        targetFile.parentFile?.mkdirs()
-        artifactFile.parentFile?.mkdirs()
+        val targetApk = File("D:/Labeeb/Online Shop/Angadi-Online.apk")
+        val targetAab = File("D:/Labeeb/Online Shop/Angadi-Online.aab")
+        targetApk.parentFile?.mkdirs()
+        
         val tempDir = File(System.getProperty("java.io.tmpdir"))
         tempDir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.apk" }.forEach { apk: File ->
-            apk.copyTo(targetFile, overwrite = true)
-            apk.copyTo(artifactFile, overwrite = true)
-            println("=== SUCCESS COPYING ${apk.name}: Target size=${targetFile.length()} bytes, Artifact size=${artifactFile.length()} bytes ===")
+            apk.copyTo(targetApk, overwrite = true)
+            println("=== SUCCESS COPYING APK: Target size=${targetApk.length()} bytes ===")
+        }
+        tempDir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.aab" }.forEach { aab: File ->
+            aab.copyTo(targetAab, overwrite = true)
+            println("=== SUCCESS COPYING AAB: Target size=${targetAab.length()} bytes ===")
         }
     } catch (e: Exception) {
         println("=== COPY ERROR: ${e.message} ===")

@@ -30,12 +30,11 @@ type Order = {
   order_number?: string | number
 }
 
-const STATUS_FLOW = ['pending', 'accepted', 'ready', 'out_for_delivery', 'delivered']
+const STATUS_FLOW = ['pending', 'delivering', 'packing', 'delivered']
 const STATUS_ICONS: Record<string, React.ReactNode> = {
   pending: <Clock size={16} />,
-  accepted: <Box size={16} />,
-  ready: <Package size={16} />,
-  out_for_delivery: <Truck size={16} />,
+  delivering: <Truck size={16} />,
+  packing: <Box size={16} />,
   delivered: <CheckCircle size={16} />,
 }
 
@@ -81,9 +80,8 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'pending': return t('vendor_order_processing.status_pending')
-      case 'accepted': return t('vendor_order_processing.status_accepted')
-      case 'ready': return t('vendor_order_processing.status_ready')
-      case 'out_for_delivery': return t('vendor_order_processing.status_out_for_delivery')
+      case 'delivering': return t('vendor_order_processing.status_delivering')
+      case 'packing': return t('vendor_order_processing.status_completed_transaction')
       case 'delivered': return t('vendor_order_processing.status_delivered')
       case 'cancelled': return t('vendor_order_processing.status_cancelled')
       default: return status
@@ -520,9 +518,9 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
            </div>
         )}
 
-        {order.status === 'out_for_delivery' ? (
+        {order.status === 'packing' ? (
            <div style={{ padding: '1rem', background: 'rgba(59, 130, 246, 0.1)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '12px', color: '#93c5fd', textAlign: 'center', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-             <Clock size={18} /> {t('vendor_order_processing.waiting_user_confirmation')}
+             <Clock size={18} /> {t('vendor_order_processing.waiting_user_confirmation') || 'Transaction Completed. Waiting for Customer Confirmation.'}
            </div>
         ) : (
           nextStatus && order.status !== 'cancelled' && (
@@ -533,7 +531,15 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
               onClick={() => updateOrderStatus(nextStatus)}
               disabled={updating || (order.status === 'pending' && !allItemsProcessed) || !isAllowed}
             >
-              {updating ? t('vendor_order_processing.updating') : order.status === 'pending' ? t('vendor_order_processing.accept_order_start_packing') : t('vendor_order_processing.mark_as').replace('{status}', getStatusLabel(nextStatus))}
+              {updating ? (
+                t('vendor_order_processing.updating')
+              ) : order.status === 'pending' ? (
+                t('vendor_order_processing.mark_as_delivering') || 'Set Out for Delivery'
+              ) : order.status === 'delivering' ? (
+                t('vendor_order_processing.mark_as_completed_transaction') || 'Complete Transaction'
+              ) : (
+                t('vendor_order_processing.mark_as').replace('{status}', getStatusLabel(nextStatus))
+              )}
               {!updating && <ChevronRight size={20} />}
             </button>
           )

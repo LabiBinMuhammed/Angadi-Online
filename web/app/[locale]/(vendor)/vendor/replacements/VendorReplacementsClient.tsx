@@ -53,8 +53,9 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
 
   // Selected request for action modal
   const [selectedReq, setSelectedReq] = useState<any | null>(null)
-  const [resolutionStatus, setResolutionStatus] = useState<'approved' | 'rejected' | 'completed'>('approved')
+  const [decision, setDecision] = useState<'approve_next_shift' | 'approve_now' | 'reject'>('approve_next_shift')
   const [generalNotes, setGeneralNotes] = useState('')
+  const [rejectionReason, setRejectionReason] = useState('')
   const [itemNotes, setItemNotes] = useState<Record<string, string>>({})
   
   // Settings tab state (per shop)
@@ -101,8 +102,9 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
   // Open action modal
   function handleOpenActionModal(req: any) {
     setSelectedReq(req)
-    setResolutionStatus(req.status.toLowerCase() === 'pending' ? 'approved' : req.status.toLowerCase())
-    setGeneralNotes(req.notes || '')
+    setDecision('approve_next_shift')
+    setGeneralNotes('')
+    setRejectionReason('')
     
     const initialItemNotes: Record<string, string> = {}
     req.replacement_items?.forEach((itm: any) => {
@@ -117,14 +119,35 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
     e.preventDefault()
     if (!selectedReq) return
 
+    if (decision === 'reject' && !rejectionReason.trim() && !generalNotes.trim()) {
+      setErrorMsg('Please specify a rejection reason for the customer.')
+      return
+    }
+
     setSubmitting(true)
     setErrorMsg('')
     setSuccessMsg('')
 
     try {
-      const mappedStatus = resolutionStatus === 'approved' ? 'Approved'
-                         : resolutionStatus === 'completed' ? 'Completed'
-                         : 'Rejected'
+      let mappedStatus: 'Approved' | 'Rejected' = 'Approved'
+      let finalNotes = ''
+
+      if (decision === 'reject') {
+        mappedStatus = 'Rejected'
+        finalNotes = rejectionReason.trim() || generalNotes.trim()
+      } else if (decision === 'approve_next_shift') {
+        mappedStatus = 'Approved'
+        const customNote = generalNotes.trim()
+        finalNotes = customNote 
+          ? `${customNote} [Delivery: Next Shift]` 
+          : 'Approved for replacement. Delivery scheduled in the next shift.'
+      } else if (decision === 'approve_now') {
+        mappedStatus = 'Approved'
+        const customNote = generalNotes.trim()
+        finalNotes = customNote 
+          ? `${customNote} [Delivery: Out Now]` 
+          : 'Approved for immediate replacement. Items dispatched for delivery.'
+      }
 
       const response = await fetch('/api/vendor/replacements', {
         method: 'POST',
@@ -133,7 +156,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
           requestId: selectedReq.id,
           shopId: selectedReq.shop_id,
           status: mappedStatus,
-          notes: generalNotes,
+          notes: finalNotes,
           sellerNotesMap: itemNotes
         })
       })
@@ -147,7 +170,7 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
         setRequests(prev => prev.map(r => r.id === selectedReq.id ? {
           ...r,
           status: mappedStatus,
-          notes: generalNotes,
+          notes: finalNotes,
           updated_at: new Date().toISOString(),
           replacement_items: r.replacement_items?.map((ri: any) => ({
             ...ri,
@@ -155,7 +178,11 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
           }))
         } : r))
         
-        setSuccessMsg('Request updated successfully.')
+        setSuccessMsg(
+          decision === 'reject' 
+            ? 'Replacement request rejected.' 
+            : 'Replacement approved! Waiting for customer confirmation upon delivery.'
+        )
         setSelectedReq(null)
       }
     } catch (err: any) {
@@ -528,88 +555,177 @@ export default function VendorReplacementsClient({ initialRequests, shops, local
 
       {/* Action Dialog / Modal */}
       {selectedReq && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#fff', margin: '0 0 16px' }}>
+        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }}>
+          <div className="modal-content" style={{ background: '#0f172a', border: '1px solid #334155', borderRadius: '16px', color: '#f8fafc', padding: '1.5rem', maxWidth: '520px' }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#f8fafc', margin: '0 0 16px' }}>
               {t('replacements.resolve_replacement_request') || 'Resolve Replacement Request'}
             </h3>
             
             <form onSubmit={handleSubmitAction}>
-              <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '16px' }}>
+              <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
                 <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
-                  {t('replacements.action_decision') || 'Action Decision'}
+                  Select Decision
                 </label>
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '14px', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label 
+                    onClick={() => setDecision('approve_next_shift')}
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      padding: '12px 14px', 
+                      borderRadius: '12px',
+                      background: decision === 'approve_next_shift' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.02)',
+                      border: `1.5px solid ${decision === 'approve_next_shift' ? '#3b82f6' : 'rgba(255,255,255,0.06)'}`,
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '14px', color: '#fff' }}>🚚 Approve & Deliver in Next Shift</div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>Replacement items will be batched for the next delivery shift</div>
+                    </div>
                     <input 
                       type="radio" 
-                      name="dec" 
-                      value="approved" 
-                      checked={resolutionStatus === 'approved'}
-                      onChange={() => setResolutionStatus('approved')}
+                      name="decision" 
+                      checked={decision === 'approve_next_shift'}
+                      onChange={() => setDecision('approve_next_shift')}
                     />
-                    {t('replacements.approve') || 'Approve'}
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '14px', cursor: 'pointer' }}>
+
+                  <label 
+                    onClick={() => setDecision('approve_now')}
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      padding: '12px 14px', 
+                      borderRadius: '12px',
+                      background: decision === 'approve_now' ? 'rgba(34, 197, 94, 0.15)' : 'rgba(255,255,255,0.02)',
+                      border: `1.5px solid ${decision === 'approve_now' ? '#22c55e' : 'rgba(255,255,255,0.06)'}`,
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '14px', color: '#fff' }}>⚡ Approve & Deliver Now</div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>Dispatches replacement items immediately for direct delivery</div>
+                    </div>
                     <input 
                       type="radio" 
-                      name="dec" 
-                      value="completed" 
-                      checked={resolutionStatus === 'completed'}
-                      onChange={() => setResolutionStatus('completed')}
+                      name="decision" 
+                      checked={decision === 'approve_now'}
+                      onChange={() => setDecision('approve_now')}
                     />
-                    {t('replacements.complete_resolved') || 'Complete (Resolved)'}
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '14px', cursor: 'pointer' }}>
+
+                  <label 
+                    onClick={() => setDecision('reject')}
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between',
+                      padding: '12px 14px', 
+                      borderRadius: '12px',
+                      background: decision === 'reject' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(255,255,255,0.02)',
+                      border: `1.5px solid ${decision === 'reject' ? '#ef4444' : 'rgba(255,255,255,0.06)'}`,
+                      cursor: 'pointer' 
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: '14px', color: '#fff' }}>❌ Reject Request with Reason</div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>Decline the replacement claim with customer explanation</div>
+                    </div>
                     <input 
                       type="radio" 
-                      name="dec" 
-                      value="rejected" 
-                      checked={resolutionStatus === 'rejected'}
-                      onChange={() => setResolutionStatus('rejected')}
+                      name="decision" 
+                      checked={decision === 'reject'}
+                      onChange={() => setDecision('reject')}
                     />
-                    {t('replacements.reject') || 'Reject'}
                   </label>
                 </div>
               </div>
 
               {/* Item-specific notes */}
-              <div style={{ marginBottom: '16px' }}>
-                <div className="section-label" style={{ marginBottom: '8px' }}>{t('replacements.item_resolutions') || 'Item Resolutions'}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {selectedReq.replacement_items?.map((ri: any) => (
-                    <div key={ri.id} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '10px', borderRadius: '8px' }}>
-                      <p style={{ margin: '0 0 6px', fontSize: '13px', fontWeight: 700, color: '#fff' }}>
-                        {ri.order_items?.items?.name} (Qty: {ri.quantity})
-                      </p>
-                      <input 
-                        type="text" 
-                        className="search-input" 
-                        style={{ padding: '8px 12px', fontSize: '13px' }}
-                        placeholder="Specific action note for this item (e.g. Approved replacement dispatch...)"
-                        value={itemNotes[ri.id] || ''}
-                        onChange={(e) => setItemNotes(prev => ({
-                          ...prev,
-                          [ri.id]: e.target.value
-                        }))}
-                      />
-                    </div>
-                  ))}
+              {decision !== 'reject' && (
+                <div style={{ marginBottom: '16px' }}>
+                  <div className="section-label" style={{ marginBottom: '8px' }}>{t('replacements.item_resolutions') || 'Item Resolutions'}</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {selectedReq.replacement_items?.map((ri: any) => (
+                      <div key={ri.id} style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '10px', borderRadius: '8px' }}>
+                        <p style={{ margin: '0 0 6px', fontSize: '13px', fontWeight: 700, color: '#fff' }}>
+                          {ri.order_items?.items?.name} (Qty: {ri.quantity})
+                        </p>
+                        <input 
+                          type="text" 
+                          className="search-input" 
+                          style={{ padding: '8px 12px', fontSize: '13px' }}
+                          placeholder="Specific action note for this item (e.g. Approved replacement dispatch...)"
+                          value={itemNotes[ri.id] || ''}
+                          onChange={(e) => setItemNotes(prev => ({
+                            ...prev,
+                            [ri.id]: e.target.value
+                          }))}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
-                <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
-                  {t('replacements.general_resolution_explanation') || 'General Resolution Explanation'}
-                </label>
-                <textarea 
-                  className="search-input" 
-                  style={{ minHeight: '80px', lineHeight: 1.5 }}
-                  placeholder="Enter overall notes about this request..."
-                  value={generalNotes}
-                  onChange={(e) => setGeneralNotes(e.target.value)}
-                />
-              </div>
+              {decision === 'reject' ? (
+                <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
+                  <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#fca5a5' }}>
+                    Rejection Reason / Explanation (Required)
+                  </label>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '6px' }}>
+                    {[
+                      'Damage not visible in photos',
+                      'Product already consumed',
+                      'Outside return policy window',
+                      'Item reported does not match order'
+                    ].map(template => (
+                      <button
+                        key={template}
+                        type="button"
+                        onClick={() => setRejectionReason(template)}
+                        style={{
+                          padding: '3px 8px',
+                          fontSize: '11px',
+                          borderRadius: '6px',
+                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          background: rejectionReason === template ? 'rgba(239, 68, 68, 0.25)' : 'rgba(255,255,255,0.04)',
+                          color: '#fca5a5',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {template}
+                      </button>
+                    ))}
+                  </div>
+                  <textarea 
+                    className="search-input" 
+                    style={{ minHeight: '80px', lineHeight: 1.5, borderColor: 'rgba(239, 68, 68, 0.3)' }}
+                    placeholder="Explain why this request is being rejected..."
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                  />
+                </div>
+              ) : (
+                <div className="vp-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '20px' }}>
+                  <label className="vp-label" style={{ fontSize: '13px', fontWeight: 700, color: '#94a3b8' }}>
+                    {t('replacements.general_resolution_explanation') || 'Seller Delivery Notes (Optional)'}
+                  </label>
+                  <textarea 
+                    className="search-input" 
+                    style={{ minHeight: '80px', lineHeight: 1.5 }}
+                    placeholder="Add delivery notes or instructions for the customer..."
+                    value={generalNotes}
+                    onChange={(e) => setGeneralNotes(e.target.value)}
+                  />
+                  <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#94a3b8', fontStyle: 'italic' }}>
+                    ℹ️ Once approved, the customer will verify and confirm receipt of the replacement items upon delivery.
+                  </p>
+                </div>
+              )}
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
                 <button 

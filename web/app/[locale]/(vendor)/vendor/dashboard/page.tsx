@@ -3,9 +3,10 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { 
   Package, ShoppingBag, Clock, Plus, Store, CreditCard,
-  TrendingUp, BarChart3, Users, AlertTriangle
+  TrendingUp, BarChart3, Users, AlertTriangle, RotateCcw
 } from 'lucide-react'
 import VendorDeliveryRuns from './VendorDeliveryRuns'
+import VendorUnfinishedReplacements from './VendorUnfinishedReplacements'
 import { getServerTranslations } from '@/lib/i18n/server'
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
@@ -112,6 +113,42 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
     }
   }
 
+  // Fetch unfinished replacement requests (Pending, Approved, In Progress)
+  let unfinishedReplacements: any[] = []
+  if (shopIds.length > 0) {
+    try {
+      const { data: replData } = await supabase
+        .from('replacement_requests')
+        .select(`
+          *,
+          orders (
+            order_number,
+            users (
+              name,
+              phone
+            )
+          ),
+          replacement_items (
+            *,
+            order_items (
+              *,
+              items (name),
+              item_variants (label)
+            )
+          )
+        `)
+        .in('shop_id', shopIds)
+        .in('status', ['Pending', 'pending', 'Approved', 'approved', 'in_progress'])
+        .order('created_at', { ascending: false })
+
+      if (replData) {
+        unfinishedReplacements = replData
+      }
+    } catch (err) {
+      console.error('Error loading unfinished replacements:', err)
+    }
+  }
+
   return (
     <>
       <div className="vp-header">
@@ -180,6 +217,12 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
         />
       )}
 
+      {/* Unfinished Replacement Requests */}
+      <VendorUnfinishedReplacements 
+        initialRequests={unfinishedReplacements}
+        locale={activeLocale}
+      />
+
       <h2 className="vp-title" style={{ fontSize: '1.5rem', marginBottom: '1.5rem', marginTop: '2rem' }}>{t('vendor_dashboard.quick_actions_title') || 'Quick Actions'}</h2>
       <div className="vp-quick-grid">
         <Link href="/vendor/items/new" id="dashboard-add-new-item" className="vp-card vp-quick-action">
@@ -193,6 +236,12 @@ export default async function VendorDashboardPage({ params }: { params: Promise<
             <ShoppingBag size={40} color="#c084fc" />
           </div>
           <span className="vp-quick-label">{t('vendor_dashboard.manage_orders_action') || 'Manage Orders'}</span>
+        </Link>
+        <Link href="/vendor/replacements" id="dashboard-manage-replacements" className="vp-card vp-quick-action">
+          <div className="vp-quick-icon">
+            <RotateCcw size={40} color="#f59e0b" />
+          </div>
+          <span className="vp-quick-label">{t('vendor_dashboard.replacements_action') || 'Replacements'}</span>
         </Link>
         <Link href="/vendor/credit" id="dashboard-manage-credit" className="vp-card vp-quick-action">
           <div className="vp-quick-icon">

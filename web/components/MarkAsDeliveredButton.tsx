@@ -22,7 +22,7 @@ export default function MarkAsDeliveredButton({ orderId }: { orderId: string }) 
       if (!res.ok || data.error) {
         throw new Error(data.error || 'Failed to confirm delivery')
       }
-      router.refresh()
+      router.push(window.location.pathname + '/delivered')
     } catch (e: any) {
       alert('Error updating status: ' + e.message)
     } finally {

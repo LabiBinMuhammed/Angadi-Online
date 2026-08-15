@@ -963,44 +963,54 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (_userRole == 'shop_owner' || _userRole == 'admin') ...[
-                    GestureDetector(
-                      onTap: () => context.push('/vendor/dashboard'),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: ThemeService.instance.isDarkMode ? const Color(0x1F60A5FA) : const Color(0x152563EB),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0x3D60A5FA) : const Color(0x3D2563EB)),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
-                        ),
-                        child: HugeIcon(
-                          icon: HugeIcons.strokeRoundedStore01,
-                          color: ThemeService.instance.isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-                          size: 16,
+                    Semantics(
+                      button: true,
+                      enabled: true,
+                      label: 'Vendor Dashboard',
+                      child: GestureDetector(
+                        onTap: () => context.push('/vendor/dashboard'),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: ThemeService.instance.isDarkMode ? const Color(0x1F60A5FA) : const Color(0x152563EB),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0x3D60A5FA) : const Color(0x3D2563EB)),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
+                          ),
+                          child: HugeIcon(
+                            icon: HugeIcons.strokeRoundedStore01,
+                            color: ThemeService.instance.isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                            size: 16,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
                   ],
                   if (_userRole == 'admin') ...[
-                    GestureDetector(
-                      onTap: () => context.push('/admin/dashboard'),
-                      child: Container(
-                        width: 36,
-                        height: 36,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: ThemeService.instance.isDarkMode ? const Color(0x1F818CF8) : const Color(0x154F46E5),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0x3D818CF8) : const Color(0x3D4F46E5)),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
-                        ),
-                        child: HugeIcon(
-                          icon: HugeIcons.strokeRoundedSecurityCheck,
-                          color: ThemeService.instance.isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
-                          size: 16,
+                    Semantics(
+                      button: true,
+                      enabled: true,
+                      label: 'Admin Dashboard',
+                      child: GestureDetector(
+                        onTap: () => context.push('/admin/dashboard'),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: ThemeService.instance.isDarkMode ? const Color(0x1F818CF8) : const Color(0x154F46E5),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: ThemeService.instance.isDarkMode ? const Color(0x3D818CF8) : const Color(0x3D4F46E5)),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 4, offset: const Offset(0, 1.5))],
+                          ),
+                          child: HugeIcon(
+                            icon: HugeIcons.strokeRoundedSecurityCheck,
+                            color: ThemeService.instance.isDarkMode ? const Color(0xFF818CF8) : const Color(0xFF4F46E5),
+                            size: 16,
+                          ),
                         ),
                       ),
                     ),

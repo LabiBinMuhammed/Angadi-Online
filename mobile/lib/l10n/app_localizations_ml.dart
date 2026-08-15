@@ -1527,4 +1527,25 @@ class AppLocalizationsMl extends AppLocalizations {
 
   @override
   String get coOwnerRemovedSuccess => 'സഹ-ഉടമയെ വിജയകരമായി നീക്കം ചെയ്തു!';
+
+  @override
+  String get loyaltyRewardClaimedTitle => '🎉 അഭിനന്ദനങ്ങൾ!';
+
+  @override
+  String get loyaltyScratchDialogTitle => '🎟️ ലക്കി സ്ക്രാച്ച് കാർഡ്';
+
+  @override
+  String loyaltyRewardClaimedSubtitle(String amount) {
+    return '₹$amount അങ്ങാടി ക്രെഡിറ്റ് നിങ്ങളുടെ വാലറ്റിൽ ചേർത്തു!';
+  }
+
+  @override
+  String get loyaltyScratchDialogSubtitle =>
+      'നിങ്ങളുടെ ഉറപ്പായ സമ്മാനം കാണാൻ ഈ പ്രതലം സ്ക്രാച്ച് ചെയ്യുക!';
+
+  @override
+  String get loyaltyCloseBtn => 'അടയ്ക്കുക';
+
+  @override
+  String get loyaltyClaimRewardBtn => 'സമ്മാനം നേടുക 🎁';
 }

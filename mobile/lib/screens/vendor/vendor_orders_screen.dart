@@ -370,7 +370,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
             child: ListView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              children: ['all', 'pending', 'accepted', 'packing', 'ready', 'out_for_delivery', 'delivered', 'cancelled'].map((f) {
+              children: ['all', 'pending', 'delivering', 'packing', 'delivered', 'cancelled'].map((f) {
                 final isSelected = _filter == f;
                 return GestureDetector(
                   onTap: () => setState(() => _filter = f),
@@ -394,7 +394,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                           : null,
                     ),
                     child: Text(
-                      f == 'all' ? l10n.allStatusesFilter : f[0].toUpperCase() + f.substring(1).replaceAll('_', ' '),
+                      f == 'all' ? l10n.allStatusesFilter : (f == 'packing' ? 'Completed Transaction' : f[0].toUpperCase() + f.substring(1).replaceAll('_', ' ')),
                       style: TextStyle(
                         color: isSelected ? Colors.white : kVendorSubText,
                         fontSize: 13,
@@ -618,7 +618,7 @@ class _VendorOrdersScreenState extends State<VendorOrdersScreen> {
                                       ),
                                     ),
                                     VendorBadge(
-                                      label: status.replaceAll('_', ' '),
+                                      label: status == 'packing' ? 'Completed Transaction' : status.replaceAll('_', ' '),
                                       type: badgeType,
                                     ),
                                   ],

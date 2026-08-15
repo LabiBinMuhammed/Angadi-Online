@@ -1496,4 +1496,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get coOwnerRemovedSuccess => 'تمت إزالة المالك المشارك بنجاح!';
+
+  @override
+  String get loyaltyRewardClaimedTitle => '🎉 تهانينا!';
+
+  @override
+  String get loyaltyScratchDialogTitle => '🎟️ بطاقة امسح واربح المحظوظة';
+
+  @override
+  String loyaltyRewardClaimedSubtitle(String amount) {
+    return 'تم إضافة ₹$amount من رصيد أنغادي إلى محفظتك!';
+  }
+
+  @override
+  String get loyaltyScratchDialogSubtitle =>
+      'امسح السطح المعدني للكشف عن جائزتك المضمونة!';
+
+  @override
+  String get loyaltyCloseBtn => 'إغلاق';
+
+  @override
+  String get loyaltyClaimRewardBtn => 'المطالبة بالمكافأة 🎁';
 }

@@ -123,6 +123,18 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
         }
       }
 
+      List unfinishedReplacementsRes = [];
+      try {
+        unfinishedReplacementsRes = await supabase
+            .from('replacement_requests')
+            .select('*, orders(order_number, users(name, phone)), replacement_items(*, order_items(*, items(name), item_variants(label))))')
+            .inFilter('shop_id', shopIds)
+            .inFilter('status', ['Pending', 'pending', 'Approved', 'approved', 'in_progress'])
+            .order('created_at', ascending: false);
+      } catch (e) {
+        debugPrint('Error fetching unfinished replacements: $e');
+      }
+
       return _Data(
         shopId: shopId,
         shopName: shopName,
@@ -131,11 +143,473 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
         pending: (results[2] as List).length,
         revenue: totalRev,
         runs: runs,
+        unfinishedReplacements: List<Map<String, dynamic>>.from(unfinishedReplacementsRes),
       );
     } catch (e, stack) {
       debugPrint('Error fetching dashboard: $e\n$stack');
-      return _Data(shopId: null, shopName: 'Your Shop', items: 0, orders: 0, pending: 0, revenue: 0.0, runs: []);
+      return _Data(shopId: null, shopName: 'Your Shop', items: 0, orders: 0, pending: 0, revenue: 0.0, runs: [], unfinishedReplacements: []);
     }
+  }
+
+  Future<void> _updateReplacementStatus(String requestId, String status, String? notes) async {
+    try {
+      await supabase
+          .from('replacement_requests')
+          .update({
+            'status': status,
+            'notes': notes,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', requestId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Request updated to $status')),
+        );
+        setState(() {
+          _future = _fetch();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error updating status: $e')),
+        );
+      }
+    }
+  }
+
+  void _showActionDialog(Map<String, dynamic> req) {
+    final notesController = TextEditingController();
+    String selectedDecision = 'approve_next_shift'; // 'approve_next_shift', 'approve_now', 'reject'
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: kVendorDialogBg,
+          title: Text('Resolve Replacement Request', style: TextStyle(color: kVendorText, fontWeight: FontWeight.bold, fontSize: 18)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Select Decision:', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w700, fontSize: 13)),
+                const SizedBox(height: 10),
+                
+                // Option 1: Approve & Deliver in Next Shift
+                InkWell(
+                  onTap: () => setDialogState(() => selectedDecision = 'approve_next_shift'),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: selectedDecision == 'approve_next_shift' ? const Color(0xFF3B82F6).withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: selectedDecision == 'approve_next_shift' ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.08),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.schedule_rounded, color: selectedDecision == 'approve_next_shift' ? const Color(0xFF60A5FA) : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Approve & Deliver in Next Shift', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w800, fontSize: 13)),
+                              const SizedBox(height: 2),
+                              Text('Batched for the next delivery shift', style: TextStyle(color: kVendorSubText, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        if (selectedDecision == 'approve_next_shift')
+                          const Icon(Icons.check_circle, color: Color(0xFF60A5FA), size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Option 2: Approve & Deliver Now
+                InkWell(
+                  onTap: () => setDialogState(() => selectedDecision = 'approve_now'),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: selectedDecision == 'approve_now' ? const Color(0xFF22C55E).withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: selectedDecision == 'approve_now' ? const Color(0xFF22C55E) : Colors.white.withValues(alpha: 0.08),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.bolt_rounded, color: selectedDecision == 'approve_now' ? const Color(0xFF4ADE80) : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Approve & Deliver Now', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w800, fontSize: 13)),
+                              const SizedBox(height: 2),
+                              Text('Immediate dispatch to customer', style: TextStyle(color: kVendorSubText, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        if (selectedDecision == 'approve_now')
+                          const Icon(Icons.check_circle, color: Color(0xFF4ADE80), size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Option 3: Reject with Reason
+                InkWell(
+                  onTap: () => setDialogState(() => selectedDecision = 'reject'),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: selectedDecision == 'reject' ? const Color(0xFFEF4444).withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: selectedDecision == 'reject' ? const Color(0xFFEF4444) : Colors.white.withValues(alpha: 0.08),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel_outlined, color: selectedDecision == 'reject' ? const Color(0xFFF87171) : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Reject Request with Reason', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w800, fontSize: 13)),
+                              const SizedBox(height: 2),
+                              Text('Decline replacement with customer explanation', style: TextStyle(color: kVendorSubText, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        if (selectedDecision == 'reject')
+                          const Icon(Icons.check_circle, color: Color(0xFFF87171), size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+                Text(
+                  selectedDecision == 'reject' ? 'Rejection Reason (Required):' : 'Seller Delivery Notes (Optional):',
+                  style: TextStyle(color: selectedDecision == 'reject' ? const Color(0xFFF87171) : kVendorText, fontWeight: FontWeight.w700, fontSize: 12),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: notesController,
+                  maxLines: 3,
+                  style: TextStyle(color: kVendorText, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: selectedDecision == 'reject' ? 'Explain why this claim is being declined...' : 'Add delivery note or instructions for customer...',
+                    hintStyle: TextStyle(color: kVendorSubText, fontSize: 12),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.05),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  ),
+                ),
+                if (selectedDecision != 'reject') ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'ℹ️ Once approved, the customer will confirm receipt upon delivery.',
+                    style: TextStyle(color: kVendorSubText, fontSize: 11, fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('Cancel', style: TextStyle(color: kVendorSubText)),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final text = notesController.text.trim();
+                if (selectedDecision == 'reject' && text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a rejection reason.')),
+                  );
+                  return;
+                }
+
+                Navigator.pop(ctx);
+                String finalStatus = selectedDecision == 'reject' ? 'Rejected' : 'Approved';
+                String finalNotes = text;
+                if (selectedDecision == 'approve_next_shift') {
+                  finalNotes = text.isNotEmpty ? '$text [Delivery: Next Shift]' : 'Approved for replacement. Delivery scheduled in the next shift.';
+                } else if (selectedDecision == 'approve_now') {
+                  finalNotes = text.isNotEmpty ? '$text [Delivery: Out Now]' : 'Approved for immediate replacement. Dispatched for delivery now.';
+                }
+
+                _updateReplacementStatus(req['id'], finalStatus, finalNotes);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: selectedDecision == 'reject' ? const Color(0xFFEF4444) : const Color(0xFF2563EB),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(selectedDecision == 'reject' ? 'Reject Claim' : 'Confirm & Approve'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUnfinishedReplacementsSection(List<Map<String, dynamic>> replacements) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 32),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                const HugeIcon(icon: HugeIcons.strokeRoundedExchange01, color: Color(0xFFF59E0B), size: 22),
+                const SizedBox(width: 8),
+                Text(
+                  'Unfinished Replacements',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: kVendorText,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                if (replacements.isNotEmpty) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B).withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.3)),
+                    ),
+                    child: Text(
+                      '${replacements.length} Action Required',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFF59E0B),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            TextButton(
+              onPressed: () => context.push('/vendor/replacements').then((_) => setState(() { _future = _fetch(); })),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('View All', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF60A5FA))),
+                  SizedBox(width: 4),
+                  Icon(Icons.chevron_right, size: 16, color: Color(0xFF60A5FA)),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        if (replacements.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: vendorCardDecoration(radius: 20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF22C55E).withOpacity(0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.check_circle, color: Color(0xFF22C55E), size: 20),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No unfinished replacement requests',
+                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: kVendorText),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'All replacement claims and complaints are up to date.',
+                        style: TextStyle(fontSize: 11, color: kVendorSubText),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: replacements.length,
+            itemBuilder: (context, index) {
+              final req = replacements[index];
+              final status = (req['status'] as String? ?? 'Pending');
+              final isPending = status.toLowerCase() == 'pending';
+              final order = req['orders'] as Map<String, dynamic>?;
+              final user = order?['users'] as Map<String, dynamic>?;
+              final custName = user?['name'] as String? ?? 'Customer';
+              final custPhone = user?['phone'] as String?;
+              final orderNum = order?['order_number'] as String? ?? (req['order_id'] as String? ?? '').substring(0, 8);
+              final reason = req['reason'] as String? ?? 'Complaint';
+              final desc = req['description'] as String?;
+              final items = (req['replacement_items'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(16),
+                decoration: vendorCardDecoration(radius: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                custName,
+                                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: kVendorText),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                'Order #$orderNum${custPhone != null ? ' · $custPhone' : ''}',
+                                style: TextStyle(fontSize: 12, color: kVendorSubText),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isPending ? const Color(0xFFF59E0B).withOpacity(0.15) : const Color(0xFF3B82F6).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: isPending ? const Color(0xFFF59E0B).withOpacity(0.3) : const Color(0xFF3B82F6).withOpacity(0.3),
+                            ),
+                          ),
+                          child: Text(
+                            isPending ? 'Pending Review' : 'Approved - In Progress',
+                            style: TextStyle(
+                              color: isPending ? const Color(0xFFFBBF24) : const Color(0xFF60A5FA),
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.03),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white.withOpacity(0.05)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            reason.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFF59E0B),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          if (desc != null && desc.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              '"$desc"',
+                              style: TextStyle(fontSize: 12, color: kVendorText.withOpacity(0.85), fontStyle: FontStyle.italic),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    if (items.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        'Requested Items:',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: kVendorSubText),
+                      ),
+                      const SizedBox(height: 6),
+                      ...items.map((itm) {
+                        final orderItem = itm['order_items'] as Map<String, dynamic>?;
+                        final itemName = (orderItem?['items'] as Map?)?['name'] as String? ?? 'Item';
+                        final variant = (orderItem?['item_variants'] as Map?)?['label'] as String?;
+                        final qty = itm['quantity'] ?? 1;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  '$itemName${variant != null ? ' ($variant)' : ''}',
+                                  style: TextStyle(fontSize: 12, color: kVendorText, fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Text(
+                                'Qty: $qty',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Color(0xFF60A5FA)),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                    const SizedBox(height: 14),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => _showActionDialog(req),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF2563EB),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: const Text('Resolve Complaint', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+      ],
+    );
   }
 
   Future<void> _createBatch(String date, String slot, String shopId) async {
@@ -499,6 +973,9 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                 if (d.shopId != null)
                   _buildRunsSection(d.runs, d.shopId!),
 
+                // Unfinished Replacement Requests Section
+                _buildUnfinishedReplacementsSection(d.unfinishedReplacements),
+
                 // Quick Actions Header
                 const SizedBox(height: 36),
                 Text(
@@ -538,6 +1015,12 @@ class _VendorDashboardScreenState extends State<VendorDashboardScreen> {
                       iconColor: const Color(0xFFC084FC),
                       label: l10n.manageOrdersAction,
                       onTap: () => context.push('/vendor/orders').then((_) => setState(() { _future = _fetch(); })),
+                    ),
+                    _ActionCard(
+                      icon: HugeIcons.strokeRoundedExchange01,
+                      iconColor: const Color(0xFFF59E0B),
+                      label: 'Replacements',
+                      onTap: () => context.push('/vendor/replacements').then((_) => setState(() { _future = _fetch(); })),
                     ),
                     _ActionCard(
                       icon: HugeIcons.strokeRoundedMoney03,
@@ -667,5 +1150,15 @@ class _Data {
   final int items, orders, pending;
   final double revenue;
   final List<Map<String, dynamic>> runs;
-  _Data({required this.shopId, required this.shopName, required this.items, required this.orders, required this.pending, required this.revenue, required this.runs});
+  final List<Map<String, dynamic>> unfinishedReplacements;
+  _Data({
+    required this.shopId,
+    required this.shopName,
+    required this.items,
+    required this.orders,
+    required this.pending,
+    required this.revenue,
+    required this.runs,
+    this.unfinishedReplacements = const [],
+  });
 }

@@ -60,15 +60,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
     setState(() { _slot = s; _future = _fetch(); });
   }
 
-  // ─── Status helpers ──────────────────────────────────────────────────────────
   static const _statusConfig = {
     'pending':    _StatusConfig(color: Color(0xFFF59E0B), bg: Color(0xFFFFF7ED), icon: Icons.schedule_rounded,    label: 'Pending'),
-    'packing':    _StatusConfig(color: Color(0xFF0EA5E9), bg: Color(0xFFE0F2FE), icon: Icons.inventory_2_rounded, label: 'Packing'),
-    'accepted':   _StatusConfig(color: Color(0xFF8B5CF6), bg: Color(0xFFEDE9FE), icon: Icons.check_circle_outline_rounded, label: 'Accepted'),
-    'ready':      _StatusConfig(color: Color(0xFF6366F1), bg: Color(0xFFE0E7FF), icon: Icons.storefront_rounded,  label: 'Ready'),
-    'out_for_delivery': _StatusConfig(color: Color(0xFF3B82F6), bg: Color(0xFFEFF6FF), icon: Icons.two_wheeler_rounded, label: 'On the Way'),
-    'delivering': _StatusConfig(color: Color(0xFF3B82F6), bg: Color(0xFFEFF6FF), icon: Icons.local_shipping_rounded, label: 'Delivering'),
-    'delivered':  _StatusConfig(color: Color(0xFF22C55E), bg: Color(0xFFF0FDF4), icon: Icons.check_circle_rounded, label: 'Delivered'),
+    'delivering': _StatusConfig(color: Color(0xFF0EA5E9), bg: Color(0xFFE0F2FE), icon: Icons.two_wheeler_rounded, label: 'Out for Delivery'),
+    'packing':    _StatusConfig(color: Color(0xFF3B82F6), bg: Color(0xFFEFF6FF), icon: Icons.inventory_2_rounded, label: 'Completed Transaction'),
+    'delivered':  _StatusConfig(color: Color(0xFF22C55E), bg: Color(0xFFF0FDF4), icon: Icons.check_circle_rounded, label: 'Completed Order'),
     'cancelled':  _StatusConfig(color: Color(0xFFEF4444), bg: Color(0xFFFEF2F2), icon: Icons.cancel_rounded,       label: 'Cancelled'),
   };
 

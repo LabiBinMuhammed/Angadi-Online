@@ -19,13 +19,12 @@ type OrderRow = {
 
 const STATUS_BADGE: Record<string, string> = {
   pending: 'vp-badge-warning',
-  accepted: 'vp-badge-info',
-  ready: 'vp-badge-info',
-  out_for_delivery: 'vp-badge-info',
+  delivering: 'vp-badge-info',
+  completed_transaction: 'vp-badge-primary',
   delivered: 'vp-badge-success',
   cancelled: 'vp-badge-danger',
 }
-const STATUSES = ['all', 'pending', 'accepted', 'ready', 'out_for_delivery', 'delivered', 'cancelled']
+const STATUSES = ['all', 'pending', 'delivering', 'completed_transaction', 'delivered', 'cancelled']
 
 export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
   const { t } = useTranslation()
@@ -66,7 +65,7 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
           <input 
             className="vp-input" 
             style={{ paddingLeft: '2.75rem', borderRadius: '99px', border: '1px solid rgba(255, 255, 255, 0.15)' }}
-            placeholder={t('vendor_dashboard.search_products_placeholder') || 'Search by customer or order ID…'} 
+            placeholder={t('vendor_dashboard.search_orders_placeholder') || 'Search by customer or order ID…'} 
             value={search} 
             onChange={e => setSearch(e.target.value)} 
           />
@@ -94,7 +93,7 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
               <option key={s} value={s} style={{ background: '#1e1b4b', color: '#fff' }}>
                 {s === 'all' 
                   ? (t('vendor_dashboard.filter_all') || 'All') 
-                  : (t(`orders.status_${s === 'accepted' ? 'pending' : s === 'ready' ? 'packing' : s === 'out_for_delivery' ? 'delivering' : s}`) || s.charAt(0).toUpperCase() + s.slice(1))}
+                  : (t(`orders.status_${s}`) || s.charAt(0).toUpperCase() + s.slice(1))}
               </option>
             ))}
           </select>
@@ -114,7 +113,7 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
         <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#64748b' }}>
           <ShoppingBag size={48} style={{ margin: '0 auto 1rem', opacity: 0.5 }} />
           <p style={{ fontSize: '1.1rem', fontWeight: 600 }}>{t('vendor_dashboard.vendor_no_orders') || 'No orders found'}</p>
-          <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('recent_purchases.start_shopping') || 'Try adjusting your search or filter'}</p>
+          <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>{t('vendor_dashboard.vendor_no_orders_subtitle') || 'Try adjusting your search or filter'}</p>
         </div>
       ) : (
         <div className="vp-table-wrapper">
@@ -168,7 +167,7 @@ export default function VendorOrdersClient({ orders }: { orders: OrderRow[] }) {
                   </td>
                   <td className="hide-on-mobile">
                     <span className={`vp-badge ${STATUS_BADGE[order.status] ?? 'vp-badge-neutral'}`}>
-                      {t(`orders.status_${order.status === 'accepted' ? 'pending' : order.status === 'ready' ? 'packing' : order.status === 'out_for_delivery' ? 'delivering' : order.status}`) || order.status}
+                      {t(`orders.status_${order.status}`) || order.status}
                     </span>
                   </td>
                   <td style={{ textAlign: 'right' }}>

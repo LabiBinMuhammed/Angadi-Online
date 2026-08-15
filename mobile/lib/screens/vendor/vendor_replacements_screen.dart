@@ -75,77 +75,193 @@ class _VendorReplacementsScreenState extends State<VendorReplacementsScreen> {
   }
 
   void _showActionDialog(Map<String, dynamic> req) {
-    final notesController = TextEditingController(text: req['notes'] as String? ?? '');
-    String selectedStatus = (req['status'] as String? ?? 'Pending') == 'Pending' ? 'Approved' : (req['status'] as String? ?? 'Approved');
+    final notesController = TextEditingController();
+    String selectedDecision = 'approve_next_shift'; // 'approve_next_shift', 'approve_now', 'reject'
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: kVendorDialogBg,
-        title: Text('Resolve Complaint Request', style: TextStyle(color: kVendorText, fontWeight: FontWeight.bold)),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Select Resolution Status:', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w600, fontSize: 13)),
-              const SizedBox(height: 8),
-              StatefulBuilder(
-                builder: (context, setDialogState) => Column(
-                  children: [
-                    RadioListTile<String>(
-                      title: const Text('Approve Request', style: TextStyle(color: Color(0xFF22C55E), fontWeight: FontWeight.bold)),
-                      value: 'Approved',
-                      groupValue: selectedStatus,
-                      onChanged: (val) => setDialogState(() => selectedStatus = val!),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: kVendorDialogBg,
+          title: Text('Resolve Replacement Request', style: TextStyle(color: kVendorText, fontWeight: FontWeight.bold, fontSize: 18)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Select Decision:', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w700, fontSize: 13)),
+                const SizedBox(height: 10),
+                
+                // Option 1: Approve & Deliver in Next Shift
+                InkWell(
+                  onTap: () => setDialogState(() => selectedDecision = 'approve_next_shift'),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: selectedDecision == 'approve_next_shift' ? const Color(0xFF3B82F6).withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: selectedDecision == 'approve_next_shift' ? const Color(0xFF3B82F6) : Colors.white.withValues(alpha: 0.08),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    RadioListTile<String>(
-                      title: const Text('Reject Request', style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold)),
-                      value: 'Rejected',
-                      groupValue: selectedStatus,
-                      onChanged: (val) => setDialogState(() => selectedStatus = val!),
+                    child: Row(
+                      children: [
+                        Icon(Icons.schedule_rounded, color: selectedDecision == 'approve_next_shift' ? const Color(0xFF60A5FA) : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Approve & Deliver in Next Shift', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w800, fontSize: 13)),
+                              const SizedBox(height: 2),
+                              Text('Batched for the next delivery shift', style: TextStyle(color: kVendorSubText, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        if (selectedDecision == 'approve_next_shift')
+                          const Icon(Icons.check_circle, color: Color(0xFF60A5FA), size: 18),
+                      ],
                     ),
-                    RadioListTile<String>(
-                      title: const Text('Mark Completed (Delivered)', style: TextStyle(color: Color(0xFF3B82F6), fontWeight: FontWeight.bold)),
-                      value: 'Completed',
-                      groupValue: selectedStatus,
-                      onChanged: (val) => setDialogState(() => selectedStatus = val!),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              Text('Seller Notes / Resolution details:', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w600, fontSize: 13)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: notesController,
-                maxLines: 3,
-                style: TextStyle(color: kVendorText, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'Enter resolution details or notes for customer...',
-                  hintStyle: TextStyle(color: kVendorSubText, fontSize: 13),
-                  filled: true,
-                  fillColor: kVendorInputBg,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kVendorCardBorder)),
+
+                // Option 2: Approve & Deliver Now
+                InkWell(
+                  onTap: () => setDialogState(() => selectedDecision = 'approve_now'),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: selectedDecision == 'approve_now' ? const Color(0xFF22C55E).withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: selectedDecision == 'approve_now' ? const Color(0xFF22C55E) : Colors.white.withValues(alpha: 0.08),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.bolt_rounded, color: selectedDecision == 'approve_now' ? const Color(0xFF4ADE80) : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Approve & Deliver Now', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w800, fontSize: 13)),
+                              const SizedBox(height: 2),
+                              Text('Immediate dispatch to customer', style: TextStyle(color: kVendorSubText, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        if (selectedDecision == 'approve_now')
+                          const Icon(Icons.check_circle, color: Color(0xFF4ADE80), size: 18),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ],
+
+                // Option 3: Reject with Reason
+                InkWell(
+                  onTap: () => setDialogState(() => selectedDecision = 'reject'),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: selectedDecision == 'reject' ? const Color(0xFFEF4444).withValues(alpha: 0.15) : Colors.white.withValues(alpha: 0.03),
+                      border: Border.all(
+                        color: selectedDecision == 'reject' ? const Color(0xFFEF4444) : Colors.white.withValues(alpha: 0.08),
+                        width: 1.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.cancel_outlined, color: selectedDecision == 'reject' ? const Color(0xFFF87171) : Colors.grey, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Reject Request with Reason', style: TextStyle(color: kVendorText, fontWeight: FontWeight.w800, fontSize: 13)),
+                              const SizedBox(height: 2),
+                              Text('Decline replacement with customer explanation', style: TextStyle(color: kVendorSubText, fontSize: 11)),
+                            ],
+                          ),
+                        ),
+                        if (selectedDecision == 'reject')
+                          const Icon(Icons.check_circle, color: Color(0xFFF87171), size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+                Text(
+                  selectedDecision == 'reject' ? 'Rejection Reason (Required):' : 'Seller Delivery Notes (Optional):',
+                  style: TextStyle(color: selectedDecision == 'reject' ? const Color(0xFFF87171) : kVendorText, fontWeight: FontWeight.w700, fontSize: 12),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: notesController,
+                  maxLines: 3,
+                  style: TextStyle(color: kVendorText, fontSize: 13),
+                  decoration: InputDecoration(
+                    hintText: selectedDecision == 'reject' ? 'Explain why this claim is being declined...' : 'Add delivery note or instructions for customer...',
+                    hintStyle: TextStyle(color: kVendorSubText, fontSize: 12),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.05),
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                  ),
+                ),
+                if (selectedDecision != 'reject') ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'ℹ️ Once approved, the customer will confirm receipt upon delivery.',
+                    style: TextStyle(color: kVendorSubText, fontSize: 11, fontStyle: FontStyle.italic),
+                  ),
+                ],
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Cancel', style: TextStyle(color: kVendorSubText)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: selectedDecision == 'reject' ? const Color(0xFFEF4444) : const Color(0xFF2563EB),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                final text = notesController.text.trim();
+                if (selectedDecision == 'reject' && text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Please enter a rejection reason.')),
+                  );
+                  return;
+                }
+
+                Navigator.of(ctx).pop();
+                String finalStatus = selectedDecision == 'reject' ? 'Rejected' : 'Approved';
+                String finalNotes = text;
+                if (selectedDecision == 'approve_next_shift') {
+                  finalNotes = text.isNotEmpty ? '$text [Delivery: Next Shift]' : 'Approved for replacement. Delivery scheduled in the next shift.';
+                } else if (selectedDecision == 'approve_now') {
+                  finalNotes = text.isNotEmpty ? '$text [Delivery: Out Now]' : 'Approved for immediate replacement. Dispatched for delivery now.';
+                }
+
+                _updateStatus(req['id'] as String, req['shop_id'] as String, finalStatus, finalNotes);
+              },
+              child: Text(selectedDecision == 'reject' ? 'Reject Claim' : 'Confirm & Approve'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text('Cancel', style: TextStyle(color: kVendorSubText)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF3B82F6)),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              _updateStatus(req['id'] as String, req['shop_id'] as String, selectedStatus, notesController.text.trim());
-            },
-            child: const Text('Save Changes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
     );
   }

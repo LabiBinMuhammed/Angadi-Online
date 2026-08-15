@@ -1501,4 +1501,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get coOwnerRemovedSuccess => 'Co-owner removed successfully!';
+
+  @override
+  String get loyaltyRewardClaimedTitle => '🎉 Congratulations!';
+
+  @override
+  String get loyaltyScratchDialogTitle => '🎟️ Lucky Scratch Card';
+
+  @override
+  String loyaltyRewardClaimedSubtitle(String amount) {
+    return '₹$amount Angadi Credit added to your wallet!';
+  }
+
+  @override
+  String get loyaltyScratchDialogSubtitle =>
+      'Rub the metallic surface to reveal your guaranteed reward!';
+
+  @override
+  String get loyaltyCloseBtn => 'Close';
+
+  @override
+  String get loyaltyClaimRewardBtn => 'Claim Reward 🎁';
 }

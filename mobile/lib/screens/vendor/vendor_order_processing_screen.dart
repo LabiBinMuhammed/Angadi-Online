@@ -20,15 +20,12 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
   bool _loading = true;
   bool _updating = false;
 
-  static const _flow = ['pending', 'accepted', 'packing', 'ready', 'out_for_delivery', 'delivered'];
+  static const _flow = ['pending', 'delivering', 'packing', 'delivered'];
   static const _statusLabel = {
     'pending': '🕐 Pending',
-    'accepted': '🤝 Accepted',
-    'packing': '📦 Packing',
-    'ready': '🛎️ Ready',
-    'out_for_delivery': '🚴 Out for Delivery',
-    'delivering': '🚴 Delivering',
-    'delivered': '✅ Delivered',
+    'delivering': '🚴 Out for Delivery',
+    'packing': '📦 Completed Transaction',
+    'delivered': '✅ Completed Order',
     'cancelled': '❌ Cancelled',
   };
 
@@ -782,7 +779,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
               ),
             ),
             // Actions Buttons
-            if (status == 'out_for_delivery') ...[
+            if (status == 'packing') ...[
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
@@ -796,10 +793,10 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                   children: [
                     const Icon(Icons.access_time_rounded, color: Color(0xFF93C5FD), size: 18),
                     const SizedBox(width: 8),
-                    Expanded(
+                    const Expanded(
                       child: Text(
-                        l10n.waitingUserConfirmation,
-                        style: const TextStyle(color: Color(0xFF93C5FD), fontSize: 14, fontWeight: FontWeight.bold),
+                        'Transaction Completed. Waiting for Customer Confirmation.',
+                        style: TextStyle(color: Color(0xFF93C5FD), fontSize: 14, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -832,7 +829,13 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Mark as ${nextStatus[0].toUpperCase()}${nextStatus.substring(1)}'),
+                    Text(
+                      status == 'pending'
+                          ? 'Set Out for Delivery'
+                          : status == 'delivering'
+                              ? 'Complete Transaction'
+                              : 'Mark as ${nextStatus[0].toUpperCase()}${nextStatus.substring(1)}',
+                    ),
                     const SizedBox(width: 8),
                     const DirectionalHugeIcon(icon: HugeIcons.strokeRoundedArrowRight01, size: 18),
                   ],

@@ -15,11 +15,8 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
 
   static const _statusColor = {
     'pending':          Color(0xFFF59E0B),
-    'accepted':         Color(0xFF0EA5E9),
-    'packing':          Color(0xFF3B82F6),
-    'ready':            Color(0xFF8B5CF6),
-    'out_for_delivery': Color(0xFFFB923C),
     'delivering':       Color(0xFFFB923C),
+    'packing':          Color(0xFF3B82F6),
     'delivered':        Color(0xFF22C55E),
     'cancelled':        Color(0xFFEF4444),
   };
@@ -58,7 +55,13 @@ class _AdminOrderDetailScreenState extends State<AdminOrderDetailScreen> {
                         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                           Text('Customer: ${(_order!['users'] as Map?)?['name'] ?? '—'}', style: const TextStyle(fontWeight: FontWeight.w600)),
                           Chip(
-                            label: Text(_order!['status'] ?? ''),
+                            label: Text(
+                              _order!['status'] == 'packing'
+                                  ? 'Completed Transaction'
+                                  : _order!['status'] == 'delivering'
+                                      ? 'Out for Delivery'
+                                      : (_order!['status'] ?? ''),
+                            ),
                             backgroundColor: (_statusColor[_order!['status']] ?? kNeutral400).withAlpha(38), // ~0.15
                             labelStyle: TextStyle(color: _statusColor[_order!['status']] ?? kNeutral400, fontWeight: FontWeight.w700, fontSize: 12),
                           ),

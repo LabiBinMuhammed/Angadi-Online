@@ -69,9 +69,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           .from('orders')
           .update({'status': 'delivered'})
           .eq('id', widget.orderId);
-      setState(() {
-        _future = _fetch();
-      });
+      if (mounted) {
+        context.push('/orders/${widget.orderId}/delivered');
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -170,17 +170,69 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
+  Future<void> _confirmReplacementReceived(String requestId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Replacement Received'),
+        content: const Text('Have you received your replacement items in good condition?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Not Yet'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF22C55E),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Yes, Received!'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _updating = true);
+    try {
+      await supabase
+          .from('replacement_requests')
+          .update({
+            'status': 'Completed',
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', requestId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Replacement confirmed as received! 🎉')),
+        );
+        setState(() {
+          _future = _fetch();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error confirming replacement: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _updating = false);
+      }
+    }
+  }
+
 
 
   // ─── Status map ─────────────────────────────────────────────────────────────
   static const _statusMap = {
     'pending':          _StatusConfig(color: Color(0xFFF59E0B), bg: Color(0xFFFFF7ED), icon: Icons.schedule_rounded,           label: 'Order Placed'),
-    'packing':          _StatusConfig(color: Color(0xFF0EA5E9), bg: Color(0xFFE0F2FE), icon: Icons.inventory_2_rounded,        label: 'Preparing'),
-    'accepted':         _StatusConfig(color: Color(0xFF8B5CF6), bg: Color(0xFFEDE9FE), icon: Icons.check_circle_outline_rounded, label: 'Accepted'),
-    'ready':            _StatusConfig(color: Color(0xFF6366F1), bg: Color(0xFFE0E7FF), icon: Icons.storefront_rounded,         label: 'Ready to Pick'),
-    'out_for_delivery': _StatusConfig(color: Color(0xFF3B82F6), bg: Color(0xFFEFF6FF), icon: Icons.two_wheeler_rounded,        label: 'Out for Delivery'),
-    'delivering':       _StatusConfig(color: Color(0xFF3B82F6), bg: Color(0xFFEFF6FF), icon: Icons.local_shipping_rounded,     label: 'On the Way'),
-    'delivered':        _StatusConfig(color: Color(0xFF22C55E), bg: Color(0xFFF0FDF4), icon: Icons.check_circle_rounded,       label: 'Delivered'),
+    'delivering':       _StatusConfig(color: Color(0xFF0EA5E9), bg: Color(0xFFE0F2FE), icon: Icons.two_wheeler_rounded,        label: 'Out for Delivery'),
+    'packing':          _StatusConfig(color: Color(0xFF3B82F6), bg: Color(0xFFEFF6FF), icon: Icons.inventory_2_rounded,        label: 'Completed Transaction'),
+    'delivered':        _StatusConfig(color: Color(0xFF22C55E), bg: Color(0xFFF0FDF4), icon: Icons.check_circle_rounded,       label: 'Completed Order'),
     'cancelled':        _StatusConfig(color: Color(0xFFEF4444), bg: Color(0xFFFEF2F2), icon: Icons.cancel_rounded,             label: 'Cancelled'),
   };
 
@@ -517,8 +569,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           const SizedBox(height: 16),
                         ],
 
-                        // ─── Confirm Delivery prompt (if out_for_delivery or delivering) ──────
-                        if (status == 'out_for_delivery' || status == 'delivering') ...[
+                        if (status == 'packing') ...[
                           _buildSectionCard(
                             surface: surface, border: border,
                             child: Column(
@@ -527,7 +578,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                 _buildCardTitle(icon: Icons.check_circle_outline_rounded, iconColor: kWaGreen, title: 'Confirm Delivery', textBase: textBase),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Has your order arrived? Please click the button below to confirm receipt of the delivery.',
+                                  'The shop has completed the transaction. Please click the button below to confirm receipt of the delivery and complete the order.',
                                   style: TextStyle(fontSize: 13, color: textMuted, fontWeight: FontWeight.w500),
                                 ),
                                 const SizedBox(height: 16),
@@ -738,23 +789,39 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                             const SizedBox(height: 2),
                                             Text('$variantLabel × $qty',
                                               style: TextStyle(fontSize: 13, color: textMuted, fontWeight: FontWeight.w500)),
-                                            if (oisStatus != 'approved' && oisStatus != 'pending') ...[
-                                              const SizedBox(height: 4),
-                                              Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                                decoration: BoxDecoration(
-                                                  color: oisStatus == 'rejected'
-                                                      ? const Color(0xFFEF4444).withValues(alpha: 0.1)
-                                                      : const Color(0xFFF59E0B).withValues(alpha: 0.1),
-                                                  borderRadius: BorderRadius.circular(8),
-                                                ),
-                                                child: Text(oisStatus.toUpperCase(),
-                                                  style: TextStyle(
-                                                    fontSize: 9, fontWeight: FontWeight.w700,
-                                                    color: oisStatus == 'rejected' ? const Color(0xFFEF4444) : const Color(0xFFF59E0B),
-                                                  )),
+                                            const SizedBox(height: 4),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: oisStatus == 'approved'
+                                                    ? const Color(0xFF22C55E).withValues(alpha: 0.1)
+                                                    : oisStatus == 'rejected'
+                                                        ? const Color(0xFFEF4444).withValues(alpha: 0.1)
+                                                        : oisStatus == 'adjusted'
+                                                            ? const Color(0xFFF59E0B).withValues(alpha: 0.1)
+                                                            : const Color(0xFF94A3B8).withValues(alpha: 0.1),
+                                                borderRadius: BorderRadius.circular(8),
                                               ),
-                                            ],
+                                              child: Text(
+                                                oisStatus == 'approved'
+                                                    ? 'APPROVED'
+                                                    : oisStatus == 'rejected'
+                                                        ? 'DECLINED'
+                                                        : oisStatus == 'adjusted'
+                                                            ? 'ADJUSTED'
+                                                            : 'PENDING APPROVAL',
+                                                style: TextStyle(
+                                                  fontSize: 9, fontWeight: FontWeight.w700,
+                                                  color: oisStatus == 'approved'
+                                                      ? const Color(0xFF22C55E)
+                                                      : oisStatus == 'rejected'
+                                                          ? const Color(0xFFEF4444)
+                                                          : oisStatus == 'adjusted'
+                                                              ? const Color(0xFFF59E0B)
+                                                              : const Color(0xFF64748B),
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -877,6 +944,63 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                         final qty = ri['quantity'] ?? 1;
                                         return Text('• $itemName × $qty', style: TextStyle(fontSize: 13, color: textLight, fontWeight: FontWeight.w600));
                                       }),
+                                    ],
+                                    if (req['notes'] != null && (req['notes'] as String).isNotEmpty) ...[
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF22C55E).withValues(alpha: 0.08),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: Border.all(color: const Color(0xFF22C55E).withValues(alpha: 0.2)),
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('🚚 ', style: TextStyle(fontSize: 14)),
+                                            Expanded(
+                                              child: Text(
+                                                'Seller Note: ${req['notes']}',
+                                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: textBase),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                    if (reqStatus == 'Approved') ...[
+                                      const SizedBox(height: 12),
+                                      GestureDetector(
+                                        onTap: _updating ? null : () => _confirmReplacementReceived(req['id'] as String),
+                                        child: Container(
+                                          width: double.infinity,
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [Color(0xFF22C55E), Color(0xFF16A34A)],
+                                            ),
+                                            borderRadius: BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(0xFF22C55E).withValues(alpha: 0.25),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Confirm Replacement Received (Complete)',
+                                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ],
                                     if (reqStatus == 'Pending') ...[
                                       const SizedBox(height: 12),

@@ -1510,4 +1510,25 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get coOwnerRemovedSuccess => 'सह-मालिक सफलतापूर्वक हटाया गया!';
+
+  @override
+  String get loyaltyRewardClaimedTitle => '🎉 बधाई हो!';
+
+  @override
+  String get loyaltyScratchDialogTitle => '🎟️ लकी स्क्रैच कार्ड';
+
+  @override
+  String loyaltyRewardClaimedSubtitle(String amount) {
+    return '₹$amount अंगड़ी क्रेडिट आपके वॉलेट में जोड़ दिया गया है!';
+  }
+
+  @override
+  String get loyaltyScratchDialogSubtitle =>
+      'अपना गारंटीकृत इनाम देखने के लिए सतह को स्क्रैच करें!';
+
+  @override
+  String get loyaltyCloseBtn => 'बंद करें';
+
+  @override
+  String get loyaltyClaimRewardBtn => 'इनाम प्राप्त करें 🎁';
 }

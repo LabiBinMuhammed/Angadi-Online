@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
     if (action === 'update_order_status') {
       // If accepting pending order, auto-approve any pending items
-      if (nextStatus === 'accepted') {
+      if (nextStatus === 'delivering') {
         const { data: pendingItems } = await supabaseAdmin
           .from('order_items')
           .select('id, estimated_price, final_price')

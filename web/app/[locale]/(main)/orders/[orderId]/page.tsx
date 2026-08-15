@@ -8,6 +8,7 @@ import { ArrowLeft, Clock, Package, Truck, CheckCircle2, XCircle, MapPin, Credit
 import MarkAsDeliveredButton from '@/components/MarkAsDeliveredButton'
 import CancelOrderButton from '@/components/CancelOrderButton'
 import BackButton from '@/components/BackButton'
+import ConfirmReplacementButton from './ConfirmReplacementButton'
 
 type Props = { params: Promise<{ locale: string; orderId: string }> }
 
@@ -18,9 +19,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 const STATUS_MAP: Record<string, { bg: string; color: string; label: string; Icon: any }> = {
   pending:    { bg: 'var(--status-pending-bg)', color: '#f59e0b', label: 'Order Placed', Icon: Clock },
-  packing:    { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'Preparing',    Icon: Package },
-  out_for_delivery: { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'On the way', Icon: Truck },
-  delivered:  { bg: 'var(--status-delivered-bg)', color: '#22c55e', label: 'Delivered',  Icon: CheckCircle2 },
+  delivering: { bg: 'var(--status-packing-bg)', color: '#0ea5e9', label: 'On the way', Icon: Truck },
+  packing:    { bg: 'var(--status-packing-bg)', color: '#3b82f6', label: 'Complete Transaction', Icon: Package },
+  completed_transaction: { bg: 'var(--status-packing-bg)', color: '#3b82f6', label: 'Complete Transaction', Icon: Package },
+  delivered:  { bg: 'var(--status-delivered-bg)', color: '#22c55e', label: 'Completed Order',  Icon: CheckCircle2 },
   cancelled:  { bg: 'var(--status-cancelled-bg)', color: '#ef4444', label: 'Cancelled',  Icon: XCircle },
 }
 
@@ -181,10 +183,10 @@ export default async function OrderDetailPage({ params }: Props) {
           </div>
         )}
 
-        {o.status === 'out_for_delivery' && (
+        {(o.status === 'packing' || (o.status as any) === 'completed_transaction') && (
           <div className="card" style={{ border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: 'var(--text-base)' }}>Confirm Delivery</h3>
-            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>Has your order arrived? Please click the button below to confirm receipt of the delivery.</p>
+            <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>The shop has completed the transaction. Please click the button below to confirm receipt of the delivery and complete the order.</p>
             <MarkAsDeliveredButton orderId={o.id} />
           </div>
         )}
@@ -260,6 +262,9 @@ export default async function OrderDetailPage({ params }: Props) {
                         <strong>Seller Note:</strong> {req.notes}
                       </div>
                     )}
+                    {(req.status === 'Approved' || req.status === 'approved') && (
+                      <ConfirmReplacementButton requestId={req.id} />
+                    )}
                   </div>
                 )
               })}
@@ -321,11 +326,19 @@ export default async function OrderDetailPage({ params }: Props) {
                 <div style={{ flex: 1, paddingRight: '16px' }}>
                   <p className="item-name">{oi.items?.name}</p>
                   <p className="item-meta">{oi.item_variants?.label} × {oi.requested_value || 1}</p>
-                  {oi.status !== 'approved' && oi.status !== 'pending' && (
-                    <span className="status-badge" style={{ background: oi.status === 'rejected' ? 'var(--status-cancelled-bg)' : 'var(--status-pending-bg)', color: oi.status === 'rejected' ? '#ef4444' : '#f59e0b' }}>
-                      {oi.status}
+                  <div style={{ marginTop: '4px' }}>
+                    <span className={`status-badge ${
+                      oi.status === 'approved' ? 'badge-completed' :
+                      oi.status === 'rejected' ? 'badge-rejected' :
+                      oi.status === 'adjusted' ? 'badge-approved' :
+                      'badge-pending'
+                    }`} style={{ margin: 0, fontSize: '11px', padding: '2px 8px' }}>
+                      {oi.status === 'approved' ? 'Approved' :
+                       oi.status === 'rejected' ? 'Declined' :
+                       oi.status === 'adjusted' ? 'Adjusted' :
+                       'Pending Approval'}
                     </span>
-                  )}
+                  </div>
                 </div>
                 <div>
                   <p className="item-price">₹ {Number(oi.final_price).toFixed(0)}</p>

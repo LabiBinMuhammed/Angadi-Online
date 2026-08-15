@@ -209,6 +209,47 @@ export async function updateReplacementStatusAction(
 }
 
 /**
+ * Customer Action: Confirm replacement delivered/received (transitions status to Completed).
+ */
+export async function confirmReplacementReceivedAction(requestId: string) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Not authenticated' }
+
+    // Fetch request to verify user ownership and that status is Approved
+    const { data: request, error: fetchErr } = await supabase
+      .from('replacement_requests')
+      .select('user_id, order_id, status')
+      .eq('id', requestId)
+      .single()
+
+    if (fetchErr || !request) return { error: 'Replacement request not found.' }
+    if (request.user_id !== user.id) return { error: 'Unauthorized.' }
+    if (request.status !== 'Approved' && request.status !== 'approved') {
+      return { error: 'Only approved replacement requests can be confirmed as received.' }
+    }
+
+    const { error: updateErr } = await supabase
+      .from('replacement_requests')
+      .update({
+        status: 'Completed',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', requestId)
+
+    if (updateErr) return { error: updateErr.message }
+
+    revalidatePath(`/[locale]/orders/${request.order_id}`, 'page')
+    revalidatePath('/[locale]/(vendor)/vendor/dashboard', 'page')
+    revalidatePath('/[locale]/(vendor)/vendor/replacements', 'page')
+    return { success: true }
+  } catch (err: any) {
+    return { error: err.message || 'An unexpected error occurred' }
+  }
+}
+
+/**
  * Shop Settings Action: Save replacement settings for a shop.
  */
 export async function updateShopReplacementSettingsAction(
