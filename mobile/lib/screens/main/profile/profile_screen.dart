@@ -369,6 +369,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () => context.push('/profile/privacy'),
                         ),
                         _buildLinkItem(
+                          label: 'Terms of Service',
+                          icon: HugeIcons.strokeRoundedFile01,
+                          color: const Color(0xFF3B82F6),
+                          bg: isDark ? const Color(0xFF1E293B) : const Color(0xFFEFF6FF),
+                          isDark: isDark,
+                          onTap: () => context.push('/profile/terms'),
+                        ),
+                        _buildLinkItem(
+                          label: 'Delete Account',
+                          icon: HugeIcons.strokeRoundedDelete02,
+                          color: const Color(0xFFEF4444),
+                          bg: isDark ? const Color(0xFF1E293B) : const Color(0xFFFEF2F2),
+                          isDark: isDark,
+                          onTap: () => context.push('/profile/delete-account'),
+                        ),
+                        _buildLinkItem(
                           label: l10n.platformFeedbackLabel,
                           icon: HugeIcons.strokeRoundedChat01,
                           color: const Color(0xFF10B981),

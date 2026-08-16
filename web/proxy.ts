@@ -117,7 +117,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Routes that don't require authentication
-  const publicRoutes = ['/login', '/signup', '/forgot-password', '/privacy', '/terms']
+  const publicRoutes = ['/login', '/signup', '/forgot-password', '/privacy', '/terms', '/delete-account']
   const isPublicRoute =
     publicRoutes.some((r) => cleanPathname.startsWith(r)) ||
     cleanPathname === '/' ||

@@ -172,6 +172,8 @@ export default function Footer() {
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <Link href={`/${locale}/settings`} className="footer-link">{t('nav.settings')}</Link>
             <Link href={`/${locale}/privacy`} className="footer-link">Privacy Policy</Link>
+            <Link href={`/${locale}/terms`} className="footer-link">Terms of Service</Link>
+            <Link href={`/${locale}/delete-account`} className="footer-link">Delete Account</Link>
             <Link href={`/${locale}/notifications`} className="footer-link">{t('notifications.title') || 'Notifications'}</Link>
           </div>
 
@@ -186,7 +188,7 @@ export default function Footer() {
       <div style={{ borderTop: '1px solid var(--border)', padding: '20px 24px', background: 'var(--bg-surface)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
-            &copy; {new Date().getFullYear()} Angadi Online. {t('footer.rights_reserved') || 'All rights reserved.'} • <Link href={`/${locale}/privacy`} style={{ color: 'inherit', textDecoration: 'underline' }}>Privacy Policy</Link>
+            &copy; {new Date().getFullYear()} Angadi Online. {t('footer.rights_reserved') || 'All rights reserved.'} • <Link href={`/${locale}/privacy`} style={{ color: 'inherit', textDecoration: 'underline' }}>Privacy</Link> • <Link href={`/${locale}/terms`} style={{ color: 'inherit', textDecoration: 'underline' }}>Terms</Link> • <Link href={`/${locale}/delete-account`} style={{ color: 'inherit', textDecoration: 'underline' }}>Delete Account</Link>
           </p>
 
           <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '4px' }}>

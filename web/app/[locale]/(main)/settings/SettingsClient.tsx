@@ -127,6 +127,34 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
           </div>
           <span style={{ color: 'var(--text-muted)', fontSize: '18px' }}>›</span>
         </Link>
+
+        {/* Terms of Service */}
+        <Link
+          href={`/${locale}/terms`}
+          className="wa-list-item"
+          style={{ textDecoration: 'none', color: 'inherit' }}
+        >
+          <span>📜</span>
+          <div className="wa-item-body" style={{ flex: 1 }}>
+            <p className="wa-item-title">Terms of Service</p>
+            <p className="wa-item-sub">Marketplace rules, pricing & delivery terms</p>
+          </div>
+          <span style={{ color: 'var(--text-muted)', fontSize: '18px' }}>›</span>
+        </Link>
+
+        {/* Delete Account */}
+        <Link
+          href={`/${locale}/delete-account`}
+          className="wa-list-item"
+          style={{ textDecoration: 'none', color: 'inherit' }}
+        >
+          <span>🗑️</span>
+          <div className="wa-item-body" style={{ flex: 1 }}>
+            <p className="wa-item-title" style={{ color: '#ef4444' }}>Delete Account</p>
+            <p className="wa-item-sub">Request permanent removal of your data</p>
+          </div>
+          <span style={{ color: 'var(--text-muted)', fontSize: '18px' }}>›</span>
+        </Link>
       </div>
 
       <div style={{ marginTop: '1.5rem' }}>
