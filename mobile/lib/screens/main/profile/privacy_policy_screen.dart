@@ -221,9 +221,9 @@ class PrivacyPolicyScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          const Icon(Icons.email_outlined, color: kWaGreen, size: 18),
+                          Icon(Icons.email_outlined, color: kWaGreen, size: 18),
                           const SizedBox(width: 8),
-                          const Text(
+                          Text(
                             'support@angadionline.com',
                             style: TextStyle(
                               fontSize: 14,
