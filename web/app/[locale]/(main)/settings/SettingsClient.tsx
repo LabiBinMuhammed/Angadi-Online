@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation, Locale } from '@/lib/i18n/I18nContext'
@@ -113,14 +114,19 @@ export default function SettingsClient({ preferredLanguage }: { preferredLanguag
           </div>
         </div>
 
-        {/* Privacy */}
-        <div className="wa-list-item" style={{ cursor: 'default' }}>
+        {/* Privacy Policy */}
+        <Link
+          href={`/${locale}/privacy`}
+          className="wa-list-item"
+          style={{ textDecoration: 'none', color: 'inherit' }}
+        >
           <span>🔒</span>
-          <div className="wa-item-body">
-            <p className="wa-item-title">Privacy</p>
-            <p className="wa-item-sub">Your data is stored securely</p>
+          <div className="wa-item-body" style={{ flex: 1 }}>
+            <p className="wa-item-title">Privacy Policy</p>
+            <p className="wa-item-sub">View our full privacy & data protection policy</p>
           </div>
-        </div>
+          <span style={{ color: 'var(--text-muted)', fontSize: '18px' }}>›</span>
+        </Link>
       </div>
 
       <div style={{ marginTop: '1.5rem' }}>

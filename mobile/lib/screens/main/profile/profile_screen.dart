@@ -361,6 +361,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onTap: () => context.push('/profile/security'),
                         ),
                         _buildLinkItem(
+                          label: 'Privacy Policy',
+                          icon: HugeIcons.strokeRoundedShield01,
+                          color: const Color(0xFF0EA5E9),
+                          bg: isDark ? const Color(0xFF1E293B) : const Color(0xFFE0F2FE),
+                          isDark: isDark,
+                          onTap: () => context.push('/profile/privacy'),
+                        ),
+                        _buildLinkItem(
                           label: l10n.platformFeedbackLabel,
                           icon: HugeIcons.strokeRoundedChat01,
                           color: const Color(0xFF10B981),
