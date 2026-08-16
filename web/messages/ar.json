@@ -448,9 +448,12 @@
     "management": "الإدارة",
     "vendor_panel": "لوحة البائع",
     "vendor_panel_sub": "إدارة متجرك وطلباتك",
-    "admin_panel": "لوحة المدير",
+    "admin_panel": "لوحة الإدارة",
     "admin_panel_sub": "إدارة النظام",
-    "security_settings": "Security Settings"
+    "security_settings": "إعدادات الأمان",
+    "privacy_policy": "سياسة الخصوصية (Privacy Policy)",
+    "terms_of_service": "شروط الخدمة (Terms)",
+    "delete_account": "حذف الحساب (Delete Account)"
   },
   "vendor_nav": {
     "sec_overview": "نظرة عامة",

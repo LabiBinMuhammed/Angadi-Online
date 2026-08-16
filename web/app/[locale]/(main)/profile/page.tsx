@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { User, UserProfile } from '@/types'
-import { Settings, MapPin, Package, Bell, Store, ShieldAlert, ChevronRight, Mail, Calendar, Globe, User as UserIcon, MessageSquare, History, Bookmark, Lock } from 'lucide-react'
+import { Settings, MapPin, Package, Bell, Store, ShieldAlert, ChevronRight, Mail, Calendar, Globe, User as UserIcon, MessageSquare, History, Bookmark, Lock, ShieldCheck, FileText, Trash2 } from 'lucide-react'
 import LogoutButton from './LogoutButton'
 import ThemeToggle from './ThemeToggle'
 import { getServerTranslations } from '@/lib/i18n/server'
@@ -37,14 +37,17 @@ export default async function ProfilePage({ params }: { params: Promise<{ locale
   const role = u?.role ?? 'customer'
 
   const links = [
-    { href: '/profile/addresses', icon: MapPin, label: t('profile.my_addresses'), color: '#3b82f6', bg: '#eff6ff' },
-    { href: '/orders', icon: Package, label: t('profile.my_orders'), color: '#8b5cf6', bg: '#f5f3ff' },
-    { href: '/notifications', icon: Bell, label: t('profile.notifications'), color: '#f59e0b', bg: '#fffbeb' },
-    { href: '/pinned-shops', icon: Bookmark, label: t('profile.pinned_shops'), color: '#ec4899', bg: '#fdf2f8' },
-    { href: '/purchase-history', icon: History, label: t('profile.purchase_history'), color: '#8b5cf6', bg: '#f5f3ff' },
-    { href: '/profile/feedback', icon: MessageSquare, label: t('profile.platform_feedback'), color: '#10b981', bg: '#ecfdf5' },
-    { href: '/profile/security', icon: Lock, label: t('profile.security_settings') || 'Security Settings', color: '#10b981', bg: '#ecfdf5' },
-    { href: '/settings', icon: Settings, label: t('profile.settings'), color: '#64748b', bg: '#f8fafc' },
+    { href: `/${activeLocale}/profile/addresses`, icon: MapPin, label: t('profile.my_addresses'), color: '#3b82f6', bg: '#eff6ff' },
+    { href: `/${activeLocale}/orders`, icon: Package, label: t('profile.my_orders'), color: '#8b5cf6', bg: '#f5f3ff' },
+    { href: `/${activeLocale}/notifications`, icon: Bell, label: t('profile.notifications'), color: '#f59e0b', bg: '#fffbeb' },
+    { href: `/${activeLocale}/pinned-shops`, icon: Bookmark, label: t('profile.pinned_shops'), color: '#ec4899', bg: '#fdf2f8' },
+    { href: `/${activeLocale}/purchase-history`, icon: History, label: t('profile.purchase_history'), color: '#8b5cf6', bg: '#f5f3ff' },
+    { href: `/${activeLocale}/profile/feedback`, icon: MessageSquare, label: t('profile.platform_feedback'), color: '#10b981', bg: '#ecfdf5' },
+    { href: `/${activeLocale}/profile/security`, icon: Lock, label: t('profile.security_settings') || 'Security Settings', color: '#10b981', bg: '#ecfdf5' },
+    { href: `/${activeLocale}/privacy`, icon: ShieldCheck, label: t('profile.privacy_policy') || 'Privacy Policy', color: '#0ea5e9', bg: '#e0f2fe' },
+    { href: `/${activeLocale}/terms`, icon: FileText, label: t('profile.terms_of_service') || 'Terms of Service', color: '#3b82f6', bg: '#eff6ff' },
+    { href: `/${activeLocale}/delete-account`, icon: Trash2, label: t('profile.delete_account') || 'Delete Account', color: '#ef4444', bg: '#fef2f2' },
+    { href: `/${activeLocale}/settings`, icon: Settings, label: t('profile.settings'), color: '#64748b', bg: '#f8fafc' },
   ]
 
 

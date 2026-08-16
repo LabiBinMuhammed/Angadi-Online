@@ -117,7 +117,10 @@ export async function proxy(request: NextRequest) {
   }
 
   // Routes that don't require authentication
-  const publicRoutes = ['/login', '/signup', '/forgot-password', '/privacy', '/terms', '/delete-account']
+  const authOnlyRoutes = ['/login', '/signup', '/forgot-password', '/reset-password']
+  const publicContentRoutes = ['/privacy', '/terms', '/delete-account']
+  const publicRoutes = [...authOnlyRoutes, ...publicContentRoutes]
+
   const isPublicRoute =
     publicRoutes.some((r) => cleanPathname.startsWith(r)) ||
     cleanPathname === '/' ||
@@ -158,8 +161,8 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  // Already authenticated → don't allow accessing public auth pages (e.g. /login, /signup)
-  const isAuthPage = publicRoutes.some((r) => cleanPathname.startsWith(r))
+  // Already authenticated → don't allow accessing auth pages (e.g. /login, /signup), but allow /privacy, /terms, /delete-account
+  const isAuthPage = authOnlyRoutes.some((r) => cleanPathname.startsWith(r))
   if (user && isAuthPage && !pathname.startsWith('/api')) {
     const homeUrl = request.nextUrl.clone()
     homeUrl.pathname = `/${locale}/home`

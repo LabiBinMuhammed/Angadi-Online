@@ -450,7 +450,10 @@
     "vendor_panel_sub": "നിങ്ങളുടെ കടയും ഓർഡറുകളും നിയന്ത്രിക്കുക",
     "admin_panel": "അഡ്മിൻ പാനൽ",
     "admin_panel_sub": "സിസ്റ്റം അഡ്മിനിസ്ട്രേഷൻ",
-    "security_settings": "Security Settings"
+    "security_settings": "സുരക്ഷാ ക്രമീകരണങ്ങൾ",
+    "privacy_policy": "സ്വകാര്യതാ നയം (Privacy Policy)",
+    "terms_of_service": "ഉപയോഗ നിബന്ധനകൾ (Terms)",
+    "delete_account": "അക്കൗണ്ട് ഇല്ലാതാക്കുക (Delete Account)"
   },
   "vendor_nav": {
     "sec_overview": "അവലോകനം",

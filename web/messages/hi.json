@@ -449,8 +449,11 @@
     "vendor_panel": "विक्रेता पैनल",
     "vendor_panel_sub": "अपनी दुकान और ऑर्डर्स प्रबंधित करें",
     "admin_panel": "व्यवस्थापक पैनल",
-    "admin_panel_sub": "सिस्टम प्रशासन",
-    "security_settings": "Security Settings"
+    "admin_panel_sub": "सिस्टम व्यवस्थापन",
+    "security_settings": "सुरक्षा सेटिंग्स",
+    "privacy_policy": "गोपनीयता नीति (Privacy Policy)",
+    "terms_of_service": "सेवा की शर्तें (Terms)",
+    "delete_account": "खाता हटाएं (Delete Account)"
   },
   "vendor_nav": {
     "sec_overview": "अवलोकन",

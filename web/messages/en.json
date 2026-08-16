@@ -450,7 +450,10 @@
     "vendor_panel_sub": "Manage your shop & orders",
     "admin_panel": "Admin Panel",
     "admin_panel_sub": "System administration",
-    "security_settings": "Security Settings"
+    "security_settings": "Security Settings",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service",
+    "delete_account": "Delete Account"
   },
   "vendor_nav": {
     "sec_overview": "Overview",

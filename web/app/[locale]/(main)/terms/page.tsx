@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
-import { FileText, ArrowLeft, Store, ShieldCheck, RefreshCw, AlertTriangle, Scale, Mail } from 'lucide-react'
+import { FileText, ArrowLeft, Store, RefreshCw, AlertTriangle, Scale, Mail } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Terms of Service | Angadi Online',
@@ -13,11 +13,14 @@ export default async function TermsOfServicePage({
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
+  const isMl = locale === 'ml'
+  const isHi = locale === 'hi'
+  const isAr = locale === 'ar'
 
   return (
-    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '24px 16px 80px' }}>
+    <div style={{ maxWidth: '860px', margin: '0 auto', padding: '24px 16px 80px' }} dir={isAr ? 'rtl' : 'ltr'}>
       {/* Back to App */}
-      <div style={{ marginBottom: '20px' }}>
+      <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Link
           href={`/${locale}/home`}
           style={{
@@ -30,8 +33,20 @@ export default async function TermsOfServicePage({
             textDecoration: 'none',
           }}
         >
-          <ArrowLeft size={16} /> Back to App
+          <ArrowLeft size={16} style={{ transform: isAr ? 'rotate(180deg)' : 'none' }} />
+          {isMl ? 'തിരികെ ആപ്പിലേക്ക്' : isHi ? 'वापस ऐप पर जाएं' : isAr ? 'العودة إلى التطبيق' : 'Back to App'}
         </Link>
+
+        {/* Language Quick Switcher */}
+        <div style={{ display: 'flex', gap: '8px', fontSize: '13px' }}>
+          <Link href="/en/terms" style={{ fontWeight: locale === 'en' ? 800 : 500, color: locale === 'en' ? '#2563eb' : 'var(--text-muted)' }}>EN</Link>
+          <span>•</span>
+          <Link href="/ml/terms" style={{ fontWeight: locale === 'ml' ? 800 : 500, color: locale === 'ml' ? '#2563eb' : 'var(--text-muted)' }}>മലയാളം</Link>
+          <span>•</span>
+          <Link href="/hi/terms" style={{ fontWeight: locale === 'hi' ? 800 : 500, color: locale === 'hi' ? '#2563eb' : 'var(--text-muted)' }}>हिंदी</Link>
+          <span>•</span>
+          <Link href="/ar/terms" style={{ fontWeight: locale === 'ar' ? 800 : 500, color: locale === 'ar' ? '#2563eb' : 'var(--text-muted)' }}>العربية</Link>
+        </div>
       </div>
 
       {/* Header Banner */}
@@ -62,7 +77,7 @@ export default async function TermsOfServicePage({
           </div>
           <div>
             <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: 'var(--text-base)' }}>
-              Terms of Service
+              {isMl ? 'ഉപയോഗ നിബന്ധനകൾ (Terms of Service)' : isHi ? 'सेवा की शर्तें (Terms of Service)' : isAr ? 'شروط الخدمة (Terms of Service)' : 'Terms of Service'}
             </h1>
             <p style={{ margin: '2px 0 0', fontSize: '13px', color: 'var(--text-muted)', fontWeight: 500 }}>
               Angadi Online Marketplace Agreement & User Guidelines
@@ -71,7 +86,7 @@ export default async function TermsOfServicePage({
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '16px' }}>
           <span className="badge" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#2563eb', fontWeight: 600 }}>
-            Effective Date: August 16, 2026
+            {isMl ? 'പ്രാബല്യത്തിൽ: ആഗസ്റ്റ് 16, 2026' : isHi ? 'प्रभावी तिथि: 16 अगस्त, 2026' : isAr ? 'تاريخ السريان: 16 أغسطس 2026' : 'Effective Date: August 16, 2026'}
           </span>
           <span className="badge" style={{ background: 'rgba(34, 197, 94, 0.15)', color: '#16a34a', fontWeight: 600 }}>
             Version 1.0
@@ -82,108 +97,83 @@ export default async function TermsOfServicePage({
       {/* Content Container */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', lineHeight: 1.7, color: 'var(--text-base)', fontSize: '15px' }}>
 
-        {/* Section 1: Agreement to Terms */}
+        {/* Section 1: Agreement */}
         <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#2563eb' }}>1.</span> Agreement to Terms
+            <span style={{ color: '#2563eb' }}>1.</span> 
+            {isMl ? 'നിബന്ധനകൾ അംഗീകരിക്കൽ' : isHi ? 'शर्तों की स्वीकृति' : isAr ? 'الموافقة على الشروط' : 'Agreement to Terms'}
           </h2>
           <p style={{ margin: 0 }}>
-            By creating an account, downloading the mobile app, or accessing <strong>Angadi Online</strong> (&quot;the Platform&quot;), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the application or services.
+            {isMl
+              ? 'അങ്ങാടി ഓൺലൈൻ ഉപയോഗിക്കുന്നതിലൂടെ നിങ്ങൾ ഈ നിബന്ധനകൾ പൂർണ്ണമായി അംഗീകരിക്കുന്നു.'
+              : isHi
+              ? 'अंगाडी ऑनलाइन का उपयोग करके आप इन सेवा शर्तों से पूरी तरह सहमत होते हैं।'
+              : isAr
+              ? 'باستخدام تطبيق أنجادي أونلاين، فإنك توافق على الالتزام بكافة هذه الشروط والأحكام.'
+              : 'By creating an account, downloading the mobile app, or accessing Angadi Online, you agree to be bound by these Terms of Service.'}
           </p>
         </section>
 
-        {/* Section 2: Marketplace Model & Shop Responsibility */}
+        {/* Section 2: Marketplace Model */}
         <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Store size={20} style={{ color: '#16a34a' }} />
-            <span>2. Neighborhood Marketplace Model</span>
+            <span>{isMl ? 'മാർക്കറ്റ്പ്ലേസ് മാതൃക' : isHi ? 'मार्केटप्लेस मॉडल' : isAr ? 'نموذج السوق المحلي' : 'Neighborhood Marketplace Model'}</span>
           </h2>
           <p style={{ margin: 0 }}>
-            Angadi Online connects customers with independent neighborhood grocery, supermarket, and convenience store vendors.
+            {isMl
+              ? 'അങ്ങാടി ഓൺലൈൻ നിങ്ങളുടെ അടുത്തുള്ള പ്രാദേശിക കടകളെ നിങ്ങളുമായി ബന്ധിപ്പിക്കുന്ന പ്ലാറ്റ്‌ഫോമാണ്. ഓരോ കടയുടമയും സ്വന്തം സാധനങ്ങൾ പാക്ക് ചെയ്യുന്നതിനും ഡെലിവറി നടത്തുന്നതിനും ഉത്തരവാദിയാണ്.'
+              : isHi
+              ? 'अंगाडी ऑनलाइन आपके पड़ोस की दुकानों को आपसे जोड़ता है। प्रत्येक विक्रेता उत्पादों की उपलब्धता, गुणवत्ता और डिलीवरी के लिए सीधे जिम्मेदार है।'
+              : isAr
+              ? 'أنجادي أونلاين منصة تربطك بالمتاجر المحلية في حيك. يتحمل كل متجر مسؤولية جودة المنتجات وتوصيلها مباشرة.'
+              : 'Angadi Online connects customers with independent neighborhood grocery and store vendors. Each shop is responsible for its pricing, product packing, and doorstep delivery.'}
           </p>
-          <ul style={{ margin: '12px 0 0', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <li><strong>Vendor Fulfillment:</strong> Each registered shop operates independently and is responsible for inventory pricing, item packing, freshness, and local doorstep delivery.</li>
-            <li><strong>Order Placement:</strong> When you place an order, a direct commercial relationship is formed between you and the respective shop vendor.</li>
-          </ul>
         </section>
 
-        {/* Section 3: Pricing, Weight-based Items & Payment */}
+        {/* Section 3: Pricing & Weights */}
         <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Scale size={20} style={{ color: '#f59e0b' }} />
-            <span>3. Pricing, Estimation & Payments</span>
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <div style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: '10px' }}>
-              <strong>Estimated vs. Final Price:</strong> For weighted items (e.g., fresh vegetables, fruits, cuts of meat), the checkout price displayed is an accurate estimate. The final price is calculated by the vendor upon weighing and confirmed before delivery.
-            </div>
-            <div style={{ padding: '12px', background: 'var(--bg-secondary)', borderRadius: '10px' }}>
-              <strong>Payment Methods:</strong> Orders can be settled via Cash on Delivery (COD), direct shop UPI upon delivery, or verified Shop-Managed Credit (where granted by the shop owner).
-            </div>
-          </div>
-        </section>
-
-        {/* Section 4: Delivery Shifts & Schedules */}
-        <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#2563eb' }}>4.</span> Delivery Shifts & Cut-Off Windows
+            <span>{isMl ? 'വിലനിർണ്ണയവും തൂക്കവും' : isHi ? 'मूल्य निर्धारण और वजन' : isAr ? 'الأسعار والوزن' : 'Pricing, Estimation & Payments'}</span>
           </h2>
           <p style={{ margin: 0 }}>
-            Deliveries are organized into scheduled shifts:
+            {isMl
+              ? 'പച്ചക്കറികൾ, പഴങ്ങൾ തുടങ്ങിയ തൂക്കം അനുസരിച്ചുള്ള സാധനങ്ങൾക്ക് കാർട്ടിൽ കാണിക്കുന്നത് ഏകദേശ വിലയാണ്. കടയിൽ വെച്ച് കൃത്യമായി തൂക്കിനോക്കിയ ശേഷമുള്ള അന്തിമ വിലയാണ് ഡെലിവറി സമയത്ത് നൽകേണ്ടത്.'
+              : isHi
+              ? 'सब्जियों और फलों जैसी वजन वाली वस्तुओं के लिए कार्ट में अनुमानित मूल्य दिखाया जाता है। दुकान द्वारा सटीक वजन के बाद अंतिम बिल तय होता है।'
+              : isAr
+              ? 'بالنسبة للمنتجات المباعة بالوزن (مثل الخضار واللحوم)، فإن السعر في السلة تقديري ويتم تأكيد السعر النهائي بعد الوزن الفعلي عند التجهيز.'
+              : 'For weighted items (vegetables, meat), the checkout price is an accurate estimate. The final price is calculated by the shop upon physical weighing.'}
           </p>
-          <ul style={{ margin: '10px 0 0', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <li><strong>Morning Shift:</strong> Delivery between 7:00 AM – 12:00 PM (Cut-off for same day: 8:00 AM).</li>
-            <li><strong>Evening Shift:</strong> Delivery between 4:00 PM – 8:00 PM (Cut-off for same day: 2:00 PM).</li>
-          </ul>
         </section>
 
-        {/* Section 5: Cancellations & Replacement Policy */}
+        {/* Section 4: Replacements */}
         <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <RefreshCw size={20} style={{ color: '#8b5cf6' }} />
-            <span>5. Cancellations & Replacements</span>
-          </h2>
-          <ul style={{ margin: 0, paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            <li><strong>Cancellation:</strong> You may cancel an order before the vendor begins packing or dispatching.</li>
-            <li><strong>Replacement Request:</strong> If an item arrives damaged, expired, or incorrect, you can submit a replacement request with a photo within 24 hours of delivery.</li>
-            <li><strong>Vendor Resolution:</strong> The vendor may approve delivery in the next shift, deliver immediately, or provide a refund/credit adjustment.</li>
-          </ul>
-        </section>
-
-        {/* Section 6: User Conduct & Account Security */}
-        <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShieldCheck size={20} style={{ color: '#16a34a' }} />
-            <span>6. User Conduct & Security</span>
+            <span>{isMl ? 'റീപ്ലേസ്‌മെന്റ് പോളിസി' : isHi ? 'प्रतिस्थापन (Replacement) नीति' : isAr ? 'سياسة الاستبدال' : 'Cancellations & Replacements'}</span>
           </h2>
           <p style={{ margin: 0 }}>
-            You agree to provide accurate registration information (including real phone number and delivery address). Fraudulent orders, abusive behavior toward delivery staff, or misuse of shop credit will result in immediate account suspension.
+            {isMl
+              ? 'കേടുപാടുകൾ ഉള്ള സാധനങ്ങൾക്ക് ഡെലിവറി കഴിഞ്ഞ് 24 മണിക്കൂറിനുള്ളിൽ ആപ്പിലൂടെ ഫോട്ടോ സഹിതം റീപ്ലേസ്‌മെന്റ് റിക്വസ്റ്റ് സമർപ്പിക്കാവുന്നതാണ്. കടയുടമ അത് പരിശോധിച്ച് അടുത്ത ഷിഫ്റ്റിലോ ഉടനടിയോ പുതിയ സാധനം നൽകുന്നതാണ്.'
+              : isHi
+              ? 'क्षतिग्रस्त या गलत वस्तुओं के लिए डिलीवरी के 24 घंटों के भीतर फोटो के साथ रिप्लेसमेंट अनुरोध दर्ज करें। दुकानदार अगले स्लॉट में इसे बदल देंगे।'
+              : isAr
+              ? 'إذا وصلت سلعة تالفة، يمكنك تقديم طلب استبدال بصورة خلال 24 ساعة وسيقوم المتجر باستبدالها في الوردية القادمة أو فوراً.'
+              : 'If an item arrives damaged or incorrect, submit a replacement request with a photo within 24 hours. The vendor can approve replacement in the next shift or dispatch immediately.'}
           </p>
         </section>
 
-        {/* Section 7: Limitation of Liability */}
-        <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertTriangle size={20} style={{ color: '#ef4444' }} />
-            <span>7. Limitation of Liability</span>
-          </h2>
-          <p style={{ margin: 0 }}>
-            Angadi Online provides the platform &quot;as is&quot;. While we enforce strict quality standards on participating vendors, the platform is not liable for indirect damages, temporary network interruptions, or food/product quality disputes beyond the replacement mechanism provided.
-          </p>
-        </section>
-
-        {/* Section 8: Contact Information */}
+        {/* Section 5: Contact */}
         <section className="card" style={{ padding: '24px', borderRadius: '14px', border: '1px solid var(--border)' }}>
           <h2 style={{ fontSize: '18px', fontWeight: 800, marginTop: 0, marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Mail size={20} style={{ color: '#2563eb' }} />
-            <span>8. Contact & Legal Inquiries</span>
+            <span>{isMl ? 'നിയമപരമായ അന്വേഷണങ്ങൾ' : isHi ? 'संपर्क' : isAr ? 'التواصل والاستفسار' : 'Contact & Legal Inquiries'}</span>
           </h2>
-          <p style={{ margin: 0 }}>
-            For legal inquiries, dispute escalations, or terms clarification, reach out to:
+          <p style={{ margin: 0, fontSize: '14px' }}>
+            Email: <a href="mailto:support@angadionline.com" style={{ color: '#2563eb', fontWeight: 600 }}>support@angadionline.com</a>
           </p>
-          <div style={{ marginTop: '10px', fontSize: '14px' }}>
-            <strong>Email:</strong> <a href="mailto:support@angadionline.com" style={{ color: '#2563eb' }}>support@angadionline.com</a>
-          </div>
         </section>
 
       </div>
