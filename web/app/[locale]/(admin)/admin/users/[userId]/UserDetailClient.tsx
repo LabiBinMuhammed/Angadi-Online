@@ -16,7 +16,8 @@ import {
   Loader2,
   UserCheck
 } from 'lucide-react'
-import { updateUserRoleAction } from '@/app/actions/admin'
+import { useRouter } from 'next/navigation'
+import { updateUserRoleAction, adminToggleUserActiveAction, adminDeleteUserAction } from '@/app/actions/admin'
 
 type Props = {
   user: any
@@ -55,9 +56,12 @@ const ROLES = [
 ]
 
 export default function UserDetailClient({ user: initialUser, orders, shops }: Props) {
+  const router = useRouter()
   const [user, setUser] = useState(initialUser)
   const [role, setRole] = useState<string>(initialUser.role ?? 'customer')
   const [savingRole, setSavingRole] = useState(false)
+  const [togglingStatus, setTogglingStatus] = useState(false)
+  const [deletingUser, setDeletingUser] = useState(false)
   const [roleMsg, setRoleMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   async function handleRoleChange(newRole: string) {
@@ -82,6 +86,38 @@ export default function UserDetailClient({ user: initialUser, orders, shops }: P
         type: 'error',
         text: res.error || 'Failed to update user role.'
       })
+    }
+  }
+
+  async function handleToggleStatus() {
+    if (togglingStatus) return
+    const next = !user.is_active
+    setTogglingStatus(true)
+    const res = await adminToggleUserActiveAction(user.id, next)
+    setTogglingStatus(false)
+    if (res.success) {
+      setUser((prev: any) => ({ ...prev, is_active: next }))
+      setRoleMsg({
+        type: 'success',
+        text: next ? 'User account has been activated.' : 'User account and associated shop data deactivated.'
+      })
+      setTimeout(() => setRoleMsg(null), 4000)
+    } else {
+      alert(`Failed to update status: ${res.error || 'Failed'}`)
+    }
+  }
+
+  async function handleDeleteUser() {
+    if (!window.confirm(`Delete user "${user.name ?? 'this user'}"? This will permanently delete owned shops, catalog items, and profile data.`)) {
+      return
+    }
+    setDeletingUser(true)
+    const res = await adminDeleteUserAction(user.id)
+    setDeletingUser(false)
+    if (res.success) {
+      router.push('/admin/users')
+    } else {
+      alert(`Error deleting user: ${res.error || 'Failed'}`)
     }
   }
 
@@ -287,7 +323,7 @@ export default function UserDetailClient({ user: initialUser, orders, shops }: P
       {(orders ?? []).length === 0 ? (
         <p className="text-muted text-sm">No orders recorded for this user.</p>
       ) : (
-        <div className="wa-list">
+        <div className="wa-list" style={{ marginBottom: '1.5rem' }}>
           {(orders as any[]).map(o => (
             <Link key={o.id} href={`/admin/orders/${o.id}`} id={`udetail-order-${o.id}`} className="wa-list-item">
               <div className="wa-avatar" style={{ background: 'var(--neutral-100)', color: 'var(--text-base)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={16} /></div>
@@ -303,6 +339,56 @@ export default function UserDetailClient({ user: initialUser, orders, shops }: P
           ))}
         </div>
       )}
+
+      {/* Account Controls Card */}
+      <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '.75rem' }}>Account Controls</h2>
+      <div className="card" style={{ padding: '1.25rem', background: '#fff', border: '1px solid var(--wa-separator)', borderRadius: 'var(--radius-lg)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={handleToggleStatus}
+          disabled={togglingStatus}
+          className={`btn ${user.is_active ? 'btn-outline-danger' : 'btn-outline-success'}`}
+          style={{
+            flex: 1,
+            minWidth: '180px',
+            padding: '.65rem 1rem',
+            borderRadius: 'var(--radius-md)',
+            fontWeight: 700,
+            border: `1.5px solid ${user.is_active ? 'var(--danger)' : 'var(--wa-green-dark)'}`,
+            color: user.is_active ? 'var(--danger)' : 'var(--wa-green-dark)',
+            background: 'transparent',
+            cursor: togglingStatus ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {togglingStatus ? (
+            <Loader2 size={16} className="spinner" />
+          ) : user.is_active ? (
+            'Deactivate User'
+          ) : (
+            'Activate User'
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleDeleteUser}
+          disabled={deletingUser}
+          className="btn btn-danger"
+          style={{
+            flex: 1,
+            minWidth: '180px',
+            padding: '.65rem 1rem',
+            borderRadius: 'var(--radius-md)',
+            fontWeight: 700,
+            background: 'var(--danger)',
+            color: '#fff',
+            border: 'none',
+            cursor: deletingUser ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {deletingUser ? <Loader2 size={16} className="spinner" /> : 'Delete User Permanently'}
+        </button>
+      </div>
     </div>
   )
 }

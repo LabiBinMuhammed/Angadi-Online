@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/admin_service.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -193,37 +194,20 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
             .eq('shop_id', widget.shopId)
             .eq('user_id', userId);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Co-owner removed successfully.')),
-        );
-        _load();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Co-owner removed successfully.')),
+          );
+          _load();
+        }
       } catch (err) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to remove co-owner: $err')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to remove co-owner: $err')),
+          );
+        }
       }
     }
-  }
-
-
-  Future<void> _toggleShopActive(bool val) async {
-    final type = _shop!['type'] as String?;
-    String newType;
-    if (val) {
-      newType = type != null ? type.replaceAll('_inactive', '') : 'general';
-    } else {
-      newType = type != null 
-          ? (type.endsWith('_inactive') ? type : '${type}_inactive') 
-          : 'general_inactive';
-    }
-    
-    await supabase.from('shops').update({'type': newType}).eq('id', widget.shopId);
-    setState(() {
-      if (_shop != null) {
-        _shop!['type'] = newType;
-        _shop!['is_active'] = val;
-      }
-    });
   }
 
   Future<void> _toggleItemActive(Map<String, dynamic> item, bool val) async {
@@ -236,6 +220,31 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
     });
   }
 
+  Future<void> _toggleShopActive(bool val) async {
+    if (_shop == null) return;
+    final res = await adminService.toggleShopActive(widget.shopId, val);
+    if (res['success'] != true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update shop status: ${res['error']}'), backgroundColor: Colors.red),
+        );
+      }
+      return;
+    }
+    
+    final type = _shop!['type'] as String?;
+    String newType = val
+        ? (type != null ? type.replaceAll('_inactive', '') : 'general')
+        : (type != null ? (type.endsWith('_inactive') ? type : '${type}_inactive') : 'general_inactive');
+    
+    setState(() {
+      if (_shop != null) {
+        _shop!['type'] = newType;
+        _shop!['is_active'] = val;
+      }
+    });
+  }
+
   Future<void> _deleteShop() async {
     final name = _shop?['name'] ?? 'this shop';
     final confirm = await showDialog<bool>(
@@ -243,7 +252,7 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete Shop'),
-          content: Text('Delete shop "$name"? This cannot be undone.'),
+          content: Text('Delete shop "$name"? This will permanently delete all catalog items, variants, orders, and dependencies.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
@@ -263,18 +272,16 @@ class _AdminShopDetailScreenState extends State<AdminShopDetailScreen> {
     );
 
     if (confirm == true) {
-      try {
-        await supabase.from('shops').delete().eq('id', widget.shopId);
-        if (mounted) {
+      final res = await adminService.deleteShop(widget.shopId);
+      if (mounted) {
+        if (res['success'] == true) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Shop "$name" has been deleted.')),
+            SnackBar(content: Text('Shop "$name" has been deleted.'), backgroundColor: const Color(0xFF166534)),
           );
           Navigator.pop(context);
-        }
-      } catch (err) {
-        if (mounted) {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error deleting shop: $err')),
+            SnackBar(content: Text('Error deleting shop: ${res['error']}'), backgroundColor: Colors.red),
           );
         }
       }

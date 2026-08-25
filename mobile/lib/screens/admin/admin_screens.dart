@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hugeicons/hugeicons.dart';
+import '../../../core/admin_service.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -32,7 +33,7 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
 
   Future<void> _load() async {
     final results = await Future.wait([
-      supabase.from('shops').select('*, shop_owners(users(name, phone)), locations(name)').order('created_at', ascending: false),
+      supabase.from('shops').select('*, shop_owners(user_id, users(name, phone)), locations(name)').order('created_at', ascending: false),
       supabase.from('users').select('id, name, phone, role').order('name'),
       supabase.from('locations').select('id, name').order('name'),
     ]);
@@ -46,11 +47,18 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
     }
   }
 
-  Future<void> _toggleShopActive(Map<String, dynamic> shop) async {
+  Future<void> _toggleShop(Map<String, dynamic> shop) async {
     final type = shop['type'] as String? ?? 'general';
     final isActive = !type.endsWith('_inactive');
-    final newType = isActive ? '${type}_inactive' : type.replaceAll('_inactive', '');
-    await supabase.from('shops').update({'type': newType}).eq('id', shop['id']);
+    final next = !isActive;
+    final res = await adminService.toggleShopActive(shop['id'], next);
+    if (res['success'] != true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update shop status: ${res['error']}'), backgroundColor: Colors.red));
+      }
+      return;
+    }
+    final newType = next ? (type.endsWith('_inactive') ? type.replaceAll('_inactive', '') : type) : (type.endsWith('_inactive') ? type : '${type}_inactive');
     setState(() {
       final idx = _shops.indexWhere((s) => s['id'] == shop['id']);
       if (idx >= 0) _shops[idx] = {..._shops[idx], 'type': newType};
@@ -64,7 +72,7 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? kNeutral800 : Colors.white,
         title: const Text('Delete Shop'),
-        content: Text('Delete "${shop['name']}"? This cannot be undone.'),
+        content: Text('Delete "${shop['name']}"? This will permanently delete all catalog items, variants, and orders.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           ElevatedButton(
@@ -399,7 +407,7 @@ class _AdminShopsScreenState extends State<AdminShopsScreen> {
 
                                     // Tappable status badge
                                     GestureDetector(
-                                      onTap: () => _toggleShopActive(shop),
+                                      onTap: () => _toggleShop(shop),
                                       child: _StatusBadge(isActive: isActive),
                                     ),
                                   ]),
@@ -483,7 +491,13 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
 
   Future<void> _toggleUser(Map<String, dynamic> user) async {
     final next = !(user['is_active'] as bool? ?? true);
-    await supabase.from('users').update({'is_active': next}).eq('id', user['id']);
+    final res = await adminService.toggleUserActive(user['id'], next);
+    if (res['success'] != true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to update user status: ${res['error']}'), backgroundColor: Colors.red));
+      }
+      return;
+    }
     setState(() {
       final idx = _users.indexWhere((u) => u['id'] == user['id']);
       if (idx >= 0) _users[idx] = {..._users[idx], 'is_active': next};
@@ -497,7 +511,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? kNeutral800 : Colors.white,
         title: const Text('Delete User'),
-        content: Text('Delete "${user['name']}"? This cannot be undone.'),
+        content: Text('Delete "${user['name']}"? This will permanently delete owned shops, catalog items, and profile data.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
           ElevatedButton(
@@ -509,7 +523,13 @@ class _AdminUsersScreenState extends State<AdminUsersScreen> {
       ),
     );
     if (confirm != true) return;
-    await supabase.from('users').delete().eq('id', user['id']);
+    final res = await adminService.deleteUser(user['id']);
+    if (res['success'] != true) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to delete user: ${res['error']}'), backgroundColor: Colors.red));
+      }
+      return;
+    }
     setState(() => _users.removeWhere((u) => u['id'] == user['id']));
   }
 

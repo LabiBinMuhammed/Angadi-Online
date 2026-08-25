@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/admin_service.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
@@ -19,6 +20,7 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
   List<Map<String, dynamic>> _shops  = [];
   bool _loading = true;
   bool _updatingRole = false;
+  bool _togglingStatus = false;
 
   static const _roleColors = {
     'customer':  Color(0xFF64748B),
@@ -58,10 +60,68 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
   }
 
   Future<void> _toggleStatus() async {
-    if (_user == null) return;
+    if (_user == null || _togglingStatus) return;
     final next = !(_user!['is_active'] as bool? ?? true);
-    await supabase.from('users').update({'is_active': next}).eq('id', widget.userId);
-    setState(() => _user = {..._user!, 'is_active': next});
+    setState(() => _togglingStatus = true);
+
+    final res = await adminService.toggleUserActive(widget.userId, next);
+    if (mounted) {
+      setState(() => _togglingStatus = false);
+      if (res['success'] == true) {
+        setState(() => _user = {..._user!, 'is_active': next});
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next ? 'User successfully activated' : 'User and owned shop data deactivated'),
+            backgroundColor: next ? const Color(0xFF166534) : const Color(0xFFB91C1C),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update status: ${res['error']}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteUser() async {
+    if (_user == null) return;
+    final isDark = ThemeService.instance.isDarkMode;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? kNeutral800 : Colors.white,
+        title: const Text('Delete User'),
+        content: Text('Delete "${_user!['name']}"? This will permanently delete owned shops, catalog items, variants, and profile data.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: kDanger, foregroundColor: Colors.white),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+
+    final res = await adminService.deleteUser(widget.userId);
+    if (mounted) {
+      if (res['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User deleted successfully'), backgroundColor: Color(0xFF166534), behavior: SnackBarBehavior.floating),
+        );
+        context.pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete user: ${res['error']}'), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+        );
+      }
+    }
   }
 
   Future<void> _updateRole(String newRole) async {
@@ -499,7 +559,64 @@ class _AdminUserDetailScreenState extends State<AdminUserDetailScreen> {
                         }).toList(),
                       ),
                     ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
+
+                  // ─── Account Actions Card ───────────────────────────────
+                  Container(
+                    decoration: BoxDecoration(
+                      color: cardBg,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: cardBorder),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionHeader(HugeIcons.strokeRoundedShield01, 'Account Controls', textMain: textMain),
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                icon: _togglingStatus
+                                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                                    : HugeIcon(
+                                        icon: isActive ? HugeIcons.strokeRoundedUnavailable : HugeIcons.strokeRoundedCheckmarkCircle01,
+                                        size: 18,
+                                        color: isActive ? kDanger : kSuccess,
+                                      ),
+                                label: Text(
+                                  isActive ? 'Deactivate User' : 'Activate User',
+                                  style: TextStyle(color: isActive ? kDanger : kSuccess, fontWeight: FontWeight.w700),
+                                ),
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(color: isActive ? kDanger.withAlpha(120) : kSuccess.withAlpha(120)),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                onPressed: _togglingStatus ? null : _toggleStatus,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                icon: const HugeIcon(icon: HugeIcons.strokeRoundedDelete02, size: 18, color: Colors.white),
+                                label: const Text('Delete User', style: TextStyle(fontWeight: FontWeight.w700)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: kDanger,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                onPressed: _deleteUser,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
