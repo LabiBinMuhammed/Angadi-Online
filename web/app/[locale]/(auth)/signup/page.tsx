@@ -94,8 +94,8 @@ export default function SignupPage() {
       setError('Please enter a password.')
       return
     }
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long.')
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.')
       return
     }
 
@@ -122,7 +122,7 @@ export default function SignupPage() {
         }
       } else {
         if (data?.session) {
-          router.push(`/${locale}/home`)
+          window.location.href = `/${locale}/home`
         } else {
           setInfo('Sign up successful! If you registered via email, please check your inbox for a confirmation link.')
         }

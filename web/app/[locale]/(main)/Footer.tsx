@@ -126,13 +126,12 @@ export default function Footer() {
       <div className="footer-main-grid">
         {/* Col 1: Brand Info */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <div style={{ width: '36px', height: '36px', background: 'linear-gradient(135deg, #4cd964, #32b84a)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: 'bold', boxShadow: '0 4px 12px rgba(76,217,100,0.3)' }}>
-              A
-            </div>
-            <span style={{ fontSize: '20px', fontWeight: 900, color: 'var(--text-base)', letterSpacing: '-0.5px' }}>
-              Angadi Online
-            </span>
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+            <img 
+              src="/logo.png" 
+              alt="Angadi Online" 
+              style={{ height: '40px', objectFit: 'contain' }} 
+            />
           </div>
 
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.6', maxWidth: '320px' }}>
@@ -171,9 +170,9 @@ export default function Footer() {
           <h4 className="footer-heading">Preferences</h4>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <Link href={`/${locale}/settings`} className="footer-link">{t('nav.settings')}</Link>
-            <Link href={`/${locale}/privacy`} className="footer-link">Privacy Policy</Link>
-            <Link href={`/${locale}/terms`} className="footer-link">Terms of Service</Link>
-            <Link href={`/${locale}/delete-account`} className="footer-link">Delete Account</Link>
+            <Link href={`/${locale}/privacy`} className="footer-link">{t('profile.privacy_policy') || 'Privacy Policy'}</Link>
+            <Link href={`/${locale}/terms`} className="footer-link">{t('profile.terms_of_service') || 'Terms of Service'}</Link>
+            <Link href={`/${locale}/delete-account`} className="footer-link">{t('profile.delete_account') || 'Delete Account'}</Link>
             <Link href={`/${locale}/notifications`} className="footer-link">{t('notifications.title') || 'Notifications'}</Link>
           </div>
 
@@ -188,7 +187,7 @@ export default function Footer() {
       <div style={{ borderTop: '1px solid var(--border)', padding: '20px 24px', background: 'var(--bg-surface)' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
           <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-muted)' }}>
-            &copy; {new Date().getFullYear()} Angadi Online. {t('footer.rights_reserved') || 'All rights reserved.'} • <Link href={`/${locale}/privacy`} style={{ color: 'inherit', textDecoration: 'underline' }}>Privacy</Link> • <Link href={`/${locale}/terms`} style={{ color: 'inherit', textDecoration: 'underline' }}>Terms</Link> • <Link href={`/${locale}/delete-account`} style={{ color: 'inherit', textDecoration: 'underline' }}>Delete Account</Link>
+            &copy; {new Date().getFullYear()} Angadi Online. {t('footer.rights_reserved') || 'All rights reserved.'} • <Link href={`/${locale}/privacy`} style={{ color: 'inherit', textDecoration: 'underline' }}>{t('profile.privacy_policy') || 'Privacy Policy'}</Link> • <Link href={`/${locale}/terms`} style={{ color: 'inherit', textDecoration: 'underline' }}>{t('profile.terms_of_service') || 'Terms of Service'}</Link> • <Link href={`/${locale}/delete-account`} style={{ color: 'inherit', textDecoration: 'underline' }}>{t('profile.delete_account') || 'Delete Account'}</Link>
           </p>
 
           <p style={{ margin: 0, fontSize: '12px', color: 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '4px' }}>

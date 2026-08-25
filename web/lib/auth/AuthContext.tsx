@@ -122,16 +122,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     }
-    const identifier = email ? email.trim() : normalizePhone(phone!)
+    const identifier = email ? email.trim().toLowerCase() : normalizePhone(phone!)
     if (email) {
-      signUpParams.email = email.trim()
+      signUpParams.email = email.trim().toLowerCase()
       if (phone) {
         signUpParams.options.data.phone = normalizePhone(phone)
       }
     } else if (phone) {
       signUpParams.phone = normalizePhone(phone)
       if (email) {
-        signUpParams.options.data.email = email.trim()
+        signUpParams.options.data.email = email.trim().toLowerCase()
       }
     }
 
@@ -195,7 +195,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function signInWithPassword(phoneOrEmail: string, password: string) {
     const isEmail = phoneOrEmail.includes('@')
     const credentials = isEmail
-      ? { email: phoneOrEmail.trim(), password }
+      ? { email: phoneOrEmail.trim().toLowerCase(), password }
       : { phone: normalizePhone(phoneOrEmail), password }
 
     const { data, error } = await supabase.auth.signInWithPassword(credentials)

@@ -2688,6 +2688,72 @@ abstract class AppLocalizations {
   /// **'Tap on any item card to see more details and add it to your bag.'**
   String get tutorialShopOpenDesc;
 
+  /// No description provided for @bagTutorialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Shopping Bag'**
+  String get bagTutorialTitle;
+
+  /// No description provided for @bagTutorialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your selected items appear here. Review your items, change quantities, and continue to checkout.'**
+  String get bagTutorialDesc;
+
+  /// No description provided for @ordersTutorialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Orders'**
+  String get ordersTutorialTitle;
+
+  /// No description provided for @ordersTutorialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your current orders and view your previous purchases here.'**
+  String get ordersTutorialDesc;
+
+  /// No description provided for @profileTutorialTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Profile'**
+  String get profileTutorialTitle;
+
+  /// No description provided for @profileTutorialDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your profile, saved addresses, language, and other personal settings here.'**
+  String get profileTutorialDesc;
+
+  /// No description provided for @selectImageSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Image Source'**
+  String get selectImageSource;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
+  String get takePhoto;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
+  String get chooseFromGallery;
+
+  /// No description provided for @cameraOptionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use your camera to take a photo'**
+  String get cameraOptionDesc;
+
+  /// No description provided for @galleryOptionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an existing image from gallery'**
+  String get galleryOptionDesc;
+
   /// No description provided for @shopOwnersTitle.
   ///
   /// In en, this message translates to:

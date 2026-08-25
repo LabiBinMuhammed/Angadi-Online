@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { createShopAction } from '@/app/[locale]/(vendor)/vendor/shop/actions'
+import { adminDeleteShopAction, adminToggleShopActiveAction } from '@/app/actions/admin'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 import { Plus, X, Store, User, Tag, MapPin, Loader2 } from 'lucide-react'
@@ -59,23 +60,24 @@ export default function ShopManagementClient({
   async function toggleShopActive(shop: ShopRow) {
     const isActive = shop.is_active !== false
     const next = !isActive
-    const currentType = shop.type || 'general'
-    const newType = next 
-      ? (currentType.endsWith('_inactive') ? currentType.slice(0, -9) : currentType) 
-      : (currentType.endsWith('_inactive') ? currentType : currentType + '_inactive')
-      
-    const supabase = createClient()
-    await supabase.from('shops').update({ type: newType }).eq('id', shop.id)
-    setShops(prev => prev.map(s => s.id === shop.id ? { ...s, type: newType, is_active: next } : s))
-    router.refresh()
+    const res = await adminToggleShopActiveAction(shop.id, next)
+    if (res.success) {
+      setShops(prev => prev.map(s => s.id === shop.id ? { ...s, is_active: next } : s))
+      router.refresh()
+    } else {
+      alert(`Error toggling shop: ${res.error || 'Failed'}`)
+    }
   }
 
   async function deleteShop(shop: ShopRow) {
-    if (!window.confirm(`Delete shop "${shop.name}"? This cannot be undone.`)) return
-    const supabase = createClient()
-    await supabase.from('shops').delete().eq('id', shop.id)
-    setShops(prev => prev.filter(s => s.id !== shop.id))
-    router.refresh()
+    if (!window.confirm(`Delete shop "${shop.name}"? This will also remove all its products, categories, orders, and configuration.`)) return
+    const res = await adminDeleteShopAction(shop.id)
+    if (res.success) {
+      setShops(prev => prev.filter(s => s.id !== shop.id))
+      router.refresh()
+    } else {
+      alert(`Error deleting shop: ${res.error || 'Failed'}`)
+    }
   }
 
   async function handleCreate(e: React.FormEvent) {

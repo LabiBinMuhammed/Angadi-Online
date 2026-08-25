@@ -1426,6 +1426,42 @@ class AppLocalizationsMl extends AppLocalizations {
       'സാധനങ്ങളുടെ കൂടുതൽ വിവരങ്ങൾ കാണാനും ബാഗിലേക്ക് ചേർക്കാനും ഇതിൽ ടാപ്പ് ചെയ്യുക.';
 
   @override
+  String get bagTutorialTitle => 'നിങ്ങളുടെ ഷോപ്പിംഗ് ബാഗ്';
+
+  @override
+  String get bagTutorialDesc =>
+      'നിങ്ങൾ തിരഞ്ഞെടുത്ത ഇനങ്ങൾ ഇവിടെ കാണാം. ഇനങ്ങൾ പരിശോധിക്കാനും അളവുകൾ മാറ്റാനും ചെക്ക്ഔട്ടിലേക്ക് പോകാനും ഇവിടെ ടാപ്പ് ചെയ്യുക.';
+
+  @override
+  String get ordersTutorialTitle => 'നിങ്ങളുടെ ഓർഡറുകൾ';
+
+  @override
+  String get ordersTutorialDesc =>
+      'നിങ്ങളുടെ നിലവിലെ ഓർഡറുകൾ ട്രാക്ക് ചെയ്യാനും മുൻ വാങ്ങലുകൾ കാണാനും ഇവിടെ ക്ലിക്ക് ചെയ്യുക.';
+
+  @override
+  String get profileTutorialTitle => 'നിങ്ങളുടെ പ്രൊഫൈൽ';
+
+  @override
+  String get profileTutorialDesc =>
+      'നിങ്ങളുടെ പ്രൊഫൈൽ, വിലാസങ്ങൾ, ഭാഷ, മറ്റ് ക്രമീകരണങ്ങൾ എന്നിവ ഇവിടെ നിയന്ത്രിക്കാം.';
+
+  @override
+  String get selectImageSource => 'ചിത്രം തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get takePhoto => 'ഫോട്ടോ എടുക്കുക';
+
+  @override
+  String get chooseFromGallery => 'ഗാലറിയിൽ നിന്ന് തിരഞ്ഞെടുക്കുക';
+
+  @override
+  String get cameraOptionDesc => 'ക്യാമറ ഉപയോഗിച്ച് പുതിയ ഫോട്ടോ എടുക്കുക';
+
+  @override
+  String get galleryOptionDesc => 'ഗാലറിയിൽ നിന്നും ചിത്രം തിരഞ്ഞെടുക്കുക';
+
+  @override
   String get shopOwnersTitle => 'കട ഉടമസ്ഥർ / സഹ-ഉടമകൾ';
 
   @override

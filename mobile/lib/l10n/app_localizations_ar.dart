@@ -1397,6 +1397,42 @@ class AppLocalizationsAr extends AppLocalizations {
       'انقر على أي بطاقة منتج لعرض مزيد من التفاصيل وإضافته إلى حقيبتك.';
 
   @override
+  String get bagTutorialTitle => 'حقيبة التسوق الخاصة بك';
+
+  @override
+  String get bagTutorialDesc =>
+      'تظهر العناصر المحددة هنا. راجع العناصر، وقم بتغيير الكميات، وتابع إلى الدفع.';
+
+  @override
+  String get ordersTutorialTitle => 'طلباتك';
+
+  @override
+  String get ordersTutorialDesc =>
+      'تتبع طلباتك الحالية واعرض مشترياتك السابقة من هنا.';
+
+  @override
+  String get profileTutorialTitle => 'ملفك الشخصي';
+
+  @override
+  String get profileTutorialDesc =>
+      'قم بإدارة ملفك الشخصي وعناوينك المحفوظة ولغتك وإعداداتك الشخصية الأخرى هنا.';
+
+  @override
+  String get selectImageSource => 'اختر مصدر الصورة';
+
+  @override
+  String get takePhoto => 'التقاط صورة';
+
+  @override
+  String get chooseFromGallery => 'اختيار من المعرض';
+
+  @override
+  String get cameraOptionDesc => 'استخدم كاميرا هاتفك لالتقاط صورة الآن';
+
+  @override
+  String get galleryOptionDesc => 'اختر صورة موجودة من معرض الصور';
+
+  @override
   String get shopOwnersTitle => 'مالكو المتاجر / المالكين المشاركين';
 
   @override

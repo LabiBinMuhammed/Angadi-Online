@@ -27,13 +27,30 @@ export async function POST(req: Request) {
     }
 
     if (action === 'update_order_status') {
-      // If accepting pending order, auto-approve any pending items
+      const { data: allOrderItems } = await supabaseAdmin
+        .from('order_items')
+        .select('id, variant_type, actual_value, status, estimated_price, final_price')
+        .eq('order_id', orderId)
+
+      // Validate dynamic items: all non-rejected dynamic items must have actual_value and status adjusted
+      if (nextStatus !== 'cancelled') {
+        const unadjustedDynamicItems = allOrderItems?.filter(item => {
+          const vType = item.variant_type?.toLowerCase()
+          const isDynamic = vType === 'dynamic' || vType === 'portion'
+          if (!isDynamic || item.status === 'rejected') return false
+          return item.status !== 'adjusted' || item.actual_value == null || Number(item.actual_value) <= 0
+        })
+
+        if (unadjustedDynamicItems && unadjustedDynamicItems.length > 0) {
+          return NextResponse.json({
+            error: 'Price & weight editing is compulsory for all dynamic products before updating order status.'
+          }, { status: 400, headers: corsHeaders() })
+        }
+      }
+
+      // If accepting pending order, auto-approve any remaining non-dynamic pending items
       if (nextStatus === 'delivering') {
-        const { data: pendingItems } = await supabaseAdmin
-          .from('order_items')
-          .select('id, estimated_price, final_price')
-          .eq('order_id', orderId)
-          .eq('status', 'pending')
+        const pendingItems = allOrderItems?.filter(item => item.status === 'pending')
 
         if (pendingItems && pendingItems.length > 0) {
           for (const item of pendingItems) {
@@ -127,6 +144,25 @@ export async function POST(req: Request) {
     }
 
     if (action === 'update_payment_type') {
+      if (paymentType === 'credit') {
+        const { data: ord } = await supabaseAdmin
+          .from('orders')
+          .select('shop_id, user_id')
+          .eq('id', orderId)
+          .single()
+        
+        if (ord?.shop_id && ord?.user_id) {
+          await supabaseAdmin
+            .from('shop_user_credit')
+            .upsert({
+              shop_id: ord.shop_id,
+              user_id: ord.user_id,
+              is_credit_enabled: true,
+              is_blocked: false,
+            }, { onConflict: 'shop_id,user_id' })
+        }
+      }
+
       await supabaseAdmin.from('orders').update({ payment_type: paymentType }).eq('id', orderId)
       
       const { data: updatedOrder } = await supabaseAdmin

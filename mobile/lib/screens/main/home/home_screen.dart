@@ -746,6 +746,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                      duration: const Duration(seconds: 1),
                                    ),
                                  );
+                                 TutorialManager.instance.triggerBagTutorial(context);
                                }
                              },
                              child: Container(

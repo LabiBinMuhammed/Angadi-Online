@@ -36,6 +36,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
   }
 
   final Map<String, String> _actualValues = {};
+  Map<String, dynamic>? _customerCredit;
 
   Future<void> _load() async {
     if (!mounted) return;
@@ -46,9 +47,26 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
           .select('*, users(name, phone), order_addresses(*), order_items(*, items(name, image_url), item_variants:vw_item_variants_with_fallback(label, value, unit_id, image_url))')
           .eq('id', widget.orderId)
           .maybeSingle();
+
+      Map<String, dynamic>? creditData;
+      if (res != null) {
+        final userId = res['user_id'];
+        final shopId = res['shop_id'];
+        if (userId != null && shopId != null) {
+          final creditRes = await supabase
+              .from('shop_user_credit')
+              .select('*')
+              .eq('user_id', userId)
+              .eq('shop_id', shopId)
+              .maybeSingle();
+          creditData = creditRes;
+        }
+      }
+
       if (mounted) {
         setState(() {
           _order = res;
+          _customerCredit = creditData;
         });
       }
     } catch (e, stack) {
@@ -61,6 +79,50 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
     } finally {
       if (mounted) {
         setState(() => _loading = false);
+      }
+    }
+  }
+
+  Future<void> _updatePaymentType(String paymentType) async {
+    if (_order == null) return;
+    setState(() => _updating = true);
+    try {
+      final userId = _order!['user_id'];
+      final shopId = _order!['shop_id'];
+
+      if (paymentType == 'credit') {
+        if (userId != null && shopId != null) {
+          // If credit profile doesn't exist or is not enabled or is blocked, auto-initialize/enable it for this customer
+          if (_customerCredit == null || _customerCredit!['is_credit_enabled'] != true || _customerCredit!['is_blocked'] == true) {
+            await supabase.from('shop_user_credit').upsert({
+              'shop_id': shopId,
+              'user_id': userId,
+              'is_credit_enabled': true,
+              'is_blocked': false,
+            }, onConflict: 'shop_id,user_id');
+          }
+        }
+      }
+
+      await supabase.from('orders').update({'payment_type': paymentType}).eq('id', widget.orderId);
+      await _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(paymentType == 'credit' ? 'Payment method set to Credit (Pay Later)' : 'Payment method set to Cash on Delivery (COD)'),
+            backgroundColor: paymentType == 'credit' ? const Color(0xFFF59E0B) : const Color(0xFF10B981),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update payment method: $e'), backgroundColor: Colors.redAccent),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _updating = false);
       }
     }
   }
@@ -216,12 +278,20 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
 
     final orderItems = (o['order_items'] as List?) ?? [];
     final allItemsProcessed = orderItems.every((oi) => oi['status'] != 'pending');
+    final unadjustedDynamicItems = orderItems.where((oi) {
+      final vType = oi['variant_type']?.toString().toLowerCase();
+      final isDyn = vType == 'dynamic' || vType == 'portion';
+      final itemSt = oi['status'] as String? ?? 'pending';
+      return isDyn && itemSt != 'rejected' && (itemSt != 'adjusted' || oi['actual_value'] == null);
+    }).toList();
+    final allDynamicItemsAdjusted = unadjustedDynamicItems.isEmpty;
 
     final deliveryDateStr = o['delivery_date'] as String?;
     final deliverySlot = o['delivery_slot'] as String?;
     final allowedCheck = _checkProcessingAllowed(deliveryDateStr, deliverySlot);
     final isAllowed = allowedCheck['allowed'] as bool;
     final disallowedReason = allowedCheck['reason'] as String?;
+    final canAdvanceStatus = isAllowed && allItemsProcessed && allDynamicItemsAdjusted;
 
     // Determine status badge metadata
     VendorBadgeType badgeType = VendorBadgeType.neutral;
@@ -359,9 +429,9 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                         width: double.infinity,
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF115E59).withOpacity(0.08),
+                          color: const Color(0xFF115E59).withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF134E5A).withOpacity(0.12)),
+                          border: Border.all(color: const Color(0xFF134E5A).withValues(alpha: 0.12)),
                         ),
                         child: Text(
                           '📝 Note: ${address['delivery_note']}',
@@ -445,19 +515,20 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
             ],
 
-            // Delivery Slot Card
-            if (o['delivery_date'] != null && o['delivery_slot'] != null) ...[
+            // Delivery Slot Section
+            if (o['delivery_slot'] != null) ...[
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: vendorCardDecoration(radius: 24),
                 child: Row(
                   children: [
-                    Text(
-                      o['delivery_slot'] == 'morning' ? '☀️' : '🌙',
-                      style: const TextStyle(fontSize: 24),
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.12),
+                      child: const HugeIcon(icon: HugeIcons.strokeRoundedCalendar03, color: Color(0xFF34D399), size: 20),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -465,32 +536,34 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${o['delivery_slot'] == 'morning' ? "Morning" : "Evening"} Delivery Slot',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: kVendorText),
+                            'Delivery Slot: ${o['delivery_slot'].toString().toUpperCase()}',
+                            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, color: kVendorText),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Deliver on: ${o['delivery_date']}',
-                            style: TextStyle(color: kVendorSubText, fontSize: 12),
-                          ),
+                          if (deliveryDateStr != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              'Date: ${deliveryDateStr.split('T')[0]}',
+                              style: TextStyle(color: kVendorSubText, fontSize: 12),
+                            ),
+                          ],
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
             ],
 
-            // Progress Timeline Indicator
+            // Status Stepper
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              padding: const EdgeInsets.all(20),
               decoration: vendorCardDecoration(radius: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.orderTimelineTitle,
+                    'Order Progress',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kVendorText),
                   ),
                   const SizedBox(height: 16),
@@ -504,7 +577,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                               height: 6,
                               margin: const EdgeInsets.symmetric(horizontal: 4),
                               decoration: BoxDecoration(
-                                color: done ? Color(0xFF4ADE80) : kVendorTransparentBorder,
+                                color: done ? const Color(0xFF4ADE80) : kVendorTransparentBorder,
                                 borderRadius: BorderRadius.circular(3),
                               ),
                             ),
@@ -513,7 +586,7 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                               e.value.toUpperCase(),
                               style: TextStyle(
                                 fontSize: 9,
-                                color: done ? Color(0xFF4ADE80) : kVendorSubText,
+                                color: done ? const Color(0xFF4ADE80) : kVendorSubText,
                                 fontWeight: e.key == currentIdx ? FontWeight.bold : FontWeight.normal,
                               ),
                             ),
@@ -567,7 +640,6 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                         children: [
                           Row(
                             children: [
-                              // Image
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: imageUrl != null && imageUrl.isNotEmpty
@@ -580,24 +652,43 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                       ),
                               ),
                               const SizedBox(width: 14),
-                              // Details
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      variantLabel.isNotEmpty ? '$name ($variantLabel)' : name,
-                                      style: TextStyle(fontWeight: FontWeight.w700, color: kVendorText, fontSize: 14),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            variantLabel.isNotEmpty ? '$name ($variantLabel)' : name,
+                                            style: TextStyle(fontWeight: FontWeight.w700, color: kVendorText, fontSize: 14),
+                                          ),
+                                        ),
+                                        if (isDynamic) ...[
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFF59E0B).withValues(alpha: 0.15),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                                            ),
+                                            child: const Text(
+                                              '⚖️ WEIGHT',
+                                              style: TextStyle(color: Color(0xFFFBBF24), fontSize: 9, fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Requested: $requestedVal',
+                                      'Requested: $requestedVal ${variantLabel.isNotEmpty ? variantLabel : ''}',
                                       style: TextStyle(color: kVendorSubText, fontSize: 12, fontWeight: FontWeight.w500),
                                     ),
                                     if (actualVal != null) ...[
                                       const SizedBox(height: 2),
                                       Text(
-                                        'Actual Packed: $actualVal',
+                                        'Actual Packed: $actualVal ${variantLabel.isNotEmpty ? variantLabel : ''}',
                                         style: const TextStyle(color: Color(0xFF4ADE80), fontSize: 12, fontWeight: FontWeight.bold),
                                       ),
                                     ],
@@ -605,7 +696,6 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              // Price
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
@@ -630,35 +720,82 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                             ],
                           ),
                           // Actions Panel
-                          // Actions Panel
-                          if (status == 'pending') ...[
-                            if (itemStatus == 'pending') ...[
+                          if (isDynamic) ...[
+                            if (itemStatus == 'rejected') ...[
+                              const SizedBox(height: 8),
+                              const Align(
+                                alignment: Alignment.centerRight,
+                                child: VendorBadge(label: 'rejected', type: VendorBadgeType.danger),
+                              ),
+                            ] else if (status == 'pending' || status == 'delivering') ...[
                               const SizedBox(height: 12),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  ElevatedButton.icon(
-                                    onPressed: (_updating || !isAllowed) ? null : () => _updateItemStatus(oi, 'approved'),
-                                    icon: const Icon(Icons.check, size: 14, color: Colors.white),
-                                    label: const Text('Approve', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF16A34A),
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: 38,
+                                      child: TextFormField(
+                                        initialValue: _actualValues[oi['id']] ?? (actualVal != null ? actualVal.toString() : ''),
+                                        enabled: isAllowed,
+                                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                        style: TextStyle(color: kVendorText, fontSize: 13),
+                                        decoration: InputDecoration(
+                                          hintText: 'Actual weight (e.g. 1.25)',
+                                          hintStyle: TextStyle(color: kVendorSubText.withValues(alpha: 0.5), fontSize: 12),
+                                          filled: true,
+                                          fillColor: kVendorTransparentBg,
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide(
+                                              color: itemStatus == 'adjusted' ? const Color(0xFF10B981) : const Color(0xFFF59E0B),
+                                            ),
+                                          ),
+                                        ),
+                                        onChanged: (val) {
+                                          _actualValues[oi['id']!] = val;
+                                        },
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  OutlinedButton.icon(
-                                    onPressed: (_updating || !isAllowed) ? null : () => _updateItemStatus(oi, 'rejected'),
-                                    icon: const Icon(Icons.close, size: 14, color: Color(0xFFF87171)),
-                                    label: const Text('Reject', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFF87171))),
-                                    style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: Color(0x33F87171)),
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  ElevatedButton(
+                                    onPressed: (_updating || !isAllowed)
+                                        ? null
+                                        : () => _updateItemStatus(oi, 'adjusted'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF3B82F6),
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                     ),
+                                    child: Text(itemStatus == 'adjusted' ? 'Update Wt' : 'Set Wt', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                  ),
+                                  if (status == 'pending') ...[
+                                    const SizedBox(width: 6),
+                                    IconButton(
+                                      onPressed: (_updating || !isAllowed)
+                                          ? null
+                                          : () => _updateItemStatus(oi, 'rejected'),
+                                      icon: const Icon(Icons.close, color: Color(0xFFF87171), size: 20),
+                                      tooltip: 'Reject Item',
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  if (itemStatus != 'adjusted')
+                                    const Text(
+                                      '* Weight Required  ',
+                                      style: TextStyle(color: Color(0xFFF59E0B), fontSize: 11, fontWeight: FontWeight.bold),
+                                    ),
+                                  VendorBadge(
+                                    label: itemStatus == 'adjusted' ? 'ADJUSTED' : 'PENDING WEIGHT',
+                                    type: itemStatus == 'adjusted' ? VendorBadgeType.success : VendorBadgeType.warning,
                                   ),
                                 ],
                               ),
@@ -668,89 +805,67 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                                 alignment: Alignment.centerRight,
                                 child: VendorBadge(
                                   label: itemStatus,
-                                  type: itemStatus == 'rejected'
-                                      ? VendorBadgeType.danger
-                                      : itemStatus == 'adjusted'
-                                          ? VendorBadgeType.warning
-                                          : VendorBadgeType.success,
-                                ),
-                              ),
-                            ],
-                          ] else if (status == 'accepted' || status == 'packing') ...[
-                            if (itemStatus == 'rejected') ...[
-                              const SizedBox(height: 8),
-                              const Align(
-                                alignment: Alignment.centerRight,
-                                child: VendorBadge(
-                                  label: 'rejected',
-                                  type: VendorBadgeType.danger,
-                                ),
-                              ),
-                            ] else ...[
-                              const SizedBox(height: 12),
-                              if (isDynamic) ...[
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 36,
-                                        child: TextFormField(
-                                          initialValue: _actualValues[oi['id']] ?? '',
-                                          enabled: isAllowed,
-                                          keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                          style: TextStyle(color: kVendorText, fontSize: 13),
-                                          decoration: InputDecoration(
-                                            hintText: 'Actual weight (e.g. 0.6)',
-                                            hintStyle: TextStyle(color: kVendorSubText.withOpacity(0.5), fontSize: 12),
-                                            filled: true,
-                                            fillColor: kVendorTransparentBg,
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                            border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.circular(8),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                          ),
-                                          onChanged: (val) {
-                                            _actualValues[oi['id']!] = val;
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    IconButton(
-                                      onPressed: (_updating || !isAllowed)
-                                          ? null
-                                          : () => _updateItemStatus(oi, 'adjusted'),
-                                      icon: const Icon(Icons.edit_note, color: Color(0xFF60A5FA), size: 24),
-                                      tooltip: 'Adjust Price',
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                              ],
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: VendorBadge(
-                                  label: itemStatus,
-                                  type: itemStatus == 'adjusted'
-                                      ? VendorBadgeType.warning
-                                      : VendorBadgeType.success,
+                                  type: itemStatus == 'adjusted' ? VendorBadgeType.success : VendorBadgeType.neutral,
                                 ),
                               ),
                             ],
                           ] else ...[
-                            const SizedBox(height: 8),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: VendorBadge(
-                                label: itemStatus,
-                                type: itemStatus == 'rejected'
-                                    ? VendorBadgeType.danger
-                                    : itemStatus == 'adjusted'
-                                        ? VendorBadgeType.warning
+                            /* Non-dynamic items */
+                            if (status == 'pending') ...[
+                              if (itemStatus == 'pending') ...[
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton.icon(
+                                      onPressed: (_updating || !isAllowed) ? null : () => _updateItemStatus(oi, 'approved'),
+                                      icon: const Icon(Icons.check, size: 14, color: Colors.white),
+                                      label: const Text('Approve', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color(0xFF16A34A),
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    OutlinedButton.icon(
+                                      onPressed: (_updating || !isAllowed) ? null : () => _updateItemStatus(oi, 'rejected'),
+                                      icon: const Icon(Icons.close, size: 14, color: Color(0xFFF87171)),
+                                      label: const Text('Reject', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFF87171))),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Color(0x33F87171)),
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ] else ...[
+                                const SizedBox(height: 8),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: VendorBadge(
+                                    label: itemStatus,
+                                    type: itemStatus == 'rejected'
+                                        ? VendorBadgeType.danger
                                         : VendorBadgeType.success,
+                                  ),
+                                ),
+                              ],
+                            ] else ...[
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: VendorBadge(
+                                  label: itemStatus,
+                                  type: itemStatus == 'rejected'
+                                      ? VendorBadgeType.danger
+                                      : VendorBadgeType.success,
+                                ),
                               ),
-                            ),
+                            ],
                           ],
                         ],
                       ),
@@ -778,6 +893,167 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                 ],
               ),
             ),
+
+            // Payment Settlement Card (Cash vs Credit)
+            if (status == 'delivering' || status == 'packing' || status == 'delivered') ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: vendorCardDecoration(radius: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3B82F6).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.payment_rounded, color: Color(0xFF60A5FA), size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Payment Settlement',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: kVendorText),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Select how this order was settled at delivery',
+                                style: TextStyle(fontSize: 12, color: kVendorSubText),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Credit Info Banner
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      margin: const EdgeInsets.only(bottom: 14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.08),
+                        border: Border.all(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.account_balance_wallet_outlined,
+                            size: 16,
+                            color: Color(0xFF34D399),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _customerCredit == null
+                                  ? 'Customer Credit: Available (Enabled on selection)'
+                                  : _customerCredit!['credit_limit'] != null
+                                      ? 'Credit Available: ₹${(((_customerCredit!['credit_limit'] as num?)?.toDouble() ?? 0.0) - (((_customerCredit!['used_amount'] ?? 0.0) as num).toDouble())).clamp(0.0, double.infinity).toStringAsFixed(0)} (Limit: ₹${((_customerCredit!['credit_limit'] as num?)?.toDouble() ?? 0.0).toStringAsFixed(0)})'
+                                      : 'Credit Ledger: Active (Current Outstanding: ₹${(((_customerCredit!['used_amount'] ?? 0.0) as num).toDouble()).toStringAsFixed(0)})',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF34D399),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Row(
+                      children: [
+                        // Cash on Delivery Button
+                        Expanded(
+                          child: InkWell(
+                            onTap: (_updating || !isAllowed) ? null : () => _updatePaymentType('cod'),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: (o['payment_type'] == 'cod' || o['payment_type'] == null)
+                                    ? const Color(0xFF10B981).withValues(alpha: 0.15)
+                                    : kVendorTransparentBg,
+                                border: Border.all(
+                                  color: (o['payment_type'] == 'cod' || o['payment_type'] == null)
+                                      ? const Color(0xFF10B981)
+                                      : kVendorTransparentBorder,
+                                  width: (o['payment_type'] == 'cod' || o['payment_type'] == null) ? 1.5 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (o['payment_type'] == 'cod' || o['payment_type'] == null) ...[
+                                    const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 16),
+                                    const SizedBox(width: 6),
+                                  ],
+                                  const Text(
+                                    '💵 Cash (COD)',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+
+                        // Credit Button
+                        Expanded(
+                          child: InkWell(
+                            onTap: (_updating || !isAllowed) ? null : () => _updatePaymentType('credit'),
+                            borderRadius: BorderRadius.circular(14),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: (o['payment_type'] == 'credit')
+                                    ? const Color(0xFFF59E0B).withValues(alpha: 0.15)
+                                    : kVendorTransparentBg,
+                                border: Border.all(
+                                  color: (o['payment_type'] == 'credit')
+                                      ? const Color(0xFFF59E0B)
+                                      : kVendorTransparentBorder,
+                                  width: (o['payment_type'] == 'credit') ? 1.5 : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (o['payment_type'] == 'credit') ...[
+                                    const Icon(Icons.check_circle, color: Color(0xFFF59E0B), size: 16),
+                                    const SizedBox(width: 6),
+                                  ],
+                                  const Text(
+                                    '💳 Credit (Pay Later)',
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 16),
+
             // Actions Buttons
             if (status == 'packing') ...[
               Container(
@@ -788,12 +1064,12 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                   border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.2)),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.access_time_rounded, color: Color(0xFF93C5FD), size: 18),
-                    const SizedBox(width: 8),
-                    const Expanded(
+                    Icon(Icons.access_time_rounded, color: Color(0xFF93C5FD), size: 18),
+                    SizedBox(width: 8),
+                    Expanded(
                       child: Text(
                         'Transaction Completed. Waiting for Customer Confirmation.',
                         style: TextStyle(color: Color(0xFF93C5FD), fontSize: 14, fontWeight: FontWeight.bold),
@@ -815,16 +1091,33 @@ class _VendorOrderProcessingScreenState extends State<VendorOrderProcessingScree
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Text(
-                    'Please approve or adjust all items before accepting the order.',
+                    'Please review all items before advancing the order.',
                     style: TextStyle(color: Color(0xFFFCA5A5), fontSize: 13, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ],
+              if (!allDynamicItemsAdjusted) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                    border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '⚖️ Price & weight editing is compulsory for all dynamic products (${unadjustedDynamicItems.length} pending). Please enter actual packed weight before advancing order status.',
+                    style: const TextStyle(color: Color(0xFFFCD34D), fontSize: 13, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
               VendorGradientButton(
-                onPressed: (_updating || (status == 'pending' && !allItemsProcessed))
-                    ? null
-                    : () => _updateStatus(nextStatus),
+                onPressed: canAdvanceStatus
+                    ? () => _updateStatus(nextStatus)
+                    : null,
                 loading: _updating,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,

@@ -9,6 +9,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
+import '../../widgets/image_source_picker_sheet.dart';
 import 'vendor_theme_helper.dart';
 
 extension StringExtension on String? {
@@ -190,9 +191,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
 
   Future<void> _pickImage() async {
     if (_imageSources.length >= 4) return;
+    final source = await showImageSourcePicker(context);
+    if (source == null) return;
+
     final picker = ImagePicker();
     try {
-      final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      final image = await picker.pickImage(source: source, imageQuality: 85);
       if (image != null) {
         setState(() {
           _imageSources.add(image);
@@ -204,9 +208,12 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   }
 
   Future<void> _pickVariantImage(int index) async {
+    final source = await showImageSourcePicker(context);
+    if (source == null) return;
+
     final picker = ImagePicker();
     try {
-      final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      final image = await picker.pickImage(source: source, imageQuality: 85);
       if (image != null) {
         setState(() {
           _variants[index]['image_source'] = image;

@@ -5,6 +5,7 @@ import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -22,6 +23,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
   void initState() {
     super.initState();
     _future = _fetch();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      TutorialManager.instance.triggerOrdersTutorial(context);
+    });
   }
 
   Future<List<Map<String, dynamic>>> _fetch() async {

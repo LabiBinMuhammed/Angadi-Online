@@ -88,8 +88,11 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
     }
   }
 
+  const [orderError, setOrderError] = useState<string | null>(null)
+
   async function updateOrderStatus(nextStatus: string) {
     setUpdating(true)
+    setOrderError(null)
     try {
       const res = await fetch('/api/vendor/orders', {
         method: 'POST',
@@ -97,6 +100,10 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
         body: JSON.stringify({ action: 'update_order_status', orderId: order.id, nextStatus })
       })
       const data = await res.json()
+      if (data.error) {
+        setOrderError(data.error)
+        return
+      }
       if (data.success && data.order) {
         setOrder(data.order)
       } else {
@@ -107,9 +114,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
 
     } catch (err: any) {
       console.error('Failed to update order status:', err)
-      const supabase = createClient()
-      await supabase.from('orders').update({ status: nextStatus }).eq('id', order.id)
-      setOrder(o => ({ ...o, status: nextStatus }))
+      setOrderError(err.message || 'Failed to update order status')
     } finally {
       setUpdating(false)
     }
@@ -192,7 +197,18 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
   const currentIdx = STATUS_FLOW.indexOf(order.status)
   const nextStatus = STATUS_FLOW[currentIdx + 1]
   
+  const isItemDynamic = (oi: OrderItem) => {
+    const vType = oi.variant_type?.toLowerCase()
+    return vType === 'dynamic' || vType === 'portion'
+  }
+
+  const unadjustedDynamicItems = order.order_items.filter(oi => {
+    if (!isItemDynamic(oi) || oi.status === 'rejected') return false
+    return oi.status !== 'adjusted' || oi.actual_value == null || Number(oi.actual_value) <= 0
+  })
+  const allDynamicItemsAdjusted = unadjustedDynamicItems.length === 0
   const allItemsProcessed = order.order_items.every(oi => oi.status !== 'pending')
+  const canAdvanceStatus = !updating && isAllowed && (order.status !== 'pending' || allItemsProcessed) && allDynamicItemsAdjusted
 
   return (
     <div style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -372,8 +388,7 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
       <h2 className="vp-title" style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>{t('vendor_order_processing.order_items')}</h2>
       <div className="vp-card" style={{ padding: 0, marginBottom: '1.5rem', overflow: 'hidden' }}>
         {order.order_items.map((oi, i) => {
-          const variantTypeLower = oi.variant_type?.toLowerCase()
-          const isDynamic = variantTypeLower === 'dynamic' || variantTypeLower === 'portion'
+          const isDynamic = isItemDynamic(oi)
           
           return (
             <div key={oi.id} className="order-item-row" style={{ 
@@ -387,19 +402,26 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                     : <Package size={24} color="#94a3b8" />}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem' }}>{oi.items?.name ?? t('vendor_order_processing.item')}</p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <p style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem', margin: 0 }}>{oi.items?.name ?? t('vendor_order_processing.item')}</p>
+                    {isDynamic && (
+                      <span style={{ fontSize: '0.7rem', padding: '0.15rem 0.45rem', borderRadius: '6px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', border: '1px solid rgba(245, 158, 11, 0.3)', fontWeight: 700 }}>
+                        ⚖️ DYNAMIC (WEIGHT)
+                      </span>
+                    )}
+                  </div>
                   <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginTop: '0.3rem' }}>
                     {t('vendor_order_processing.requested')} <span style={{ color: '#e2e8f0' }}>{oi.requested_value ?? oi.item_variants?.value ?? 1} {oi.item_variants?.label ?? ''}</span>
                   </p>
                   {oi.actual_value && (
                     <p style={{ fontSize: '0.85rem', color: '#10b981', marginTop: '0.2rem' }}>
-                      {t('vendor_order_processing.actual_packed')} {oi.actual_value}
+                      {t('vendor_order_processing.actual_packed')} {oi.actual_value} {oi.item_variants?.label ?? ''}
                     </p>
                   )}
                 </div>
               </div>
               
-              <div className="order-item-actions" style={{ textAlign: 'right', minWidth: 120 }}>
+              <div className="order-item-actions" style={{ textAlign: 'right', minWidth: 140 }}>
                 {oi.status === 'rejected' ? (
                   <span style={{ fontWeight: 700, color: '#ef4444', textDecoration: 'line-through' }}>₹{oi.estimated_price}</span>
                 ) : (
@@ -411,53 +433,74 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
                   </>
                 )}
                 <div style={{ marginTop: '0.5rem' }}>
-                  {order.status === 'pending' ? (
-                    oi.status === 'pending' ? (
-                      <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                        <button onClick={() => updateItemStatus(oi, 'approved')} disabled={updating || !isAllowed} className="vp-btn vp-btn-success vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><Check size={14} /> {t('vendor_order_processing.approve')}</button>
-                        <button onClick={() => updateItemStatus(oi, 'rejected')} disabled={updating || !isAllowed} className="vp-btn vp-btn-danger vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><X size={14} /> {t('vendor_order_processing.reject')}</button>
-                      </div>
-                    ) : (
-                      <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : oi.status === 'adjusted' ? 'warning' : 'success'}`}>
-                        {getStatusLabel(oi.status).toUpperCase()}
-                      </span>
-                    )
-                  ) : ['accepted', 'packing'].includes(order.status) ? (
+                  {isDynamic ? (
                     oi.status === 'rejected' ? (
                       <span className="vp-badge vp-badge-danger">REJECTED</span>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
-                        {isDynamic && (
-                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        {(order.status === 'pending' || order.status === 'delivering') && (
+                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                             <input 
                               type="number" 
+                              step="any"
                               className="vp-input" 
-                              style={{ width: 80, padding: '0.25rem 0.5rem', fontSize: '0.85rem' }} 
-                              placeholder={t('vendor_order_processing.actual_qty_placeholder')}
-                              value={actualValues[oi.id] ?? ''}
+                              style={{ width: 85, padding: '0.3rem 0.5rem', fontSize: '0.85rem', borderColor: oi.status === 'adjusted' ? '#10b981' : '#f59e0b' }} 
+                              placeholder={t('vendor_order_processing.actual_qty_placeholder') || 'Actual Wt'}
+                              value={actualValues[oi.id] ?? (oi.actual_value ? String(oi.actual_value) : '')}
                               onChange={e => setActualValues({ ...actualValues, [oi.id]: e.target.value })}
-                              disabled={!isAllowed}
+                              disabled={!isAllowed || updating}
                             />
                             <button 
                               onClick={() => updateItemStatus(oi, 'adjusted')} 
-                              disabled={updating || !actualValues[oi.id] || !isAllowed}
+                              disabled={updating || (!actualValues[oi.id] && !oi.actual_value) || !isAllowed}
                               className="vp-btn vp-btn-primary vp-btn-sm" 
-                              style={{ padding: '0.3rem 0.6rem' }}
-                              title={t('vendor_order_processing.adjust_price_tooltip')}
+                              style={{ padding: '0.35rem 0.65rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+                              title={t('vendor_order_processing.adjust_price_tooltip') || 'Set price based on weight'}
                             >
-                              <Edit2 size={14} />
+                              <Edit2 size={13} />
+                              <span style={{ fontSize: '0.75rem' }}>{oi.status === 'adjusted' ? 'Update' : 'Set Wt'}</span>
                             </button>
+                            {order.status === 'pending' && (
+                              <button 
+                                onClick={() => updateItemStatus(oi, 'rejected')} 
+                                disabled={updating || !isAllowed} 
+                                className="vp-btn vp-btn-danger vp-btn-sm" 
+                                style={{ padding: '0.35rem 0.5rem' }}
+                                title={t('vendor_order_processing.reject') || 'Reject'}
+                              >
+                                <X size={13} />
+                              </button>
+                            )}
                           </div>
                         )}
-                        <span className={`vp-badge vp-badge-${oi.status === 'adjusted' ? 'warning' : 'success'}`}>
-                          {getStatusLabel(oi.status).toUpperCase()}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          {oi.status !== 'adjusted' && (
+                            <span style={{ fontSize: '0.72rem', color: '#f59e0b', fontWeight: 600 }}>* Weight Required</span>
+                          )}
+                          <span className={`vp-badge vp-badge-${oi.status === 'adjusted' ? 'success' : 'warning'}`}>
+                            {oi.status === 'adjusted' ? 'ADJUSTED' : 'PENDING WEIGHT'}
+                          </span>
+                        </div>
                       </div>
                     )
                   ) : (
-                    <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : 'success'}`}>
-                      {getStatusLabel(oi.status).toUpperCase()}
-                    </span>
+                    /* Non-dynamic products */
+                    order.status === 'pending' ? (
+                      oi.status === 'pending' ? (
+                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                          <button onClick={() => updateItemStatus(oi, 'approved')} disabled={updating || !isAllowed} className="vp-btn vp-btn-success vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><Check size={14} /> {t('vendor_order_processing.approve')}</button>
+                          <button onClick={() => updateItemStatus(oi, 'rejected')} disabled={updating || !isAllowed} className="vp-btn vp-btn-danger vp-btn-sm" style={{ padding: '0.3rem 0.6rem' }}><X size={14} /> {t('vendor_order_processing.reject')}</button>
+                        </div>
+                      ) : (
+                        <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : 'success'}`}>
+                          {getStatusLabel(oi.status).toUpperCase()}
+                        </span>
+                      )
+                    ) : (
+                      <span className={`vp-badge vp-badge-${oi.status === 'rejected' ? 'danger' : 'success'}`}>
+                        {getStatusLabel(oi.status).toUpperCase()}
+                      </span>
+                    )
                   )}
                 </div>
               </div>
@@ -512,10 +555,24 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
 
       {/* Actions */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {orderError && (
+          <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '12px', color: '#fca5a5', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            <AlertCircle size={18} />
+            <span>{orderError}</span>
+          </div>
+        )}
+
         {order.status === 'pending' && !allItemsProcessed && (
            <div style={{ padding: '1rem', background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', borderRadius: '12px', color: '#fca5a5', textAlign: 'center', fontSize: '0.9rem' }}>
              {t('vendor_order_processing.approve_all_items_warning')}
            </div>
+        )}
+
+        {!allDynamicItemsAdjusted && (
+          <div style={{ padding: '1rem', background: 'rgba(245, 158, 11, 0.12)', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: '12px', color: '#fcd34d', textAlign: 'center', fontSize: '0.9rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+            <AlertCircle size={18} />
+            <span>⚖️ Price & weight editing is compulsory for dynamic products ({unadjustedDynamicItems.length} pending). Please enter actual packed weight before advancing order status.</span>
+          </div>
         )}
 
         {order.status === 'packing' ? (
@@ -527,9 +584,9 @@ export default function OrderProcessingClient({ order: initial }: { order: Order
             <button
               id="advance-status-btn"
               className="vp-btn vp-btn-primary"
-              style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
+              style={{ width: '100%', padding: '1rem', fontSize: '1.1rem', opacity: canAdvanceStatus ? 1 : 0.6 }}
               onClick={() => updateOrderStatus(nextStatus)}
-              disabled={updating || (order.status === 'pending' && !allItemsProcessed) || !isAllowed}
+              disabled={!canAdvanceStatus}
             >
               {updating ? (
                 t('vendor_order_processing.updating')

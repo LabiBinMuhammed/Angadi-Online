@@ -131,11 +131,12 @@ class _TutorialOverlayWidgetState extends State<_TutorialOverlayWidget> with Sin
     final screenHeight = MediaQuery.of(context).size.height;
 
     // Calculate tooltip coordinates
-    double tooltipWidth = 280.0;
-    double spacing = 12.0;
+    const double tooltipWidth = 280.0;
+    const double spacing = 12.0;
 
     double tooltipLeft = 0.0;
-    double tooltipTop = 0.0;
+    double? tooltipTop;
+    double? tooltipBottom;
 
     switch (step.arrowPosition) {
       case TutorialArrowPosition.top:
@@ -144,9 +145,9 @@ class _TutorialOverlayWidgetState extends State<_TutorialOverlayWidget> with Sin
         tooltipTop = targetRect.bottom + spacing;
         break;
       case TutorialArrowPosition.bottom:
-        // Tooltip placed above target
+        // Tooltip placed above target: anchor from bottom of tooltip to top of target
         tooltipLeft = targetRect.center.dx - tooltipWidth / 2;
-        tooltipTop = targetRect.top - spacing - 140.0; // Estimate or fit height
+        tooltipBottom = (screenHeight - targetRect.top + spacing).clamp(16.0, screenHeight - 60.0);
         break;
       case TutorialArrowPosition.left:
         // Tooltip placed to the right
@@ -160,20 +161,15 @@ class _TutorialOverlayWidgetState extends State<_TutorialOverlayWidget> with Sin
         break;
     }
 
-    // Clamp tooltip positions within screen bounds with 16px safe margins
+    // Clamp tooltip horizontal positions within screen bounds with 16px safe margins
     tooltipLeft = tooltipLeft.clamp(16.0, screenWidth - tooltipWidth - 16.0);
+
+    // Dynamic relative arrow pointer offset along the tooltip width
+    final double arrowTargetX = (targetRect.center.dx - tooltipLeft).clamp(24.0, tooltipWidth - 24.0);
     
-    // Auto-adjust vertical boundaries
-    if (step.arrowPosition == TutorialArrowPosition.bottom) {
-      // Safe guard top overflow
-      if (tooltipTop < 16.0) {
-        tooltipTop = 16.0;
-      }
-    } else {
-      // Safe guard bottom overflow
-      if (tooltipTop > screenHeight - 200.0) {
-        tooltipTop = screenHeight - 200.0;
-      }
+    // Auto-adjust vertical boundaries for top-positioned tooltips
+    if (tooltipTop != null) {
+      tooltipTop = tooltipTop.clamp(16.0, screenHeight - 180.0);
     }
 
     return Material(
@@ -208,6 +204,7 @@ class _TutorialOverlayWidgetState extends State<_TutorialOverlayWidget> with Sin
           Positioned(
             left: tooltipLeft,
             top: tooltipTop,
+            bottom: tooltipBottom,
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
               transitionBuilder: (child, animation) => FadeTransition(
@@ -222,6 +219,7 @@ class _TutorialOverlayWidgetState extends State<_TutorialOverlayWidget> with Sin
                 title: step.title(l10n),
                 description: step.description(l10n),
                 arrowPosition: step.arrowPosition,
+                arrowOffset: arrowTargetX,
                 progressText: '${widget.controller.currentStepIndex + 1}/${widget.controller.totalSteps}',
                 onNext: widget.controller.nextStep,
                 onSkip: widget.controller.skipTutorial,

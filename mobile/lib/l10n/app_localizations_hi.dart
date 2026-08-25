@@ -1410,6 +1410,42 @@ class AppLocalizationsHi extends AppLocalizations {
       'अधिक विवरण देखने और अपने बैग में जोड़ने के लिए किसी भी उत्पाद कार्ड पर टैप करें।';
 
   @override
+  String get bagTutorialTitle => 'आपका शॉपिंग बैग';
+
+  @override
+  String get bagTutorialDesc =>
+      'आपके द्वारा चुने गए आइटम यहां दिखाई देंगे। आइटम की समीक्षा करें, मात्रा बदलें और चेकआउट के लिए आगे बढ़ें।';
+
+  @override
+  String get ordersTutorialTitle => 'आपके ऑर्डर';
+
+  @override
+  String get ordersTutorialDesc =>
+      'अपने वर्तमान ऑर्डर ट्रैक करें और अपनी पिछली खरीदारी यहां देखें।';
+
+  @override
+  String get profileTutorialTitle => 'आपकी प्रोफ़ाइल';
+
+  @override
+  String get profileTutorialDesc =>
+      'अपनी प्रोफ़ाइल, सहेजे गए पते, भाषा और अन्य व्यक्तिगत सेटिंग्स यहां प्रबंधित करें।';
+
+  @override
+  String get selectImageSource => 'फोटो का स्रोत चुनें';
+
+  @override
+  String get takePhoto => 'फ़ोटो लें';
+
+  @override
+  String get chooseFromGallery => 'गैलरी से चुनें';
+
+  @override
+  String get cameraOptionDesc => 'कैमरे से नई तस्वीर खींचें';
+
+  @override
+  String get galleryOptionDesc => 'गैलरी से मौजूदा फ़ोटो चुनें';
+
+  @override
   String get shopOwnersTitle => 'दुकान के मालिक / सह-मालिक';
 
   @override

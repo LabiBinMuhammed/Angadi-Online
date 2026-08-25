@@ -8,6 +8,7 @@ class TutorialTooltip extends StatelessWidget {
   final String title;
   final String description;
   final TutorialArrowPosition arrowPosition;
+  final double? arrowOffset;
   final String progressText;
   final VoidCallback onNext;
   final VoidCallback onSkip;
@@ -18,6 +19,7 @@ class TutorialTooltip extends StatelessWidget {
     required this.title,
     required this.description,
     required this.arrowPosition,
+    this.arrowOffset,
     required this.progressText,
     required this.onNext,
     required this.onSkip,
@@ -28,6 +30,7 @@ class TutorialTooltip extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = ThemeService.instance.isDarkMode;
     final l10n = AppLocalizations.of(context)!;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     final bgColor = isDark ? kNeutral800 : Colors.white;
     final textColor = isDark ? Colors.white : kNeutral900;
     final subTextColor = isDark ? kNeutral300 : kNeutral600;
@@ -41,10 +44,10 @@ class TutorialTooltip extends StatelessWidget {
       case TutorialArrowPosition.top:
         arrow = Positioned(
           top: 0,
-          left: 0,
-          right: 0,
+          left: arrowOffset != null ? (arrowOffset! - arrowSize / 2) : 0,
+          right: arrowOffset == null ? 0 : null,
           child: Align(
-            alignment: Alignment.topCenter,
+            alignment: arrowOffset != null ? Alignment.topLeft : Alignment.topCenter,
             child: Transform.translate(
               offset: const Offset(0, -arrowSize / 2),
               child: Transform.rotate(
@@ -62,10 +65,10 @@ class TutorialTooltip extends StatelessWidget {
       case TutorialArrowPosition.bottom:
         arrow = Positioned(
           bottom: 0,
-          left: 0,
-          right: 0,
+          left: arrowOffset != null ? (arrowOffset! - arrowSize / 2) : 0,
+          right: arrowOffset == null ? 0 : null,
           child: Align(
-            alignment: Alignment.bottomCenter,
+            alignment: arrowOffset != null ? Alignment.bottomLeft : Alignment.bottomCenter,
             child: Transform.translate(
               offset: const Offset(0, arrowSize / 2),
               child: Transform.rotate(
@@ -159,6 +162,7 @@ class TutorialTooltip extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
+                      textAlign: isRtl ? TextAlign.right : TextAlign.left,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
@@ -171,7 +175,7 @@ class TutorialTooltip extends StatelessWidget {
                     onTap: onSkip,
                     behavior: HitTestBehavior.opaque,
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 8.0, top: 4.0, bottom: 4.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 4.0),
                       child: Text(
                         l10n.tutorialSkip,
                         style: const TextStyle(
@@ -189,6 +193,7 @@ class TutorialTooltip extends StatelessWidget {
               // Body text
               Text(
                 description,
+                textAlign: isRtl ? TextAlign.right : TextAlign.left,
                 style: TextStyle(
                   fontSize: 13,
                   color: subTextColor,

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, X, User, Phone, Shield, Loader2, Trash2 } from 'lucide-react'
 import type { User as UserType } from '@/types'
-import { updateUserRoleAction } from '@/app/actions/admin'
+import { updateUserRoleAction, adminDeleteUserAction, adminToggleUserActiveAction } from '@/app/actions/admin'
 
 const ROLE_BADGE: Record<string, string> = {
   customer: 'badge-neutral', shop_owner: 'badge-info', admin: 'badge-warning',
@@ -63,20 +63,22 @@ export default function UserManagementClient({ users: initial }: { users: UserTy
   }
 
   async function toggleUser(u: UserType) {
-    const supabase = createClient()
     const next = !u.is_active
-    await supabase.from('users').update({ is_active: next }).eq('id', u.id)
-    setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_active: next } : x))
+    const res = await adminToggleUserActiveAction(u.id, next)
+    if (res.success) {
+      setUsers(prev => prev.map(x => x.id === u.id ? { ...x, is_active: next } : x))
+    } else {
+      alert(`Error toggling user: ${res.error || 'Failed'}`)
+    }
   }
 
   async function handleDelete(u: UserType) {
-    if (!window.confirm(`Delete user "${u.name ?? 'this user'}"? This cannot be undone.`)) {
+    if (!window.confirm(`Delete user "${u.name ?? 'this user'}"? This will also remove owned shops, catalog items, and profile data.`)) {
       return
     }
-    const supabase = createClient()
-    const { error } = await supabase.from('users').delete().eq('id', u.id)
-    if (error) {
-      alert(`Error deleting user: ${error.message}`)
+    const res = await adminDeleteUserAction(u.id)
+    if (!res.success) {
+      alert(`Error deleting user: ${res.error || 'Failed'}`)
       return
     }
     setUsers(prev => prev.filter(x => x.id !== u.id))

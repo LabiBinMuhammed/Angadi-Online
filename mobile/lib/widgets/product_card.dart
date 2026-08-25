@@ -5,6 +5,7 @@ import '../core/cart_service.dart';
 import '../theme/theme_service.dart';
 import '../core/language_service.dart';
 import '../l10n/app_localizations.dart';
+import 'tutorial/tutorial_manager.dart';
 
 // Colors mapped from ThemeService
 Color get _kText => ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF1A1A1A);
@@ -443,6 +444,7 @@ class _ProductCardState extends State<ProductCard> {
                                         duration: const Duration(seconds: 1),
                                       ),
                                     );
+                                    TutorialManager.instance.triggerBagTutorial(context);
                                   }
                                 },
                                 child: Container(
@@ -568,6 +570,7 @@ class _ProductCardState extends State<ProductCard> {
                                   duration: const Duration(seconds: 1),
                                 ),
                               );
+                              TutorialManager.instance.triggerBagTutorial(context);
                             }
                           },
                           child: Container(

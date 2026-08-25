@@ -7,6 +7,7 @@ import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
 import '../../../widgets/directional_huge_icon.dart';
 import '../../../core/location_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -24,6 +25,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _future = _fetch();
     ThemeService.instance.addListener(_onThemeChanged);
     LocationService.instance.addListener(_onLocationChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      TutorialManager.instance.triggerProfileTutorial(context);
+    });
   }
 
   @override
@@ -52,10 +56,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     final userId = user.id;
     try {
-      final userRes = await supabase.from('users').select('*, preferred_language').eq('id', userId).maybeSingle();
+      final userRes = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
+      final profileRes = await supabase.from('user_profiles').select('*').eq('user_id', userId).maybeSingle();
       return _Data(
         user: userRes ?? {'name': 'User', 'phone': ''},
-        profile: userRes,
+        profile: profileRes,
       );
     } catch (e) {
       return _Data(user: {'name': 'User', 'phone': ''}, profile: null);

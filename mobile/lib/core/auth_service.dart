@@ -74,7 +74,7 @@ class AuthService {
 
     if (email != null && email.trim().isNotEmpty) {
       response = await supabase.auth.signUp(
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password: password,
         data: data,
       );
@@ -90,9 +90,10 @@ class AuthService {
 
     if (response.user != null) {
       try {
-        await supabase.from('users').update({
+        await supabase.from('user_profiles').upsert({
+          'user_id': response.user!.id,
           'preferred_language': language,
-        }).eq('id', response.user!.id);
+        });
       } catch (_) {}
 
       if (locationId != null && locationId.isNotEmpty) {
@@ -117,7 +118,7 @@ class AuthService {
   Future<AuthResponse> loginWithPassword(String identifier, String password) async {
     final isEmail = identifier.contains('@');
     final response = await supabase.auth.signInWithPassword(
-      email: isEmail ? identifier.trim() : null,
+      email: isEmail ? identifier.trim().toLowerCase() : null,
       phone: isEmail ? null : _normalizePhone(identifier),
       password: password,
     );

@@ -717,26 +717,41 @@ class _CartItemTile extends StatefulWidget {
 
 class _CartItemTileState extends State<_CartItemTile> {
   late TextEditingController _qtyController;
+  late FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
     _qtyController = TextEditingController(text: _formatQty(widget.cartItem.quantity));
+    _focusNode = FocusNode();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus) {
+        final parsed = double.tryParse(_qtyController.text) ?? 0.0;
+        if (parsed > 0 && parsed != widget.cartItem.quantity) {
+          CartService.instance.updateQuantity(widget.cartItem.variant.id, parsed);
+        } else if (parsed <= 0) {
+          _qtyController.text = _formatQty(widget.cartItem.quantity);
+        }
+      }
+    });
   }
 
   @override
   void didUpdateWidget(covariant _CartItemTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.cartItem.quantity != widget.cartItem.quantity) {
-      final formatted = _formatQty(widget.cartItem.quantity);
-      if (_qtyController.text != formatted) {
-        _qtyController.text = formatted;
+      if (!_focusNode.hasFocus) {
+        final formatted = _formatQty(widget.cartItem.quantity);
+        if (_qtyController.text != formatted) {
+          _qtyController.text = formatted;
+        }
       }
     }
   }
 
   @override
   void dispose() {
+    _focusNode.dispose();
     _qtyController.dispose();
     super.dispose();
   }
@@ -955,6 +970,7 @@ class _CartItemTileState extends State<_CartItemTile> {
                         Expanded(
                           child: TextField(
                             controller: _qtyController,
+                            focusNode: _focusNode,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: kGreenDark),
                             decoration: const InputDecoration(
@@ -962,7 +978,7 @@ class _CartItemTileState extends State<_CartItemTile> {
                               isDense: true,
                               border: InputBorder.none,
                             ),
-                            onChanged: (val) {
+                            onSubmitted: (val) {
                               final parsed = double.tryParse(val) ?? 0.0;
                               if (parsed > 0) {
                                 CartService.instance.updateQuantity(variant.id, parsed);

@@ -9,18 +9,34 @@ import 'theme/app_theme.dart';
 import 'theme/theme_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  await Supabase.initialize(
-    url: supabaseUrl,
-    anonKey: supabaseAnon,
-  );
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnon,
+    );
 
-  await ThemeService.instance.init();
-  await LanguageService.instance.initialize();
-  await LocationService.instance.init();
+    await ThemeService.instance.init();
+    await LanguageService.instance.initialize();
+    await LocationService.instance.init();
 
-  runApp(const VillageMarketApp());
+    runApp(const VillageMarketApp());
+  } catch (e, stack) {
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'FATAL ERROR ON STARTUP:\n$e\n\n$stack',
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+            ),
+          ),
+        ),
+      ),
+    ));
+  }
 }
 
 class VillageMarketApp extends StatelessWidget {

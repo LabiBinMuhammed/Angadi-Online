@@ -4,6 +4,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase_client.dart';
+import '../../widgets/image_source_picker_sheet.dart';
 import 'vendor_theme_helper.dart';
 
 class VendorSingleImageUploader extends StatefulWidget {
@@ -60,6 +61,9 @@ class _VendorSingleImageUploaderState extends State<VendorSingleImageUploader> {
   }
 
   Future<void> _pickAndUploadImage() async {
+    final source = await showImageSourcePicker(context);
+    if (source == null) return;
+
     setState(() {
       _uploading = true;
       _error = null;
@@ -68,7 +72,7 @@ class _VendorSingleImageUploaderState extends State<VendorSingleImageUploader> {
     try {
       final picker = ImagePicker();
       final XFile? file = await picker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         maxWidth: widget.isBanner ? 1600 : 900,
         imageQuality: 88,
       );

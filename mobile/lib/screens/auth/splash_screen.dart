@@ -64,31 +64,21 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 120, height: 120,
-                  padding: const EdgeInsets.all(12),
+                  width: 200, height: 80,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 24, offset: Offset(0, 8))],
                   ),
                   child: Center(
                     child: Image.asset(
-                      Theme.of(context).brightness == Brightness.dark
-                          ? 'assets/images/logo_dark.png'
-                          : 'assets/images/logo_light.png',
-                      width: 90,
-                      height: 90,
+                      'assets/images/logo.png',
                       fit: BoxFit.contain,
                     ),
-
                   ),
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Angadi',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: .5),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 16),
                 const Text(
                   'Your local marketplace',
                   style: TextStyle(fontSize: 14, color: Colors.white70),

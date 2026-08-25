@@ -3,6 +3,8 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/theme_service.dart';
 
+import '../widgets/tutorial/tutorial_keys.dart';
+
 class MainShell extends StatelessWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
@@ -48,10 +50,10 @@ class MainShell extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildNavItem(context, icon: HugeIcons.strokeRoundedHome01, activeIcon: HugeIcons.strokeRoundedHome01, label: 'Home', index: 0, currentIndex: idx, path: '/home', isDark: isDark),
-                  _buildNavItem(context, icon: HugeIcons.strokeRoundedCrop, activeIcon: HugeIcons.strokeRoundedCrop, label: 'Orders', index: 1, currentIndex: idx, path: '/orders', isDark: isDark),
-                  _buildNavItem(context, icon: HugeIcons.strokeRoundedShoppingBag01, activeIcon: HugeIcons.strokeRoundedShoppingBag01, label: 'Bag', index: 2, currentIndex: idx, path: '/cart', isBag: true, isDark: isDark),
-                  _buildNavItem(context, icon: HugeIcons.strokeRoundedUser, activeIcon: HugeIcons.strokeRoundedUser, label: 'Profile', index: 3, currentIndex: idx, path: '/profile', isDark: isDark),
+                  _buildNavItem(context, itemKey: TutorialKeys.homeNavKey, icon: HugeIcons.strokeRoundedHome01, activeIcon: HugeIcons.strokeRoundedHome01, label: 'Home', index: 0, currentIndex: idx, path: '/home', isDark: isDark),
+                  _buildNavItem(context, itemKey: TutorialKeys.ordersNavKey, icon: HugeIcons.strokeRoundedCrop, activeIcon: HugeIcons.strokeRoundedCrop, label: 'Orders', index: 1, currentIndex: idx, path: '/orders', isDark: isDark),
+                  _buildNavItem(context, itemKey: TutorialKeys.bagNavKey, icon: HugeIcons.strokeRoundedShoppingBag01, activeIcon: HugeIcons.strokeRoundedShoppingBag01, label: 'Bag', index: 2, currentIndex: idx, path: '/cart', isBag: true, isDark: isDark),
+                  _buildNavItem(context, itemKey: TutorialKeys.profileNavKey, icon: HugeIcons.strokeRoundedUser, activeIcon: HugeIcons.strokeRoundedUser, label: 'Profile', index: 3, currentIndex: idx, path: '/profile', isDark: isDark),
                 ],
               ),
             ),
@@ -77,6 +79,7 @@ class MainShell extends StatelessWidget {
 
   Widget _buildNavItem(
     BuildContext context, {
+    GlobalKey? itemKey,
     required List<List<dynamic>> icon,
     required List<List<dynamic>> activeIcon,
     required String label,
@@ -97,6 +100,7 @@ class MainShell extends StatelessWidget {
         : Matrix4.identity();
  
     return GestureDetector(
+      key: itemKey,
       onTap: () => context.go(path),
       behavior: HitTestBehavior.opaque,
       child: Column(

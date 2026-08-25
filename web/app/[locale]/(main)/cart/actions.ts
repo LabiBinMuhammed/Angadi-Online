@@ -301,13 +301,27 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
   }
 
 
-  // Upsert item in order
-  const { data: existingItem } = await supabase
+  // Fetch item sell configuration to determine sell mode
+  const { data: itemConfig } = await supabase
+    .from('item_sell_config')
+    .select('sell_mode')
+    .eq('item_id', itemId)
+    .maybeSingle()
+
+  const isManualOrDynamic = itemConfig?.sell_mode?.toLowerCase() === 'manual' || itemConfig?.sell_mode?.toLowerCase() === 'dynamic'
+
+  // Upsert item in order (match by variant for packed/portion items, by item_id for manual/dynamic)
+  let query = supabase
     .from('order_items')
     .select('id, requested_value, estimated_price')
     .eq('order_id', order.id)
     .eq('item_id', itemId)
-    .maybeSingle()
+
+  if (!isManualOrDynamic && finalVariantId) {
+    query = query.eq('variant_id', finalVariantId)
+  }
+
+  const { data: existingItem } = await query.maybeSingle()
 
   if (existingItem) {
     const newQty = existingItem.requested_value + qty

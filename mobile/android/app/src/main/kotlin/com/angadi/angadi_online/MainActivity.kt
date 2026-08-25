@@ -1,4 +1,4 @@
-package com.villagemarket.village_market
+package com.angadi.angadi_online
 
 import io.flutter.embedding.android.FlutterActivity
 

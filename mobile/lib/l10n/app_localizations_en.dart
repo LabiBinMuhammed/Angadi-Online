@@ -1401,6 +1401,42 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap on any item card to see more details and add it to your bag.';
 
   @override
+  String get bagTutorialTitle => 'Your Shopping Bag';
+
+  @override
+  String get bagTutorialDesc =>
+      'Your selected items appear here. Review your items, change quantities, and continue to checkout.';
+
+  @override
+  String get ordersTutorialTitle => 'Your Orders';
+
+  @override
+  String get ordersTutorialDesc =>
+      'Track your current orders and view your previous purchases here.';
+
+  @override
+  String get profileTutorialTitle => 'Your Profile';
+
+  @override
+  String get profileTutorialDesc =>
+      'Manage your profile, saved addresses, language, and other personal settings here.';
+
+  @override
+  String get selectImageSource => 'Select Image Source';
+
+  @override
+  String get takePhoto => 'Take Photo';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get cameraOptionDesc => 'Use your camera to take a photo';
+
+  @override
+  String get galleryOptionDesc => 'Choose an existing image from gallery';
+
+  @override
   String get shopOwnersTitle => 'Shop Owners / Co-Owners';
 
   @override

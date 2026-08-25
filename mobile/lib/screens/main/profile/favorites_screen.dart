@@ -6,6 +6,7 @@ import '../../../core/supabase_client.dart';
 import '../../../core/cart_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -166,6 +167,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.addedToCartMessage(itemName))),
         );
+        TutorialManager.instance.triggerBagTutorial(context);
       }
     } catch (e) {
       debugPrint('Error adding to cart: $e');

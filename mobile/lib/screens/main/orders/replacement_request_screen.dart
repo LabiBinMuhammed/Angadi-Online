@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
+import '../../../widgets/image_source_picker_sheet.dart';
 
 class ReplacementRequestScreen extends StatefulWidget {
   final String orderId;
@@ -48,9 +49,12 @@ class _ReplacementRequestScreenState extends State<ReplacementRequestScreen> {
 
   Future<void> _pickImage() async {
     if (_selectedImages.length >= 4) return;
+    final source = await showImageSourcePicker(context);
+    if (source == null) return;
+
     final picker = ImagePicker();
     try {
-      final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+      final image = await picker.pickImage(source: source, imageQuality: 85);
       if (image != null) {
         setState(() {
           _selectedImages.add(image);

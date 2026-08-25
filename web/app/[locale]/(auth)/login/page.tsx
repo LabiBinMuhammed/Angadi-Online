@@ -95,7 +95,7 @@ export default function LoginPage() {
           .from('users')
           .update({ last_login_at: new Date().toISOString() })
           .eq('id', userId)
-        router.push(`/${locale}/home`)
+        window.location.href = `/${locale}/home`
         return
       }
 
@@ -108,7 +108,7 @@ export default function LoginPage() {
           .from('users')
           .update({ last_login_at: new Date().toISOString() })
           .eq('id', userId)
-        router.push(`/${locale}/home`)
+        window.location.href = `/${locale}/home`
       }
     } catch (err: any) {
       setError('Failed to load your profile. Please try again.')
@@ -212,7 +212,7 @@ export default function LoginPage() {
       if (selectedLocationId) {
         document.cookie = `selected_location_id=${selectedLocationId}; path=/; max-age=3153600000;`
       }
-      router.push(`/${locale}/home`)
+      window.location.href = `/${locale}/home`
     }
   }
 

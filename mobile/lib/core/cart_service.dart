@@ -66,14 +66,27 @@ class CartService extends ChangeNotifier {
           final itemData = oItem['items'];
           if (itemData == null) continue;
           final item = Item.fromJson(itemData);
-          if (item.itemVariants.isEmpty) continue;
-
-          final String? variantId = oItem['variant_id'] as String?;
-          final variant = variantId != null
-              ? item.itemVariants.firstWhere((v) => v.id == variantId, orElse: () => item.itemVariants.first)
-              : item.itemVariants.firstWhere((v) => v.isDefault, orElse: () => item.itemVariants.first);
 
           final config = item.itemSellConfig.isNotEmpty ? item.itemSellConfig.first : null;
+          final String? variantId = oItem['variant_id'] as String?;
+
+          ItemVariant variant;
+          if (item.itemVariants.isNotEmpty) {
+            variant = variantId != null
+                ? item.itemVariants.firstWhere((v) => v.id == variantId, orElse: () => item.itemVariants.first)
+                : item.itemVariants.firstWhere((v) => v.isDefault, orElse: () => item.itemVariants.first);
+          } else {
+            variant = ItemVariant(
+              id: (variantId != null && variantId.isNotEmpty) ? variantId : 'manual-${item.id}',
+              itemId: item.id,
+              variantType: config?.sellMode == SellMode.manual ? VariantType.manual : VariantType.packed,
+              label: '',
+              price: (oItem['estimated_price'] as num?)?.toDouble() ?? config?.pricePerBaseUnit ?? 0.0,
+              isDefault: true,
+              isActive: true,
+            );
+          }
+
           final qty = (oItem['requested_value'] as num?)?.toDouble() ?? 1.0;
 
           _items.add(CartItem(
@@ -181,13 +194,47 @@ class CartService extends ChangeNotifier {
         orderId = orderRes['id'] as String;
       }
 
-      // Check if item already exists in this order
-      final existingItemRes = await supabase
+      // Ensure variant_id is valid UUID
+      String finalVariantId = variant.id;
+      if (finalVariantId.isEmpty || finalVariantId.startsWith('manual-')) {
+        final dbVariant = await supabase
+            .from('item_variants')
+            .select('id')
+            .eq('item_id', item.id)
+            .limit(1)
+            .maybeSingle();
+        if (dbVariant != null) {
+          finalVariantId = dbVariant['id'] as String;
+        } else {
+          final createdV = await supabase
+              .from('item_variants')
+              .insert({
+                'item_id': item.id,
+                'variant_type': sellConfig?.sellMode == SellMode.manual ? 'Manual' : 'Fixed',
+                'label': sellConfig?.sellMode == SellMode.manual ? 'Standard' : 'Default',
+                'value': 1,
+                'price': sellConfig?.pricePerBaseUnit ?? 0.0,
+                'is_default': true,
+                'is_active': true,
+              })
+              .select('id')
+              .single();
+          finalVariantId = createdV['id'] as String;
+        }
+      }
+
+      // Check if item/variant already exists in this order
+      var query = supabase
           .from('order_items')
           .select('id, requested_value')
           .eq('order_id', orderId)
-          .eq('item_id', item.id)
-          .maybeSingle();
+          .eq('item_id', item.id);
+
+      if (!isManualOrDynamic && finalVariantId.isNotEmpty) {
+        query = query.eq('variant_id', finalVariantId);
+      }
+
+      final existingItemRes = await query.maybeSingle();
 
       double unitPrice;
       if (sellConfig?.sellMode == SellMode.manual) {
@@ -230,7 +277,7 @@ class CartService extends ChangeNotifier {
         await supabase.from('order_items').insert({
           'order_id': orderId,
           'item_id': item.id,
-          'variant_id': variant.id,
+          'variant_id': finalVariantId,
           'variant_type': dbVariantType,
           'requested_value': quantity,
           'estimated_price': unitPrice,
@@ -254,13 +301,24 @@ class CartService extends ChangeNotifier {
       final itemRes = await supabase.from('items').select('*, item_sell_config(*), item_variants:vw_item_variants_with_fallback(*), item_images(*)').eq('id', itemId).single();
       final item = Item.fromJson(itemRes);
 
-      if (item.itemVariants.isEmpty) return;
-
-      final variant = variantId != null
-          ? item.itemVariants.firstWhere((v) => v.id == variantId, orElse: () => item.itemVariants.first)
-          : item.itemVariants.firstWhere((v) => v.isDefault, orElse: () => item.itemVariants.first);
-
       final config = item.itemSellConfig.isNotEmpty ? item.itemSellConfig.first : null;
+
+      final ItemVariant variant;
+      if (item.itemVariants.isNotEmpty) {
+        variant = variantId != null
+            ? item.itemVariants.firstWhere((v) => v.id == variantId, orElse: () => item.itemVariants.first)
+            : item.itemVariants.firstWhere((v) => v.isDefault, orElse: () => item.itemVariants.first);
+      } else {
+        variant = ItemVariant(
+          id: '',
+          itemId: item.id,
+          variantType: config?.sellMode == SellMode.manual ? VariantType.manual : VariantType.packed,
+          label: '',
+          price: config?.pricePerBaseUnit ?? 0.0,
+          isDefault: true,
+          isActive: true,
+        );
+      }
 
       await addItem(item, variant, quantity: quantity, sellConfig: config);
     } catch (e) {
@@ -296,12 +354,19 @@ class CartService extends ChangeNotifier {
       final orderIds = (pendingOrders as List<dynamic>).map((o) => o['id'] as String).toList();
       if (orderIds.isEmpty) return;
 
-      final orderItemRes = await supabase
+      var query = supabase
           .from('order_items')
           .select('id, order_id, estimated_price')
-          .inFilter('order_id', orderIds)
-          .eq('variant_id', variantId)
-          .maybeSingle();
+          .inFilter('order_id', orderIds);
+
+      if (variantId.startsWith('manual-')) {
+        final itemId = variantId.replaceFirst('manual-', '');
+        query = query.eq('item_id', itemId);
+      } else {
+        query = query.eq('variant_id', variantId);
+      }
+
+      final orderItemRes = await query.maybeSingle();
 
       if (orderItemRes != null) {
         final orderItemId = orderItemRes['id'] as String;
@@ -325,7 +390,9 @@ class CartService extends ChangeNotifier {
   }
 
   Future<void> updateVariant(String oldVariantId, ItemVariant newVariant) async {
-    final index = _items.indexWhere((i) => i.variant.id == oldVariantId);
+    final index = _items.indexWhere((i) =>
+        i.variant.id == oldVariantId ||
+        (oldVariantId.startsWith('manual-') && i.item.id == oldVariantId.replaceFirst('manual-', '')));
     if (index == -1) return;
 
     final cartItem = _items[index];
@@ -351,12 +418,19 @@ class CartService extends ChangeNotifier {
       final orderIds = (pendingOrders as List<dynamic>).map((o) => o['id'] as String).toList();
       if (orderIds.isEmpty) return;
 
-      final orderItemRes = await supabase
+      var query = supabase
           .from('order_items')
           .select('id, order_id, requested_value')
-          .inFilter('order_id', orderIds)
-          .eq('variant_id', oldVariantId)
-          .maybeSingle();
+          .inFilter('order_id', orderIds);
+
+      if (oldVariantId.startsWith('manual-')) {
+        final itemId = oldVariantId.replaceFirst('manual-', '');
+        query = query.eq('item_id', itemId);
+      } else {
+        query = query.eq('variant_id', oldVariantId);
+      }
+
+      final orderItemRes = await query.maybeSingle();
 
       if (orderItemRes != null) {
         final orderItemId = orderItemRes['id'] as String;
@@ -428,12 +502,19 @@ class CartService extends ChangeNotifier {
       final orderIds = (pendingOrders as List<dynamic>).map((o) => o['id'] as String).toList();
       if (orderIds.isEmpty) return;
 
-      final orderItemRes = await supabase
+      var query = supabase
           .from('order_items')
           .select('id, order_id')
-          .inFilter('order_id', orderIds)
-          .eq('variant_id', variantId)
-          .maybeSingle();
+          .inFilter('order_id', orderIds);
+
+      if (variantId.startsWith('manual-')) {
+        final itemId = variantId.replaceFirst('manual-', '');
+        query = query.eq('item_id', itemId);
+      } else {
+        query = query.eq('variant_id', variantId);
+      }
+
+      final orderItemRes = await query.maybeSingle();
 
       if (orderItemRes != null) {
         final orderItemId = orderItemRes['id'] as String;

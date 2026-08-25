@@ -6,6 +6,7 @@ import 'package:village_market/core/supabase_client.dart';
 import 'package:village_market/theme/theme_service.dart';
 import '../../../models/models.dart';
 import '../../../core/cart_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -517,6 +518,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       if (mounted) {
         await CartService.instance.clearCart();
+        await TutorialManager.instance.setOrdersTutorialEligible(true);
         context.pushReplacement('/cart/checkout/success?orderId=$firstOrderId');
       }
     } catch (e) {
@@ -894,26 +896,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                           const SizedBox(height: 16),
-                          ...CartService.instance.items.map((item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    '${item.item.name} (${item.variant.label}) x ${item.quantity}',
-                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kText),
-                                    overflow: TextOverflow.ellipsis,
+                          ...CartService.instance.items.map((item) {
+                            final label = item.variant.label.trim();
+                            final nameDisplay = label.isNotEmpty ? '${item.item.name} ($label)' : item.item.name;
+                            final qtyDisplay = item.quantity == item.quantity.toInt().toDouble() ? item.quantity.toInt().toString() : item.quantity.toStringAsFixed(1);
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      '$nameDisplay x $qtyDisplay',
+                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: kText),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '₹ ${((item.variant.price ?? 0.0) * item.quantity).toStringAsFixed(0)}',
-                                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: kText),
-                                ),
-                              ],
-                            ),
-                          )),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '₹ ${item.subtotal.toStringAsFixed(0)}',
+                                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: kText),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
                         ],
                       ),
                       kCardBg,

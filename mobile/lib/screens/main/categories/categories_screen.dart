@@ -7,6 +7,7 @@ import '../../../models/models.dart';
 import '../../../core/cart_service.dart';
 import '../../../../widgets/directional_huge_icon.dart';
 import '../../../../core/language_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 const _kBg = Color(0xFFFAFAFA);
 const _kGreenDark = Color(0xFF32B84A);
@@ -541,6 +542,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                                         duration: const Duration(seconds: 1),
                                       ),
                                     );
+                                    TutorialManager.instance.triggerBagTutorial(context);
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(

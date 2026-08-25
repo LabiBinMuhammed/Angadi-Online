@@ -6,6 +6,7 @@ import '../../../core/cart_service.dart';
 import '../../../core/language_service.dart';
 import '../../../theme/theme_service.dart';
 import '../../../theme/app_theme.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final String itemId;
@@ -49,7 +50,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
     _selected = variants.isNotEmpty
         ? variants.firstWhere((v) => v.isDefault, orElse: () => variants.first)
-        : null;
+        : ItemVariant(
+            id: '',
+            itemId: item.id,
+            variantType: config?.sellMode == SellMode.manual ? VariantType.manual : VariantType.packed,
+            label: '',
+            price: config?.pricePerBaseUnit ?? 0.0,
+            isDefault: true,
+            isActive: true,
+          );
     return _Data(item: item, variants: variants, config: config, units: units);
   }
 
@@ -396,6 +405,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                               sellConfig: d.config,
                             );
                             setState(() => _added = true);
+                            TutorialManager.instance.triggerBagTutorial(context);
                             Future.delayed(const Duration(seconds: 2), () {
                               if (mounted) setState(() => _added = false);
                             });

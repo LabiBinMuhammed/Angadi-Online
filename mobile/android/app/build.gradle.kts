@@ -16,7 +16,7 @@ plugins {
 }
 
 android {
-    namespace = "com.villagemarket.village_market"
+    namespace = "com.angadi.angadi_online"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -41,11 +41,12 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.villagemarket.village_market"
+        applicationId = "com.angadi.angadi_online"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -55,6 +56,8 @@ android {
             } else {
                 signingConfig = signingConfigs.getByName("debug")
             }
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }
@@ -81,4 +84,8 @@ gradle.buildFinished {
     } catch (e: Exception) {
         println("=== COPY ERROR: ${e.message} ===")
     }
+}
+
+dependencies {
+    implementation("androidx.multidex:multidex:2.0.1")
 }

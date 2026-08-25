@@ -36,6 +36,7 @@ import '../screens/vendor/vendor_user_credit_screen.dart';
 import '../screens/vendor/vendor_shops_screen.dart';
 import '../screens/vendor/vendor_shop_detail_screen.dart';
 import '../screens/vendor/vendor_replacements_screen.dart';
+import '../screens/vendor/vendor_reports_screen.dart';
 import '../screens/admin/admin_dashboard_screen.dart';
 import '../screens/admin/admin_screens.dart';
 import '../screens/admin/admin_user_detail_screen.dart';
@@ -160,6 +161,7 @@ GoRouter buildRouter() {
         builder: (_, state) => VendorShopDetailScreen(shopId: state.pathParameters['shopId']!),
       ),
       GoRoute(path: '/vendor/replacements', builder: (_, __) => const VendorReplacementsScreen()),
+      GoRoute(path: '/vendor/reports',      builder: (_, __) => const VendorReportsScreen()),
 
       // ── Admin routes ──────────────────────────────────────────────────
       GoRoute(path: '/admin/dashboard',   builder: (_, __) => const AdminDashboardScreen()),

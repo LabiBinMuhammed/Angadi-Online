@@ -53,9 +53,9 @@ export async function proxy(request: NextRequest) {
 
     if (pathnameIsMissingLocale) {
       const locale = getLocale(request)
-      // Redirect /home -> /en/home
+      const targetPath = pathname === '/' ? '/home' : pathname
       const redirectUrl = new URL(
-        `/${locale}${pathname === '/' ? '' : pathname}${request.nextUrl.search}`,
+        `/${locale}${targetPath}${request.nextUrl.search}`,
         request.url
       )
       return NextResponse.redirect(redirectUrl)

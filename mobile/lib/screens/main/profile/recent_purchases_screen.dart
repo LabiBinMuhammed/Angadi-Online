@@ -6,6 +6,7 @@ import '../../../core/supabase_client.dart';
 import '../../../core/cart_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../theme/theme_service.dart';
+import '../../../widgets/tutorial/tutorial_manager.dart';
 
 class RecentPurchasesScreen extends StatefulWidget {
   const RecentPurchasesScreen({super.key});
@@ -126,6 +127,7 @@ class _RecentPurchasesScreenState extends State<RecentPurchasesScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.addedToCartMessage(productName))),
         );
+        TutorialManager.instance.triggerBagTutorial(context);
       }
     } catch (e) {
       debugPrint('Error reordering item: $e');
