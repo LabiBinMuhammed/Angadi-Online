@@ -198,7 +198,14 @@ class _HomeScreenState extends State<HomeScreen> {
     if (user != null) {
       _userName = user.userMetadata?['name'] ?? 'Yona';
       try {
-        final profile = await supabase.from('users').select('role').eq('id', user.id).single();
+        final profile = await supabase.from('users').select('role, is_active').eq('id', user.id).single();
+        if (profile['is_active'] == false) {
+          await supabase.auth.signOut();
+          if (mounted) {
+            context.go('/login');
+          }
+          return;
+        }
         _userRole = profile['role'] as String?;
       } catch (e) {
         _userRole = user.userMetadata?['role'] as String?;
@@ -213,7 +220,10 @@ class _HomeScreenState extends State<HomeScreen> {
         supabase.from('units').select('*'),
       ]);
 
-      final shops = (res[0] as List).map((j) => Shop.fromJson(j)).toList();
+      final allShops = (res[0] as List).map((j) => Shop.fromJson(j)).toList();
+      final shops = allShops.where((s) => !(s.type?.endsWith('_inactive') ?? false)).toList();
+      final activeShopIds = shops.map((s) => s.id).toSet();
+
       final itemsList = (res[1] as List).map((j) => Item.fromJson(j)).toList();
       final cats = (res[2] as List).map((j) => Category.fromJson(j)).toList();
       final unitsList = (res[3] as List).map((j) => Unit.fromJson(j)).toList();
@@ -238,7 +248,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       final activeCategoryIds = cats.map((c) => c.id).toSet();
       final filteredItemsList = itemsList.where((item) =>
-        item.categoryId == null || activeCategoryIds.contains(item.categoryId)
+        activeShopIds.contains(item.shopId) &&
+        (item.categoryId == null || activeCategoryIds.contains(item.categoryId))
       ).toList();
 
       Map<String, List<Item>> itemsMap = {};

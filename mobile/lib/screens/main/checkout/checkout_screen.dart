@@ -438,6 +438,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       final uid = supabase.auth.currentUser?.id;
       if (uid == null) throw Exception('You must be logged in to place an order');
 
+      // Check if user is active
+      final userDoc = await supabase.from('users').select('is_active').eq('id', uid).maybeSingle();
+      if (userDoc != null && userDoc['is_active'] == false) {
+        await supabase.auth.signOut();
+        throw Exception('Your account has been deactivated by an administrator. Please contact support.');
+      }
+
       final activeAddress = _selectedAddress ?? {
         'contact_name': supabase.auth.currentUser?.email?.split('@')[0] ?? 'Customer',
         'contact_phone': '9999999999',

@@ -133,6 +133,30 @@ export async function proxy(request: NextRequest) {
     return redirect(loginUrl)
   }
 
+  // Check if authenticated user has been deactivated in database
+  if (user) {
+    const { data: dbUser } = await supabase
+      .from('users')
+      .select('is_active')
+      .eq('id', user.id)
+      .maybeSingle()
+
+    if (dbUser && dbUser.is_active === false) {
+      const loginUrl = request.nextUrl.clone()
+      loginUrl.pathname = `/${locale}/login`
+      loginUrl.searchParams.set('error', 'deactivated')
+      
+      const res = NextResponse.redirect(loginUrl)
+      // Clear Supabase auth cookies
+      request.cookies.getAll().forEach(c => {
+        if (c.name.startsWith('sb-') || c.name.includes('supabase') || c.name.includes('auth-token')) {
+          res.cookies.set(c.name, '', { maxAge: 0, path: '/' })
+        }
+      })
+      return res
+    }
+  }
+
   // Resolve selected_location_id if user is authenticated but cookie is missing
   if (user && !request.cookies.has('selected_location_id')) {
     const { data: addrs } = await supabase

@@ -66,10 +66,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('role')
+        .select('role, is_active')
         .eq('id', userId)
         .maybeSingle()
       
+      if (data && data.is_active === false) {
+        await supabase.auth.signOut()
+        setSession(null)
+        setUser(null)
+        setRole('customer')
+        return
+      }
+
       if (data && !error) {
         setRole(data.role as UserRole)
       } else {
@@ -106,6 +114,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       token,
       type: 'sms'
     })
+    if (error) return { data, error }
+
+    if (data?.user) {
+      const { data: dbUser } = await supabase
+        .from('users')
+        .select('is_active')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      if (dbUser && dbUser.is_active === false) {
+        await supabase.auth.signOut()
+        return {
+          data: null,
+          error: new Error('Your account has been deactivated by an administrator. Please contact support.')
+        }
+      }
+    }
+
     return { data, error }
   }
 
@@ -199,6 +225,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       : { phone: normalizePhone(phoneOrEmail), password }
 
     const { data, error } = await supabase.auth.signInWithPassword(credentials)
+    if (error) return { data, error }
+
+    if (data?.user) {
+      const { data: dbUser } = await supabase
+        .from('users')
+        .select('is_active')
+        .eq('id', data.user.id)
+        .maybeSingle()
+
+      if (dbUser && dbUser.is_active === false) {
+        await supabase.auth.signOut()
+        return {
+          data: null,
+          error: new Error('Your account has been deactivated by an administrator. Please contact support.')
+        }
+      }
+    }
+
     return { data, error }
   }
 

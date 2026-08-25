@@ -114,6 +114,68 @@ class _ShopScreenState extends State<ShopScreen> {
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         final d = snapshot.data!;
+
+        if (d.shop.type?.endsWith('_inactive') ?? false) {
+          return Scaffold(
+            backgroundColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFFAFAFA),
+            appBar: AppBar(
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              elevation: 0,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios_new_rounded, color: isDark ? Colors.white : const Color(0xFF0F172A), size: 20),
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.go('/home');
+                  }
+                },
+              ),
+              title: Text(d.shop.name),
+            ),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 72,
+                      height: 72,
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.storefront_outlined, size: 36, color: Colors.red),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Shop Currently Inactive',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'This shop is currently not taking orders. Please explore other shops in your area.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: () => context.go('/home'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF25D366),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Back to Home'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         if (!_tutorialStarted) {
           _tutorialStarted = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {

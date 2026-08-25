@@ -85,9 +85,15 @@ export default function LoginPage() {
       const supabase = createClient()
       const { data: userRow } = await supabase
         .from('users')
-        .select('name, role')
+        .select('name, role, is_active')
         .eq('id', userId)
         .maybeSingle()
+
+      if (userRow && userRow.is_active === false) {
+        await supabase.auth.signOut()
+        setError('Your account has been deactivated by an administrator. Please contact support.')
+        return
+      }
 
       // If user is admin, bypass Complete Registration completely
       if (userRow?.role === 'admin') {

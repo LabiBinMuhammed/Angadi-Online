@@ -41,14 +41,22 @@ class AuthService {
       type: type,
     );
     
-    // If logging in via sms, update last_login_at
-    if (response.user != null && type == OtpType.sms) {
-      try {
-        await supabase
-            .from('users')
-            .update({'last_login_at': DateTime.now().toIso8601String()})
-            .eq('id', response.user!.id);
-      } catch (_) {}
+    if (response.user != null) {
+      final userDoc = await supabase.from('users').select('is_active').eq('id', response.user!.id).maybeSingle();
+      if (userDoc != null && userDoc['is_active'] == false) {
+        await supabase.auth.signOut();
+        throw const AuthException('Your account has been deactivated by an administrator. Please contact support.');
+      }
+
+      // If logging in via sms, update last_login_at
+      if (type == OtpType.sms) {
+        try {
+          await supabase
+              .from('users')
+              .update({'last_login_at': DateTime.now().toIso8601String()})
+              .eq('id', response.user!.id);
+        } catch (_) {}
+      }
     }
     
     return response;
@@ -124,6 +132,12 @@ class AuthService {
     );
     
     if (response.user != null) {
+      final userDoc = await supabase.from('users').select('is_active').eq('id', response.user!.id).maybeSingle();
+      if (userDoc != null && userDoc['is_active'] == false) {
+        await supabase.auth.signOut();
+        throw const AuthException('Your account has been deactivated by an administrator. Please contact support.');
+      }
+
       try {
         await supabase
             .from('users')

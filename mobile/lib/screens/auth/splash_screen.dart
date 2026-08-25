@@ -37,9 +37,25 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           DateTime.fromMillisecondsSinceEpoch(session.expiresAt! * 1000).isBefore(DateTime.now())) {
         await supabase.auth.signOut();
         if (mounted) context.go('/login');
-      } else {
-        context.go('/home');
+        return;
       }
+
+      // Check if user is active in public.users
+      try {
+        final res = await supabase.from('users').select('is_active').eq('id', session.user.id).maybeSingle();
+        if (res != null && res['is_active'] == false) {
+          await supabase.auth.signOut();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Your account has been deactivated. Please contact support.')),
+            );
+            context.go('/login');
+          }
+          return;
+        }
+      } catch (_) {}
+
+      context.go('/home');
     } else {
       context.go('/login');
     }

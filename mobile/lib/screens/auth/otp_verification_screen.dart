@@ -95,11 +95,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           if (userId != null) {
             final userRecord = await supabase
                 .from('users')
-                .select('id, name')
+                .select('id, name, is_active')
                 .eq('id', userId)
                 .maybeSingle();
 
             if (mounted) {
+              if (userRecord != null && userRecord['is_active'] == false) {
+                await supabase.auth.signOut();
+                setState(() => _error = 'Your account has been deactivated by an administrator. Please contact support.');
+                return;
+              }
+
               final name = userRecord?['name'] as String?;
               if (userRecord == null || name == null || name == 'User' || name.trim().isEmpty) {
                 // Incomplete signup - redirect to complete registration

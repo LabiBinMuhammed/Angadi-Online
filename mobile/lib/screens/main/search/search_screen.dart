@@ -40,7 +40,8 @@ class _SearchScreenState extends State<SearchScreen> {
         .limit(20);
     if (mounted) {
       setState(() {
-        _results = (res as List).map((j) => Shop.fromJson(j)).toList();
+        final all = (res as List).map((j) => Shop.fromJson(j)).toList();
+        _results = all.where((s) => !(s.type?.endsWith('_inactive') ?? false)).toList();
         _loading = false;
       });
     }

@@ -165,7 +165,22 @@ class CartService extends ChangeNotifier {
     if (uid == null) return;
 
     try {
+      final userDoc = await supabase.from('users').select('is_active').eq('id', uid).maybeSingle();
+      if (userDoc != null && userDoc['is_active'] == false) {
+        _items.removeWhere((i) => i.item.id == item.id);
+        notifyListeners();
+        await supabase.auth.signOut();
+        return;
+      }
+
       final shopId = item.shopId;
+      final shopDoc = await supabase.from('shops').select('type').eq('id', shopId).maybeSingle();
+      final shopType = shopDoc?['type'] as String? ?? '';
+      if (shopType.endsWith('_inactive')) {
+        _items.removeWhere((i) => i.item.id == item.id);
+        notifyListeners();
+        return;
+      }
       
       // Find or create pending order for this user and shop
       var orderRes = await supabase

@@ -176,6 +176,24 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not logged in')
 
+  // Check if user is active
+  const { data: publicUser } = await supabase.from('users').select('id, is_active').eq('id', user.id).maybeSingle()
+  if (publicUser && publicUser.is_active === false) {
+    throw new Error('Your account has been deactivated by an administrator. Please contact support.')
+  }
+
+  // Check if shop is active
+  const { data: shop } = await supabase.from('shops').select('type').eq('id', shopId).maybeSingle()
+  if (!shop || shop.type?.endsWith('_inactive')) {
+    throw new Error('This shop is currently inactive.')
+  }
+
+  // Check if item is active
+  const { data: item } = await supabase.from('items').select('is_active, deleted_at').eq('id', itemId).maybeSingle()
+  if (!item || item.is_active === false || item.deleted_at) {
+    throw new Error('This item is no longer available.')
+  }
+
   // Check if shop has level 3 restriction
   const { data: sub } = await supabase
     .from('shop_subscription')
@@ -187,7 +205,6 @@ export async function addToCart(shopId: string, itemId: string, qty: number, pri
   }
 
   // Ensure user exists in public.users
-  const { data: publicUser } = await supabase.from('users').select('id').eq('id', user.id).maybeSingle()
   if (!publicUser) {
     await supabase.from('users').insert({
       id: user.id,
