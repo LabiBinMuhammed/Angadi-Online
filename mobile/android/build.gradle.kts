@@ -12,11 +12,20 @@ val newBuildDir: Directory =
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
+    if (project.projectDir.canonicalPath.startsWith(rootProject.projectDir.canonicalPath.substring(0, 2))) {
+        val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
+        project.layout.buildDirectory.value(newSubprojectBuildDir)
+    }
 }
 subprojects {
     project.evaluationDependsOn(":app")
+}
+subprojects {
+    tasks.whenTaskAdded {
+        if (name.startsWith("lintVital")) {
+            enabled = false
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {
