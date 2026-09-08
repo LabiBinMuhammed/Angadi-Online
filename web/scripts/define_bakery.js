@@ -1,0 +1,362 @@
+const fs = require('fs');
+
+const bakeryMasterItems = [
+  // --- KERALA FRESH BAKERY SNACKS (HOT SAVOURIES & TRADITIONAL ITEMS) ---
+  {
+    name: 'Kerala Egg Puff',
+    brand: 'Local Bakery',
+    family: 'Puffs & Savouries',
+    description: 'Crispy golden flaky puff pastry stuffed with spicy onion masala and hard-boiled egg half, iconic Kerala tea snack.',
+    sell_mode: 'Fixed',
+    default_quantity: '1 pc',
+    default_image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Veg Puff',
+    brand: 'Local Bakery',
+    family: 'Puffs & Savouries',
+    description: 'Crisp layered puff stuffed with seasoned carrots, potatoes, green peas, and local spices.',
+    sell_mode: 'Fixed',
+    default_quantity: '1 pc',
+    default_image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Chicken Puff',
+    brand: 'Local Bakery',
+    family: 'Puffs & Savouries',
+    description: 'Flaky baked puff pastry filled with slow-cooked shredded spicy chicken and caramelised onions.',
+    sell_mode: 'Fixed',
+    default_quantity: '1 pc',
+    default_image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Meat Puff (Beef)',
+    brand: 'Local Bakery',
+    family: 'Puffs & Savouries',
+    description: 'Classic bakery puff stuffed with peppery roasted beef mince, crushed ginger, and curry leaves.',
+    sell_mode: 'Fixed',
+    default_quantity: '1 pc',
+    default_image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Chicken Cutlet',
+    brand: 'Local Bakery',
+    family: 'Cutlets',
+    description: 'Crispy breadcrumb-coated patty made with minced chicken, mashed potatoes, and crushed green chillies.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Meat Cutlet (Beef)',
+    brand: 'Local Bakery',
+    family: 'Cutlets',
+    description: 'Traditional crumbed meat cutlet seasoned with black pepper, garam masala, and fennel seeds.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Veg Cutlet',
+    brand: 'Local Bakery',
+    family: 'Cutlets',
+    description: 'Deep-fried golden vegetable patty prepared with beetroot, carrot, potato, and aromatic Kerala spices.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs', '4 pcs']
+  },
+  {
+    name: 'Kerala Onion Samosa',
+    brand: 'Local Bakery',
+    family: 'Samosas',
+    description: 'Crisp triangular thin-pastry samosa packed with spicy sauteed sliced onions, green chillies, and curry leaves.',
+    sell_mode: 'Fixed',
+    default_quantity: '4 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs', '10 pcs']
+  },
+  {
+    name: 'Meat Samosa (Beef/Chicken)',
+    brand: 'Local Bakery',
+    family: 'Samosas',
+    description: 'Golden crunchy triangular pastry filled with dry-roasted spiced meat mince.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs']
+  },
+  {
+    name: 'Unniyappam',
+    brand: 'Local Bakery',
+    family: 'Traditional Sweets',
+    description: 'Authentic deep-fried sweet rice fritters made with roasted rice flour, melted jaggery, mashed banana, and fried coconut bites.',
+    sell_mode: 'Fixed',
+    default_quantity: '5 pcs',
+    default_image: 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=500&auto=format&fit=crop&q=80',
+    variants: ['5 pcs', '10 pcs']
+  },
+  {
+    name: 'Neyyappam',
+    brand: 'Local Bakery',
+    family: 'Traditional Sweets',
+    description: 'Dark golden ghee-fried sweet pancake fritters flavored with cardamom, dried ginger, and sesame seeds.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '5 pcs']
+  },
+  {
+    name: 'Achappam (Rose Cookies)',
+    brand: 'Local Bakery',
+    family: 'Traditional Sweets',
+    description: 'Crunchy flower-shaped deep-fried sweet cookies made from rice flour, coconut milk, egg, and sesame seeds.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=500&auto=format&fit=crop&q=80',
+    variants: ['100 g', '250 g']
+  },
+  {
+    name: 'Vattayappam',
+    brand: 'Local Bakery',
+    family: 'Traditional Cakes',
+    description: 'Soft and spongy fermented steamed rice cake sweetened with sugar, coconut milk, cardamom, and raisins.',
+    sell_mode: 'Fixed',
+    default_quantity: '250 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['250 g', '500 g']
+  },
+  {
+    name: 'Pazham Pori (Banana Fritters)',
+    brand: 'Local Bakery',
+    family: 'Traditional Snacks',
+    description: 'Crispy golden battered ripe Nendran banana slices fried fresh in coconut oil.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs']
+  },
+  {
+    name: 'Parippu Vada (Dal Fritters)',
+    brand: 'Local Bakery',
+    family: 'Traditional Snacks',
+    description: 'Crunchy deep-fried chana dal fritters infused with crushed shallots, dried chillies, ginger, and curry leaves.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs']
+  },
+  {
+    name: 'Uzhunnu Vada (Medu Vada)',
+    brand: 'Local Bakery',
+    family: 'Traditional Snacks',
+    description: 'Fluffy inside and crispy outside doughnut-shaped black gram lentil fritters with crushed black pepper and ginger.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs']
+  },
+
+  // --- FRESH BAKERY BUNS & DAILY BREADS ---
+  {
+    name: 'Local Bakery White Sandwich Bread',
+    brand: 'Local Bakery',
+    family: 'Bread',
+    description: 'Soft, freshly baked everyday sliced white loaf from neighbourhood Kerala bakeries.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g']
+  },
+  {
+    name: 'Local Bakery Milk Bread',
+    brand: 'Local Bakery',
+    family: 'Bread',
+    description: 'Slightly sweetened fluffy milk loaf baked with fresh dairy milk.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g']
+  },
+  {
+    name: 'Local Bakery Sweet Bun',
+    brand: 'Local Bakery',
+    family: 'Buns',
+    description: 'Classic sweet bakery bun with a shiny glaze, studded with tutti frutti bits.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs']
+  },
+  {
+    name: 'Local Bakery Cream Bun',
+    brand: 'Local Bakery',
+    family: 'Buns',
+    description: 'Split soft sweet bun generously filled with sweetened vanilla bakery buttercream and dusted with sugar.',
+    sell_mode: 'Fixed',
+    default_quantity: '1 pc',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['1 pc', '2 pcs']
+  },
+  {
+    name: 'Local Bakery Butter Bun',
+    brand: 'Local Bakery',
+    family: 'Buns',
+    description: 'Soft dinner roll stuffed with sweet butter spread, classic evening chai accompaniment.',
+    sell_mode: 'Fixed',
+    default_quantity: '2 pcs',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['2 pcs', '4 pcs']
+  },
+  {
+    name: 'Traditional Kerala Tea Rusk',
+    brand: 'Local Bakery',
+    family: 'Rusks',
+    description: 'Double-baked crunchy wheat toast with aromatic cardamom essence for tea dipping.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '400 g']
+  },
+  {
+    name: 'Local Bakery Rich Plum Cake',
+    brand: 'Local Bakery',
+    family: 'Cakes',
+    description: 'Traditional moist dark plum cake infused with caramel, candied peels, raisins, and spice syrup.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g', '800 g']
+  },
+  {
+    name: 'Local Bakery Tea Cake',
+    brand: 'Local Bakery',
+    family: 'Cakes',
+    description: 'Light and airy vanilla sponge tea cake, soft texture perfect for daily teatime.',
+    sell_mode: 'Fixed',
+    default_quantity: '250 g',
+    default_image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80',
+    variants: ['250 g', '500 g']
+  },
+  {
+    name: 'Fresh Black Forest Cake',
+    brand: 'Local Bakery',
+    family: 'Cakes',
+    description: 'Layered chocolate sponge cake dressed with whipped dairy cream, cherry compote, and chocolate curls.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 g',
+    default_image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 g', '1 kg']
+  },
+
+  // --- PACKAGED BRAND BAKERY (ELITE & BRITANNIA - LEVEL 1 & 2) ---
+  {
+    name: 'Elite Milk Bread',
+    brand: 'Elite',
+    family: 'Bread',
+    description: 'Enriched soft white milk bread made from premium wheat flour and dairy milk.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g']
+  },
+  {
+    name: 'Elite 100% Whole Wheat Bread',
+    brand: 'Elite',
+    family: 'Bread',
+    description: 'Healthy whole wheat atta bread high in dietary fiber with no added maida.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g']
+  },
+  {
+    name: 'Elite White Sandwich Bread',
+    brand: 'Elite',
+    family: 'Bread',
+    description: 'Square cut family sandwich loaf, holds sandwich fillings and toasts evenly.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g', '800 g']
+  },
+  {
+    name: 'Elite Premium Milk Rusk',
+    brand: 'Elite',
+    family: 'Rusks',
+    description: 'Extra crispy baked rusks enriched with creamy dairy milk and cardamom.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '400 g']
+  },
+  {
+    name: 'Elite Rich Plum Cake',
+    brand: 'Elite',
+    family: 'Cakes',
+    description: 'Packaged moist Kerala plum cake packed with marinated raisins, dates, cherries, and orange peel.',
+    sell_mode: 'Fixed',
+    default_quantity: '350 g',
+    default_image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80',
+    variants: ['350 g', '700 g']
+  },
+  {
+    name: 'Elite Real Fruit Cake',
+    brand: 'Elite',
+    family: 'Cakes',
+    description: 'Soft slice cake enriched with colourful tutti frutti fruit nuggets.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '400 g']
+  },
+  {
+    name: 'Britannia 100% Whole Wheat Bread',
+    brand: 'Britannia',
+    family: 'Bread',
+    description: 'Wholesome brown bread made with 100 percent whole wheat flour for daily healthy breakfasts.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g']
+  },
+  {
+    name: 'Britannia White Sandwich Bread',
+    brand: 'Britannia',
+    family: 'Bread',
+    description: 'Standard sliced white bread with soft crumb for toasts and sandwiches.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['400 g']
+  },
+  {
+    name: 'Britannia Toastea Premium Milk Rusk',
+    brand: 'Britannia',
+    family: 'Rusks',
+    description: 'Crunchy baked wheat toast flavored with elaichi, India favorite tea-time dip.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '400 g']
+  },
+  {
+    name: 'Britannia Fruit Roll Cake',
+    brand: 'Britannia',
+    family: 'Cakes',
+    description: 'Rolled sponge cake layered with sweet fruit jam and cream filling.',
+    sell_mode: 'Fixed',
+    default_quantity: '150 g',
+    default_image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80',
+    variants: ['150 g', '300 g']
+  }
+];
+
+fs.writeFileSync('scripts/bakery_data.json', JSON.stringify(bakeryMasterItems, null, 2), 'utf8');
+console.log(`Defined Bakery master items: ${bakeryMasterItems.length}`);

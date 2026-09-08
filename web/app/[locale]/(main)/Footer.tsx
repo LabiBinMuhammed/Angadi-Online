@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { 
   Truck, Store, ShieldCheck, MessageSquare, 
   MapPin, Heart, Sparkles, PhoneCall 
@@ -8,17 +9,25 @@ import {
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 export default function Footer() {
+  const pathname = usePathname()
   const { locale, t } = useTranslation()
 
+  if (pathname && (pathname.includes('/home') || pathname.includes('/checkout'))) {
+    return null
+  }
+
   return (
-    <footer style={{
-      background: 'var(--bg-surface)',
-      borderTop: '1px solid var(--border)',
-      marginTop: 'auto',
-      width: '100%',
-      boxSizing: 'border-box'
-    }}>
-      <style dangerouslySetInnerHTML={{ __html: `
+    <footer 
+      suppressHydrationWarning
+      style={{
+        background: 'var(--bg-surface)',
+        borderTop: '1px solid var(--border)',
+        marginTop: 'auto',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}
+    >
+      <style suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `
         .footer-trust-grid {
           display: grid;
           grid-template-columns: repeat(1, 1fr);

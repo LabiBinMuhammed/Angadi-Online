@@ -11,6 +11,8 @@ import 'theme/theme_service.dart';
 Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
+    PaintingBinding.instance.imageCache.maximumSize = 500;
+    PaintingBinding.instance.imageCache.maximumSizeBytes = 150 << 20; // 150MB
 
     await Supabase.initialize(
       url: supabaseUrl,

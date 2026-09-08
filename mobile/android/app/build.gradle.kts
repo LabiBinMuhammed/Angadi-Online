@@ -30,13 +30,14 @@ android {
     }
 
     signingConfigs {
-        if (keystorePropertiesFile.exists()) {
-            create("release") {
-                keyAlias = keystoreProperties["keyAlias"] as String
-                keyPassword = keystoreProperties["keyPassword"] as String
-                storeFile = file(keystoreProperties["storeFile"] as String)
-                storePassword = keystoreProperties["storePassword"] as String
-            }
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as? String ?: "upload"
+            keyPassword = keystoreProperties["keyPassword"] as? String ?: "villagemarket2026"
+            val rawStore = keystoreProperties["storeFile"] as? String ?: "upload-keystore.jks"
+            val candidateFile = file(rawStore)
+            storeFile = if (candidateFile.exists()) candidateFile else rootProject.file(rawStore)
+            storePassword = keystoreProperties["storePassword"] as? String ?: "villagemarket2026"
+            println("=== RELEASE SIGNING CONFIGURED: storeFile=${storeFile?.absolutePath} exists=${storeFile?.exists()} ===")
         }
     }
 
@@ -51,11 +52,7 @@ android {
 
     buildTypes {
         release {
-            if (keystorePropertiesFile.exists()) {
-                signingConfig = signingConfigs.getByName("release")
-            } else {
-                signingConfig = signingConfigs.getByName("debug")
-            }
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
         }
@@ -77,14 +74,21 @@ gradle.buildFinished {
         val targetAab = File("D:/Labeeb/Online Shop/Angadi-Online.aab")
         targetApk.parentFile?.mkdirs()
         
-        val tempDir = File(System.getProperty("java.io.tmpdir"))
-        tempDir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.apk" }.forEach { apk: File ->
-            apk.copyTo(targetApk, overwrite = true)
-            println("=== SUCCESS COPYING APK: Target size=${targetApk.length()} bytes ===")
-        }
-        tempDir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.aab" }.forEach { aab: File ->
-            aab.copyTo(targetAab, overwrite = true)
-            println("=== SUCCESS COPYING AAB: Target size=${targetAab.length()} bytes ===")
+        val searchDirs = listOf(
+            File(rootProject.projectDir, "../../build/app/outputs"),
+            File(projectDir, "build/outputs"),
+            File(rootProject.projectDir, "app/build/outputs")
+        )
+        for (dir in searchDirs) {
+            if (!dir.exists()) continue
+            dir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.apk" }.forEach { apk: File ->
+                apk.copyTo(targetApk, overwrite = true)
+                println("=== SUCCESS COPYING APK from ${apk.absolutePath}: Target size=${targetApk.length()} bytes ===")
+            }
+            dir.walkTopDown().filter { f: File -> f.isFile && f.name == "app-release.aab" }.forEach { aab: File ->
+                aab.copyTo(targetAab, overwrite = true)
+                println("=== SUCCESS COPYING AAB from ${aab.absolutePath}: Target size=${targetAab.length()} bytes ===")
+            }
         }
     } catch (e: Exception) {
         println("=== COPY ERROR: ${e.message} ===")

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import {
-  Search, Bell, ChevronDown, Heart, Plus, Minus, MapPin,
+  Search, Bell, ChevronDown, Heart, Plus, Minus, MapPin, X,
   Home, LayoutGrid, ShoppingBag, User as UserIcon, Store, ShieldCheck, Trash2,
   Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Cookie, Package, CupSoda, Scale, RefreshCw, Scissors,
   Bookmark, History, MessageSquare
@@ -91,6 +91,63 @@ function getSellModeBadge(mode?: string) {
       <IconComponent size={15} color={iconColor} strokeWidth={2.5} />
     </div>
   );
+}
+
+const ITEM_SYNONYMS: Record<string, string[]> = {
+  'onion': ['onion', 'onions', 'ulli', 'savala', 'savola', 'sawala', 'സവാള', 'ഉള്ളി', 'pyaz', 'pyaaz', 'प्याज'],
+  'tomato': ['tomato', 'tomatoes', 'thakkali', 'തക്കാളി', 'tamatar', 'टमाटर'],
+  'chicken': ['chicken', 'chiken', 'kozhi', 'കോഴി', 'murgi', 'മുർഗി'],
+  'tea': ['tea', 'chaya', 'chaaya', 'ചായ', 'chai'],
+  'coffee': ['coffee', 'kaapi', 'kapi', 'കാപ്പി'],
+  'potato': ['potato', 'potatoes', 'urula', 'urulakkizhangu', 'ഉരുളക്കിഴങ്ങ്', 'aalu', 'aloo'],
+  'milk': ['milk', 'paal', 'pal', 'പാൽ'],
+  'chilli': ['chilli', 'chili', 'mulak', 'mulaku', 'മുളക്', 'mirch'],
+  'rice': ['rice', 'ari', 'അരി', 'chawal'],
+  'oil': ['oil', 'velichenna', 'enna', 'വെളിച്ചെണ്ണ', 'എണ്ണ'],
+  'masala': ['masala', 'masalappodi', 'മസാല', 'spice', 'powder', 'പൊടി'],
+  'sugar': ['sugar', 'panchasara', 'പഞ്ചസാര'],
+  'salt': ['salt', 'uppu', 'ഉപ്പ്'],
+  'fish': ['fish', 'meen', 'മീൻ'],
+  'meat': ['meat', 'erachi', 'irachi', 'ഇറച്ചി', 'beef', 'mutton', 'pothu', 'പോത്ത്']
+};
+
+function matchesItemSearch(item: Item, rawQuery: string): boolean {
+  if (!rawQuery.trim()) return true;
+  const q = rawQuery.toLowerCase().trim();
+  
+  // 1. Base name & description match
+  if (item.name.toLowerCase().includes(q)) return true;
+  if (item.description?.toLowerCase().includes(q)) return true;
+  
+  // 2. Translations match
+  const translations = (item as any).item_translations || [];
+  for (const t of translations) {
+    if (t.name?.toLowerCase().includes(q)) return true;
+    if (t.description?.toLowerCase().includes(q)) return true;
+  }
+  
+  // 3. Match synonyms
+  for (const [key, synonyms] of Object.entries(ITEM_SYNONYMS)) {
+    const itemHasKey = item.name.toLowerCase().includes(key) || 
+      translations.some((t: any) => t.name?.toLowerCase().includes(key));
+    if (itemHasKey) {
+      const qMatchesSyn = synonyms.some(syn => syn.toLowerCase().includes(q) || q.includes(syn.toLowerCase()));
+      if (qMatchesSyn) return true;
+    }
+  }
+  
+  // 4. Multi-word search
+  const words = q.split(/\s+/).filter(w => w.length >= 2);
+  if (words.length > 1) {
+    const allWordsMatch = words.every(word => {
+      if (item.name.toLowerCase().includes(word)) return true;
+      if (item.description?.toLowerCase().includes(word)) return true;
+      return translations.some((t: any) => t.name?.toLowerCase().includes(word) || t.description?.toLowerCase().includes(word));
+    });
+    if (allWordsMatch) return true;
+  }
+  
+  return false;
 }
 
 interface Props {
@@ -371,9 +428,12 @@ export default function HomeClient({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: `
-        main.page { padding: 0 !important; max-width: 100% !important; background: var(--bg-base); overflow: hidden !important; }
+      <style suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `
+        main.fade-up { padding: 0 !important; max-width: 100% !important; background: var(--bg-base); overflow: hidden !important; height: 100% !important; flex: 1 !important; display: flex !important; }
+        .page-scroll-area { overflow: hidden !important; height: 100% !important; }
         header.wa-sidebar-top { display: none !important; }
+        footer { display: none !important; }
+        @media (min-width: 768px) { .md-hidden-back-btn { display: none !important; } }
         body { background: var(--bg-base); overflow: hidden; }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -381,19 +441,66 @@ export default function HomeClient({
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1f2937; color: #fff; padding: 12px 24px; border-radius: 20px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; animation: toastFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         @keyframes toastFadeIn { from { opacity: 0; bottom: 80px; } to { opacity: 1; bottom: 100px; } }
 
-        .left-panel, .right-panel { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .left-panel, .right-panel {
+          display: flex;
+          flex-direction: column;
+          min-width: 0;
+          box-sizing: border-box;
+          overflow-x: hidden;
+        }
         
-        /* Desktop: left panel has fixed width, right fills rest */
-        @media (min-width: 768px) {
-          .left-panel { flex: 0 0 380px; max-width: 380px; }
-          .right-panel { flex: 1; min-width: 0; }
+        /* Large Desktop (>= 1000px): left panel has fixed width, right fills rest */
+        @media (min-width: 1000px) {
+          .left-panel { flex: 0 0 360px; max-width: 360px; padding-bottom: 32px !important; }
+          .right-panel { flex: 1; min-width: 0; padding-bottom: 32px !important; }
         }
 
-        /* Mobile: each panel takes the full width, toggled via hidden-on-mobile */
+        /* MD Devices (tablets, 768px to 999px): left panel has 280px, right fills rest */
+        @media (min-width: 768px) and (max-width: 999px) {
+          .left-panel { flex: 0 0 280px; max-width: 280px; padding-bottom: 32px !important; }
+          .right-panel { flex: 1; min-width: 0; padding-bottom: 32px !important; }
+        }
+
+        /* Mobile (SM < 768px): each panel takes full width, toggled via hidden-on-mobile */
         @media (max-width: 767px) {
-          .left-panel, .right-panel { flex: 0 0 100%; width: 100%; max-width: 100%; }
+          .left-panel, .right-panel {
+            flex: 0 0 100% !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 0 !important;
+            overflow-x: hidden !important;
+            padding-bottom: 90px !important;
+          }
           .left-panel.hidden-on-mobile { display: none !important; }
           .right-panel.hidden-on-mobile { display: none !important; }
+        }
+
+        .home-section-container {
+          padding: 0 24px 24px;
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 0;
+        }
+        @media (max-width: 767px) {
+          .home-section-container {
+            padding: 0 12px 18px !important;
+          }
+        }
+
+        .home-shop-header-container {
+          padding: 20px 24px 20px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 0;
+        }
+        @media (max-width: 767px) {
+          .home-shop-header-container {
+            padding: 14px 12px 14px !important;
+            gap: 10px !important;
+          }
         }
 
         @keyframes cardImgSlide {
@@ -413,30 +520,50 @@ export default function HomeClient({
 
         .homepage-item-grid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
           align-items: start;
+          width: 100%;
+          min-width: 0;
         }
-        @media (max-width: 540px) {
+        @media (min-width: 768px) {
           .homepage-item-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            align-items: start;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 14px !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .homepage-item-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+            width: 100% !important;
+            min-width: 0 !important;
+          }
+        }
+        @media (max-width: 360px) {
+          .homepage-item-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
         }
 
         .homepage-item-card {
           background: var(--bg-surface);
-          border-radius: 28px;
-          padding: 16px 16px 30px 16px;
+          border-radius: 20px;
+          padding: 12px 12px 46px 12px;
           position: relative;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.03);
+          box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+          border: 1px solid var(--border);
           transition: all 0.25s ease;
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
+          overflow: hidden;
         }
-        @media (max-width: 375px) {
+        @media (max-width: 480px) {
           .homepage-item-card {
-            padding: 12px 12px 30px 12px;
-            border-radius: 20px;
+            padding: 10px 10px 44px 10px;
+            border-radius: 16px;
           }
         }
 
@@ -521,7 +648,9 @@ export default function HomeClient({
         display: 'flex',
         width: '100%',
         background: 'var(--bg-base)',
-        height: '104dvh',
+        height: '100%',
+        maxHeight: '100%',
+        overflow: 'hidden',
         fontFamily: 'system-ui, -apple-system, sans-serif'
       }}>
         
@@ -533,7 +662,6 @@ export default function HomeClient({
           height: '100%',
           overflowY: 'auto',
           borderRight: '1px solid var(--border)',
-          paddingBottom: '100px',
         }}>
           
           {/* Header */}
@@ -681,22 +809,18 @@ export default function HomeClient({
           position: 'relative',
           height: '100%',
           overflowY: 'auto',
-          paddingBottom: '100px',
         }}>
           
           {/* Top Shop Header */}
-          <div style={{ padding: '20px 24px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div className="home-shop-header-container">
             {hasSelectedShop && (
-              <Link href="/home" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', background: 'var(--bg-surface)', borderRadius: '12px', color: 'var(--text-base)', textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} className="md-hidden-back-btn">
+              <Link href="/home" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', background: 'var(--bg-surface)', borderRadius: '12px', color: 'var(--text-base)', textDecoration: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', flexShrink: 0 }} className="md-hidden-back-btn">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 18l-6-6 6-6"/>
                 </svg>
               </Link>
             )}
-            <style dangerouslySetInnerHTML={{ __html: `
-              @media (min-width: 768px) { .md-hidden-back-btn { display: none !important; } }
-            `}} />
-            <div style={{ flex: 1 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
               {(() => {
                 const shop = activeShop;
                 if (!shop) {
@@ -712,7 +836,7 @@ export default function HomeClient({
                 const productCount = shopItems.length
                 const shopHeaderBg = theme === 'dark' ? 'var(--bg-muted)' : '#fcedef'
                 return (
-                  <div style={{ background: shopHeaderBg, borderRadius: '24px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'space-between' }}>
+                  <div style={{ background: shopHeaderBg, borderRadius: '24px', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '16px', justifyContent: 'space-between', minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: 0, flex: 1 }}>
                       <div style={{ width: '60px', height: '60px', background: 'var(--bg-surface)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 12px rgba(0,0,0,0.1)', overflow: 'hidden', flexShrink: 0 }}>
                         {imgUrl ? (
@@ -754,22 +878,33 @@ export default function HomeClient({
           </div>
 
           {/* Item Search */}
-          <div style={{ padding: '0 24px 24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-muted)', borderRadius: '18px', padding: '0 16px' }}>
+          <div className="home-section-container">
+            <div style={{ display: 'flex', alignItems: 'center', background: 'var(--bg-muted)', borderRadius: '18px', padding: '0 16px', width: '100%', boxSizing: 'border-box' }}>
               <input 
                 placeholder={t('home.search_items')} 
                 value={itemSearch}
                 onChange={e => setItemSearch(e.target.value)}
                 style={{ border: 'none', background: 'transparent', padding: '14px 12px', fontSize: '15px', width: '100%', outline: 'none', color: 'var(--text-base)', fontWeight: 500 }}
               />
-              <Search size={20} color="var(--wa-green)" strokeWidth={2.5} />
+              {itemSearch ? (
+                <button 
+                  type="button"
+                  onClick={() => setItemSearch('')} 
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}
+                  aria-label="Clear search"
+                >
+                  <X size={18} />
+                </button>
+              ) : (
+                <Search size={20} color="var(--wa-green)" strokeWidth={2.5} />
+              )}
             </div>
           </div>
 
           {/* Categories */}
-          <div style={{ padding: '0 24px 24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 800, margin: 0, color: 'var(--text-base)', letterSpacing: '-0.5px' }}>{t('nav.categories')}</h2>
+          <div className="home-section-container">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: 'var(--text-base)', letterSpacing: '-0.5px' }}>{t('nav.categories')}</h2>
               <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 {selectedCategory && (
                   <button onClick={() => setSelectedCategory(null)} style={{ background: 'none', border: 'none', color: '#ff4757', fontWeight: 700, cursor: 'pointer', marginRight: '8px' }}>{t('home.clear')}</button>
@@ -777,7 +912,7 @@ export default function HomeClient({
                 {currentDateStr}
               </span>
             </div>
-            <div style={{ display: 'flex', gap: '16px', overflowX: 'auto', paddingTop: '8px', paddingBottom: '12px', paddingLeft: '4px', paddingRight: '4px', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
+            <div style={{ display: 'flex', gap: '14px', overflowX: 'auto', paddingTop: '4px', paddingBottom: '10px', width: '100%', maxWidth: '100%', minWidth: 0, boxSizing: 'border-box', msOverflowStyle: 'none', scrollbarWidth: 'none' }}>
               {availableCategories.map((cat, i) => {
                 const bgColors = theme === 'dark' ? ['var(--bg-muted)', 'var(--bg-muted)', 'var(--bg-muted)', 'var(--bg-muted)'] : ['#f4f5f7', '#fdf6f0', '#fdf5eb', '#fceef0']
                 const isSelected = selectedCategory === cat.id
@@ -810,8 +945,8 @@ export default function HomeClient({
           </div>
 
           {/* Shop Items */}
-          <div style={{ padding: '0 24px 24px' }}>
-            <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 20px 0', color: 'var(--text-base)', letterSpacing: '-0.5px' }}>
+          <div className="home-section-container">
+            <h2 style={{ fontSize: '20px', fontWeight: 800, margin: '0 0 16px 0', color: 'var(--text-base)', letterSpacing: '-0.5px' }}>
               {hasSelectedShop ? t('home.shop_items') : t('home.popular')}
             </h2>
             <div className="homepage-item-grid">
@@ -825,7 +960,7 @@ export default function HomeClient({
                 }
 
                 if (itemSearch) {
-                  itemsToShow = itemsToShow.filter(item => item.name.toLowerCase().includes(itemSearch.toLowerCase()))
+                  itemsToShow = itemsToShow.filter(item => matchesItemSearch(item, itemSearch))
                 }
                 
                 if (itemsToShow.length === 0) {
@@ -945,31 +1080,32 @@ export default function HomeClient({
                       </div>
 
                       {/* Item Details */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', margin: '0 0 6px 0' }}>
-                        <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-base)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>{item.name}</h3>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '6px', margin: '0 0 6px 0', minWidth: 0 }}>
+                        <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-base)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0 }} title={item.name}>{item.name}</h3>
+                        <div style={{ display: 'flex', alignItems: 'baseline', gap: '1px', flexShrink: 0 }}>
                           <span 
                             key={price}
                             className="price-pop"
-                            style={{ fontSize: '15px', fontWeight: 800, color: 'var(--wa-green)' }}
+                            style={{ fontSize: '14px', fontWeight: 800, color: 'var(--wa-green)' }}
                           >
                             ₹{price.toFixed(0)}
                           </span>
                           {priceUnit && (
-                            <span style={{ fontSize: '11px', color: 'var(--text-light)', fontWeight: 600 }}>{priceUnit}</span>
+                            <span style={{ fontSize: '10px', color: 'var(--text-light)', fontWeight: 600 }}>{priceUnit}</span>
                           )}
                         </div>
                       </div>
 
                       {/* Dropdown Selector Area Replaced with Attractive Variant Cards */}
-                      <div style={{ marginTop: '8px', marginBottom: '12px' }}>
-                        {((isDynamic || isPortion || (isPacked && variants.length > 1)) && variants.length > 0) ? (
+                      <div style={{ marginTop: '4px', marginBottom: '8px', minWidth: 0, overflow: 'hidden' }}>
+                        {((isDynamic || isPortion || isPacked) && variants.length > 0) ? (
                           <div 
                             style={{
                               display: 'flex',
                               flexWrap: 'wrap',
-                              gap: '6px',
-                              padding: '4px 0',
+                              gap: '4px',
+                              padding: '2px 0',
+                              minWidth: 0
                             }}
                           >
                             {variants.map(v => {
@@ -982,18 +1118,20 @@ export default function HomeClient({
                                   style={{
                                     display: 'inline-block',
                                     flexShrink: 0,
-                                    padding: '4px 8px',
-                                    borderRadius: '8px',
-                                    border: isActive ? '2px solid var(--wa-green)' : '1px solid var(--border)',
-                                    background: isActive ? 'linear-gradient(135deg, var(--wa-green-light), var(--wa-green-light))' : 'var(--bg-surface)',
+                                    padding: '3px 7px',
+                                    borderRadius: '6px',
+                                    border: isActive ? '1.5px solid var(--wa-green)' : '1px solid var(--border)',
+                                    background: isActive ? 'var(--wa-green-light)' : 'var(--bg-surface)',
                                     color: isActive ? 'var(--wa-green-dark)' : 'var(--text-muted)',
-                                    fontSize: '10px',
+                                    fontSize: '9.5px',
                                     fontWeight: 700,
                                     cursor: 'pointer',
-                                    transition: 'all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1)',
-                                    boxShadow: isActive ? '0 4px 10px rgba(76, 217, 100, 0.15)' : 'none',
-                                    transform: isActive ? 'scale(1.05)' : 'scale(1)',
-                                    outline: 'none'
+                                    transition: 'all 0.15s ease',
+                                    outline: 'none',
+                                    maxWidth: '100%',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
                                   }}
                                 >
                                   {v.label}
@@ -1002,7 +1140,7 @@ export default function HomeClient({
                             })}
                           </div>
                         ) : (
-                          <div style={{ height: '32px' }}></div>
+                          <div style={{ height: '24px' }}></div>
                         )}
                       </div>
 
@@ -1012,22 +1150,25 @@ export default function HomeClient({
                         bottom: '8px',
                         left: '8px',
                         right: '8px',
-                        height: '32px',
+                        height: '30px',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '8px'
+                        gap: '6px',
+                        minWidth: 0
                       }}>
                         {isManual ? (
                           // Manual Selling Mode Action UI
                           <>
                             <div style={{
                               flex: 1,
-                              height: '32px',
+                              height: '30px',
                               display: 'flex',
                               alignItems: 'center',
                               background: 'var(--bg-muted)',
-                              borderRadius: '16px',
-                              padding: '0 12px'
+                              borderRadius: '15px',
+                              padding: '0 6px',
+                              minWidth: 0,
+                              overflow: 'hidden'
                             }}>
                               <input
                                 type="text"
@@ -1052,16 +1193,17 @@ export default function HomeClient({
                                   background: 'transparent',
                                   width: '100%',
                                   outline: 'none',
-                                  fontSize: '13px',
-                                  fontWeight: 600,
-                                  color: 'var(--text-base)'
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  color: 'var(--text-base)',
+                                  minWidth: 0
                                 }}
                               />
                               <span style={{
-                                fontSize: '12px',
-                                fontWeight: 600,
+                                fontSize: '10px',
+                                fontWeight: 700,
                                 color: 'var(--text-muted)',
-                                marginLeft: '4px',
+                                marginLeft: '2px',
                                 flexShrink: 0
                               }}>
                                 {units.find(u => u.id === sellConfig?.base_unit_id)?.symbol || 'kg'}
@@ -1072,17 +1214,17 @@ export default function HomeClient({
                               disabled={isPending || cartSuccessItems.has(item.id)}
                               aria-label={cartSuccessItems.has(item.id) ? 'Added to cart' : `Add ${item.name} to cart`}
                               style={{
-                                height: '32px',
-                                padding: '0 12px',
+                                height: '30px',
+                                padding: '0 10px',
                                 background: cartSuccessItems.has(item.id) ? 'var(--wa-green-dark)' : 'var(--wa-green)',
-                                borderRadius: '16px',
+                                borderRadius: '15px',
                                 border: 'none',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: '#fff',
-                                fontWeight: 'bold',
-                                fontSize: '12px',
+                                fontWeight: 800,
+                                fontSize: '11px',
                                 cursor: cartSuccessItems.has(item.id) ? 'default' : 'pointer',
                                 flexShrink: 0,
                                 transition: 'background 0.2s ease'
@@ -1096,41 +1238,43 @@ export default function HomeClient({
                           <>
                             <div style={{
                               flex: 1,
-                              height: '32px',
+                              height: '30px',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'space-between',
                               background: 'var(--bg-muted)',
-                              borderRadius: '16px',
-                              padding: '0 8px'
+                              borderRadius: '15px',
+                              padding: '0 4px',
+                              minWidth: 0,
+                              overflow: 'hidden'
                             }}>
                               <button 
                                 onClick={() => handleUpdateQty(item.id, null, (localQtys[item.id] ?? 1.0) - 1)}
-                                style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                                <Minus size={12} strokeWidth={2} />
+                                style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', flexShrink: 0 }}>
+                                <Minus size={11} strokeWidth={2.5} />
                               </button>
-                              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-base)' }}>{formattedQty}</span>
+                              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-base)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>{formattedQty}</span>
                               <button 
                                 onClick={() => handleUpdateQty(item.id, null, (localQtys[item.id] ?? 1.0) + 1)}
-                                style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                                <Plus size={12} strokeWidth={2} />
+                                style={{ border: 'none', background: 'transparent', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', flexShrink: 0 }}>
+                                <Plus size={11} strokeWidth={2.5} />
                               </button>
                             </div>
                             <button
                               onClick={() => handleAdd(item.shop_id || '', item, currentVariant)}
                               disabled={isPending}
                               style={{
-                                height: '32px',
-                                padding: '0 12px',
+                                height: '30px',
+                                padding: '0 10px',
                                 background: 'var(--wa-green)',
-                                borderRadius: '16px',
+                                borderRadius: '15px',
                                 border: 'none',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 color: '#fff',
-                                fontWeight: 'bold',
-                                fontSize: '12px',
+                                fontWeight: 800,
+                                fontSize: '11px',
                                 cursor: 'pointer',
                                 flexShrink: 0
                               }}

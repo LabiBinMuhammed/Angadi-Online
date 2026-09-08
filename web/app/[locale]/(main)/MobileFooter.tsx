@@ -83,7 +83,6 @@ export default function MobileFooter() {
             </Link>
           )
         })}
-        <div style={{ position: 'absolute', bottom: '8px', left: '50%', transform: 'translateX(-50%)', width: '130px', height: '5px', background: 'var(--text-base)', opacity: 0.3, borderRadius: '10px' }} />
       </div>
     </>
   )

@@ -7,8 +7,8 @@ export const metadata: Metadata = { title: 'Demo Templates' }
 export default async function DemosPage() {
   const supabase = await createClient()
   const [{ data: demos }, { data: categories }, { data: units }] = await Promise.all([
-    supabase.from('demo_items').select('id, name, sell_mode, default_image, category_id, unit_id').order('name'),
-    supabase.from('categories').select('id, name').eq('is_active', true).order('name'),
+    supabase.from('demo_items').select('id, name, sell_mode, default_image, category_id, unit_id, code, display_order').order('name'),
+    supabase.from('categories').select('id, name, is_active').order('display_order', { ascending: true }),
     supabase.from('units').select('id, name, symbol').order('name'),
   ])
 

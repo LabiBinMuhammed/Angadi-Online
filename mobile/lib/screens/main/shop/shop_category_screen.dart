@@ -26,7 +26,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
 
   Future<_Data> _fetch() async {
     final results = await Future.wait([
-      supabase.from('categories').select('id, name, is_active, category_translations(*)').eq('id', widget.categoryId).single(),
+      supabase.from('categories').select('*, category_translations(*)').eq('id', widget.categoryId).single(),
       supabase
           .from('items')
           .select('*, item_translations(*), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*, variant_translations(*)), item_images(*)')
@@ -35,7 +35,7 @@ class _ShopCategoryScreenState extends State<ShopCategoryScreen> {
           .eq('is_active', true)
           .isFilter('deleted_at', null)
           .order('name'),
-      supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
+      supabase.from('categories').select('*, category_translations(*)').eq('is_active', true).order('display_order'),
       supabase.from('units').select('*'),
     ]);
     final category = Category.fromJson(results[0] as Map<String, dynamic>);

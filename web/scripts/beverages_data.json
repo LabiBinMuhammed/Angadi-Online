@@ -1,0 +1,363 @@
+[
+  {
+    "name": "AVT Premium Dust Tea",
+    "brand": "AVT",
+    "family": "Dust Tea",
+    "description": "Kerala legendary strong reddish liquor dust tea with invigorating aroma and brisk taste.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "100 g",
+      "250 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "AVT Gold Cup Strong Tea",
+    "brand": "AVT",
+    "family": "Dust Tea",
+    "description": "Special blend of high-grown Assam and South Indian CTC dust teas for rich hotel-style milk tea.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "250 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Kannan Devan Classic Dust Tea",
+    "brand": "Kannan Devan",
+    "family": "Dust Tea",
+    "description": "Iconic Munnar high-range dust tea known for its distinctive deep colour and authentic brisk flavour.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "100 g",
+      "250 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Kannan Devan Strong Tea",
+    "brand": "Kannan Devan",
+    "family": "Dust Tea",
+    "description": "Extra strong CTC black tea leaves sourced from the hills of Munnar.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "250 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Brooke Bond Red Label Tea",
+    "brand": "Brooke Bond",
+    "family": "Black Tea",
+    "description": "Finest quality CTC black tea leaves processed with great taste and aroma.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "100 g",
+      "250 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Brooke Bond Red Label Natural Care Tea",
+    "brand": "Brooke Bond",
+    "family": "Herbal Infused Tea",
+    "description": "CTC black tea enriched with 5 Ayurvedic herbs: Tulsi, Ashwagandha, Mulethi, Ginger, and Cardamom.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "100 g",
+      "250 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Brooke Bond 3 Roses Dust Tea",
+    "brand": "Brooke Bond",
+    "family": "Dust Tea",
+    "description": "Rich colour, strong taste, and perfect strength for South Indian morning chai.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "100 g",
+      "250 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Tata Tea Agni Strong Dust Tea",
+    "brand": "Tata Tea",
+    "family": "Dust Tea",
+    "description": "Strong, robust CTC dust tea with extra brewing strength for strong tea lovers.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "250 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Tata Tea Gold Premium Leaf Tea",
+    "brand": "Tata Tea",
+    "family": "Leaf Tea",
+    "description": "Delightful blend of rich Assam CTC tea with 15 percent gently rolled long leaves for superior aroma.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "250 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Lipton Pure & Light Green Tea Bags",
+    "brand": "Lipton",
+    "family": "Green Tea",
+    "description": "Zero calorie non-bitter soothing green tea packed with natural antioxidants.",
+    "sell_mode": "Fixed",
+    "default_quantity": "25 bags",
+    "default_image": "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "25 bags",
+      "100 bags"
+    ]
+  },
+  {
+    "name": "Bru Instant Coffee",
+    "brand": "Bru",
+    "family": "Instant Coffee",
+    "description": "India beloved blend of 70 percent coffee and 30 percent chicory, roasted to aromatic perfection.",
+    "sell_mode": "Fixed",
+    "default_quantity": "100 g",
+    "default_image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "50 g",
+      "100 g",
+      "200 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Bru Green Label Filter Coffee",
+    "brand": "Bru",
+    "family": "Filter Coffee",
+    "description": "Traditional South Indian filter coffee blend with 53 percent coffee and 47 percent chicory.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "200 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Nescafé Classic Instant Coffee",
+    "brand": "Nescafé",
+    "family": "Instant Coffee",
+    "description": "100% pure soluble coffee granules made from medium-dark roasted Robusta coffee beans.",
+    "sell_mode": "Fixed",
+    "default_quantity": "100 g",
+    "default_image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "25 g",
+      "50 g",
+      "100 g",
+      "200 g"
+    ]
+  },
+  {
+    "name": "Nescafé Sunrise Instant Coffee",
+    "brand": "Nescafé",
+    "family": "Instant Coffee",
+    "description": "Slow-roasted Arabica and Robusta coffee beans expertly blended with chicory.",
+    "sell_mode": "Fixed",
+    "default_quantity": "100 g",
+    "default_image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "50 g",
+      "100 g",
+      "200 g",
+      "500 g"
+    ]
+  },
+  {
+    "name": "Local Fresh Roasted Filter Coffee Powder",
+    "brand": "Local Roaster",
+    "family": "Filter Coffee",
+    "description": "Freshly ground Wayanad Robusta and Arabica coffee beans roasted locally to custom aroma.",
+    "sell_mode": "Manual",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "100 g",
+      "250 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Horlicks Classic Malt Drink",
+    "brand": "Horlicks",
+    "family": "Health Drinks",
+    "description": "Nourishing malt-based health food drink clinically proven to support bone, muscle, and cognitive health.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "200 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Horlicks Chocolate Delight",
+    "brand": "Horlicks",
+    "family": "Health Drinks",
+    "description": "Rich chocolate flavored wholesome malted cereal milk drink.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Boost Energy & Stamina Drink",
+    "brand": "Boost",
+    "family": "Health Drinks",
+    "description": "Malted chocolate energy drink enriched with Envita nutrients including Iron, Vitamin A, C, B12, and Folic Acid.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "200 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Cadbury Bournvita Chocolate Drink",
+    "brand": "Bournvita",
+    "family": "Health Drinks",
+    "description": "Malted cocoa nutrition drink formulated with Inner Strength Formula containing Vitamin D, Calcium, and Iron.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "200 g",
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Complan Royal Chocolate Nutrition Drink",
+    "brand": "Complan",
+    "family": "Health Drinks",
+    "description": "100 percent milk protein complete nutrition drink with 34 vital nutrients supporting growth.",
+    "sell_mode": "Fixed",
+    "default_quantity": "500 g",
+    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "500 g",
+      "1 kg"
+    ]
+  },
+  {
+    "name": "Fresh Tender Coconut (Karikku)",
+    "brand": "Local Farm",
+    "family": "Natural Beverages",
+    "description": "Fresh green tender coconut with naturally sweet electrolyte-rich water and delicate soft coconut flesh.",
+    "sell_mode": "Fixed",
+    "default_quantity": "1 pc",
+    "default_image": "https://images.unsplash.com/photo-1544253102-14a0980ffbb5?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "1 pc",
+      "2 pcs",
+      "4 pcs"
+    ]
+  },
+  {
+    "name": "Traditional Sambharam (Spiced Buttermilk)",
+    "brand": "Local Dairy",
+    "family": "Traditional Beverages",
+    "description": "Chilled freshly churned buttermilk seasoned with crushed ginger, green chillies, shallots, and curry leaves.",
+    "sell_mode": "Manual",
+    "default_quantity": "1 L",
+    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "500 ml",
+      "1 L"
+    ]
+  },
+  {
+    "name": "Fresh Lime Juice / Soda",
+    "brand": "Local Cafe",
+    "family": "Fresh Juices",
+    "description": "Freshly squeezed juicy yellow lime mixed with chilled water or bubbling soda, sweet or salt.",
+    "sell_mode": "Fixed",
+    "default_quantity": "300 ml",
+    "default_image": "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "300 ml",
+      "500 ml"
+    ]
+  },
+  {
+    "name": "Kinley Packaged Drinking Water",
+    "brand": "Kinley",
+    "family": "Drinking Water",
+    "description": "Reverse osmosis purified drinking water with added minerals.",
+    "sell_mode": "Fixed",
+    "default_quantity": "1 L",
+    "default_image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "500 ml",
+      "1 L",
+      "2 L"
+    ]
+  },
+  {
+    "name": "Bisleri Packaged Mineral Water",
+    "brand": "Bisleri",
+    "family": "Drinking Water",
+    "description": "Pure mineral water with essential minerals passing through a 10-step purification process.",
+    "sell_mode": "Fixed",
+    "default_quantity": "1 L",
+    "default_image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "500 ml",
+      "1 L",
+      "2 L",
+      "5 L"
+    ]
+  },
+  {
+    "name": "Kinley Club Soda",
+    "brand": "Kinley",
+    "family": "Carbonated Water",
+    "description": "Extra bubbly carbonated water, perfect for kulukki sarbath, fresh lime soda, and drinks.",
+    "sell_mode": "Fixed",
+    "default_quantity": "750 ml",
+    "default_image": "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=500&auto=format&fit=crop&q=80",
+    "variants": [
+      "750 ml"
+    ]
+  }
+]

@@ -44,7 +44,31 @@ const CUSTOM_SYNONYMS: Record<string, string[]> = {
   // Chicken (kozhi/murgi)
   'chicken': ['chicken', 'chiken', 'kozhi', 'കോഴി', 'murgi', 'मुर्गी', 'دجاج', 'kozhi ഇറച്ചി'],
   // Watermelon (vatakka/thannimathan)
-  'water melon': ['watermelon', 'water melon', 'whater melon', 'watamelon', 'vatakka', 'തണ്ണിമത്തൻ', 'വതക്ക']
+  'water melon': ['watermelon', 'water melon', 'whater melon', 'watamelon', 'vatakka', 'തണ്ണിമത്തൻ', 'വതക്ക'],
+  // Tea
+  'tea': ['tea', 'chaya', 'chaaya', 'ചായ', 'chai', 'tea powder'],
+  // Coffee
+  'coffee': ['coffee', 'kaapi', 'kapi', 'കാപ്പി', 'coffee powder'],
+  // Potato
+  'potato': ['potato', 'potatoes', 'urula', 'urulakkizhangu', 'ഉരുളക്കിഴങ്ങ്', 'aalu', 'aloo', 'ആലു'],
+  // Milk
+  'milk': ['milk', 'paal', 'pal', 'പാൽ', 'doodh', 'دودھ'],
+  // Chilli
+  'chilli': ['chilli', 'chili', 'mulak', 'mulaku', 'മുളക്', 'mirch', 'kashmiri chilli'],
+  // Rice
+  'rice': ['rice', 'ari', 'അരി', 'chawal', 'ബിരിയാണി അരി'],
+  // Coconut oil / Oil
+  'oil': ['oil', 'velichenna', 'enna', 'വെളിച്ചെണ്ണ', 'എണ്ണ', 'tail'],
+  // Masala / Spices
+  'masala': ['masala', 'masalappodi', 'മസാല', 'spice', 'spices', 'powder', 'പൊടി'],
+  // Sugar
+  'sugar': ['sugar', 'panchasara', 'പഞ്ചസാര', 'cheeni', 'shakkara'],
+  // Salt
+  'salt': ['salt', 'uppu', 'ഉപ്പ്', 'namak'],
+  // Fish
+  'fish': ['fish', 'meen', 'മീൻ', 'machli'],
+  // Meat / Beef / Mutton
+  'meat': ['meat', 'erachi', 'irachi', 'ഇറച്ചി', 'beef', 'mutton', 'pothu', 'പോത്തിറച്ചി', 'പോത്ത്']
 };
 
 function normalizeSearchQuery(input: string): string {
@@ -165,8 +189,7 @@ async function fetchDatabaseData(): Promise<CacheData> {
       categories:category_id(id, name, is_active, category_translations(category_id, language_code, name))
     `)
     .eq('is_active', true)
-    .is('deleted_at', null)
-    .eq('status', 'published');
+    .is('deleted_at', null);
 
   if (error) {
     console.error("Supabase search seed load error:", error.message);
@@ -240,7 +263,7 @@ export async function GET(request: NextRequest) {
     let matchedItems = data.items.filter(item => {
       const shop = item.shops;
       const category = item.categories;
-      if (item.deleted_at || !item.is_active || item.status !== 'published') return false;
+      if (item.deleted_at || !item.is_active) return false;
       if (!shop || shop.type?.includes('_inactive')) return false;
       if (item.category_id && (!category || !category.is_active)) return false;
       if (shopId && item.shop_id !== shopId) return false;

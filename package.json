@@ -1,0 +1,28 @@
+{
+  "name": "angadi-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Angadi — Hyperlocal Multi-Vendor Community Marketplace (Web, Flutter Mobile, Supabase)",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix web run start",
+    "lint": "npm --prefix web run lint",
+    "web:dev": "npm --prefix web run dev",
+    "web:build": "npm --prefix web run build",
+    "web:start": "npm --prefix web run start",
+    "web:lint": "npm --prefix web run lint",
+    "analyze": "node web/scripts/analyze_codebase.js",
+    "test:qa": "node web/scripts/test_full_system_qa.js"
+  },
+  "keywords": [
+    "angadi",
+    "ecommerce",
+    "multivendor",
+    "nextjs",
+    "flutter",
+    "supabase"
+  ],
+  "author": "Angadi Team",
+  "license": "UNLICENSED"
+}

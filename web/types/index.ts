@@ -109,10 +109,18 @@ export interface Category {
   id: string
   name: string
   description?: string
+  image_url?: string
   is_active: boolean
   display_order?: number
   commission_percentage?: number
   updated_at: string
+  category_translations?: Array<{
+    id?: string
+    category_id?: string
+    language_code: string
+    name: string
+  }>
+  item_count?: number
 }
 
 export interface UnitGroup {
@@ -140,6 +148,8 @@ export interface DemoItem {
   default_image?: string
   demo_version?: number
   translations?: any
+  code?: string
+  display_order?: number
 }
 
 export interface DemoSellConfig {

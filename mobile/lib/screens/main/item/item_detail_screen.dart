@@ -7,6 +7,7 @@ import '../../../core/language_service.dart';
 import '../../../theme/theme_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../widgets/tutorial/tutorial_manager.dart';
+import '../../../widgets/app_cached_image.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final String itemId;
@@ -111,7 +112,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                         fit: StackFit.expand,
                         children: [
                           activeImg != null
-                              ? Image.network(activeImg, fit: BoxFit.cover)
+                              ? AppCachedImage(
+                                  imageUrl: activeImg,
+                                  fit: BoxFit.cover,
+                                  memCacheWidth: 800,
+                                  memCacheHeight: 800,
+                                )
                               : const Center(child: Text('📦', style: TextStyle(fontSize: 80))),
                           // Bottom shadow overlay
                           const Positioned.fill(

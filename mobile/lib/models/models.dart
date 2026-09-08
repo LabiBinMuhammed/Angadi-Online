@@ -71,6 +71,7 @@ class Category {
   final String name;
   final bool isActive;
   final double commissionPercentage;
+  final String? imageUrl;
   final List<Map<String, dynamic>>? categoryTranslations;
 
   const Category({
@@ -78,6 +79,7 @@ class Category {
     required this.name,
     this.isActive = true,
     this.commissionPercentage = 4.0,
+    this.imageUrl,
     this.categoryTranslations,
   });
 
@@ -86,6 +88,7 @@ class Category {
         name: json['name'] as String,
         isActive: json['is_active'] as bool? ?? true,
         commissionPercentage: (json['commission_percentage'] as num?)?.toDouble() ?? 4.0,
+        imageUrl: json['image_url'] as String?,
         categoryTranslations: (json['category_translations'] as List?)
             ?.map((e) => Map<String, dynamic>.from(e as Map))
             .toList(),
@@ -294,6 +297,17 @@ class Item {
       desc = desc.split(RegExp(r'\n*Keywords:', caseSensitive: false))[0].trim();
     }
     return desc;
+  }
+
+  double get effectivePrice {
+    if (itemVariants.isNotEmpty) {
+      final defaultVar = itemVariants.firstWhere((v) => v.isDefault, orElse: () => itemVariants.first);
+      return defaultVar.price ?? 0.0;
+    }
+    if (itemSellConfig.isNotEmpty && itemSellConfig.first.pricePerBaseUnit != null) {
+      return itemSellConfig.first.pricePerBaseUnit!;
+    }
+    return 0.0;
   }
 }
 

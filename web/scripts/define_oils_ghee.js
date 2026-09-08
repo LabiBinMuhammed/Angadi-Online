@@ -1,0 +1,449 @@
+const fs = require('fs');
+
+// ==========================================
+// CATEGORY A: OILS & GHEE (Target: 45-60 items)
+// ==========================================
+const OILS_GHEE = [
+  // 1. Coconut Oils (Kerala Core)
+  {
+    name: "Coconut Oil",
+    desc: "Pure edible coconut oil expeller-pressed from sun-dried copra; the cornerstone cooking oil of Kerala cuisine for curries, roasts, and frying.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["200 ml", "500 ml", "1 L", "2 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Roasted Coconut Oil",
+    desc: "Traditional Kerala hot-processed coconut oil, locally known as Urukku Velichenna; prepared by boiling fresh coconut milk, prized for infant massage and traditional wellness.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["100 ml", "250 ml", "500 ml"],
+    img: ""
+  },
+  {
+    name: "Virgin Coconut Oil",
+    desc: "Cold-extracted unrefined virgin coconut oil produced directly from fresh coconut milk without heat; delicate aroma for direct culinary consumption and dressings.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml", "500 ml", "1 L"],
+    img: ""
+  },
+  {
+    name: "Cold-Pressed Coconut Oil",
+    desc: "Gently extracted unheated coconut oil retaining natural volatile aroma compounds, antioxidants, and pure coconut flavor.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Wood-Pressed Coconut Oil",
+    desc: "Traditional wooden marachekku pressed coconut oil extracted at very low revolutions to preserve authentic rustic taste and clarity.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Filtered Coconut Oil",
+    desc: "Micro-filtered clear coconut oil with moisture removed, providing extended shelf stability and clean burning smoke point for deep frying.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "2 L"],
+    img: ""
+  },
+  {
+    name: "Loose Coconut Oil",
+    desc: "Fresh unbranded coconut oil dispensed loose by volume directly from local oil mills into customer containers.",
+    qty: "1 L",
+    sell_mode: "Manual",
+    unit_symbol: "L",
+    variants: [],
+    img: ""
+  },
+  {
+    name: "Organic Coconut Oil",
+    desc: "Certified organic pure coconut oil milled from pesticide-free organically farmed coconuts.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+
+  // 2. Mainstream Cooking Oils (South Indian & Kerala Staples)
+  {
+    name: "Sesame Oil",
+    desc: "Pure expeller-pressed sesame seed oil, commonly known as Gingelly Oil or Nallenna; essential for tempering South Indian sambar, rasam, and traditional pickles.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["200 ml", "500 ml", "1 L", "2 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Cold-Pressed Sesame Oil",
+    desc: "Unrefined gingelly oil pressed at low temperatures without chemical refining; robust aroma preferred for traditional pickles and ayurvedic oil baths.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+  {
+    name: "Wood-Pressed Sesame Oil",
+    desc: "Authentic wooden chekku pressed gingelly oil sweetened with palm jaggery in the traditional South Indian extraction method.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+  {
+    name: "Loose Sesame Oil",
+    desc: "Fresh unbranded gingelly oil sold loose by volume at traditional grocery and oil mill counters.",
+    qty: "1 L",
+    sell_mode: "Manual",
+    unit_symbol: "L",
+    variants: [],
+    img: ""
+  },
+  {
+    name: "Sunflower Oil",
+    desc: "Light and clear refined sunflower oil with a high smoke point; universally stocked across Kerala for neutral everyday cooking, shallow frying, and baking.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "2 L", "5 L", "15 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Cold-Pressed Sunflower Oil",
+    desc: "Unrefined sunflower oil extracted from raw sunflower kernels; mild nutty flavor suitable for healthy sautéing and salad dressings.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+  {
+    name: "Groundnut Oil",
+    desc: "Refined peanut cooking oil, locally known as Kadalaenna; popular for crisp deep frying of Kerala banana chips and evening snacks.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Cold-Pressed Groundnut Oil",
+    desc: "Traditional cold-pressed peanut oil with rich nutty aroma and natural golden color; favored for authentic snack preparation.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Wood-Pressed Groundnut Oil",
+    desc: "Pure wood-pressed groundnut oil milled using traditional wooden mortars without chemical solvents.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+  {
+    name: "Mustard Oil",
+    desc: "Pungent cold-pressed mustard seed oil, locally called Kadukenna or Kachi Ghani; distinctive sharp aroma used in select spicy pickles and curries.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Rice Bran Oil",
+    desc: "High-smoke-point edible oil extracted from the hard outer brown layer of rice; popular neutral cooking medium in Kerala homes and restaurants.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "2 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Palmolein Oil",
+    desc: "Refined liquid fraction of palm oil widely utilized in commercial bakeries, catering, and economical household deep frying.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L", "15 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Soybean Oil",
+    desc: "Refined light vegetable oil extracted from whole soybeans; economical neutral medium for everyday household cooking.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Corn Oil",
+    desc: "Refined maize germ cooking oil with a high smoke point; well suited for deep frying and non-stick pan cooking.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Canola Oil",
+    desc: "Refined low-erucic rapeseed oil with light texture and neutral flavor; popular for multi-purpose culinary sautéing.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "2 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Safflower Oil",
+    desc: "Light edible vegetable oil extracted from safflower seeds, known as Kardi oil; favored for delicate stir-fries and dressings.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Cottonseed Oil",
+    desc: "Refined cooking oil extracted from cotton plant seeds; frequently used in commercial food service and savory mixture frying.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Blended Vegetable Cooking Oil",
+    desc: "Dual-source refined vegetable oil blend formulated for balanced fatty acids and high stability during prolonged frying.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+
+  // 3. Specialty Culinary Oils
+  {
+    name: "Olive Oil",
+    desc: "Refined culinary olive oil blended with virgin olive oil; suitable for medium-heat cooking, pasta dishes, and continental recipes.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "2 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Extra Virgin Olive Oil",
+    desc: "First cold-pressed unrefined olive oil with low acidity and fruity bouquet; ideal for cold drizzling over salads and fresh dips.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml", "500 ml", "1 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Olive Pomace Oil",
+    desc: "Refined solvent-extracted olive oil blend with high heat tolerance; suitable for everyday Indian deep frying and shallow pan cooking.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["1 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500"
+  },
+  {
+    name: "Flaxseed Oil",
+    desc: "Cold-pressed edible oil extracted from whole flaxseeds; rich in alpha-linolenic acid, consumed cold in dressings and smoothies.",
+    qty: "250 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml", "500 ml"],
+    img: ""
+  },
+  {
+    name: "Avocado Oil",
+    desc: "Pure cold-pressed oil extracted from the fleshy pulp of avocados; mild buttery flavor with an exceptionally high smoke point.",
+    qty: "250 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml", "500 ml"],
+    img: ""
+  },
+  {
+    name: "Almond Oil",
+    desc: "100% pure edible sweet almond oil cold-pressed from premium dried almonds; used in desserts, infant massage, and wellness diets.",
+    qty: "100 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["50 ml", "100 ml", "200 ml"],
+    img: ""
+  },
+  {
+    name: "Walnut Oil",
+    desc: "Delicate cold-pressed culinary oil extracted from dried English walnuts; rich nutty finish for gourmet salads and confectionery.",
+    qty: "250 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml"],
+    img: ""
+  },
+  {
+    name: "Grapeseed Oil",
+    desc: "Clean light oil extracted from pressed grape seeds; neutral palate preferred for emulsified sauces, marinades, and high-heat cooking.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+  {
+    name: "Castor Oil",
+    desc: "Cold-drawn pure castor seed oil, locally known as Aavanakkenna; traditional Kerala household oil used for hair nourishment and oil lamps.",
+    qty: "200 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["100 ml", "200 ml", "500 ml"],
+    img: ""
+  },
+  {
+    name: "Neem Oil",
+    desc: "Pure bitter oil pressed from whole neem seeds, locally called Veppenna; traditional non-culinary topical and home garden oil.",
+    qty: "100 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["100 ml", "200 ml"],
+    img: ""
+  },
+  {
+    name: "Pooja Deepam Oil",
+    desc: "Panchadeepam blend of traditional vegetable oils scented with camphor and spices; formulated for clean burning ritual brass lamps.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L"],
+    img: ""
+  },
+
+  // 4. Ghee & Traditional Clarified Butter
+  {
+    name: "Cow Ghee",
+    desc: "Golden granulated clarified butter prepared from fresh cow milk fat; essential Kerala festive staple for Nei Choru, Sadya parippu, and payasams.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["100 ml", "200 ml", "500 ml", "1 L", "5 L"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Desi Cow Ghee",
+    desc: "Artisanal clarified butter prepared from the milk of indigenous desi cows; renowned for deep natural aroma and golden grain texture.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml", "500 ml", "1 L"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Bilona Cow Ghee",
+    desc: "Traditional hand-churned cultured ghee made by setting whole cow milk into curd and slow-clarifying the makhana butter over firewood.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["250 ml", "500 ml", "1 L"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Buffalo Ghee",
+    desc: "Pure clarified butter made from high-fat buffalo milk; white appearance with a dense creamy flavor, popular for Indian sweets and baking.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["500 ml", "1 L"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Biriyani Ghee",
+    desc: "Specially clarified high-aroma cow ghee tailored for flavoring authentic Malabar biryanis, ghee rice, and rich meat curries.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["200 ml", "500 ml", "1 L"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Loose Cow Ghee",
+    desc: "Fresh unbranded clarified cow ghee scooped and sold loose by weight or volume at local dairy and grocery counters.",
+    qty: "1 kg",
+    sell_mode: "Manual",
+    unit_symbol: "kg",
+    variants: [],
+    img: ""
+  },
+  {
+    name: "Organic Cow Ghee",
+    desc: "Pure clarified cow butter prepared exclusively from certified organic dairy farms following pesticide-free cattle feeding.",
+    qty: "500 ml",
+    sell_mode: "Fixed",
+    unit_symbol: "ml",
+    variants: ["500 ml", "1 L"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Vanaspati",
+    desc: "Hydrogenated vegetable fat, commonly known as Dalda; traditional economical baking fat and deep frying medium for bakery sweets and snacks.",
+    qty: "1 L",
+    sell_mode: "Fixed",
+    unit_symbol: "L",
+    variants: ["500 ml", "1 L", "5 L"],
+    img: ""
+  },
+  {
+    name: "Table Butter",
+    desc: "Pasteurized salted dairy butter churned from pure cow milk cream; daily household spread for breakfast toast, parottas, and cooking.",
+    qty: "500 g",
+    sell_mode: "Fixed",
+    unit_symbol: "g",
+    variants: ["100 g", "500 g"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Cooking Butter",
+    desc: "Fresh unsalted white dairy butter, locally called Nadan Venna; essential for clarifying into homemade ghee, traditional sweets, and baking.",
+    qty: "500 g",
+    sell_mode: "Fixed",
+    unit_symbol: "g",
+    variants: ["200 g", "500 g", "1 kg"],
+    img: "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500"
+  },
+  {
+    name: "Loose Cooking Butter",
+    desc: "Fresh unbranded unsalted white dairy butter sold loose by weight at local dairy and village grocery shops.",
+    qty: "1 kg",
+    sell_mode: "Manual",
+    unit_symbol: "kg",
+    variants: [],
+    img: ""
+  }
+];
+
+console.log('Oils & Ghee items defined:', OILS_GHEE.length);
+fs.writeFileSync('d:/Labeeb/ANGADI/web/scripts/oils_ghee_data.json', JSON.stringify(OILS_GHEE, null, 2), 'utf8');

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useTransition } from 'react'
 import Link from 'next/link'
-import { ShoppingCart, Send, Plus, Minus, ChevronDown, X, Heart, Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Package, Smile, Paperclip, Scale, RefreshCw, Scissors } from 'lucide-react'
+import { Search, ShoppingCart, Send, Plus, Minus, ChevronDown, X, Heart, Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Package, Smile, Paperclip, Scale, RefreshCw, Scissors } from 'lucide-react'
 import type { Item, Category, Unit, ItemVariant, ItemSellConfig } from '@/types'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 import { addToCart as dbAddToCart, removeOrderItem as dbRemoveOrderItem, updateOrderItemQty as dbUpdateOrderItemQty } from '../../cart/actions'
@@ -84,6 +84,24 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
     })
   }
 
+  const ITEM_SYNONYMS: Record<string, string[]> = {
+    'onion': ['onion', 'onions', 'ulli', 'savala', 'savola', 'sawala', 'സവാള', 'ഉള്ളി', 'pyaz', 'pyaaz', 'प्याज'],
+    'tomato': ['tomato', 'tomatoes', 'thakkali', 'തക്കാളി', 'tamatar', 'टमाटर'],
+    'chicken': ['chicken', 'chiken', 'kozhi', 'കോഴി', 'murgi', 'മുർഗി'],
+    'tea': ['tea', 'chaya', 'chaaya', 'ചായ', 'chai'],
+    'coffee': ['coffee', 'kaapi', 'kapi', 'കാപ്പി'],
+    'potato': ['potato', 'potatoes', 'urula', 'urulakkizhangu', 'ഉരുളക്കിഴങ്ങ്', 'aalu', 'aloo'],
+    'milk': ['milk', 'paal', 'pal', 'പാൽ'],
+    'chilli': ['chilli', 'chili', 'mulak', 'mulaku', 'മുളക്', 'mirch'],
+    'rice': ['rice', 'ari', 'അരി', 'chawal'],
+    'oil': ['oil', 'velichenna', 'enna', 'വെളിച്ചെണ്ണ', 'എണ്ണ'],
+    'masala': ['masala', 'masalappodi', 'മസാല', 'spice', 'powder', 'പൊടി'],
+    'sugar': ['sugar', 'panchasara', 'പഞ്ചസാര'],
+    'salt': ['salt', 'uppu', 'ഉപ്പ്'],
+    'fish': ['fish', 'meen', 'മീൻ'],
+    'meat': ['meat', 'erachi', 'irachi', 'ഇറച്ചി', 'beef', 'mutton', 'pothu', 'പോത്ത്']
+  }
+
   const filtered = useMemo(() => {
     let list = items
     if (activeCat !== 'all') {
@@ -102,6 +120,27 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
         for (const t of translations) {
           if (t.name?.toLowerCase().includes(q)) return true
           if (t.description?.toLowerCase().includes(q)) return true
+        }
+
+        // 3. Match synonyms
+        for (const [key, synonyms] of Object.entries(ITEM_SYNONYMS)) {
+          const itemHasKey = item.name.toLowerCase().includes(key) || 
+            translations.some((t: any) => t.name?.toLowerCase().includes(key))
+          if (itemHasKey) {
+            const matchesSyn = synonyms.some(syn => syn.toLowerCase().includes(q) || q.includes(syn.toLowerCase()))
+            if (matchesSyn) return true
+          }
+        }
+
+        // 4. Multi-word search
+        const words = q.split(/\s+/).filter(w => w.length >= 2)
+        if (words.length > 1) {
+          const allWordsMatch = words.every(word => {
+            if (item.name.toLowerCase().includes(word)) return true
+            if (item.description?.toLowerCase().includes(word)) return true
+            return translations.some((t: any) => t.name?.toLowerCase().includes(word) || t.description?.toLowerCase().includes(word))
+          })
+          if (allWordsMatch) return true
         }
 
         return false
@@ -259,7 +298,7 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
 
   return (
     <div className="catalog-wrapper">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style suppressHydrationWarning dangerouslySetInnerHTML={{ __html: `
         /* ─── Premium Product Card Styles ─── */
         .premium-card {
           background: #ffffff;
@@ -526,6 +565,37 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
           background: var(--wa-green-light);
           color: var(--wa-green-dark);
         }
+
+        /* ─── Catalog Grid Responsive Rules ─── */
+        .catalog-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          padding: 16px 24px 80px;
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 0;
+        }
+        @media (min-width: 768px) {
+          .catalog-grid {
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 16px !important;
+            padding: 16px 24px 80px !important;
+          }
+        }
+        @media (max-width: 767px) {
+          .catalog-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+            padding: 12px 12px 60px !important;
+          }
+        }
+        @media (max-width: 360px) {
+          .catalog-grid {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+          }
+        }
       `}} />
 
       {restrictionLevel >= 3 && (
@@ -550,6 +620,55 @@ export default function ShopCatalogClient({ items, categories, shopId, shopName,
           </div>
         </div>
       )}
+
+      {/* ── Catalog Search Bar ────────────────────────────── */}
+      <div style={{ padding: '16px 24px 4px' }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          background: 'var(--bg-muted, #f1f5f9)',
+          borderRadius: '16px',
+          padding: '0 16px',
+          border: '1.5px solid var(--border, rgba(0,0,0,0.06))',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+        }}>
+          <Search size={18} color="var(--wa-green, #25D366)" strokeWidth={2.5} style={{ flexShrink: 0, marginRight: '10px' }} />
+          <input
+            type="text"
+            placeholder={t('home.search_items') || 'Search items in this shop...'}
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            style={{
+              flex: 1,
+              border: 'none',
+              background: 'transparent',
+              padding: '12px 0',
+              fontSize: '14px',
+              outline: 'none',
+              color: 'var(--text-base, #0f172a)',
+              fontWeight: 500
+            }}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery('')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                color: 'var(--text-muted, #64748b)'
+              }}
+              aria-label="Clear search"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* ── Category chips ───────────────────────────────── */}
       <div className="catalog-cats">

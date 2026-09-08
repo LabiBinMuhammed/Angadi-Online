@@ -10,6 +10,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:village_market/l10n/app_localizations.dart';
 import '../../../core/supabase_client.dart';
 import '../../widgets/image_source_picker_sheet.dart';
+import '../../widgets/app_cached_image.dart';
 import 'vendor_theme_helper.dart';
 
 extension StringExtension on String? {
@@ -32,6 +33,10 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
   final _manualPriceCtrl = TextEditingController();
   final _newOptMeasureCtrl = TextEditingController();
   final _newOptPriceCtrl = TextEditingController();
+  final _searchCtrl = TextEditingController();
+
+  String _selectedBrand = 'All';
+  bool _loadingCategoryDemos = false;
 
   bool _isActive = true;
   bool _loading = false;
@@ -87,6 +92,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
 
   @override
   void dispose() {
+    _searchCtrl.dispose();
     _nameCtrl.dispose();
     _descCtrl.dispose();
     _manualUnitCtrl.dispose();
@@ -837,12 +843,7 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           itemBuilder: (context, index) {
             final cat = _categories[index];
             return InkWell(
-              onTap: () {
-                setState(() {
-                  _categoryId = cat['id'] as String;
-                  _step = 2;
-                });
-              },
+              onTap: () => _selectCategory(cat['id'] as String),
               borderRadius: BorderRadius.circular(16),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -864,8 +865,104 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
     );
   }
 
+  Future<void> _selectCategory(String catId) async {
+    setState(() {
+      _categoryId = catId;
+      _searchCtrl.clear();
+      _selectedBrand = 'All';
+      _step = 2;
+    });
+
+    final existing = _demoItems.where((d) => d['category_id'] == catId).toList();
+    if (existing.isNotEmpty) return;
+
+    setState(() => _loadingCategoryDemos = true);
+    try {
+      final res = await supabase
+          .from('demo_items')
+          .select('*')
+          .eq('category_id', catId)
+          .order('display_order', ascending: true);
+
+      final demoList = List<Map<String, dynamic>>.from(res as List);
+      final demoIds = demoList.map((d) => d['id'] as String).toList();
+
+      if (demoIds.isNotEmpty) {
+        final configsRes = await supabase.from('demo_sell_config').select('*').inFilter('demo_item_id', demoIds);
+        final varsRes = await supabase.from('demo_variants').select('*').inFilter('demo_item_id', demoIds);
+
+        setState(() {
+          _demoItems.addAll(demoList);
+          _demoConfigs.addAll(List<Map<String, dynamic>>.from(configsRes as List));
+          _demoVariants.addAll(List<Map<String, dynamic>>.from(varsRes as List));
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching category items: $e');
+    } finally {
+      if (mounted) setState(() => _loadingCategoryDemos = false);
+    }
+  }
+
+  Widget _buildBrandChip(String label, int count) {
+    final isSel = _selectedBrand == label;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: InkWell(
+        onTap: () => setState(() => _selectedBrand = isSel && label != 'All' ? 'All' : label),
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: isSel ? const Color(0xFF3B82F6) : kVendorTransparentBg,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: isSel ? const Color(0xFF3B82F6) : kVendorTransparentBorder),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label == 'All' ? 'All ($count)' : '$label ($count)',
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: isSel ? FontWeight.bold : FontWeight.w500,
+              color: isSel ? Colors.white : kVendorSubText,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildStep2() {
-    final filteredDemos = _demoItems.where((d) => d['category_id'] == _categoryId).toList();
+    final cat = _categories.firstWhere((c) => c['id'] == _categoryId, orElse: () => {'name': 'Category'});
+    final catName = cat['name'] as String? ?? 'Category';
+    final categoryDemos = _demoItems.where((d) => d['category_id'] == _categoryId).toList();
+
+    // Extract brands
+    final brandCounts = <String, int>{};
+    for (final d in categoryDemos) {
+      final name = (d['name'] as String? ?? '').trim();
+      if (name.contains(' ')) {
+        final first = name.split(' ').first;
+        if (!['fresh', 'raw', 'green', 'red', 'organic', 'cut', 'by', 'packet', 'pure', 'classic'].contains(first.toLowerCase())) {
+          brandCounts[first] = (brandCounts[first] ?? 0) + 1;
+        }
+      }
+    }
+    final brandList = brandCounts.entries.where((e) => e.value >= 2).map((e) => e.key).toList();
+    brandList.sort();
+
+    final query = _searchCtrl.text.trim().toLowerCase();
+    final filteredDemos = categoryDemos.where((d) {
+      final name = (d['name'] as String? ?? '').toLowerCase();
+      final code = (d['code'] as String? ?? '').toLowerCase();
+      if (_selectedBrand != 'All' && !name.contains(_selectedBrand.toLowerCase())) {
+        return false;
+      }
+      if (query.isNotEmpty && !name.contains(query) && !code.contains(query)) {
+        return false;
+      }
+      return true;
+    }).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -873,76 +970,275 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '2. Select Base Item',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorText),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0x263B82F6),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        catName,
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF60A5FA)),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '(${categoryDemos.length} items)',
+                      style: TextStyle(fontSize: 11, color: kVendorSubText),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Select from Catalog',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: kVendorText),
+                ),
+              ],
             ),
-            VendorOutlineButton(
-              height: 36,
-              onPressed: () => setState(() => _step = 1),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.arrow_back, size: 14),
-                  SizedBox(width: 4),
-                  Text('Back', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                ],
-              ),
+            Row(
+              children: [
+                VendorOutlineButton(
+                  height: 34,
+                  onPressed: () => setState(() => _step = 1),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.arrow_back, size: 13),
+                      SizedBox(width: 4),
+                      Text('Change', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                VendorOutlineButton(
+                  height: 34,
+                  onPressed: _skipDemo,
+                  child: const Text('+ Custom', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        if (filteredDemos.isNotEmpty)
+        const SizedBox(height: 12),
+
+        // Search Bar
+        Container(
+          height: 42,
+          decoration: BoxDecoration(
+            color: kVendorTransparentBg,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: kVendorTransparentBorder),
+          ),
+          child: TextField(
+            controller: _searchCtrl,
+            onChanged: (_) => setState(() {}),
+            style: TextStyle(color: kVendorText, fontSize: 13),
+            decoration: InputDecoration(
+              hintText: 'Search $catName by name or brand...',
+              hintStyle: TextStyle(color: kVendorSubText, fontSize: 13),
+              prefixIcon: Icon(Icons.search, size: 18, color: kVendorSubText),
+              suffixIcon: _searchCtrl.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.clear, size: 16, color: kVendorSubText),
+                      onPressed: () => setState(() => _searchCtrl.clear()),
+                    )
+                  : null,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 10),
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        // Brand Pills
+        if (brandList.isNotEmpty) ...[
+          SizedBox(
+            height: 32,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: [
+                _buildBrandChip('All', categoryDemos.length),
+                ...brandList.map((b) => _buildBrandChip(b, brandCounts[b] ?? 0)),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
+        if (_loadingCategoryDemos)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 32),
+            child: Center(child: CircularProgressIndicator(color: Color(0xFF3B82F6))),
+          )
+        else if (filteredDemos.isNotEmpty)
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.8,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 0.68,
             ),
             itemCount: filteredDemos.length,
             itemBuilder: (context, index) {
               final demo = filteredDemos[index];
-              return InkWell(
-                onTap: () => _selectDemoItem(demo),
-                borderRadius: BorderRadius.circular(16),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0x1A3B82F6), // blue 10%
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: const Color(0x4D3B82F6)), // blue 30%
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        demo['name'] ?? '',
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF60A5FA), fontSize: 13),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+              final demoId = demo['id'] as String;
+              final config = _demoConfigs.firstWhere((c) => c['demo_item_id'] == demoId, orElse: () => {});
+              final price = config['price_per_base_unit'];
+              final imgUrl = demo['default_image'] as String?;
+
+              return Container(
+                decoration: BoxDecoration(
+                  color: kVendorTransparentBg,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: kVendorTransparentBorder),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Image container
+                    Expanded(
+                      flex: 5,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          if (imgUrl != null && imgUrl.isNotEmpty)
+                            AppCachedImage(
+                              imageUrl: imgUrl,
+                              fit: BoxFit.cover,
+                              errorWidget: Container(
+                                color: Colors.black26,
+                                child: Icon(Icons.shopping_bag_outlined, color: kVendorSubText, size: 28),
+                              ),
+                            )
+                          else
+                            Container(
+                              color: Colors.black26,
+                              child: Icon(Icons.shopping_bag_outlined, color: kVendorSubText, size: 28),
+                            ),
+                          // Mode badge
+                          Positioned(
+                            top: 6,
+                            left: 6,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: demo['sell_mode'] == 'Manual' ? const Color(0xE63B82F6) : const Color(0xE610B981),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                demo['sell_mode'] == 'Manual' ? 'Weight' : 'Pack',
+                                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                          // Price badge
+                          if (price != null && (double.tryParse(price.toString()) ?? 0) > 0)
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.black87,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: const Color(0x4DFBBF24)),
+                                ),
+                                child: Text(
+                                  '₹$price',
+                                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFFFBBF24)),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Mode: ${demo['sell_mode'] ?? 'Manual'}',
-                        style: TextStyle(fontSize: 10, color: kVendorSubText),
+                    ),
+                    // Details & Adopt button
+                    Expanded(
+                      flex: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              demo['name'] ?? '',
+                              style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 12),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 28,
+                              child: ElevatedButton.icon(
+                                onPressed: () => _selectDemoItem(demo),
+                                icon: const Icon(Icons.add, size: 13, color: Colors.white),
+                                label: const Text('Adopt', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF3B82F6),
+                                  padding: EdgeInsets.zero,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  elevation: 0,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               );
             },
           )
         else
-          Text(
-            'No templates found for this category.',
-            style: TextStyle(color: kVendorSubText, fontSize: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: kVendorTransparentBg,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: kVendorTransparentBorder),
+            ),
+            child: Column(
+              children: [
+                Icon(Icons.inventory_2_outlined, size: 36, color: kVendorSubText),
+                const SizedBox(height: 8),
+                Text(
+                  query.isNotEmpty ? 'No products matching "$query"' : 'No templates found',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: kVendorText, fontSize: 13),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'You can add this as a custom product',
+                  style: TextStyle(color: kVendorSubText, fontSize: 11),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () {
+                    if (query.isNotEmpty) _nameCtrl.text = query;
+                    _skipDemo();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B82F6),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Text(
+                    query.isNotEmpty ? '+ Create "$query"' : '+ Create Custom Item',
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
           ),
-        const SizedBox(height: 24),
-        Divider(color: kVendorDivider),
         const SizedBox(height: 16),
         VendorOutlineButton(
           width: double.infinity,

@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Item, Category, DemoItem, Unit, DemoSellConfig, DemoVariant } from '@/types'
-import { Package, Save, AlertCircle, ArrowRight, ArrowLeft, Plus, Trash2, Edit, Check, Eye, Store, Sparkles, PenTool, Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish } from 'lucide-react'
+import { Package, Save, AlertCircle, ArrowRight, ArrowLeft, Plus, Trash2, Edit, Check, Eye, Store, Sparkles, PenTool, Carrot, Apple, Milk, Wheat, Flame, Croissant, GlassWater, Fish, Search, X, Tag, Filter, CheckCircle2, Loader2 } from 'lucide-react'
 import ImageUploader from '@/components/ImageUploader'
-import { parseVariantLabel } from '@/lib/utils/parser'
 import { useTranslation } from '@/lib/i18n/I18nContext'
+import { findCatalogProduct, getCategoryBrands } from '@/lib/catalog/brandRegistry'
 
 type Props = {
   item: Item | null
@@ -196,15 +196,153 @@ export default function ItemFormClient({
     setForm(f => ({ ...f, [key]: val }))
   }
 
+  // Catalog Discovery state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedBrand, setSelectedBrand] = useState('All')
+  const [itemBrand, setItemBrand] = useState('')
+  const [allDemos, setAllDemos] = useState<DemoItem[]>(demoItems)
+  const [allConfigs, setAllConfigs] = useState<DemoSellConfig[]>(demoConfigs)
+  const [allVariants, setAllVariants] = useState<DemoVariant[]>(demoVariants)
+  const [loadingCategory, setLoadingCategory] = useState(false)
+  const cacheRef = useRef<Record<string, { demos: DemoItem[], configs: DemoSellConfig[], variants: DemoVariant[] }>>({})
+
+  // Category selection handler with on-demand fetching to bypass 1000 row limits
+  async function selectCategory(catId: string) {
+    set('category_id', catId)
+    setSearchQuery('')
+    setSelectedBrand('All')
+    setItemBrand('')
+    setStep(2)
+
+    if (cacheRef.current[catId]) {
+      const cached = cacheRef.current[catId]
+      setAllDemos(prev => [...prev.filter(d => d.category_id !== catId), ...cached.demos])
+      setAllConfigs(prev => [...prev.filter(c => !cached.demos.some(d => d.id === c.demo_item_id)), ...cached.configs])
+      setAllVariants(prev => [...prev.filter(v => !cached.demos.some(d => d.id === v.demo_item_id)), ...cached.variants])
+      return
+    }
+
+    try {
+      setLoadingCategory(true)
+      const supabase = createClient()
+      const { data: catDemos } = await supabase
+        .from('demo_items')
+        .select('*')
+        .eq('category_id', catId)
+        .order('display_order', { ascending: true })
+
+      if (catDemos && catDemos.length > 0) {
+        const demoIds = catDemos.map(d => d.id)
+        const [{ data: cfgs }, { data: vars }] = await Promise.all([
+          supabase.from('demo_sell_config').select('*').in('demo_item_id', demoIds),
+          supabase.from('demo_variants').select('*').in('demo_item_id', demoIds)
+        ])
+
+        cacheRef.current[catId] = {
+          demos: catDemos,
+          configs: (cfgs || []) as DemoSellConfig[],
+          variants: (vars || []) as DemoVariant[]
+        }
+
+        setAllDemos(prev => [...prev.filter(d => d.category_id !== catId), ...catDemos])
+        if (cfgs) setAllConfigs(prev => [...prev.filter(c => !demoIds.includes(c.demo_item_id)), ...cfgs])
+        if (vars) setAllVariants(prev => [...prev.filter(v => !demoIds.includes(v.demo_item_id)), ...vars])
+      }
+    } catch (e) {
+      console.error('Failed loading category items:', e)
+    } finally {
+      setLoadingCategory(false)
+    }
+  }
+
   const categoryDemos = useMemo(() => {
     if (!form.category_id) return []
-    return demoItems.filter(d => d.category_id === form.category_id)
-  }, [form.category_id, demoItems])
+    return allDemos.filter(d => d.category_id === form.category_id)
+  }, [form.category_id, allDemos])
+
+  const categoryName = useMemo(() => {
+    return categories.find(c => c.id === form.category_id)?.name || ''
+  }, [form.category_id, categories])
+
+  const currentMasterProduct = useMemo(() => {
+    if (!form.demo_item_id) return null
+    const demo = allDemos.find(d => d.id === form.demo_item_id)
+    return demo ? findCatalogProduct(demo.name) : null
+  }, [form.demo_item_id, allDemos])
+
+  // Extract distinct brands from current category products or registry
+  const availableBrands = useMemo(() => {
+    const regBrands = categoryName ? getCategoryBrands(categoryName) : []
+    if (regBrands.length > 0) return regBrands
+
+    const brandCounts: Record<string, number> = {}
+    categoryDemos.forEach(d => {
+      const reg = findCatalogProduct(d.name)
+      if (reg && reg.brands) {
+        reg.brands.forEach(b => { brandCounts[b] = (brandCounts[b] || 0) + 1 })
+      } else if (d.name.includes(' ')) {
+        const first = d.name.split(' ')[0].trim()
+        if (!['fresh', 'raw', 'green', 'red', 'organic', 'cut', 'by', 'packet', 'pure', 'classic'].includes(first.toLowerCase())) {
+          brandCounts[first] = (brandCounts[first] || 0) + 1
+        }
+      }
+    })
+    return Object.entries(brandCounts)
+      .filter(([_, count]) => count >= 2)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(([brand, count]) => ({ brand, count }))
+  }, [categoryDemos, categoryName])
+
+  // Filtered catalog items matching search query, brand filter, aliases, and Malayalam script
+  const filteredDemos = useMemo(() => {
+    let list = categoryDemos
+    if (selectedBrand !== 'All') {
+      const targetB = selectedBrand.toLowerCase()
+      list = list.filter(d => {
+        const reg = findCatalogProduct(d.name)
+        if (reg && reg.brands.some(b => b.toLowerCase() === targetB)) return true
+        return d.name.toLowerCase().includes(targetB)
+      })
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim()
+      const qTokens = q.split(/\s+/).filter(Boolean)
+      list = list.filter(d => {
+        const reg = findCatalogProduct(d.name)
+        const dName = d.name.toLowerCase()
+        const dCode = (d.code || '').toLowerCase()
+        const mal = (reg?.malayalam || '').toLowerCase()
+        const aliases = (reg?.aliases || []).map(a => a.toLowerCase())
+        const brands = (reg?.brands || []).map(b => b.toLowerCase())
+
+        // Direct matches
+        if (dName.includes(q) || dCode.includes(q) || mal.includes(q)) return true
+        if (aliases.some(a => a.includes(q))) return true
+        if (brands.some(b => b.includes(q))) return true
+
+        // Multi-token match (e.g. "eastern turmeric")
+        if (qTokens.length > 1) {
+          const allMatch = qTokens.every(tok => 
+            dName.includes(tok) || 
+            dCode.includes(tok) || 
+            mal.includes(tok) || 
+            aliases.some(a => a.includes(tok)) || 
+            brands.some(b => b.includes(tok))
+          )
+          if (allMatch) return true
+        }
+        return false
+      })
+    }
+    return list
+  }, [categoryDemos, selectedBrand, searchQuery])
 
   function selectDemoItem(demo: DemoItem) {
-    const config = demoConfigs.find(c => c.demo_item_id === demo.id)
-    const vars = demoVariants.filter(v => v.demo_item_id === demo.id)
+    const config = allConfigs.find(c => c.demo_item_id === demo.id) || demoConfigs.find(c => c.demo_item_id === demo.id)
+    const vars = allVariants.filter(v => v.demo_item_id === demo.id) || demoVariants.filter(v => v.demo_item_id === demo.id)
 
+    setItemBrand('')
     set('demo_item_id', demo.id)
     set('name', demo.name)
     set('sell_mode', demo.sell_mode)
@@ -227,21 +365,21 @@ export default function ItemFormClient({
     }
 
     if (vars.length > 0) {
-       setVariants(vars.map(v => ({
-         variant_type: demo.sell_mode,
-         label: v.label,
-         unit_id: v.unit_id || demo.unit_id || '',
-         value: v.value || '',
-         price: v.price || '',
-         min_value: v.min_value ?? null,
-         max_value: v.max_value ?? null,
-         is_default: v.is_default,
-         is_active: v.is_active,
-         image_url: ''
-       })))
-     } else {
-       setVariants([])
-     }
+      setVariants(vars.map(v => ({
+        variant_type: demo.sell_mode,
+        label: v.label,
+        unit_id: v.unit_id || demo.unit_id || '',
+        value: v.value || '',
+        price: v.price || '',
+        min_value: v.min_value ?? null,
+        max_value: v.max_value ?? null,
+        is_default: v.is_default,
+        is_active: v.is_active,
+        image_url: demo.default_image || ''
+      })))
+    } else {
+      setVariants([])
+    }
 
     if (demo.default_image) setImages([demo.default_image])
     setStep(3)
@@ -363,18 +501,32 @@ export default function ItemFormClient({
     return calc.toFixed(2)
   }
 
+  function parseVariantLabel(label: string, _catId: string, uList: typeof units) {
+    const match = label.trim().match(/^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?$/)
+    if (!match) return { value: '', unitId: '' }
+    const value = match[1] || ''
+    const symbol = match[2]?.toLowerCase() || ''
+    const unit = uList.find(u => u.symbol.toLowerCase() === symbol || u.name.toLowerCase() === symbol)
+    return { value, unitId: unit?.id || '' }
+  }
+
   function handleModalLabelChange(label: string) {
     setModalLabel(label)
     const parsed = parseVariantLabel(label, form.category_id, units)
     if (parsed.value) {
-      setModalValue(parsed.value)
-    }
-    if (parsed.unitId) {
-      setModalUnitId(parsed.unitId)
-      const calculated = autoCalculatePrice(parsed.value, parsed.unitId)
-      if (calculated) {
-        setModalPrice(calculated)
+      const numVal = parseFloat(parsed.value)
+      if (!isNaN(numVal)) {
+        setModalValue(numVal)
+        if (parsed.unitId) {
+          setModalUnitId(parsed.unitId)
+          const calculated = autoCalculatePrice(numVal, parsed.unitId)
+          if (calculated) {
+            setModalPrice(calculated)
+          }
+        }
       }
+    } else if (parsed.unitId) {
+      setModalUnitId(parsed.unitId)
     }
   }
 
@@ -740,7 +892,7 @@ export default function ItemFormClient({
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '1rem' }}>
             {categories.map(c => (
-              <button key={c.id} type="button" onClick={() => { set('category_id', c.id); setStep(2) }}
+              <button key={c.id} type="button" onClick={() => selectCategory(c.id)}
                 className="vp-btn" style={{
                   height: '130px',
                   display: 'flex',
@@ -777,50 +929,259 @@ export default function ItemFormClient({
         </div>
       )}
 
-      {/* STEP 2: LOAD FROM TEMPLATES */}
+      {/* STEP 2: MASTER CATALOG DISCOVERY BROWSER */}
       {step === 2 && !isEdit && (
-        <div className="vp-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
+        <div className="vp-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          {/* Header & Category Badge */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexDirection: isRtl ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: '0.75rem' }}>
             <div>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#fff', margin: '0 0 0.25rem 0' }}>{t('vendor_items.step_2_title')}</h2>
-              <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.95rem' }}>{t('vendor_items.step_2_desc')}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                <span style={{ fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(59,130,246,0.15)', color: '#60a5fa', fontWeight: 700 }}>
+                  {categories.find(c => c.id === form.category_id)?.name || 'Category'}
+                </span>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                  ({categoryDemos.length} items available)
+                </span>
+              </div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', margin: 0 }}>Select Product from Catalog</h2>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem', flexDirection: isRtl ? 'row-reverse' : 'row' }}>
-              <button type="button" onClick={() => setStep(1)} className="vp-btn vp-btn-outline vp-btn-sm" style={{ height: '38px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}><BackIcon size={16}/> {t('vendor_items.back_button')}</button>
-              <button type="button" onClick={skipDemo} className="vp-btn vp-btn-outline vp-btn-sm" style={{ height: '38px', borderRadius: '10px' }}>{t('vendor_items.skip_to_custom')}</button>
+              <button type="button" onClick={() => setStep(1)} className="vp-btn vp-btn-outline vp-btn-sm" style={{ height: '38px', borderRadius: '10px', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                <BackIcon size={16}/> Change Category
+              </button>
+              <button type="button" onClick={skipDemo} className="vp-btn vp-btn-outline vp-btn-sm" style={{ height: '38px', borderRadius: '10px', borderColor: 'rgba(255,255,255,0.15)' }}>
+                + Custom Item
+              </button>
             </div>
           </div>
 
-          {categoryDemos.length > 0 ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.75rem' }}>
-              {categoryDemos.map(d => (
-                <button key={d.id} type="button" onClick={() => selectDemoItem(d)}
-                  className="vp-btn" style={{
-                    background: 'rgba(59,130,246,0.08)',
-                    border: '1px solid rgba(59,130,246,0.2)',
-                    borderRadius: '16px',
-                    padding: '0.75rem 1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    justifyContent: 'flex-start',
-                    width: '100%',
-                    textAlign: isRtl ? 'right' : 'left'
+          {/* Search Bar */}
+          <div style={{ position: 'relative', width: '100%' }}>
+            <Search size={18} style={{ position: 'absolute', left: isRtl ? 'auto' : '1rem', right: isRtl ? '1rem' : 'auto', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+            <input
+              type="text"
+              className="vp-input"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder={`Search ${categories.find(c => c.id === form.category_id)?.name || ''} by title, brand, keyword...`}
+              style={{
+                width: '100%',
+                paddingLeft: isRtl ? '1rem' : '2.75rem',
+                paddingRight: isRtl ? '2.75rem' : (searchQuery ? '2.5rem' : '1rem'),
+                height: '46px',
+                borderRadius: '14px',
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(255,255,255,0.1)',
+                fontSize: '0.95rem'
+              }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{ position: 'absolute', right: isRtl ? 'auto' : '1rem', left: isRtl ? '1rem' : 'auto', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Brand Filter Pills */}
+          {availableBrands.length > 0 && (
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.25rem', scrollbarWidth: 'none' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedBrand('All')}
+                style={{
+                  padding: '0.4rem 0.85rem',
+                  borderRadius: '20px',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  background: selectedBrand === 'All' ? 'linear-gradient(135deg, #3b82f6, #6366f1)' : 'rgba(255,255,255,0.05)',
+                  color: selectedBrand === 'All' ? '#fff' : '#94a3b8',
+                  border: `1px solid ${selectedBrand === 'All' ? '#3b82f6' : 'rgba(255,255,255,0.08)'}`
+                }}
+              >
+                All Brands ({categoryDemos.length})
+              </button>
+              {availableBrands.map(b => (
+                <button
+                  key={b.brand}
+                  type="button"
+                  onClick={() => setSelectedBrand(selectedBrand === b.brand ? 'All' : b.brand)}
+                  style={{
+                    padding: '0.4rem 0.85rem',
+                    borderRadius: '20px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    background: selectedBrand === b.brand ? 'linear-gradient(135deg, #3b82f6, #6366f1)' : 'rgba(255,255,255,0.05)',
+                    color: selectedBrand === b.brand ? '#fff' : '#94a3b8',
+                    border: `1px solid ${selectedBrand === b.brand ? '#3b82f6' : 'rgba(255,255,255,0.08)'}`
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.15)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.08)'}
                 >
-                  <Package size={16} style={{ color: '#60a5fa' }} />
-                  <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#fff' }}>{d.name}</span>
+                  {b.brand} ({b.count})
                 </button>
               ))}
             </div>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '3rem 2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '24px', border: '1px dashed rgba(255,255,255,0.1)' }}>
-              <Package size={48} style={{ color: '#475569', margin: '0 auto 1rem auto' }} />
-              <p style={{ color: '#94a3b8', margin: '0 0 1.5rem 0', fontSize: '0.95rem' }}>{t('vendor_items.no_templates')}</p>
-              <button type="button" onClick={skipDemo} className="vp-btn vp-btn-primary">
-                {t('vendor_items.create_custom_item')}
+          )}
+
+          {/* Loading Indicator */}
+          {loadingCategory && (
+            <div style={{ textAlign: 'center', padding: '2rem', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+              <Loader2 className="animate-spin" size={20} /> Loading catalog items...
+            </div>
+          )}
+
+          {/* Catalog Product Grid */}
+          {!loadingCategory && filteredDemos.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '0.85rem', maxHeight: '550px', overflowY: 'auto', paddingRight: '0.25rem' }}>
+              {filteredDemos.map(d => {
+                const config = allConfigs.find(c => c.demo_item_id === d.id) || demoConfigs.find(c => c.demo_item_id === d.id)
+                const unit = units.find(u => u.id === (config?.base_unit_id || d.unit_id))
+                const price = config?.price_per_base_unit
+
+                return (
+                  <div
+                    key={d.id}
+                    style={{
+                      background: 'rgba(255,255,255,0.025)',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      borderRadius: '16px',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(59,130,246,0.3)';
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)';
+                      e.currentTarget.style.transform = 'none';
+                    }}
+                  >
+                    {/* Thumbnail */}
+                    <div style={{ height: '130px', width: '100%', position: 'relative', overflow: 'hidden', background: 'rgba(0,0,0,0.2)' }}>
+                      <img
+                        src={d.default_image || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500'}
+                        alt={d.name}
+                        loading="lazy"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500'
+                        }}
+                      />
+                      <span style={{
+                        position: 'absolute',
+                        top: '8px',
+                        left: isRtl ? 'auto' : '8px',
+                        right: isRtl ? '8px' : 'auto',
+                        fontSize: '0.68rem',
+                        fontWeight: 700,
+                        padding: '0.2rem 0.5rem',
+                        borderRadius: '6px',
+                        background: d.sell_mode === 'Manual' ? 'rgba(59,130,246,0.9)' : 'rgba(16,185,129,0.9)',
+                        color: '#fff',
+                        backdropFilter: 'blur(4px)'
+                      }}>
+                        {d.sell_mode === 'Manual' ? 'By Weight' : 'Pre-Packed'}
+                      </span>
+                      {price && (
+                        <span style={{
+                          position: 'absolute',
+                          top: '8px',
+                          right: isRtl ? 'auto' : '8px',
+                          left: isRtl ? '8px' : 'auto',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '0.2rem 0.5rem',
+                          borderRadius: '6px',
+                          background: 'rgba(0,0,0,0.75)',
+                          color: '#fbbf24',
+                          border: '1px solid rgba(251,191,36,0.3)'
+                        }}>
+                          MRP: ₹{price}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Info & Adopt */}
+                    <div style={{ padding: '0.85rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '0.6rem' }}>
+                      <div>
+                        <h4 style={{ margin: 0, fontSize: '0.88rem', fontWeight: 700, color: '#fff', lineHeight: '1.3', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                          {d.name}
+                        </h4>
+                        {(() => {
+                          const reg = findCatalogProduct(d.name)
+                          if (!reg || !reg.brands || reg.brands.length === 0) return null
+                          return (
+                            <div style={{ marginTop: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.3rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '0.68rem', padding: '0.15rem 0.45rem', borderRadius: '6px', background: 'rgba(59,130,246,0.12)', color: '#60a5fa', fontWeight: 600 }}>
+                                {reg.brands.slice(0, 3).join(', ')}{reg.brands.length > 3 ? ` +${reg.brands.length - 3}` : ''}
+                              </span>
+                            </div>
+                          )
+                        })()}
+                        {unit && (
+                          <span style={{ fontSize: '0.72rem', color: '#94a3b8', display: 'inline-block', marginTop: '0.25rem' }}>
+                            Base: 1 {unit.symbol}
+                          </span>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => selectDemoItem(d)}
+                        className="vp-btn vp-btn-primary"
+                        style={{
+                          width: '100%',
+                          height: '34px',
+                          padding: '0',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.35rem',
+                          borderRadius: '10px'
+                        }}
+                      >
+                        <Plus size={14} /> Adopt Product
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Empty Search Result */}
+          {!loadingCategory && filteredDemos.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '3rem 2rem', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+              <Package size={42} style={{ color: '#475569', margin: '0 auto 0.75rem auto' }} />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#fff', margin: '0 0 0.5rem 0' }}>
+                {searchQuery ? `No products matching "${searchQuery}"` : 'No products found'}
+              </h3>
+              <p style={{ color: '#94a3b8', margin: '0 0 1.5rem 0', fontSize: '0.9rem' }}>
+                You can create this product as a custom item in just seconds.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (searchQuery.trim()) set('name', searchQuery.trim())
+                  skipDemo()
+                }}
+                className="vp-btn vp-btn-primary"
+                style={{ padding: '0.65rem 1.5rem', borderRadius: '12px' }}
+              >
+                + Create Custom Item {searchQuery ? `"${searchQuery}"` : ''}
               </button>
             </div>
           )}
@@ -844,6 +1205,104 @@ export default function ItemFormClient({
               </button>
             )}
           </div>
+
+          {form.demo_item_id && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.75rem 1rem',
+              borderRadius: '12px',
+              background: 'rgba(59,130,246,0.1)',
+              border: '1px solid rgba(59,130,246,0.25)',
+              fontSize: '0.85rem',
+              color: '#93c5fd'
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
+                <CheckCircle2 size={16} style={{ color: '#60a5fa' }} />
+                Master Catalog Template Adopted
+              </span>
+              <button
+                type="button"
+                onClick={() => setStep(2)}
+                style={{ background: 'none', border: 'none', color: '#60a5fa', cursor: 'pointer', fontSize: '0.8rem', textDecoration: 'underline' }}
+              >
+                Change Product
+              </button>
+            </div>
+          )}
+
+          {form.demo_item_id && currentMasterProduct && currentMasterProduct.brands && currentMasterProduct.brands.length > 0 && (
+            <div style={{
+              background: 'rgba(255,255,255,0.025)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+              padding: '1.15rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.92rem', fontWeight: 700, color: '#fff', display: 'block', margin: 0 }}>
+                    Select Brand Offering
+                  </label>
+                  <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                    Choose the brand your shop stocks for {currentMasterProduct.canonicalName}:
+                  </span>
+                </div>
+                {itemBrand && (
+                  <span style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '12px', background: 'rgba(16,185,129,0.15)', color: '#34d399', fontWeight: 600 }}>
+                    Selected: {itemBrand}
+                  </span>
+                )}
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setItemBrand('')
+                    set('name', currentMasterProduct.canonicalName)
+                  }}
+                  style={{
+                    padding: '0.4rem 0.8rem',
+                    borderRadius: '8px',
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    background: !itemBrand ? '#3b82f6' : 'rgba(255,255,255,0.05)',
+                    color: !itemBrand ? '#fff' : '#cbd5e1',
+                    border: `1px solid ${!itemBrand ? '#3b82f6' : 'rgba(255,255,255,0.1)'}`
+                  }}
+                >
+                  Generic / Local
+                </button>
+                {currentMasterProduct.brands.map(b => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => {
+                      setItemBrand(b)
+                      set('name', `${b} ${currentMasterProduct.canonicalName}`)
+                    }}
+                    style={{
+                      padding: '0.4rem 0.8rem',
+                      borderRadius: '8px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      background: itemBrand === b ? '#3b82f6' : 'rgba(255,255,255,0.05)',
+                      color: itemBrand === b ? '#fff' : '#cbd5e1',
+                      border: `1px solid ${itemBrand === b ? '#3b82f6' : 'rgba(255,255,255,0.1)'}`
+                    }}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <ImageUploader
             shopId={shopId}

@@ -7,6 +7,7 @@ import 'package:village_market/theme/theme_service.dart';
 import '../../../core/cart_service.dart';
 import '../../../core/language_service.dart';
 import '../../../models/models.dart';
+import '../../../widgets/app_cached_image.dart';
 
 
 class CartScreen extends StatefulWidget {
@@ -833,10 +834,10 @@ class _CartItemTileState extends State<_CartItemTile> {
                 Container(
                   width: 70, height: 70,
                   alignment: Alignment.center,
-                  child: variant.imageUrl != null && variant.imageUrl!.trim().isNotEmpty
-                      ? Image.network(variant.imageUrl!, fit: BoxFit.cover)
-                      : item.imageUrl != null
-                          ? Image.network(item.imageUrl!, fit: BoxFit.cover)
+                  child: (variant.imageUrl != null && variant.imageUrl!.trim().isNotEmpty)
+                      ? AppCachedImage(imageUrl: variant.imageUrl!, fit: BoxFit.cover, memCacheWidth: 160, memCacheHeight: 160, borderRadius: BorderRadius.circular(12))
+                      : (item.imageUrl != null && item.imageUrl!.trim().isNotEmpty)
+                          ? AppCachedImage(imageUrl: item.imageUrl!, fit: BoxFit.cover, memCacheWidth: 160, memCacheHeight: 160, borderRadius: BorderRadius.circular(12))
                           : Text(widget.fallbackEmoji, style: const TextStyle(fontSize: 40)),
                 ),
                 const SizedBox(width: 16),

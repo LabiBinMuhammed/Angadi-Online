@@ -77,7 +77,7 @@ export default async function HomePage({
       .eq('location_id', locationId),
     supabase
       .from('items')
-      .select('*, item_images(image_url), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*)')
+      .select('*, item_images(image_url), item_sell_config(*), item_variants:vw_item_variants_with_fallback(*), item_translations(*)')
       .eq('is_active', true)
       .is('deleted_at', null)
       .order('name'),

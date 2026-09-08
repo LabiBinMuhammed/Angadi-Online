@@ -1,0 +1,352 @@
+const fs = require('fs');
+
+const dairyMasterItems = [
+  // --- MILMA (KERALA CORE - LEVEL 1) ---
+  {
+    name: 'Milma Toned Milk',
+    brand: 'Milma',
+    family: 'Liquid Milk',
+    description: 'Fresh pasteurised and homogenised toned milk with 3.0% fat and 8.5% SNF, Kerala household staple.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Milma Rich Full Cream Milk',
+    brand: 'Milma',
+    family: 'Liquid Milk',
+    description: 'Thick, creamy pasteurised full cream milk with 6.0% fat and 9.0% SNF, ideal for payasam, tea, and sweets.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Milma Smart Double Toned Milk',
+    brand: 'Milma',
+    family: 'Liquid Milk',
+    description: 'Low-fat pasteurised double toned milk with 1.5% fat and 9.0% SNF for health-conscious daily diets.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml']
+  },
+  {
+    name: 'Milma Cow Milk (Pasteurised)',
+    brand: 'Milma',
+    family: 'Liquid Milk',
+    description: 'Pure pasteurised cow milk sourced directly from local Kerala dairy cooperatives.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Milma Homogenised Toned Milk',
+    brand: 'Milma',
+    family: 'Liquid Milk',
+    description: 'Evenly homogenised fresh toned milk preventing cream layer separation, perfect for tea and coffee.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Milma Set Curd',
+    brand: 'Milma',
+    family: 'Curd & Yogurt',
+    description: 'Thick, creamy set curd cultured from pure cow milk in hygienic tubs.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 g',
+    default_image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '500 g', '1 kg']
+  },
+  {
+    name: 'Milma Pouch Curd',
+    brand: 'Milma',
+    family: 'Curd & Yogurt',
+    description: 'Traditional sour curd in easy-to-use pouch packs, ideal for moru curry, pulissery, and pachadi.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 g',
+    default_image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 g', '1 kg']
+  },
+  {
+    name: 'Milma Sambharam (Spiced Buttermilk)',
+    brand: 'Milma',
+    family: 'Buttermilk',
+    description: 'Refreshing traditional Kerala spiced buttermilk infused with ginger, green chillies, curry leaves, and asafoetida.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml', '500 ml']
+  },
+  {
+    name: 'Milma Salted Table Butter',
+    brand: 'Milma',
+    family: 'Butter',
+    description: 'Golden, creamy salted table butter churned from pure cow milk cream.',
+    sell_mode: 'Fixed',
+    default_quantity: '100 g',
+    default_image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
+    variants: ['100 g', '500 g']
+  },
+  {
+    name: 'Milma Cooking Butter (Unsalted)',
+    brand: 'Milma',
+    family: 'Butter',
+    description: 'Pure unsalted white cooking butter, ideal for baking, making homemade ghee, and traditional sweets.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 g',
+    default_image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
+    variants: ['100 g', '500 g']
+  },
+  {
+    name: 'Milma Pure Cow Ghee',
+    brand: 'Milma',
+    family: 'Ghee',
+    description: 'Signature aromatic granular cow ghee made from fresh cream butter, Kerala festival and sadhya essential.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
+    variants: ['50 ml', '100 ml', '200 ml', '500 ml', '1 L']
+  },
+  {
+    name: 'Milma Fresh Paneer',
+    brand: 'Milma',
+    family: 'Paneer',
+    description: 'Soft, hygienic cottage cheese cubes made from fresh cow milk, rich in protein.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '500 g']
+  },
+  {
+    name: 'Milma Traditional Milk Peda',
+    brand: 'Milma',
+    family: 'Milk Sweets',
+    description: 'Famous Kerala cooperative milk sweet prepared by slow-cooking sweetened condensed cow milk khoya.',
+    sell_mode: 'Fixed',
+    default_quantity: '250 g',
+    default_image: 'https://images.unsplash.com/photo-1599785209707-a456fc1337bb?w=500&auto=format&fit=crop&q=80',
+    variants: ['100 g', '250 g', '500 g']
+  },
+  {
+    name: 'Milma Flavoured Milk Chocolate',
+    brand: 'Milma',
+    family: 'Flavoured Milk',
+    description: 'Sterilised chocolate flavoured double toned milk drink in ready-to-drink bottles.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml']
+  },
+  {
+    name: 'Milma Flavoured Milk Badam',
+    brand: 'Milma',
+    family: 'Flavoured Milk',
+    description: 'Aromatic almond-flavoured nutrient-rich double toned milk drink.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml']
+  },
+  {
+    name: 'Milma Flavoured Milk Pista',
+    brand: 'Milma',
+    family: 'Flavoured Milk',
+    description: 'Delicious pistachio-flavoured chilled milk drink.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml']
+  },
+  {
+    name: 'Milma Flavoured Milk Mango',
+    brand: 'Milma',
+    family: 'Flavoured Milk',
+    description: 'Sweet Alphonso mango pulp blended with sterilised chilled milk.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml']
+  },
+  {
+    name: 'Milma Sweet Lassi',
+    brand: 'Milma',
+    family: 'Lassi',
+    description: 'Chilled sweet churned yogurt drink, natural digestive and refresher.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml']
+  },
+  {
+    name: 'Milma Mango Lassi',
+    brand: 'Milma',
+    family: 'Lassi',
+    description: 'Rich cultured yogurt blended with natural mango pulp.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 ml',
+    default_image: 'https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 ml']
+  },
+  {
+    name: 'Milma Skimmed Milk Powder',
+    brand: 'Milma',
+    family: 'Milk Powder',
+    description: 'Spray dried instant skimmed milk powder for tea, coffee, and dessert preparation.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 g',
+    default_image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 g', '1 kg']
+  },
+
+  // --- AMUL (KERALA COMMON - LEVEL 2) ---
+  {
+    name: 'Amul Taaza Toned Milk',
+    brand: 'Amul',
+    family: 'Liquid Milk',
+    description: 'Homogenised pasteurised toned milk with 3.0% fat and 8.5% SNF.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Amul Gold Full Cream Milk',
+    brand: 'Amul',
+    family: 'Liquid Milk',
+    description: 'High-fat full cream milk with 6.0% fat, suitable for rich tea and desserts.',
+    sell_mode: 'Fixed',
+    default_quantity: '500 ml',
+    default_image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Amul Masti Dahi',
+    brand: 'Amul',
+    family: 'Curd & Yogurt',
+    description: 'Pasteurised thick curd made from standardized milk with no preservatives.',
+    sell_mode: 'Fixed',
+    default_quantity: '400 g',
+    default_image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '400 g', '1 kg']
+  },
+  {
+    name: 'Amul Salted Butter',
+    brand: 'Amul',
+    family: 'Butter',
+    description: 'Utterly butterly delicious pasteurised salted table butter.',
+    sell_mode: 'Fixed',
+    default_quantity: '100 g',
+    default_image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
+    variants: ['100 g', '500 g']
+  },
+  {
+    name: 'Amul Malai Paneer',
+    brand: 'Amul',
+    family: 'Paneer',
+    description: 'Soft and succulent malai cottage cheese blocks, rich in calcium and milk protein.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '500 g', '1 kg']
+  },
+  {
+    name: 'Amul Processed Cheese Block',
+    brand: 'Amul',
+    family: 'Cheese',
+    description: 'Classic mild cheddar style processed cheese block for grating over sandwiches and dishes.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '500 g', '1 kg']
+  },
+  {
+    name: 'Amul Cheese Slices',
+    brand: 'Amul',
+    family: 'Cheese',
+    description: 'Individually wrapped processed cheese slices, melts smoothly over toast and burgers.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=500&auto=format&fit=crop&q=80',
+    variants: ['100 g', '200 g', '400 g']
+  },
+  {
+    name: 'Amul Mozzarella Pizza Cheese',
+    brand: 'Amul',
+    family: 'Cheese',
+    description: 'Stretchable mozzarella and cheddar blend cheese block for pizza and baked bakes.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '1 kg']
+  },
+  {
+    name: 'Amul Fresh Cream',
+    brand: 'Amul',
+    family: 'Cream',
+    description: 'Low-fat sterilized cooking cream for gravies, fruit salads, soups, and coffee.',
+    sell_mode: 'Fixed',
+    default_quantity: '250 ml',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['250 ml', '1 L']
+  },
+  {
+    name: 'Amul Mithai Mate Condensed Milk',
+    brand: 'Amul',
+    family: 'Condensed Milk',
+    description: 'Sweetened condensed whole milk, essential for quick payasam, cakes, and fudge.',
+    sell_mode: 'Fixed',
+    default_quantity: '200 g',
+    default_image: 'https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80',
+    variants: ['200 g', '400 g']
+  },
+
+  // --- LOCAL / FARM FRESH (MANUAL & WEIGHT SELLING) ---
+  {
+    name: 'Farm Fresh Cow Milk (Loose)',
+    brand: 'Local Farm',
+    family: 'Liquid Milk',
+    description: 'Unprocessed morning-milked pure cow milk sold by volume straight from local dairy farms.',
+    sell_mode: 'Manual',
+    default_quantity: '1 L',
+    default_image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L', '2 L']
+  },
+  {
+    name: 'Farm Fresh Buffalo Milk (Loose)',
+    brand: 'Local Farm',
+    family: 'Liquid Milk',
+    description: 'High-fat thick fresh buffalo milk sold loose by volume from local dairies.',
+    sell_mode: 'Manual',
+    default_quantity: '1 L',
+    default_image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 ml', '1 L']
+  },
+  {
+    name: 'Fresh Curd (Loose)',
+    brand: 'Local Dairy',
+    family: 'Curd & Yogurt',
+    description: 'Fresh artisanal set curd scooped by custom weight into customer containers.',
+    sell_mode: 'Manual',
+    default_quantity: '1 kg',
+    default_image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=80',
+    variants: ['500 g', '1 kg']
+  },
+  {
+    name: 'Fresh Malai Paneer (Loose Block)',
+    brand: 'Local Dairy',
+    family: 'Paneer',
+    description: 'Fresh unsalted cottage cheese block cut to exact customer requested weight.',
+    sell_mode: 'Manual',
+    default_quantity: '500 g',
+    default_image: 'https://images.unsplash.com/photo-1567337710282-00832b415979?w=500&auto=format&fit=crop&q=80',
+    variants: ['250 g', '500 g', '1 kg']
+  }
+];
+
+fs.writeFileSync('scripts/dairy_data.json', JSON.stringify(dairyMasterItems, null, 2), 'utf8');
+console.log(`Defined Dairy master items: ${dairyMasterItems.length}`);

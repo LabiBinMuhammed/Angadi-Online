@@ -15,6 +15,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../widgets/tutorial/tutorial_manager.dart';
 import '../../../widgets/tutorial/tutorial_step.dart';
 import '../../../widgets/product_card.dart';
+import '../../../widgets/app_cached_image.dart';
 import 'package:intl/intl.dart';
 
 // ── Colors ────────────────────────────────────────────────────────────────────
@@ -51,6 +52,75 @@ String _getCatIcon(String name) {
   return '📦';
 }
 
+const Map<String, List<String>> _kItemSynonyms = {
+  'onion': ['onion', 'onions', 'ulli', 'savala', 'savola', 'sawala', 'സവാള', 'ഉള്ളി', 'pyaz', 'pyaaz', 'प्याज'],
+  'tomato': ['tomato', 'tomatoes', 'thakkali', 'തക്കാളി', 'tamatar', 'टमाटर'],
+  'chicken': ['chicken', 'chiken', 'kozhi', 'കോഴി', 'murgi', 'മുർഗി'],
+  'tea': ['tea', 'chaya', 'chaaya', 'ചായ', 'chai'],
+  'coffee': ['coffee', 'kaapi', 'kapi', 'കാപ്പി'],
+  'potato': ['potato', 'potatoes', 'urula', 'urulakkizhangu', 'ഉരുളക്കിഴങ്ങ്', 'aalu', 'aloo'],
+  'milk': ['milk', 'paal', 'pal', 'പാൽ'],
+  'chilli': ['chilli', 'chili', 'mulak', 'mulaku', 'മുളക്', 'mirch'],
+  'rice': ['rice', 'ari', 'അരി', 'chawal'],
+  'oil': ['oil', 'velichenna', 'enna', 'വെളിച്ചെണ്ണ', 'എണ്ണ'],
+  'masala': ['masala', 'masalappodi', 'മസാല', 'spice', 'powder', 'പൊടി'],
+  'sugar': ['sugar', 'panchasara', 'പഞ്ചസാര'],
+  'salt': ['salt', 'uppu', 'ഉപ്പ്'],
+  'fish': ['fish', 'meen', 'മീൻ'],
+  'meat': ['meat', 'erachi', 'irachi', 'ഇറച്ചി', 'beef', 'mutton', 'pothu', 'പോത്ത്']
+};
+
+bool matchesItemSearch(Item item, String query) {
+  if (query.trim().isEmpty) return true;
+  final q = query.toLowerCase().trim();
+
+  // 1. Base name & description match
+  if (item.name.toLowerCase().contains(q)) return true;
+  if (item.description?.toLowerCase().contains(q) ?? false) return true;
+
+  // 2. Translations match
+  if (item.itemTranslations != null) {
+    for (final t in item.itemTranslations!) {
+      final tName = t['name']?.toString().toLowerCase() ?? '';
+      final tDesc = t['description']?.toString().toLowerCase() ?? '';
+      if (tName.contains(q) || tDesc.contains(q)) return true;
+    }
+  }
+
+  // 3. Match synonyms
+  for (final entry in _kItemSynonyms.entries) {
+    final hasKey = item.name.toLowerCase().contains(entry.key) ||
+        (item.itemTranslations?.any((t) =>
+                (t['name']?.toString().toLowerCase() ?? '')
+                    .contains(entry.key)) ??
+            false);
+    if (hasKey) {
+      if (entry.value.any((syn) =>
+          syn.toLowerCase().contains(q) || q.contains(syn.toLowerCase()))) {
+        return true;
+      }
+    }
+  }
+
+  // 4. Multi-word search
+  final words = q.split(RegExp(r'\s+')).where((w) => w.length >= 2).toList();
+  if (words.length > 1) {
+    final allMatch = words.every((word) {
+      if (item.name.toLowerCase().contains(word)) return true;
+      if (item.description?.toLowerCase().contains(word) ?? false) return true;
+      return item.itemTranslations?.any((t) {
+            final tName = t['name']?.toString().toLowerCase() ?? '';
+            final tDesc = t['description']?.toString().toLowerCase() ?? '';
+            return tName.contains(word) || tDesc.contains(word);
+          }) ??
+          false;
+    });
+    if (allMatch) return true;
+  }
+
+  return false;
+}
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   @override
@@ -59,6 +129,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _loading = true;
+  bool _searchingItems = false;
   String _userName = 'Guest';
   
   String? _userRole;
@@ -72,10 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _shopSearch = '';
   String _itemSearch = '';
   String? _selectedCategory;
-  
-  List<Item> _itemSearchResults = [];
-  bool _searchingItems = false;
-  Timer? _itemSearchDebounce;
+  final TextEditingController _shopSearchController = TextEditingController();
+  final TextEditingController _itemSearchController = TextEditingController();
   
   final Set<String> _likedItems = {};
   Set<String> _pinnedShopIds = {};
@@ -126,7 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _itemSearchDebounce?.cancel();
+    _shopSearchController.dispose();
+    _itemSearchController.dispose();
     LocationService.instance.removeListener(_onLocationChanged);
     for (var controller in _qtyControllers.values) {
       controller.dispose();
@@ -137,55 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemSearchChanged(String query) {
     setState(() {
       _itemSearch = query;
-    });
-
-    if (_itemSearchDebounce?.isActive ?? false) _itemSearchDebounce!.cancel();
-
-    if (query.trim().isEmpty) {
-      setState(() {
-        _itemSearchResults = [];
-        _searchingItems = false;
-      });
-      return;
-    }
-
-    _itemSearchDebounce = Timer(const Duration(milliseconds: 300), () async {
-      setState(() => _searchingItems = true);
-      
-      final lang = LanguageService.instance.locale.languageCode;
-      String base = 'http://localhost:3000';
-      if (kIsWeb) {
-        final uri = Uri.parse(Uri.base.toString());
-        base = '${uri.scheme}://${uri.host}:3000';
-      } else {
-        if (defaultTargetPlatform == TargetPlatform.android) {
-          base = 'http://10.0.2.2:3000';
-        } else {
-          base = 'http://localhost:3000';
-        }
-      }
-      var urlStr = '$base/api/search?q=${Uri.encodeComponent(query.trim())}&lang=$lang';
-      if (_selectedShopId != null) {
-        urlStr += '&shopId=$_selectedShopId';
-      }
-      
-      try {
-        final response = await http.get(Uri.parse(urlStr));
-        if (response.statusCode == 200) {
-          final List<dynamic> data = jsonDecode(response.body);
-          if (mounted) {
-            setState(() {
-              _itemSearchResults = data.map((json) => Item.fromJson(Map<String, dynamic>.from(json))).toList();
-              _searchingItems = false;
-            });
-          }
-        } else {
-          if (mounted) setState(() => _searchingItems = false);
-        }
-      } catch (e) {
-        print('Search error: $e');
-        if (mounted) setState(() => _searchingItems = false);
-      }
     });
   }
 
@@ -513,7 +534,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 100,
                     child: Center(
                       child: activeImageUrl != null
-                          ? Image.network(activeImageUrl, fit: BoxFit.contain)
+                          ? AppCachedImage(
+                              imageUrl: activeImageUrl,
+                              fit: BoxFit.contain,
+                              memCacheWidth: 320,
+                              memCacheHeight: 320,
+                            )
                           : Text(
                               _getCatIcon(
                                 _categories.firstWhere(
@@ -927,10 +953,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildLeftPanel(AppLocalizations l10n) {
     final selectedLocId = LocationService.instance.selectedLocationId;
+    final q = _shopSearch.trim().toLowerCase();
     final filteredShops = _shops.where((s) {
-      final matchesSearch = s.name.toLowerCase().contains(_shopSearch.toLowerCase());
       final matchesLocation = selectedLocId == null || s.locationId == selectedLocId;
-      return matchesSearch && matchesLocation;
+      if (!matchesLocation) return false;
+      if (q.isEmpty) return true;
+      if (s.name.toLowerCase().contains(q)) return true;
+      final sItems = _allItems[s.id] ?? [];
+      return sItems.any((item) => matchesItemSearch(item, q));
     }).toList();
     filteredShops.sort((a, b) {
       final aPinned = _pinnedShopIds.contains(a.id) ? 1 : 0;
@@ -1138,11 +1168,23 @@ class _HomeScreenState extends State<HomeScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextField(
+                                  controller: _shopSearchController,
                                   onChanged: (v) => setState(() => _shopSearch = v),
                                   style: TextStyle(color: _kText, fontWeight: FontWeight.w500),
                                   decoration: InputDecoration(hintText: l10n.searchShopsPlaceholder, hintStyle: TextStyle(color: _kSubLighter, fontWeight: FontWeight.w500), border: InputBorder.none),
                                 ),
                               ),
+                              if (_shopSearch.isNotEmpty)
+                                GestureDetector(
+                                  onTap: () {
+                                    _shopSearchController.clear();
+                                    setState(() => _shopSearch = '');
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 6),
+                                    child: Icon(Icons.close, size: 18, color: _kSubLighter),
+                                  ),
+                                ),
                             ],
                           ),
                         ),
@@ -1222,7 +1264,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: shop.logoUrl != null
-                                    ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
+                                    ? ClipOval(
+                                        child: AppCachedImage(
+                                          imageUrl: shop.logoUrl!,
+                                          fit: BoxFit.cover,
+                                          memCacheWidth: 160,
+                                          memCacheHeight: 160,
+                                        ),
+                                      )
                                     : Center(child: Text(_initials(shop.name), style: TextStyle(fontSize: isNarrow ? 18 : 22, fontWeight: FontWeight.bold, color: Colors.grey))),
                               ),
                               SizedBox(width: isNarrow ? 12 : 16),
@@ -1298,33 +1347,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final shopCategories = _categories.where((cat) => activeCategoryIds.contains(cat.id)).toList();
 
     List<Item> itemsToShow;
-    if (_itemSearch.isNotEmpty) {
-      final queryLower = _itemSearch.toLowerCase().trim();
-      itemsToShow = shopItems.where((item) {
-        // 1. Base name & description match
-        if (item.name.toLowerCase().contains(queryLower)) return true;
-        if (item.description?.toLowerCase().contains(queryLower) ?? false) return true;
-
-        // 2. Localized translations match (name, description, keywords)
-        if (item.itemTranslations != null) {
-          for (var t in item.itemTranslations!) {
-            final tName = t['name']?.toString().toLowerCase() ?? '';
-            final tDesc = t['description']?.toString().toLowerCase() ?? '';
-            if (tName.contains(queryLower)) return true;
-            if (tDesc.contains(queryLower)) return true;
-          }
-        }
-        return false;
-      }).toList();
-
-      if (_selectedCategory != null) {
-        itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
-      }
+    if (_itemSearch.trim().isNotEmpty) {
+      itemsToShow = shopItems.where((item) => matchesItemSearch(item, _itemSearch)).toList();
     } else {
       itemsToShow = List.from(shopItems);
-      if (_selectedCategory != null) {
-        itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
-      }
+    }
+    if (_selectedCategory != null) {
+      itemsToShow = itemsToShow.where((i) => i.categoryId == _selectedCategory).toList();
     }
 
     return Column(
@@ -1362,7 +1391,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 60, height: 60,
                         decoration: BoxDecoration(color: _kCardBg, shape: BoxShape.circle, border: Border.all(color: _kBorder), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 6))]),
                         child: shop.logoUrl != null
-                            ? ClipOval(child: Image.network(shop.logoUrl!, fit: BoxFit.cover))
+                            ? ClipOval(
+                                child: AppCachedImage(
+                                  imageUrl: shop.logoUrl!,
+                                  fit: BoxFit.cover,
+                                  memCacheWidth: 160,
+                                  memCacheHeight: 160,
+                                ),
+                              )
                             : Center(child: Text(_initials(shop.name), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey))),
                       ),
                       const SizedBox(width: 16),
@@ -1409,12 +1445,25 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: _itemSearchController,
                             onChanged: _onItemSearchChanged,
                             style: TextStyle(color: _kText, fontWeight: FontWeight.w500),
                             decoration: InputDecoration(hintText: l10n.searchItemsPlaceholder, hintStyle: TextStyle(color: _kSubLighter, fontWeight: FontWeight.w500), border: InputBorder.none),
                           ),
                         ),
-                        Icon(Icons.search, color: _kGreen),
+                        if (_itemSearch.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              _itemSearchController.clear();
+                              _onItemSearchChanged('');
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 6),
+                              child: Icon(Icons.close, size: 18, color: _kSubLighter),
+                            ),
+                          )
+                        else
+                          Icon(Icons.search, color: _kGreen),
                       ],
                     ),
                   ),
@@ -1498,17 +1547,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 else if (itemsToShow.isEmpty)
                   Padding(padding: const EdgeInsets.all(24), child: Center(child: Text(l10n.noItemsFound, style: TextStyle(color: _kSubLighter))))
                 else
-                  ListenableBuilder(
-                    listenable: CartService.instance,
-                    builder: (context, _) {
-                      final leftItems = <Item>[];
-                      final rightItems = <Item>[];
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final w = constraints.maxWidth;
+                      final int numCols;
+                      if (w >= 650) {
+                        // md & lg devices: 4 products per row
+                        numCols = 4;
+                      } else if (w <= 360) {
+                        numCols = 1;
+                      } else {
+                        // Mobile: 2 products per row
+                        numCols = 2;
+                      }
+
+                      final columns = List.generate(numCols, (_) => <Item>[]);
                       for (int i = 0; i < itemsToShow.length; i++) {
-                        if (i % 2 == 0) {
-                          leftItems.add(itemsToShow[i]);
-                        } else {
-                          rightItems.add(itemsToShow[i]);
-                        }
+                        columns[i % numCols].add(itemsToShow[i]);
                       }
 
                       return Padding(
@@ -1516,39 +1571,28 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Column(
-                                children: leftItems.map((item) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: ProductCard(
-                                      item: item,
-                                      isLiked: _likedItems.contains(item.id),
-                                      onLikeToggle: () => _toggleLike(item.id),
-                                      units: _units,
-                                      categories: _categories,
-                                    ),
-                                  );
-                                }).toList(),
+                            for (int c = 0; c < numCols; c++) ...[
+                              if (c > 0) const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  children: columns[c].map((item) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 14),
+                                      child: RepaintBoundary(
+                                        child: ProductCard(
+                                          key: ValueKey('prod_${item.id}'),
+                                          item: item,
+                                          isLiked: _likedItems.contains(item.id),
+                                          onLikeToggle: () => _toggleLike(item.id),
+                                          units: _units,
+                                          categories: _categories,
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                children: rightItems.map((item) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(bottom: 16),
-                                    child: ProductCard(
-                                      item: item,
-                                      isLiked: _likedItems.contains(item.id),
-                                      onLikeToggle: () => _toggleLike(item.id),
-                                      units: _units,
-                                      categories: _categories,
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
+                            ],
                           ],
                         ),
                       );

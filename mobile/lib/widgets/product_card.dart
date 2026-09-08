@@ -6,6 +6,7 @@ import '../theme/theme_service.dart';
 import '../core/language_service.dart';
 import '../l10n/app_localizations.dart';
 import 'tutorial/tutorial_manager.dart';
+import 'app_cached_image.dart';
 
 // Colors mapped from ThemeService
 Color get _kText => ThemeService.instance.isDarkMode ? Colors.white : const Color(0xFF1A1A1A);
@@ -169,46 +170,68 @@ class _ProductCardState extends State<ProductCard> {
           _qtyController.text = formatted;
         }
 
-        return Container(
-          decoration: BoxDecoration(
-            color: _kCardBg,
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: _kBorder),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              )
-            ],
-          ),
-          child: Stack(
-            children: [
-              GestureDetector(
-                onTap: widget.onTap ?? () => context.push('/home/shop/${widget.item.shopId}'),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 52),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SizedBox(
-                        height: 100,
-                        child: Center(
-                          child: activeImageUrl != null
-                              ? Image.network(activeImageUrl, fit: BoxFit.contain)
-                              : Text(
-                                  _getCatIcon(
-                                    widget.categories.firstWhere(
-                                      (c) => c.id == widget.item.categoryId,
-                                      orElse: () => const Category(id: '', name: ''),
-                                    ).name,
+        return RepaintBoundary(
+          child: Container(
+            decoration: BoxDecoration(
+              color: _kCardBg,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: _kBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                )
+              ],
+            ),
+            child: Stack(
+              children: [
+                GestureDetector(
+                  onTap: widget.onTap ?? () => context.push('/home/shop/${widget.item.shopId}'),
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 52),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(
+                          height: 100,
+                          child: Center(
+                            child: activeImageUrl != null
+                                ? AppCachedImage(
+                                    imageUrl: activeImageUrl,
+                                    fit: BoxFit.contain,
+                                    memCacheWidth: 320,
+                                    memCacheHeight: 320,
+                                    placeholder: const Center(
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(strokeWidth: 2, color: _kGreen),
+                                      ),
+                                    ),
+                                    errorWidget: Text(
+                                      _getCatIcon(
+                                        widget.categories.firstWhere(
+                                          (c) => c.id == widget.item.categoryId,
+                                          orElse: () => const Category(id: '', name: ''),
+                                        ).name,
+                                      ),
+                                      style: const TextStyle(fontSize: 48),
+                                    ),
+                                  )
+                                : Text(
+                                    _getCatIcon(
+                                      widget.categories.firstWhere(
+                                        (c) => c.id == widget.item.categoryId,
+                                        orElse: () => const Category(id: '', name: ''),
+                                      ).name,
+                                    ),
+                                    style: const TextStyle(fontSize: 48),
                                   ),
-                                  style: const TextStyle(fontSize: 48),
-                                ),
+                          ),
                         ),
-                      ),
                       const SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -237,10 +260,7 @@ class _ProductCardState extends State<ProductCard> {
                       // Variant Selector Wrap
                       if (config?.sellMode == SellMode.manual)
                         const SizedBox(height: 28)
-                      else if ((config?.sellMode == SellMode.dynamic ||
-                              config?.sellMode == SellMode.portion ||
-                              ((config == null || config.sellMode == SellMode.packed) && widget.item.itemVariants.length > 1)) &&
-                          widget.item.itemVariants.isNotEmpty)
+                      else if (widget.item.itemVariants.isNotEmpty)
                         Wrap(
                           spacing: 6,
                           runSpacing: 4,
@@ -261,14 +281,22 @@ class _ProductCardState extends State<ProductCard> {
                                     color: isActive ? _kGreen : _kBorder,
                                     width: isActive ? 1.5 : 1,
                                   ),
-                                  color: isActive ? const Color(0xFFE8F9EC) : _kCardBg,
+                                  color: isActive
+                                      ? (ThemeService.instance.isDarkMode
+                                          ? const Color(0xFF1E3A2B)
+                                          : const Color(0xFFE8F9EC))
+                                      : _kCardBg,
                                 ),
                                 child: Text(
                                   v.getLocalizedLabel(langCode),
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w700,
-                                    color: isActive ? _kGreenDark : (ThemeService.instance.isDarkMode ? const Color(0xFF94A3B8) : const Color(0xFF4B5563)),
+                                    color: isActive
+                                        ? _kGreenDark
+                                        : (ThemeService.instance.isDarkMode
+                                            ? const Color(0xFF94A3B8)
+                                            : const Color(0xFF4B5563)),
                                   ),
                                 ),
                               ),
@@ -595,7 +623,8 @@ class _ProductCardState extends State<ProductCard> {
               ),
             ],
           ),
-        );
+        ),
+      );
       },
     );
   }

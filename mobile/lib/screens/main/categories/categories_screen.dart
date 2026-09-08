@@ -8,6 +8,7 @@ import '../../../core/cart_service.dart';
 import '../../../../widgets/directional_huge_icon.dart';
 import '../../../../core/language_service.dart';
 import '../../../widgets/tutorial/tutorial_manager.dart';
+import '../../../widgets/app_cached_image.dart';
 
 const _kBg = Color(0xFFFAFAFA);
 const _kGreenDark = Color(0xFF32B84A);
@@ -74,7 +75,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   Future<void> _loadData() async {
     try {
       final res = await Future.wait([
-        supabase.from('categories').select('id, name, category_translations(*)').eq('is_active', true).order('name'),
+        supabase.from('categories').select('*, category_translations(*)').eq('is_active', true).order('display_order'),
         supabase.from('shops').select('id, name').order('name'),
         supabase.from('items').select('id, shop_id, name, description, category_id, has_variants, is_active, item_images(*), item_translations(*)').eq('is_active', true).isFilter('deleted_at', null).order('name'),
         supabase.from('item_variants').select('item_id, price').eq('is_active', true).eq('is_default', true),
@@ -261,18 +262,37 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              width: 50,
-                              height: 50,
-                              decoration: const BoxDecoration(
+                              width: 54,
+                              height: 54,
+                              decoration: BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                              child: Center(
-                                child: Text(
-                                  emoji,
-                                  style: const TextStyle(fontSize: 26),
-                                ),
-                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: cat.imageUrl != null && cat.imageUrl!.trim().isNotEmpty
+                                  ? Image.network(
+                                      cat.imageUrl!.trim(),
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Center(
+                                        child: Text(
+                                          emoji,
+                                          style: const TextStyle(fontSize: 26),
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: Text(
+                                        emoji,
+                                        style: const TextStyle(fontSize: 26),
+                                      ),
+                                    ),
                             ),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,18 +386,37 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
               ),
               Container(
-                width: 44,
-                height: 44,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
                   color: _getCatColor(cat.name),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: Center(
-                  child: Text(
-                    _getCatIcon(cat.name),
-                    style: const TextStyle(fontSize: 22),
-                  ),
-                ),
+                clipBehavior: Clip.antiAlias,
+                child: cat.imageUrl != null && cat.imageUrl!.trim().isNotEmpty
+                    ? Image.network(
+                        cat.imageUrl!.trim(),
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Text(
+                            _getCatIcon(cat.name),
+                            style: const TextStyle(fontSize: 22),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Text(
+                          _getCatIcon(cat.name),
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
               ),
             ],
           ),
@@ -425,9 +464,12 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                               child: Center(
                                 child: item.imageUrl != null
-                                    ? ClipRRect(
+                                    ? AppCachedImage(
+                                        imageUrl: item.imageUrl!,
+                                        fit: BoxFit.cover,
+                                        memCacheWidth: 200,
+                                        memCacheHeight: 200,
                                         borderRadius: BorderRadius.circular(16),
-                                        child: Image.network(item.imageUrl!, fit: BoxFit.cover),
                                       )
                                     : Text(
                                         _getCatIcon(cat.name),

@@ -2,6 +2,9 @@
 *.apk
 *.aab
 *.ipa
+*.jks
+*.keystore
+*.pem
 
 # Next.js
 .next/
@@ -19,6 +22,9 @@ web/node_modules/
 # Env
 .env.local
 .env*.local
+
+# Temp
+supabase/.temp/
 
 # OS
 .DS_Store
