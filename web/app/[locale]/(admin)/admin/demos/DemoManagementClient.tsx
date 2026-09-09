@@ -33,15 +33,16 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { findCatalogProduct } from '@/lib/catalog/brandRegistry'
+import { uploadDemoImageAction } from './[demoId]/actions'
 
 export type Demo = {
   id: string
   name: string
   sell_mode: string
-  default_image?: string | null
   category_id?: string | null
   unit_id?: string | null
   code?: string | null
+  default_image?: string | null
   display_order?: number | null
 }
 
@@ -73,10 +74,10 @@ const ACTIVITY_MODES = [
 
 function renderCategoryIcon(name: string, size = 16) {
   const n = (name || '').toLowerCase()
-  if (n.includes('vegetable') || n.includes('veg')) return <Carrot size={size} />
+  if (n.includes('veg') || n.includes('produce')) return <Carrot size={size} />
   if (n.includes('fruit')) return <Apple size={size} />
-  if (n.includes('dairy') || n.includes('beverage')) return <Milk size={size} />
-  if (n.includes('grain') || n.includes('rice') || n.includes('wheat') || n.includes('grocery')) return <Wheat size={size} />
+  if (n.includes('dairy') || n.includes('milk')) return <Milk size={size} />
+  if (n.includes('grain') || n.includes('cereal') || n.includes('rice')) return <Wheat size={size} />
   if (n.includes('spice')) return <Flame size={size} />
   if (n.includes('bakery') || n.includes('bread')) return <Croissant size={size} />
   if (n.includes('oil')) return <GlassWater size={size} />
@@ -90,10 +91,12 @@ export default function DemoManagementClient({
   demos: initial,
   categories,
   units,
+  locale = 'en'
 }: {
   demos: Demo[]
   categories: Category[]
   units: Unit[]
+  locale?: string
 }) {
   const [demos, setDemos] = useState(initial)
   const [showAddForm, setShowAddForm] = useState(false)
@@ -135,23 +138,16 @@ export default function DemoManagementClient({
     setUploadingNewImage(true)
     setAddErr('')
     try {
-      const supabase = createClient()
-      const ext = file.name.split('.').pop() || 'jpg'
-      const fileName = `demos/demo_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('prefix', 'demos')
 
-      const { error: uploadErr } = await supabase.storage
-        .from('item-images')
-        .upload(fileName, file, { cacheControl: '3600', upsert: true })
-
-      if (uploadErr) throw uploadErr
-
-      const { data: publicUrlData } = supabase.storage
-        .from('item-images')
-        .getPublicUrl(fileName)
-
-      if (publicUrlData?.publicUrl) {
-        setForm(f => ({ ...f, default_image: publicUrlData.publicUrl }))
+      const res = await uploadDemoImageAction(formData)
+      if (!res.success || !res.publicUrl) {
+        throw new Error(res.error || 'Failed to upload image.')
       }
+
+      setForm(f => ({ ...f, default_image: res.publicUrl }))
     } catch (err: any) {
       console.error('Error uploading image:', err)
       setAddErr(err.message || 'Failed to upload image.')
@@ -990,7 +986,7 @@ export default function DemoManagementClient({
                   {/* Actions Row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.65rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                     <Link
-                      href={`/admin/demos/${d.id}`}
+                      href={`/${locale}/admin/demos/${d.id}`}
                       style={{
                         flex: 1,
                         height: '34px',
@@ -1090,7 +1086,7 @@ export default function DemoManagementClient({
                   <td style={{ textAlign: 'right', paddingRight: '1rem' }}>
                     <div style={{ display: 'inline-flex', gap: '0.4rem', alignItems: 'center' }}>
                       <Link
-                        href={`/admin/demos/${d.id}`}
+                        href={`/${locale}/admin/demos/${d.id}`}
                         className="btn btn-sm btn-outline"
                         style={{ height: '30px', padding: '0 0.65rem', borderRadius: '8px', display: 'flex', gap: '0.3rem', alignItems: 'center', fontSize: '0.78rem' }}
                       >

@@ -2,7 +2,6 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { DemoItem, DemoSellConfig, DemoVariant, Unit, SellMode } from '@/types'
 import {
   Save, Plus, Trash2, Info, CheckCircle2, AlertCircle,
@@ -10,6 +9,13 @@ import {
   UploadCloud, RefreshCw, X, ArrowLeft, Eye, ExternalLink,
   ShieldAlert, Sparkles, Check
 } from 'lucide-react'
+import {
+  updateDemoDetailsAction,
+  saveDemoConfigAction,
+  saveDemoVariantsAction,
+  deleteDemoTemplateAction,
+  uploadDemoImageAction
+} from './actions'
 
 type CategoryOption = {
   id: string
@@ -23,6 +29,7 @@ type Props = {
   units: Unit[]
   categories: CategoryOption[]
   initialMalayalam?: string
+  locale?: string
 }
 
 export default function DemoDetailClient({
@@ -31,17 +38,18 @@ export default function DemoDetailClient({
   initialVariants,
   units,
   categories,
-  initialMalayalam = ''
+  initialMalayalam = '',
+  locale = 'en'
 }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'details' | 'config' | 'variants'>('details')
 
   // Top Banner / Header state
   const [currentDemo, setCurrentDemo] = useState<DemoItem>(demo)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState<{ text: string; isError?: boolean } | null>(null)
 
-  function showToast(msg: string) {
-    setToastMessage(msg)
+  function showToast(msg: string, isError = false) {
+    setToastMessage({ text: msg, isError })
     setTimeout(() => setToastMessage(null), 3500)
   }
 
@@ -114,24 +122,16 @@ export default function DemoDetailClient({
     setUploadError('')
 
     try {
-      const supabase = createClient()
-      const ext = file.name.split('.').pop() || 'jpg'
-      const fileName = `demos/demo_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${ext}`
+      const formData = new FormData()
+      formData.append('file', file)
 
-      const { error: uploadErr } = await supabase.storage
-        .from('item-images')
-        .upload(fileName, file, { cacheControl: '3600', upsert: true })
-
-      if (uploadErr) throw uploadErr
-
-      const { data: publicUrlData } = supabase.storage
-        .from('item-images')
-        .getPublicUrl(fileName)
-
-      if (publicUrlData?.publicUrl) {
-        setDefaultImage(publicUrlData.publicUrl)
-        showToast('Template image uploaded and applied successfully!')
+      const res = await uploadDemoImageAction(formData)
+      if (!res.success || !res.publicUrl) {
+        throw new Error(res.error || 'Failed to upload image')
       }
+
+      setDefaultImage(res.publicUrl)
+      showToast('Template image uploaded and applied successfully!')
     } catch (err: any) {
       console.error('Upload error:', err)
       setUploadError(err.message || 'Failed to upload image. You can also paste an image URL.')
@@ -193,46 +193,34 @@ export default function DemoDetailClient({
     setSavingDetails(true)
     setDetailsMsg({ type: '', text: '' })
 
-    const supabase = createClient()
     const parsedOrder = displayOrder ? parseInt(displayOrder, 10) : null
 
     try {
-      // 1. Update demo_items
-      const payload: any = {
+      const res = await updateDemoDetailsAction({
+        demoId: demo.id,
+        locale: locale || 'en',
         name: name.trim(),
         code: code.trim() || null,
         category_id: categoryId || null,
         unit_id: unitId || null,
         sell_mode: sellMode,
-        display_order: parsedOrder,
-        default_image: defaultImage.trim() || null
+        display_order: Number.isNaN(parsedOrder) ? null : parsedOrder,
+        default_image: defaultImage.trim() || null,
+        malayalamName: malayalamName.trim()
+      })
+
+      if (!res.success) {
+        throw new Error(res.error || 'Failed to update template details.')
       }
 
-      const { error: updateErr } = await supabase
-        .from('demo_items')
-        .update(payload)
-        .eq('id', demo.id)
-
-      if (updateErr) throw updateErr
-
-      // 2. Save Malayalam translation in demo_item_translations
-      if (malayalamName.trim()) {
-        await supabase
-          .from('demo_item_translations')
-          .upsert({
-            demo_item_id: demo.id,
-            language_code: 'ml',
-            name: malayalamName.trim()
-          }, { onConflict: 'demo_item_id,language_code' })
+      if (res.item) {
+        setCurrentDemo(prev => ({
+          ...prev,
+          ...res.item
+        }))
       }
 
-      // Update currentDemo state
-      setCurrentDemo(prev => ({
-        ...prev,
-        ...payload
-      }))
-
-      // Also sync sellConfig sell_mode and base_unit_id
+      // Sync sellConfig sell_mode and base_unit_id
       setConfig(prev => ({
         ...prev,
         sell_mode: sellMode,
@@ -268,34 +256,35 @@ export default function DemoDetailClient({
       return
     }
 
-    const supabase = createClient()
-    const payload = {
-      demo_item_id: demo.id,
-      sell_mode: sellMode,
-      base_unit_id: config.base_unit_id || unitId || null,
-      allow_custom_quantity: config.allow_custom_quantity || false,
-      price_per_base_unit: config.price_per_base_unit ? Number(config.price_per_base_unit) : 0,
-      max_price_increase_percent: config.max_price_increase_percent ? Number(config.max_price_increase_percent) : 0,
-      max_price_limit: config.max_price_limit ? Number(config.max_price_limit) : 0,
-    }
+    try {
+      const res = await saveDemoConfigAction({
+        demoId: demo.id,
+        locale: locale || 'en',
+        configId: config.id,
+        sell_mode: sellMode,
+        base_unit_id: config.base_unit_id || unitId || null,
+        allow_custom_quantity: Boolean(config.allow_custom_quantity),
+        price_per_base_unit: config.price_per_base_unit ? Number(config.price_per_base_unit) : 0,
+        max_price_increase_percent: config.max_price_increase_percent ? Number(config.max_price_increase_percent) : null,
+        max_price_limit: config.max_price_limit ? Number(config.max_price_limit) : null,
+      })
 
-    if (initialConfig?.id) {
-      const { error } = await supabase.from('demo_sell_config').update(payload).eq('id', initialConfig.id)
-      if (error) setConfigMsg({ type: 'error', text: error.message })
-      else {
-        setConfigMsg({ type: 'success', text: 'Template configuration updated. Future vendor items will clone these defaults.' })
-        showToast('Sell configuration saved!')
+      if (!res.success) {
+        throw new Error(res.error || 'Failed to save configuration.')
       }
-    } else {
-      const { data, error } = await supabase.from('demo_sell_config').insert(payload).select().single()
-      if (error) setConfigMsg({ type: 'error', text: error.message })
-      else {
-        setConfigMsg({ type: 'success', text: 'Template configuration created. Future vendor items will clone these defaults.' })
-        setConfig(data)
-        showToast('Sell configuration created!')
+
+      if (res.config) {
+        setConfig(res.config)
       }
+
+      setConfigMsg({ type: 'success', text: 'Template configuration updated. Future vendor items will clone these defaults.' })
+      showToast('Sell configuration saved!')
+    } catch (err: any) {
+      console.error('Error saving config:', err)
+      setConfigMsg({ type: 'error', text: err.message || 'Failed to save configuration.' })
+    } finally {
+      setSavingConfig(false)
     }
-    setSavingConfig(false)
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -316,34 +305,40 @@ export default function DemoDetailClient({
       return
     }
 
-    const supabase = createClient()
-
-    // Clean replacement of template variants
-    await supabase.from('demo_variants').delete().eq('demo_item_id', demo.id)
-
-    if (variants.length > 0) {
-      const payload = variants.map(v => ({
-        demo_item_id: demo.id,
-        variant_type: sellMode,
-        label: v.label?.trim(),
+    try {
+      const formattedVariants = variants.map(v => ({
+        label: (v.label || '').trim(),
         unit_id: v.unit_id || unitId || null,
         value: v.value ? Number(v.value) : 1,
         price: v.price ? Number(v.price) : 0,
-        is_default: v.is_default || false,
+        is_default: Boolean(v.is_default),
         is_active: v.is_active ?? true
       }))
 
-      const { error } = await supabase.from('demo_variants').insert(payload)
-      if (error) setVariantsMsg({ type: 'error', text: error.message })
-      else {
-        setVariantsMsg({ type: 'success', text: 'Template pack variants updated. New vendor items will offer these pack options.' })
-        showToast('Pack variants updated!')
+      const res = await saveDemoVariantsAction({
+        demoId: demo.id,
+        locale: locale || 'en',
+        sellMode,
+        defaultUnitId: unitId || null,
+        variants: formattedVariants
+      })
+
+      if (!res.success) {
+        throw new Error(res.error || 'Failed to save pack variants.')
       }
-    } else {
-      setVariantsMsg({ type: 'success', text: 'All template variants cleared.' })
-      showToast('Variants cleared.')
+
+      if (res.variants) {
+        setVariants(res.variants)
+      }
+
+      setVariantsMsg({ type: 'success', text: 'Template pack variants updated. New vendor items will offer these pack options.' })
+      showToast('Pack variants updated!')
+    } catch (err: any) {
+      console.error('Error saving variants:', err)
+      setVariantsMsg({ type: 'error', text: err.message || 'Failed to save variants.' })
+    } finally {
+      setSavingVariants(false)
     }
-    setSavingVariants(false)
   }
 
   function addVariant() {
@@ -388,25 +383,20 @@ export default function DemoDetailClient({
   // ─────────────────────────────────────────────────────────────
   async function handleDeleteTemplate() {
     setDeleting(true)
-    const supabase = createClient()
     try {
-      // 1. Delete associated child records
-      await supabase.from('demo_variants').delete().eq('demo_item_id', demo.id)
-      await supabase.from('demo_sell_config').delete().eq('demo_item_id', demo.id)
-      await supabase.from('demo_item_translations').delete().eq('demo_item_id', demo.id)
-
-      // 2. Delete the demo_item itself
-      const { error: delErr } = await supabase.from('demo_items').delete().eq('id', demo.id)
-      if (delErr) throw delErr
+      const res = await deleteDemoTemplateAction(demo.id, locale || 'en')
+      if (!res.success) {
+        throw new Error(res.error || 'Failed to delete template')
+      }
 
       showToast('Template deleted successfully. Redirecting...')
       setTimeout(() => {
-        router.push('/admin/demos')
+        router.push(`/${locale || 'en'}/admin/demos`)
         router.refresh()
       }, 700)
     } catch (err: any) {
       console.error('Error deleting template:', err)
-      alert('Failed to delete template: ' + err.message)
+      showToast('Failed to delete template: ' + err.message, true)
       setDeleting(false)
       setShowDeleteModal(false)
     }
@@ -420,7 +410,7 @@ export default function DemoDetailClient({
           position: 'fixed',
           bottom: '24px',
           right: '24px',
-          background: '#064e3b',
+          background: toastMessage.isError ? '#7f1d1d' : '#064e3b',
           color: '#ffffff',
           padding: '12px 20px',
           borderRadius: '12px',
@@ -432,8 +422,8 @@ export default function DemoDetailClient({
           fontWeight: 600,
           fontSize: '0.95rem'
         }}>
-          <CheckCircle2 size={20} color="#34d399" />
-          <span>{toastMessage}</span>
+          {toastMessage.isError ? <AlertCircle size={20} color="#f87171" /> : <CheckCircle2 size={20} color="#34d399" />}
+          <span>{toastMessage.text}</span>
         </div>
       )}
 

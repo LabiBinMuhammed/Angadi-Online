@@ -4,7 +4,8 @@ import DemoManagementClient from './DemoManagementClient'
 
 export const metadata: Metadata = { title: 'Demo Templates' }
 
-export default async function DemosPage() {
+export default async function DemosPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   const supabase = await createClient()
   const [{ data: demos }, { data: categories }, { data: units }] = await Promise.all([
     supabase.from('demo_items').select('id, name, sell_mode, default_image, category_id, unit_id, code, display_order').order('name'),
@@ -19,6 +20,7 @@ export default async function DemosPage() {
         demos={(demos ?? []) as any[]}
         categories={(categories ?? []) as any[]}
         units={(units ?? []) as any[]}
+        locale={locale || 'en'}
       />
     </>
   )

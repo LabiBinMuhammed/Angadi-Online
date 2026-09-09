@@ -8,17 +8,17 @@ import type { DemoItem, DemoSellConfig, DemoVariant, Unit } from '@/types'
 
 export const metadata: Metadata = { title: 'Manage Master Catalog Template | Angadi Admin' }
 
-export default async function DemoDetailPage({ params }: { params: Promise<{ demoId: string }> }) {
+export default async function DemoDetailPage({ params }: { params: Promise<{ locale: string; demoId: string }> }) {
   const supabase = await createClient()
   
-  const { demoId } = await params
+  const { locale, demoId } = await params
   const [demoRes, configRes, variantsRes, unitsRes, catRes, transRes] = await Promise.all([
     supabase.from('demo_items').select('*').eq('id', demoId).single(),
     supabase.from('demo_sell_config').select('*').eq('demo_item_id', demoId).maybeSingle(),
     supabase.from('demo_variants').select('*').eq('demo_item_id', demoId).order('price', { ascending: true }),
     supabase.from('units').select('id, name, symbol, base_multiplier').order('name', { ascending: true }),
     supabase.from('categories').select('id, name, display_order').order('display_order', { ascending: true }),
-    supabase.from('demo_item_translations').select('*').eq('demo_item_id', demoId).eq('language_code', 'ml').maybeSingle()
+    supabase.from('demo_item_translations').select('*').eq('demo_item_id', demoId).eq('language_code', locale || 'ml').maybeSingle()
   ])
 
   if (demoRes.error || !demoRes.data) return notFound()
@@ -34,7 +34,7 @@ export default async function DemoDetailPage({ params }: { params: Promise<{ dem
     <div className="admin-container" style={{ padding: '2rem 1.5rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <Link 
-          href="/admin/demos" 
+          href={`/${locale || 'en'}/admin/demos`} 
           style={{ 
             marginBottom: '1rem', 
             display: 'inline-flex', 
@@ -61,6 +61,7 @@ export default async function DemoDetailPage({ params }: { params: Promise<{ dem
         units={units} 
         categories={categories}
         initialMalayalam={initialMalayalam}
+        locale={locale || 'en'}
       />
     </div>
   )
