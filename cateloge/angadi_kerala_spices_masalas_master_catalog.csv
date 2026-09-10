@@ -1,54 +1,83 @@
 S.No.,Category,Product Name,Description,Quantity,Original Price (MRP),Selling Price,Image URL
-1,Spices & Masalas,Asafoetida Powder (Kayam),"Asafoetida Powder (Kayam) for everyday cooking, dining, and household needs.",20g / 50g / 100g / 200g,,,
-2,Spices & Masalas,Avial Masala,"Avial Masala for everyday cooking, dining, and household needs.",50g / 100g / 200g,,,
-3,Spices & Masalas,Bay Leaf,"Bay Leaf for everyday cooking, dining, and household needs.",20g / 30g / 50g / 100g,,,
-4,Spices & Masalas,Beef Masala / Beef Roast Masala,"Beef Masala / Beef Roast Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-5,Spices & Masalas,Black Mustard Seeds,"Black Mustard Seeds for everyday cooking, dining, and household needs.",100g / 250g / 500g / 1kg,,,
-6,Spices & Masalas,Black Pepper,"Black Pepper for everyday cooking, dining, and household needs.",50g / 100g / 200g / 250g / 500g / 1kg,,,
-7,Spices & Masalas,Black Pepper Powder,"Black Pepper Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-8,Spices & Masalas,Black Sesame Seeds,"Black Sesame Seeds for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-9,Spices & Masalas,Carom Seeds (Ajwain),"Carom Seeds (Ajwain) for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-10,Spices & Masalas,Cassia Bark,"Cassia Bark for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-11,Spices & Masalas,Chaat Masala,"Chaat Masala for everyday cooking, dining, and household needs.",50g / 100g / 200g,,,
-12,Spices & Masalas,Chana Masala,"Chana Masala for everyday cooking, dining, and household needs.",50g / 100g / 200g,,,
-13,Spices & Masalas,Chicken Fry Masala,"Chicken Fry Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-14,Spices & Masalas,Chicken Masala,"Chicken Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-15,Spices & Masalas,Cinnamon,"Cinnamon for everyday cooking, dining, and household needs.",25g / 50g / 100g / 250g / 500g,,,
-16,Spices & Masalas,Cloves,"Cloves for everyday cooking, dining, and household needs.",25g / 50g / 100g / 250g / 500g,,,
-17,Spices & Masalas,Coriander Powder,"Coriander Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-18,Spices & Masalas,Coriander Seeds,"Coriander Seeds for everyday cooking, dining, and household needs.",100g / 250g / 500g / 1kg,,,
-19,Spices & Masalas,Cumin Powder,"Cumin Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-20,Spices & Masalas,Cumin Seeds,"Cumin Seeds for everyday cooking, dining, and household needs.",50g / 100g / 200g / 250g / 500g / 1kg,,,
-21,Spices & Masalas,Dried Curry Leaves,"Dried Curry Leaves for everyday cooking, dining, and household needs.",25g / 50g / 100g,,,
-22,Spices & Masalas,Dry Ginger (Chukku),"Dry Ginger (Chukku) for everyday cooking, dining, and household needs.",50g / 100g / 200g / 250g / 500g,,,
-23,Spices & Masalas,Dry Ginger Powder (Chukku Podi),"Dry Ginger Powder (Chukku Podi) for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-24,Spices & Masalas,Dry Red Chilli,"Dry Red Chilli for everyday cooking, dining, and household needs.",100g / 250g / 500g / 1kg,,,
-25,Spices & Masalas,Egg Curry Masala,"Egg Curry Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-26,Spices & Masalas,Fennel Powder,"Fennel Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-27,Spices & Masalas,Fennel Seeds,"Fennel Seeds for everyday cooking, dining, and household needs.",50g / 100g / 200g / 250g / 500g / 1kg,,,
-28,Spices & Masalas,Fenugreek Powder,"Fenugreek Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-29,Spices & Masalas,Fenugreek Seeds,"Fenugreek Seeds for everyday cooking, dining, and household needs.",100g / 250g / 500g / 1kg,,,
-30,Spices & Masalas,Fish Curry Masala,"Fish Curry Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-31,Spices & Masalas,Fish Fry Masala,"Fish Fry Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-32,Spices & Masalas,Green Cardamom,"Green Cardamom for everyday cooking, dining, and household needs.",25g / 50g / 100g / 250g / 500g,,,
-33,Spices & Masalas,Kashmiri Chilli Powder,"Kashmiri Chilli Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-34,Spices & Masalas,Kashmiri Dry Red Chilli,"Kashmiri Dry Red Chilli for everyday cooking, dining, and household needs.",100g / 250g / 500g,,,
-35,Spices & Masalas,Kerala Garam Masala,"Kerala Garam Masala for everyday cooking, dining, and household needs.",50g / 100g / 200g / 250g,,,
-36,Spices & Masalas,Kudampuli (Malabar Tamarind),"Kudampuli (Malabar Tamarind) for everyday cooking, dining, and household needs.",50g / 100g / 200g / 250g / 500g / 1kg,,,
-37,Spices & Masalas,Mace Whole,"Mace Whole for everyday cooking, dining, and household needs.",25g / 50g / 100g,,,
-38,Spices & Masalas,Malabar Biriyani Masala,"Malabar Biriyani Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-39,Spices & Masalas,Meat Masala,"Meat Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-40,Spices & Masalas,Nutmeg Whole,"Nutmeg Whole for everyday cooking, dining, and household needs.",25g / 50g / 100g / 250g,,,
-41,Spices & Masalas,Pav Bhaji Masala,"Pav Bhaji Masala for everyday cooking, dining, and household needs.",50g / 100g / 200g,,,
-42,Spices & Masalas,Pickle Masala,"Pickle Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-43,Spices & Masalas,Poppy Seeds (Khas Khas),"Poppy Seeds (Khas Khas) for everyday cooking, dining, and household needs.",25g / 50g / 100g,,,
-44,Spices & Masalas,Rasam Powder,"Rasam Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-45,Spices & Masalas,Red Chilli Powder,"Red Chilli Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-46,Spices & Masalas,Sambar Powder,"Sambar Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-47,Spices & Masalas,Star Anise,"Star Anise for everyday cooking, dining, and household needs.",25g / 50g / 100g / 250g,,,
-48,Spices & Masalas,Tamarind (Valan Puli),"Tamarind (Valan Puli) for everyday cooking, dining, and household needs.",100g / 250g / 500g / 1kg,,,
-49,Spices & Masalas,Theeyal Masala,"Theeyal Masala for everyday cooking, dining, and household needs.",50g / 100g / 200g,,,
-50,Spices & Masalas,Turmeric Powder,"Turmeric Powder for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g / 1kg,,,
-51,Spices & Masalas,Vegetable Masala / Veg Kurma Masala,"Vegetable Masala / Veg Kurma Masala for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
-52,Spices & Masalas,White Sesame Seeds,"White Sesame Seeds for everyday cooking, dining, and household needs.",50g / 100g / 250g / 500g,,,
-53,Spices & Masalas,Yellow Mustard Seeds,"Yellow Mustard Seeds for everyday cooking, dining, and household needs.",50g / 100g / 250g,,,
+1,Spices & Masalas,"Chola Chicken Masala","Chola Chicken Masala for authentic Kerala cuisine and household cooking.","100g / 50g",₹49,₹38,https://www.cholafoods.com/images/spices/chicken-masala.jpg
+2,Spices & Masalas,"Chola Dates Pickle","Chola Dates Pickle for authentic Kerala cuisine and household cooking.","100g / 200g / 500g / 1kg / 5kg",₹58,₹45,https://www.cholafoods.com/images/products/dates-pickle.jpg
+3,Spices & Masalas,"Chola Fish Masala","Chola Fish Masala for authentic Kerala cuisine and household cooking.","100g / 50g",₹46,₹35,https://www.cholafoods.com/images/spices/fish-masala.jpg
+4,Spices & Masalas,"Chola Garlic Pickle","Chola Garlic Pickle for authentic Kerala cuisine and household cooking.","100g / 200g / 500g / 1kg / 5kg",₹52,₹40,https://www.cholafoods.com/images/products/garlic-pickle.jpg
+5,Spices & Masalas,"Chola Lemon Pickle","Chola Lemon Pickle for authentic Kerala cuisine and household cooking.","100g / 200g / 500g / 1kg / 5kg",₹46,₹35,https://www.cholafoods.com/images/products/lemon-pickle.jpg
+6,Spices & Masalas,"Chola Mango Pickle","Chola Mango Pickle for authentic Kerala cuisine and household cooking.","100g / 200g / 500g / 1kg / 5kg",₹46,₹35,https://www.cholafoods.com/images/products/mango-pickle.jpg
+7,Spices & Masalas,"Chola Meat Masala","Chola Meat Masala for authentic Kerala cuisine and household cooking.","100g / 50g",₹49,₹38,https://www.cholafoods.com/images/spices/meat-masala.jpg
+8,Spices & Masalas,"Chola Mixed Fruit Jam","Chola Mixed Fruit Jam for authentic Kerala cuisine and household cooking.","500g / 200g",₹144,₹110,https://www.cholafoods.com/images/products/mixed-fruit-jam.jpg
+9,Spices & Masalas,"Chola Sambar Powder","Chola Sambar Powder for authentic Kerala cuisine and household cooking.","100g / 50g",₹42,₹32,https://www.cholafoods.com/images/spices/sambar-powder.jpg
+10,Spices & Masalas,"Chola Tender Mango Pickle (Nadan Kanni Manga)","Chola Tender Mango Pickle (Nadan Kanni Manga) for authentic Kerala cuisine and household cooking.","100g / 200g / 500g / 1kg / 5kg",₹58,₹45,https://www.cholafoods.com/images/products/tender-mango-pickle.jpg
+11,Spices & Masalas,"Chola Tomato Ketchup / Sauce","Chola Tomato Ketchup / Sauce for authentic Kerala cuisine and household cooking.","500g / 200g",₹98,₹75,https://www.cholafoods.com/images/products/tomato-sauce.jpg
+12,Spices & Masalas,"Eastern Arabia Shawarma Masala","Eastern Arabia Shawarma Masala for authentic Kerala cuisine and household cooking.","100 g",₹102,₹70,https://cdn.grofers.com/app/images/products/full_s/593765.jpg
+13,Spices & Masalas,"Eastern Asafoetida Powder","Eastern Asafoetida Powder for authentic Kerala cuisine and household cooking.","50 g",₹92,₹67,https://instamart-media.swiggy.com/eastern-asafoetida-50g.jpg
+14,Spices & Masalas,"Eastern Biriyani Masala","Eastern Biriyani Masala for authentic Kerala cuisine and household cooking.","100 g",₹109,₹70,https://instamart-media.swiggy.com/eastern-biriyani-100g.jpg
+15,Spices & Masalas,"Eastern Black Pepper Powder","Eastern Black Pepper Powder for authentic Kerala cuisine and household cooking.","100 g",₹156,₹110,https://instamart-media.swiggy.com/eastern-pepper-100g.jpg
+16,Spices & Masalas,"Eastern Chana Masala","Eastern Chana Masala for authentic Kerala cuisine and household cooking.","100 g",₹79,₹55,https://instamart-media.swiggy.com/eastern-chana-masala-100g.jpg
+17,Spices & Masalas,"Eastern Chicken Kebab Masala","Eastern Chicken Kebab Masala for authentic Kerala cuisine and household cooking.","100 g",₹69,₹53,https://instamart-media.swiggy.com/eastern-chicken-kebab-100g.jpg
+18,Spices & Masalas,"Eastern Chicken Masala","Eastern Chicken Masala for authentic Kerala cuisine and household cooking.","100 g",₹80,₹46,https://instamart-media.swiggy.com/eastern-chicken-100g.jpg
+19,Spices & Masalas,"Eastern Chicken Sukka Masala","Eastern Chicken Sukka Masala for authentic Kerala cuisine and household cooking.","80 g",₹60,₹44,https://instamart-media.swiggy.com/eastern-chicken-sukka-80g.jpg
+20,Spices & Masalas,"Eastern Chilli Powder","Eastern Chilli Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g",₹58,₹34,https://instamart-media.swiggy.com/eastern-chilli-100g.jpg
+21,Spices & Masalas,"Eastern Chilly Chicken Masala","Eastern Chilly Chicken Masala for authentic Kerala cuisine and household cooking.","100 g",₹88,₹65,https://instamart-media.swiggy.com/eastern-chilly-chicken-100g.jpg
+22,Spices & Masalas,"Eastern Coriander Powder","Eastern Coriander Powder for authentic Kerala cuisine and household cooking.","250 g / 500 g",₹178,₹108,https://instamart-media.swiggy.com/eastern-coriander-250g.jpg
+23,Spices & Masalas,"Eastern Cumin / Jeera Powder","Eastern Cumin / Jeera Powder for authentic Kerala cuisine and household cooking.","100 g",₹98,₹64,https://instamart-media.swiggy.com/eastern-cumin-100g.jpg
+24,Spices & Masalas,"Eastern Egg Curry Masala","Eastern Egg Curry Masala for authentic Kerala cuisine and household cooking.","100 g",₹64,₹45,https://instamart-media.swiggy.com/eastern-egg-masala-100g.jpg
+25,Spices & Masalas,"Eastern Fish Fry Masala","Eastern Fish Fry Masala for authentic Kerala cuisine and household cooking.","100 g",₹81,₹58,https://instamart-media.swiggy.com/eastern-fish-fry-100g.jpg
+26,Spices & Masalas,"Eastern Fish Masala","Eastern Fish Masala for authentic Kerala cuisine and household cooking.","100 g",₹83,₹63,https://instamart-media.swiggy.com/eastern-fish-100g.jpg
+27,Spices & Masalas,"Eastern Garam Masala Powder","Eastern Garam Masala Powder for authentic Kerala cuisine and household cooking.","100 g",₹136,₹77,https://instamart-media.swiggy.com/eastern-garam-masala-100g.jpg
+28,Spices & Masalas,"Eastern Kashmiri Chilly Powder","Eastern Kashmiri Chilly Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g",₹138,₹77,https://instamart-media.swiggy.com/eastern-kashmiri-chilly-100g.jpg
+29,Spices & Masalas,"Eastern Meat Masala","Eastern Meat Masala for authentic Kerala cuisine and household cooking.","100 g",₹80,₹58,https://instamart-media.swiggy.com/eastern-meat-100g.jpg
+30,Spices & Masalas,"Eastern Pav Bhaji Masala","Eastern Pav Bhaji Masala for authentic Kerala cuisine and household cooking.","100 g",₹87,₹62,https://instamart-media.swiggy.com/eastern-pav-bhaji-100g.jpg
+31,Spices & Masalas,"Eastern Pickle Masala","Eastern Pickle Masala for authentic Kerala cuisine and household cooking.","100 g",₹79,₹58,https://cdn.grofers.com/app/images/products/full_s/85733.jpg
+32,Spices & Masalas,"Eastern Rasam Powder","Eastern Rasam Powder for authentic Kerala cuisine and household cooking.","100 g",₹75,₹52,https://instamart-media.swiggy.com/eastern-rasam-100g.jpg
+33,Spices & Masalas,"Eastern Sambar Powder","Eastern Sambar Powder for authentic Kerala cuisine and household cooking.","100 g",₹89,₹58,https://instamart-media.swiggy.com/eastern-sambar-100g.jpg
+34,Spices & Masalas,"Eastern Turmeric Powder","Eastern Turmeric Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g",₹58,₹35,https://instamart-media.swiggy.com/eastern-turmeric-100g.jpg
+35,Spices & Masalas,"Elanadu Spicy Paneer Pickle Jar","Elanadu Spicy Paneer Pickle Jar for authentic Kerala cuisine and household cooking.","200 g",₹138,₹120,https://elanadumilk.com/images/products/paneer-pickle-200g.png
+36,Spices & Masalas,"Milma By Pro High Protein Cattle Feed","Milma By Pro High Protein Cattle Feed for authentic Kerala cuisine and household cooking.","50 kg",₹1702,₹1480,https://elanadumilk.com/images/products/cattle-feed-bypro-50kg.png
+37,Spices & Masalas,"Milma Rich Cattle Feed Pellets","Milma Rich Cattle Feed Pellets for authentic Kerala cuisine and household cooking.","50 kg",₹1553,₹1350,https://elanadumilk.com/images/products/cattle-feed-rich-50kg.png
+38,Spices & Masalas,"Milmamin Mineral Mixture Supplement","Milmamin Mineral Mixture Supplement for authentic Kerala cuisine and household cooking.","1 kg",₹127,₹110,https://elanadumilk.com/images/products/milmamin-1kg.png
+39,Spices & Masalas,"Supernova Beef Pickle","Supernova Beef Pickle for authentic Kerala cuisine and household cooking.","200 g",₹242,₹200,https://supernovafoods.in/wp-content/uploads/beef-pickle-200g.jpg
+40,Spices & Masalas,"Supernova Biriyani Masala","Supernova Biriyani Masala for authentic Kerala cuisine and household cooking.","100 g",₹86,₹72,https://supernovafoods.in/wp-content/uploads/biriyani-masala-100g.jpg
+41,Spices & Masalas,"Supernova Bitter Gourd Pickle","Supernova Bitter Gourd Pickle for authentic Kerala cuisine and household cooking.","400 g",₹138,₹115,https://supernovafoods.in/wp-content/uploads/bitter-gourd-pickle-400g.jpg
+42,Spices & Masalas,"Supernova Black Pepper Powder","Supernova Black Pepper Powder for authentic Kerala cuisine and household cooking.","100 g",₹159,₹130,https://supernovafoods.in/wp-content/uploads/black-pepper-100g.jpg
+43,Spices & Masalas,"Supernova Broast Powder","Supernova Broast Powder for authentic Kerala cuisine and household cooking.","100 g",₹57,₹48,https://supernovafoods.in/wp-content/uploads/broast-powder-100g.jpg
+44,Spices & Masalas,"Supernova Chaat Masala","Supernova Chaat Masala for authentic Kerala cuisine and household cooking.","100 g",₹73,₹60,https://supernovafoods.in/wp-content/uploads/chaat-masala-100g.jpg
+45,Spices & Masalas,"Supernova Chana Masala","Supernova Chana Masala for authentic Kerala cuisine and household cooking.","100 g",₹67,₹55,https://supernovafoods.in/wp-content/uploads/chana-masala-100g.jpg
+46,Spices & Masalas,"Supernova Chicken Fry Masala","Supernova Chicken Fry Masala for authentic Kerala cuisine and household cooking.","100 g",₹78,₹66,https://supernovafoods.in/wp-content/uploads/chicken-fry-masala-100g.jpg
+47,Spices & Masalas,"Supernova Chicken Masala","Supernova Chicken Masala for authentic Kerala cuisine and household cooking.","100 g",₹75,₹64,https://supernovafoods.in/wp-content/uploads/chicken-masala-100g.jpg
+48,Spices & Masalas,"Supernova Chilly Powder","Supernova Chilly Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g / 500 g / 1 kg",₹49,₹41,https://supernovafoods.in/wp-content/uploads/chilly-powder-100g.jpg
+49,Spices & Masalas,"Supernova Compounded Asafoetida","Supernova Compounded Asafoetida for authentic Kerala cuisine and household cooking.","50 g",₹88,₹76,https://supernovafoods.in/wp-content/uploads/asafoetida-50g.jpg
+50,Spices & Masalas,"Supernova Compounded Asafoetida Powder","Supernova Compounded Asafoetida Powder for authentic Kerala cuisine and household cooking.","50 g",₹93,₹80.5,https://supernovafoods.in/wp-content/uploads/asafoetida-powder-50g.jpg
+51,Spices & Masalas,"Supernova Coriander Powder","Supernova Coriander Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g / 500 g / 1 kg",₹42,₹36.5,https://supernovafoods.in/wp-content/uploads/coriander-powder-100g.jpg
+52,Spices & Masalas,"Supernova Cumin Powder","Supernova Cumin Powder for authentic Kerala cuisine and household cooking.","100 g",₹95,₹80,https://supernovafoods.in/wp-content/uploads/cumin-powder-100g.jpg
+53,Spices & Masalas,"Supernova Cumin Seeds (Jeera)","Supernova Cumin Seeds (Jeera) for authentic Kerala cuisine and household cooking.","100 g",₹98,₹80,https://supernovafoods.in/wp-content/uploads/cumin-seeds-100g.jpg
+54,Spices & Masalas,"Supernova Dates Pickle","Supernova Dates Pickle for authentic Kerala cuisine and household cooking.","400 g",₹156,₹128,https://supernovafoods.in/wp-content/uploads/dates-pickle-400g.jpg
+55,Spices & Masalas,"Supernova Egg Curry Masala","Supernova Egg Curry Masala for authentic Kerala cuisine and household cooking.","100 g",₹60,₹50,https://supernovafoods.in/wp-content/uploads/egg-curry-masala-100g.jpg
+56,Spices & Masalas,"Supernova Fennel Seeds (Saunf)","Supernova Fennel Seeds (Saunf) for authentic Kerala cuisine and household cooking.","100 g",₹56,₹45,https://supernovafoods.in/wp-content/uploads/fennel-seeds-100g.jpg
+57,Spices & Masalas,"Supernova Fenugreek Seeds","Supernova Fenugreek Seeds for authentic Kerala cuisine and household cooking.","100 g",₹41,₹32,https://supernovafoods.in/wp-content/uploads/fenugreek-seeds-100g.jpg
+58,Spices & Masalas,"Supernova Fish Curry Masala","Supernova Fish Curry Masala for authentic Kerala cuisine and household cooking.","100 g",₹79,₹65,https://supernovafoods.in/wp-content/uploads/fish-curry-masala-100g.jpg
+59,Spices & Masalas,"Supernova Fish Fry Masala","Supernova Fish Fry Masala for authentic Kerala cuisine and household cooking.","100 g",₹75,₹62,https://supernovafoods.in/wp-content/uploads/fish-fry-masala-100g.jpg
+60,Spices & Masalas,"Supernova Fish Pickle","Supernova Fish Pickle for authentic Kerala cuisine and household cooking.","200 g",₹219,₹180,https://supernovafoods.in/wp-content/uploads/fish-pickle-200g.jpg
+61,Spices & Masalas,"Supernova Garam Masala","Supernova Garam Masala for authentic Kerala cuisine and household cooking.","100 g",₹133,₹110,https://supernovafoods.in/wp-content/uploads/garam-masala-100g.jpg
+62,Spices & Masalas,"Supernova Garlic Pickle","Supernova Garlic Pickle for authentic Kerala cuisine and household cooking.","400 g",₹150,₹122,https://supernovafoods.in/wp-content/uploads/garlic-pickle-400g.jpg
+63,Spices & Masalas,"Supernova Ginger Pickle","Supernova Ginger Pickle for authentic Kerala cuisine and household cooking.","400 g",₹138,₹112,https://supernovafoods.in/wp-content/uploads/ginger-pickle-400g.jpg
+64,Spices & Masalas,"Supernova Gooseberry (Amla) Pickle","Supernova Gooseberry (Amla) Pickle for authentic Kerala cuisine and household cooking.","400 g",₹127,₹105,https://supernovafoods.in/wp-content/uploads/amla-pickle-400g.jpg
+65,Spices & Masalas,"Supernova Green Chilly Pickle","Supernova Green Chilly Pickle for authentic Kerala cuisine and household cooking.","400 g",₹121,₹98,https://supernovafoods.in/wp-content/uploads/green-chilly-pickle-400g.jpg
+66,Spices & Masalas,"Supernova Kashmiri Chilly Powder","Supernova Kashmiri Chilly Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g / 500 g / 1 kg",₹110,₹92,https://supernovafoods.in/wp-content/uploads/kashmiri-chilly-100g.jpg
+67,Spices & Masalas,"Supernova Kasuri Methi","Supernova Kasuri Methi for authentic Kerala cuisine and household cooking.","25 g",₹35,₹28,https://supernovafoods.in/wp-content/uploads/kasuri-methi-25g.jpg
+68,Spices & Masalas,"Supernova Lemon Pickle","Supernova Lemon Pickle for authentic Kerala cuisine and household cooking.","400 g",₹121,₹100,https://supernovafoods.in/wp-content/uploads/lemon-pickle-400g.jpg
+69,Spices & Masalas,"Supernova Mango Pickle","Supernova Mango Pickle for authentic Kerala cuisine and household cooking.","400 g",₹127,₹105,https://supernovafoods.in/wp-content/uploads/mango-pickle-400g.jpg
+70,Spices & Masalas,"Supernova Meat Fry Masala","Supernova Meat Fry Masala for authentic Kerala cuisine and household cooking.","100 g",₹81,₹68,https://supernovafoods.in/wp-content/uploads/meat-fry-masala-100g.jpg
+71,Spices & Masalas,"Supernova Meat Masala","Supernova Meat Masala for authentic Kerala cuisine and household cooking.","100 g",₹79,₹66,https://supernovafoods.in/wp-content/uploads/meat-masala-100g.jpg
+72,Spices & Masalas,"Supernova Mixed Vegetable Pickle","Supernova Mixed Vegetable Pickle for authentic Kerala cuisine and household cooking.","400 g",₹133,₹108,https://supernovafoods.in/wp-content/uploads/veg-pickle-400g.jpg
+73,Spices & Masalas,"Supernova Mustard Seeds","Supernova Mustard Seeds for authentic Kerala cuisine and household cooking.","100 g",₹37,₹30,https://supernovafoods.in/wp-content/uploads/mustard-seeds-100g.jpg
+74,Spices & Masalas,"Supernova Nutmeg Pickle","Supernova Nutmeg Pickle for authentic Kerala cuisine and household cooking.","400 g",₹144,₹118,https://supernovafoods.in/wp-content/uploads/nutmeg-pickle-400g.jpg
+75,Spices & Masalas,"Supernova Pav Bhaji Masala","Supernova Pav Bhaji Masala for authentic Kerala cuisine and household cooking.","100 g",₹72,₹58,https://supernovafoods.in/wp-content/uploads/pav-bhaji-masala-100g.jpg
+76,Spices & Masalas,"Supernova Prawns Pickle","Supernova Prawns Pickle for authentic Kerala cuisine and household cooking.","200 g",₹253,₹210,https://supernovafoods.in/wp-content/uploads/prawns-pickle-200g.jpg
+77,Spices & Masalas,"Supernova Rasam Powder","Supernova Rasam Powder for authentic Kerala cuisine and household cooking.","100 g",₹58,₹48,https://supernovafoods.in/wp-content/uploads/rasam-powder-100g.jpg
+78,Spices & Masalas,"Supernova Sambar Powder","Supernova Sambar Powder for authentic Kerala cuisine and household cooking.","100 g",₹64,₹52,https://supernovafoods.in/wp-content/uploads/sambar-powder-100g.jpg
+79,Spices & Masalas,"Supernova Tender Mango Pickle","Supernova Tender Mango Pickle for authentic Kerala cuisine and household cooking.","400 g",₹167,₹138,https://supernovafoods.in/wp-content/uploads/tender-mango-400g.jpg
+80,Spices & Masalas,"Supernova Turmeric Powder","Supernova Turmeric Powder for authentic Kerala cuisine and household cooking.","100 g / 250 g / 500 g / 1 kg",₹41,₹33,https://supernovafoods.in/wp-content/uploads/turmeric-powder-100g.jpg
+81,Spices & Masalas,"Supernova Vegetable Masala","Supernova Vegetable Masala for authentic Kerala cuisine and household cooking.","100 g",₹60,₹50,https://supernovafoods.in/wp-content/uploads/veg-masala-100g.jpg
+82,Spices & Masalas,"Supernova White Lemon Pickle","Supernova White Lemon Pickle for authentic Kerala cuisine and household cooking.","400 g",₹115,₹95,https://supernovafoods.in/wp-content/uploads/white-lemon-400g.jpg

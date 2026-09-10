@@ -1,0 +1,38 @@
+Category,Product Name,Description,Quantity,Original Price (MRP),Selling Price,Status,Image URL
+Straight Spices,Eastern Turmeric Powder,"Vibrant, high-curcumin haldi for daily cooking.",100 g,₹50,₹35,In Stock,https://instamart-media.swiggy.com/eastern-turmeric-100g.jpg
+Straight Spices,Eastern Turmeric Powder,Bright yellow haldi powder in a larger bulk pack.,250 g,₹125,₹87,In Stock,https://instamart-media.swiggy.com/eastern-turmeric-250g.jpg
+Straight Spices,Eastern Chilli Powder,Authentic and spicy red chilli powder for rich hot flavor.,100 g,₹50,₹34,In Stock,https://instamart-media.swiggy.com/eastern-chilli-100g.jpg
+Straight Spices,Eastern Chilli Powder,Hot spicy red chilli powder for regular gravy dishes.,250 g,₹140,₹86,Out of Stock,https://instamart-media.swiggy.com/eastern-chilli-250g.jpg
+Straight Spices,Eastern Kashmiri Chilly Powder,Mild heat with a rich red color for gravies and marinades.,100 g,₹120,₹77,Out of Stock,https://instamart-media.swiggy.com/eastern-kashmiri-chilly-100g.jpg
+Straight Spices,Eastern Kashmiri Chilly Powder,Mild heat with a deep red color for gravies and curries.,250 g,₹295,₹171,In Stock,https://instamart-media.swiggy.com/eastern-kashmiri-chilly-250g.jpg
+Straight Spices,Eastern Coriander Powder,Pure ground dhania seeds for flavor enhancement.,250 g,₹154,₹108,In Stock,https://instamart-media.swiggy.com/eastern-coriander-250g.jpg
+Straight Spices,Eastern Coriander Powder,Ground coriander powder in bulk economy pack.,500 g,₹255,₹166,Out of Stock,https://instamart-media.swiggy.com/eastern-coriander-500g.jpg
+Straight Spices,Eastern Cumin / Jeera Powder,Ground roasted cumin seeds with a strong earthy aroma.,100 g,₹85,₹64,In Stock,https://instamart-media.swiggy.com/eastern-cumin-100g.jpg
+Straight Spices,Eastern Asafoetida Powder,Aromatic hing powder essential for South Indian tempering.,50 g,₹80,₹67,In Stock,https://instamart-media.swiggy.com/eastern-asafoetida-50g.jpg
+Straight Spices,Eastern Black Pepper Powder,Coarsely ground black pepper for seasoning and soups.,100 g,₹135,₹110,Out of Stock,https://instamart-media.swiggy.com/eastern-pepper-100g.jpg
+Blended Masalas,Eastern Chicken Masala,Balanced spice mix for traditional South Indian chicken curries.,100 g,₹69,₹46,In Stock,https://instamart-media.swiggy.com/eastern-chicken-100g.jpg
+Blended Masalas,Eastern Meat Masala,"Rich, aromatic spice blend specially formulated for mutton curries.",100 g,₹69,₹58,In Stock,https://instamart-media.swiggy.com/eastern-meat-100g.jpg
+Blended Masalas,Eastern Garam Masala Powder,Classic aromatic spice blend used as a finishing touch for curries.,100 g,₹118,₹77,In Stock,https://instamart-media.swiggy.com/eastern-garam-masala-100g.jpg
+Blended Masalas,Eastern Biriyani Masala,Exotic spice formulation for fragrant chicken and mutton biryanis.,100 g,₹94,₹70,In Stock,https://instamart-media.swiggy.com/eastern-biriyani-100g.jpg
+Blended Masalas,Eastern Fish Masala,Specialty blend designed for spicy fish gravies and marinades.,100 g,₹72,₹63,In Stock,https://instamart-media.swiggy.com/eastern-fish-100g.jpg
+Blended Masalas,Eastern Sambar Powder,Authentic South Indian sambar blend made with roasted spices.,100 g,₹77,₹58,In Stock,https://instamart-media.swiggy.com/eastern-sambar-100g.jpg
+Blended Masalas,Eastern Chilly Chicken Masala,Indo-Chinese style spice mix for quick spicy chicken appetizers.,100 g,₹76,₹65,In Stock,https://instamart-media.swiggy.com/eastern-chilly-chicken-100g.jpg
+Blended Masalas,Eastern Chicken Sukka Masala,Ready spice mix for traditional coastal-style dry chicken.,80 g,₹52,₹44,In Stock,https://instamart-media.swiggy.com/eastern-chicken-sukka-80g.jpg
+Blended Masalas,Eastern Chicken Kebab Masala,Spicy marinade spice blend formulated for fried chicken kebabs.,100 g,₹60,₹53,In Stock,https://instamart-media.swiggy.com/eastern-chicken-kebab-100g.jpg
+Blended Masalas,Eastern Pickle Masala,Blend of tangy and spicy ingredients for preparing homemade pickles.,100 g,₹68,₹58,In Stock,https://cdn.grofers.com/app/images/products/full_s/85733.jpg
+Blended Masalas,Eastern Arabia Shawarma Masala,Middle Eastern spice seasoning for authentic chicken shawarma.,100 g,₹88,₹70,In Stock,https://cdn.grofers.com/app/images/products/full_s/593765.jpg
+Blended Masalas,Eastern Rasam Powder,Traditional spicy & tangy blend for preparing South Indian rasam.,100 g,₹65,₹52,Out of Stock,https://instamart-media.swiggy.com/eastern-rasam-100g.jpg
+Blended Masalas,Eastern Egg Curry Masala,Flavorful spice mix formulated for boil egg curries.,100 g,₹55,₹45,Out of Stock,https://instamart-media.swiggy.com/eastern-egg-masala-100g.jpg
+Blended Masalas,Eastern Fish Fry Masala,Ready mix for crisp and spicy fish fry coat coating.,100 g,₹70,₹58,Out of Stock,https://instamart-media.swiggy.com/eastern-fish-fry-100g.jpg
+Blended Masalas,Eastern Pav Bhaji Masala,Aromatic Mumbai style vegetable bhaji spice blend.,100 g,₹75,₹62,Out of Stock,https://instamart-media.swiggy.com/eastern-pav-bhaji-100g.jpg
+Blended Masalas,Eastern Chana Masala,Rich tangy spice blend tailored for chickpea curries.,100 g,₹68,₹55,Out of Stock,https://instamart-media.swiggy.com/eastern-chana-masala-100g.jpg
+Flours & Mixes,Eastern Puttu Powder (Chamba),"Roasted Chamba rice flour for making soft, fluffy puttu.",500 g,₹70,₹49,In Stock,https://instamart-media.swiggy.com/eastern-puttu-chamba-500g.jpg
+Flours & Mixes,Eastern White Puttu Powder,Finely ground white rice flour for traditional white puttu.,500 g,₹72,₹54,Out of Stock,https://instamart-media.swiggy.com/eastern-white-puttu-500g.jpg
+Flours & Mixes,Eastern 5 Min Palappam Mix,Instant ready mix for soft appams with crisp edges.,200 g,₹61,₹46,In Stock,https://instamart-media.swiggy.com/eastern-palappam-200g.jpg
+Flours & Mixes,Eastern 5 Min Idiyappam Mix,Quick-prep flour mix for instant string hoppers/idiyappam.,200 g,₹109,₹82,In Stock,https://instamart-media.swiggy.com/eastern-idiyappam-200g.jpg
+Flours & Mixes,Eastern Palada Mix,Sweet dessert mix with rice ada for traditional Payasam.,300 g,₹95,₹69,In Stock,https://instamart-media.swiggy.com/eastern-palada-300g.jpg
+Flours & Mixes,Eastern Kasuri Methi,Sun-dried fenugreek leaves to enhance flavor and fragrance.,25 g,₹25,₹24,In Stock,https://instamart-media.swiggy.com/eastern-kasuri-methi-25g.jpg
+Flours & Mixes,Eastern Seedless Tamarind,"Clean, seeded tamarind block for gravies, sambar, and chutneys.",200 g,₹80,₹60,In Stock,https://instamart-media.swiggy.com/eastern-tamarind-200g.jpg
+Flours & Mixes,Eastern Dosa Mix,Instant breakfast mix for preparing crispy golden dosas.,200 g,₹65,₹50,Out of Stock,https://instamart-media.swiggy.com/eastern-dosa-mix-200g.jpg
+Flours & Mixes,Eastern Roasted Rava / Sooji,Pre-roasted semolina flour for upma, halwa, and breakfast dishes.,500 g,₹45,₹38,Out of Stock,https://instamart-media.swiggy.com/eastern-roasted-rava-500g.jpg
+Flours & Mixes,Eastern Easy Pathiri Powder,Special finely ground rice flour for soft Kerala rice pathiris.,500 g,₹68,₹52,Out of Stock,https://instamart-media.swiggy.com/eastern-pathiri-powder-500g.jpg
