@@ -174,3 +174,24 @@ export function getCategoryMalayalamName(categoryName: string): string {
   }
   return cleanName
 }
+
+export function getCategoryColor(categoryName: string): string {
+  const cleanName = categoryName.replace(/^[\p{Emoji}\s]+/gu, '').trim()
+  for (const [name, meta] of Object.entries(CATEGORY_VISUALS)) {
+    if (cleanName.toLowerCase() === name.toLowerCase()) {
+      return meta.color
+    }
+  }
+  return '#3b82f6'
+}
+
+export function getCategoryVisualMeta(categoryName: string): CategoryVisualMeta | null {
+  const cleanName = categoryName.replace(/^[\p{Emoji}\s]+/gu, '').trim()
+  for (const [name, meta] of Object.entries(CATEGORY_VISUALS)) {
+    if (cleanName.toLowerCase() === name.toLowerCase()) {
+      return meta
+    }
+  }
+  return null
+}
+

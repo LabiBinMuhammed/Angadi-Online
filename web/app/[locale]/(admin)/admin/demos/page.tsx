@@ -1,8 +1,9 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import DemoManagementClient from './DemoManagementClient'
 
-export const metadata: Metadata = { title: 'Demo Templates' }
+export const metadata: Metadata = { title: 'Demo Templates | Angadi Admin' }
 
 export default async function DemosPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -16,12 +17,15 @@ export default async function DemosPage({ params }: { params: Promise<{ locale: 
   return (
     <>
       <h1 className="panel-page-title">Demo Templates</h1>
-      <DemoManagementClient
-        demos={(demos ?? []) as any[]}
-        categories={(categories ?? []) as any[]}
-        units={(units ?? []) as any[]}
-        locale={locale || 'en'}
-      />
+      <Suspense fallback={<div style={{ padding: '2rem', color: '#94a3b8' }}>Loading templates...</div>}>
+        <DemoManagementClient
+          demos={(demos ?? []) as any[]}
+          categories={(categories ?? []) as any[]}
+          units={(units ?? []) as any[]}
+          locale={locale || 'en'}
+        />
+      </Suspense>
     </>
   )
 }
+

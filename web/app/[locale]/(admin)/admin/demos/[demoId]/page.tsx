@@ -8,10 +8,24 @@ import type { DemoItem, DemoSellConfig, DemoVariant, Unit } from '@/types'
 
 export const metadata: Metadata = { title: 'Manage Master Catalog Template | Angadi Admin' }
 
-export default async function DemoDetailPage({ params }: { params: Promise<{ locale: string; demoId: string }> }) {
+export default async function DemoDetailPage({
+  params,
+  searchParams
+}: {
+  params: Promise<{ locale: string; demoId: string }>
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const supabase = await createClient()
   
   const { locale, demoId } = await params
+  const sParams = searchParams ? await searchParams : {}
+  const qs = new URLSearchParams()
+  for (const [k, v] of Object.entries(sParams)) {
+    if (typeof v === 'string' && v) qs.set(k, v)
+  }
+  const returnQuery = qs.toString()
+  const backHref = `/${locale || 'en'}/admin/demos${returnQuery ? `?${returnQuery}` : ''}`
+
   const [demoRes, configRes, variantsRes, unitsRes, catRes, transRes] = await Promise.all([
     supabase.from('demo_items').select('*').eq('id', demoId).single(),
     supabase.from('demo_sell_config').select('*').eq('demo_item_id', demoId).maybeSingle(),
@@ -34,7 +48,7 @@ export default async function DemoDetailPage({ params }: { params: Promise<{ loc
     <div className="admin-container" style={{ padding: '2rem 1.5rem', maxWidth: '1200px', margin: '0 auto' }}>
       <div className="page-header" style={{ marginBottom: '1.5rem' }}>
         <Link 
-          href={`/${locale || 'en'}/admin/demos`} 
+          href={backHref} 
           style={{ 
             marginBottom: '1rem', 
             display: 'inline-flex', 
@@ -62,6 +76,7 @@ export default async function DemoDetailPage({ params }: { params: Promise<{ loc
         categories={categories}
         initialMalayalam={initialMalayalam}
         locale={locale || 'en'}
+        returnQuery={returnQuery}
       />
     </div>
   )

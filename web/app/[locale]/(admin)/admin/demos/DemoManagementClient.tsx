@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Plus,
@@ -34,6 +35,11 @@ import {
 import Link from 'next/link'
 import { findCatalogProduct } from '@/lib/catalog/brandRegistry'
 import { uploadDemoImageAction } from './[demoId]/actions'
+import {
+  getCategoryColor,
+  getCategoryEmoji,
+  getCategoryMalayalamName
+} from '@/lib/catalog/categoryImages'
 
 export type Demo = {
   id: string
@@ -59,17 +65,17 @@ export type Unit = {
 }
 
 const SELL_MODES = [
-  { value: 'All', label: 'All Types' },
-  { value: 'Manual', label: 'Manual (By Weight ⚖️)' },
-  { value: 'Fixed', label: 'Packed (Pre-Packed 📦)' },
-  { value: 'Dynamic', label: 'Dynamic (Size-based)' },
-  { value: 'Portion', label: 'Portion (By Piece 🔪)' }
+  { value: 'All', label: 'All Types', emoji: '📦', color: '#94a3b8' },
+  { value: 'Manual', label: 'Manual (By Weight ⚖️)', emoji: '⚖️', color: '#3b82f6' },
+  { value: 'Fixed', label: 'Packed (Pre-Packed 📦)', emoji: '📦', color: '#10b981' },
+  { value: 'Dynamic', label: 'Dynamic (Size-based 📐)', emoji: '📐', color: '#ec4899' },
+  { value: 'Portion', label: 'Portion (By Piece 🔪)', emoji: '🔪', color: '#f59e0b' }
 ]
 
 const ACTIVITY_MODES = [
-  { value: 'All', label: 'All Activity' },
-  { value: 'WithImage', label: 'With Image (Active 🖼️)' },
-  { value: 'NoImage', label: 'Missing Image (Draft ⚠️)' }
+  { value: 'All', label: 'All Activity', emoji: '🎯', color: '#94a3b8' },
+  { value: 'WithImage', label: 'With Image (Active 🖼️)', emoji: '🖼️', color: '#10b981' },
+  { value: 'NoImage', label: 'Missing Image (Draft ⚠️)', emoji: '⚠️', color: '#f59e0b' }
 ]
 
 function renderCategoryIcon(name: string, size = 16) {
@@ -100,18 +106,122 @@ export default function DemoManagementClient({
 }) {
   const [demos, setDemos] = useState(initial)
   const [showAddForm, setShowAddForm] = useState(false)
-  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
 
-  // Search and Filters State
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('All')
-  const [selectedSellMode, setSelectedSellMode] = useState('All')
-  const [selectedUnit, setSelectedUnit] = useState('All')
-  const [selectedActivity, setSelectedActivity] = useState('All')
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const pathname = usePathname()
 
-  // Pagination State
-  const [pageSize, setPageSize] = useState<number>(24)
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  // Initialize Search and Filters State from URL searchParams
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All')
+  const [selectedSellMode, setSelectedSellMode] = useState(searchParams.get('sell_mode') || 'All')
+  const [selectedUnit, setSelectedUnit] = useState(searchParams.get('unit') || 'All')
+  const [selectedActivity, setSelectedActivity] = useState(searchParams.get('activity') || 'All')
+
+  // Pagination & View State
+  const [pageSize, setPageSize] = useState<number>(searchParams.get('page_size') ? Number(searchParams.get('page_size')) : 24)
+  const [currentPage, setCurrentPage] = useState<number>(searchParams.get('page') ? Number(searchParams.get('page')) : 1)
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>(searchParams.get('view') === 'table' ? 'table' : 'cards')
+
+  const [isHydrated, setIsHydrated] = useState(false)
+
+  // Rehydrate from sessionStorage if URL has no searchParams on initial mount
+  useEffect(() => {
+    const hasUrlParams = Boolean(
+      searchParams.get('category') ||
+      searchParams.get('sell_mode') ||
+      searchParams.get('unit') ||
+      searchParams.get('activity') ||
+      searchParams.get('q') ||
+      searchParams.get('page') ||
+      searchParams.get('view') ||
+      searchParams.get('page_size')
+    )
+
+    if (!hasUrlParams) {
+      try {
+        const saved = sessionStorage.getItem('angadi_demos_filter_state')
+        if (saved) {
+          const p = JSON.parse(saved)
+          if (p.category) setSelectedCategory(p.category)
+          if (p.sell_mode) setSelectedSellMode(p.sell_mode)
+          if (p.unit) setSelectedUnit(p.unit)
+          if (p.activity) setSelectedActivity(p.activity)
+          if (p.q !== undefined) setSearchQuery(p.q)
+          if (p.page) setCurrentPage(p.page)
+          if (p.view) setViewMode(p.view)
+          if (p.page_size !== undefined) setPageSize(p.page_size)
+        }
+      } catch (e) {
+        console.error('Failed to load filter state from sessionStorage', e)
+      }
+    }
+    setIsHydrated(true)
+  }, [])
+
+  // Sync to URL searchParams & sessionStorage whenever filter/pagination state updates
+  const syncFilters = useCallback((
+    cat: string,
+    mode: string,
+    unit: string,
+    act: string,
+    q: string,
+    pg: number,
+    vm: 'cards' | 'table',
+    ps: number
+  ) => {
+    try {
+      sessionStorage.setItem('angadi_demos_filter_state', JSON.stringify({
+        category: cat,
+        sell_mode: mode,
+        unit,
+        activity: act,
+        q,
+        page: pg,
+        view: vm,
+        page_size: ps
+      }))
+    } catch (e) {}
+
+    const qs = new URLSearchParams()
+    if (cat !== 'All') qs.set('category', cat)
+    if (mode !== 'All') qs.set('sell_mode', mode)
+    if (unit !== 'All') qs.set('unit', unit)
+    if (act !== 'All') qs.set('activity', act)
+    if (q.trim()) qs.set('q', q.trim())
+    if (pg > 1) qs.set('page', pg.toString())
+    if (vm !== 'cards') qs.set('view', vm)
+    if (ps !== 24) qs.set('page_size', ps.toString())
+
+    const queryString = qs.toString()
+    const targetUrl = queryString ? `${pathname}?${queryString}` : pathname
+    router.replace(targetUrl, { scroll: false })
+  }, [pathname, router])
+
+  useEffect(() => {
+    if (!isHydrated) return
+    syncFilters(
+      selectedCategory,
+      selectedSellMode,
+      selectedUnit,
+      selectedActivity,
+      searchQuery,
+      currentPage,
+      viewMode,
+      pageSize
+    )
+  }, [
+    isHydrated,
+    selectedCategory,
+    selectedSellMode,
+    selectedUnit,
+    selectedActivity,
+    searchQuery,
+    currentPage,
+    viewMode,
+    pageSize,
+    syncFilters
+  ])
 
   // Add Form State
   const [form, setForm] = useState({
@@ -256,6 +366,20 @@ export default function DemoManagementClient({
     return filteredDemos.slice(start, start + pageSize)
   }, [filteredDemos, currentPage, pageSize])
 
+  // Query string for preserving filters when clicking into items
+  const currentQueryString = useMemo(() => {
+    const qs = new URLSearchParams()
+    if (selectedCategory !== 'All') qs.set('category', selectedCategory)
+    if (selectedSellMode !== 'All') qs.set('sell_mode', selectedSellMode)
+    if (selectedUnit !== 'All') qs.set('unit', selectedUnit)
+    if (selectedActivity !== 'All') qs.set('activity', selectedActivity)
+    if (searchQuery.trim()) qs.set('q', searchQuery.trim())
+    if (currentPage > 1) qs.set('page', currentPage.toString())
+    if (viewMode !== 'cards') qs.set('view', viewMode)
+    if (pageSize !== 24) qs.set('page_size', pageSize.toString())
+    return qs.toString()
+  }, [selectedCategory, selectedSellMode, selectedUnit, selectedActivity, searchQuery, currentPage, viewMode, pageSize])
+
   // Reset page when filters change
   function handleFilterChange<T>(setter: (val: T) => void, val: T) {
     setter(val)
@@ -269,6 +393,10 @@ export default function DemoManagementClient({
     setSelectedUnit('All')
     setSelectedActivity('All')
     setCurrentPage(1)
+    try {
+      sessionStorage.removeItem('angadi_demos_filter_state')
+    } catch (e) {}
+    router.replace(pathname, { scroll: false })
   }
 
   const isFiltered = Boolean(
@@ -278,6 +406,17 @@ export default function DemoManagementClient({
     selectedUnit !== 'All' ||
     selectedActivity !== 'All'
   )
+
+  const activeCategory = categories.find(c => c.id === selectedCategory)
+  const activeCategoryColor = activeCategory ? getCategoryColor(activeCategory.name) : '#3b82f6'
+  const activeCategoryEmoji = activeCategory ? getCategoryEmoji(activeCategory.name) : '📦'
+
+  const activeSellModeObj = SELL_MODES.find(m => m.value === selectedSellMode)
+  const activeSellModeColor = activeSellModeObj?.color || '#3b82f6'
+
+  const activeActivityObj = ACTIVITY_MODES.find(a => a.value === selectedActivity)
+  const activeActivityColor = activeActivityObj?.color || '#3b82f6'
+
 
   async function addDemo() {
     if (!form.name.trim()) { setAddErr('Item name is required.'); return }
@@ -465,10 +604,10 @@ export default function DemoManagementClient({
                 onChange={e => setForm(f => ({ ...f, sell_mode: e.target.value }))}
                 style={{ width: '100%', height: '38px', borderRadius: '10px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0 0.75rem', fontSize: '0.88rem' }}
               >
-                <option value="Fixed">Packed (Pre-Packed)</option>
-                <option value="Manual">Manual (By Weight)</option>
-                <option value="Dynamic">Dynamic (Size-based)</option>
-                <option value="Portion">Portion (By Piece)</option>
+                <option value="Fixed" style={{ background: '#1e293b', color: '#10b981' }}>📦 Packed (Pre-Packed)</option>
+                <option value="Manual" style={{ background: '#1e293b', color: '#3b82f6' }}>⚖️ Manual (By Weight)</option>
+                <option value="Dynamic" style={{ background: '#1e293b', color: '#ec4899' }}>📐 Dynamic (Size-based)</option>
+                <option value="Portion" style={{ background: '#1e293b', color: '#f59e0b' }}>🔪 Portion (By Piece)</option>
               </select>
             </div>
             <div>
@@ -478,10 +617,27 @@ export default function DemoManagementClient({
                 className="form-input"
                 value={form.category_id}
                 onChange={e => setForm(f => ({ ...f, category_id: e.target.value }))}
-                style={{ width: '100%', height: '38px', borderRadius: '10px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0 0.75rem', fontSize: '0.88rem' }}
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  borderRadius: '10px',
+                  background: 'rgba(0,0,0,0.2)',
+                  border: form.category_id ? `1.5px solid ${getCategoryColor(categories.find(c => c.id === form.category_id)?.name || '')}` : '1px solid rgba(255,255,255,0.1)',
+                  color: '#fff',
+                  padding: '0 0.75rem',
+                  fontSize: '0.88rem'
+                }}
               >
-                <option value="">— Select Category —</option>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                <option value="" style={{ background: '#1e293b', color: '#94a3b8' }}>— Select Category —</option>
+                {categories.map(c => {
+                  const col = getCategoryColor(c.name)
+                  const emo = getCategoryEmoji(c.name)
+                  return (
+                    <option key={c.id} value={c.id} style={{ background: '#1e293b', color: col }}>
+                      {emo} {c.name}
+                    </option>
+                  )
+                })}
               </select>
             </div>
             <div>
@@ -643,6 +799,139 @@ export default function DemoManagementClient({
         </div>
       )}
 
+      {/* ─── Visual Category Ribbon (Quick 1-Click Category Filter) ─── */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.5rem',
+        background: 'rgba(255,255,255,0.02)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        borderRadius: '16px',
+        padding: '0.85rem 1rem'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.74rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.6px', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Filter size={14} style={{ color: '#60a5fa' }} />
+            <span>Category Quick Filter</span>
+            <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 500 }}>
+              (Click to isolate category)
+            </span>
+          </span>
+          {selectedCategory !== 'All' && (
+            <button
+              type="button"
+              onClick={() => handleFilterChange(setSelectedCategory, 'All')}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#60a5fa',
+                fontSize: '0.74rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem'
+              }}
+            >
+              <X size={12} /> Show All ({demos.length})
+            </button>
+          )}
+        </div>
+
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.45rem',
+          overflowX: 'auto',
+          paddingBottom: '0.35rem',
+          scrollbarWidth: 'thin'
+        }}>
+          {/* All Categories Chip */}
+          <button
+            type="button"
+            onClick={() => handleFilterChange(setSelectedCategory, 'All')}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              padding: '0.42rem 0.8rem',
+              borderRadius: '11px',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              cursor: 'pointer',
+              border: selectedCategory === 'All' ? '1.5px solid #3b82f6' : '1px solid rgba(255,255,255,0.08)',
+              background: selectedCategory === 'All' ? '#3b82f6' : 'rgba(255,255,255,0.03)',
+              color: selectedCategory === 'All' ? '#fff' : '#94a3b8',
+              boxShadow: selectedCategory === 'All' ? '0 4px 12px rgba(59,130,246,0.35)' : 'none',
+              transition: 'all 0.18s ease',
+              flexShrink: 0
+            }}
+          >
+            <span>📦</span>
+            <span>{locale === 'ml' ? 'എല്ലാം' : 'All Items'}</span>
+            <span style={{
+              fontSize: '0.7rem',
+              padding: '0.1rem 0.4rem',
+              borderRadius: '7px',
+              background: selectedCategory === 'All' ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.08)',
+              color: selectedCategory === 'All' ? '#fff' : '#64748b',
+              fontWeight: 800
+            }}>
+              {demos.length}
+            </span>
+          </button>
+
+          {/* 14 Category Chips */}
+          {categories.map(c => {
+            const isSelected = selectedCategory === c.id
+            const catCol = getCategoryColor(c.name)
+            const catEmo = getCategoryEmoji(c.name)
+            const catMal = getCategoryMalayalamName(c.name)
+            const count = demos.filter(d => d.category_id === c.id).length
+
+            return (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => handleFilterChange(setSelectedCategory, isSelected ? 'All' : c.id)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  padding: '0.42rem 0.8rem',
+                  borderRadius: '11px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  whiteSpace: 'nowrap',
+                  cursor: 'pointer',
+                  border: isSelected ? `1.5px solid ${catCol}` : `1px solid ${catCol}33`,
+                  background: isSelected ? catCol : `${catCol}10`,
+                  color: isSelected ? '#fff' : '#e2e8f0',
+                  boxShadow: isSelected ? `0 4px 14px ${catCol}55` : 'none',
+                  transform: isSelected ? 'translateY(-1px)' : 'none',
+                  transition: 'all 0.18s ease',
+                  flexShrink: 0
+                }}
+              >
+                <span>{catEmo}</span>
+                <span>{locale === 'ml' ? catMal : c.name}</span>
+                <span style={{
+                  fontSize: '0.7rem',
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '7px',
+                  background: isSelected ? 'rgba(255,255,255,0.25)' : `${catCol}25`,
+                  color: isSelected ? '#fff' : catCol,
+                  fontWeight: 800
+                }}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
       {/* ─── Search & Filters Bar ─── */}
       <div style={{
         background: 'rgba(255,255,255,0.025)',
@@ -662,7 +951,10 @@ export default function DemoManagementClient({
             className="form-input"
             value={searchQuery}
             onChange={e => handleFilterChange(setSearchQuery, e.target.value)}
-            placeholder="Search templates by product name, code (e.g. ANG-SPI-0001), category, brand, alias..."
+            onKeyDown={e => {
+              if (e.key === 'Escape') handleFilterChange(setSearchQuery, '')
+            }}
+            placeholder="Search templates by product name, code (e.g. ANG-SPI-0001), category, brand, alias... (Esc to clear)"
             style={{
               width: '100%',
               paddingLeft: '2.75rem',
@@ -670,7 +962,8 @@ export default function DemoManagementClient({
               height: '46px',
               borderRadius: '14px',
               background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.1)',
+              border: searchQuery.trim() ? '1.5px solid rgba(59,130,246,0.5)' : '1px solid rgba(255,255,255,0.1)',
+              boxShadow: searchQuery.trim() ? '0 0 10px rgba(59,130,246,0.2)' : 'none',
               color: '#fff',
               fontSize: '0.92rem'
             }}
@@ -679,6 +972,7 @@ export default function DemoManagementClient({
             <button
               type="button"
               onClick={() => handleFilterChange(setSearchQuery, '')}
+              title="Clear search"
               style={{
                 position: 'absolute',
                 right: '0.85rem',
@@ -700,22 +994,53 @@ export default function DemoManagementClient({
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.65rem' }}>
           {/* 1. Category Filter */}
           <div>
-            <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Category
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Category
+              </label>
+              {selectedCategory !== 'All' && (
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: activeCategoryColor,
+                  background: `${activeCategoryColor}18`,
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '6px',
+                  border: `1px solid ${activeCategoryColor}40`
+                }}>
+                  {activeCategoryEmoji} Active
+                </span>
+              )}
+            </div>
             <select
               id="filter-category"
               className="form-input"
               value={selectedCategory}
               onChange={e => handleFilterChange(setSelectedCategory, e.target.value)}
-              style={{ width: '100%', height: '38px', borderRadius: '10px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0 0.65rem', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                height: '40px',
+                borderRadius: '10px',
+                background: selectedCategory !== 'All' ? `${activeCategoryColor}18` : 'rgba(0,0,0,0.25)',
+                border: selectedCategory !== 'All' ? `1.5px solid ${activeCategoryColor}` : '1px solid rgba(255,255,255,0.1)',
+                boxShadow: selectedCategory !== 'All' ? `0 0 10px ${activeCategoryColor}33` : 'none',
+                color: '#fff',
+                padding: '0 0.65rem',
+                fontSize: '0.82rem',
+                transition: 'all 0.2s ease'
+              }}
             >
-              <option value="All">All Categories ({demos.length})</option>
+              <option value="All" style={{ background: '#1e293b', color: '#fff' }}>
+                📦 All Categories ({demos.length})
+              </option>
               {categories.map(c => {
                 const count = demos.filter(d => d.category_id === c.id).length
+                const col = getCategoryColor(c.name)
+                const emo = getCategoryEmoji(c.name)
+                const mal = getCategoryMalayalamName(c.name)
                 return (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({count})
+                  <option key={c.id} value={c.id} style={{ background: '#1e293b', color: col, fontWeight: 600 }}>
+                    {emo} {c.name} {locale === 'ml' ? `(${mal})` : ''} — {count}
                   </option>
                 )
               })}
@@ -724,23 +1049,49 @@ export default function DemoManagementClient({
 
           {/* 2. Type / Sell Mode Filter */}
           <div>
-            <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Type / Sell Mode
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Type / Sell Mode
+              </label>
+              {selectedSellMode !== 'All' && (
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: activeSellModeColor,
+                  background: `${activeSellModeColor}18`,
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '6px',
+                  border: `1px solid ${activeSellModeColor}40`
+                }}>
+                  {activeSellModeObj?.emoji} {selectedSellMode}
+                </span>
+              )}
+            </div>
             <select
               id="filter-sell-mode"
               className="form-input"
               value={selectedSellMode}
               onChange={e => handleFilterChange(setSelectedSellMode, e.target.value)}
-              style={{ width: '100%', height: '38px', borderRadius: '10px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0 0.65rem', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                height: '40px',
+                borderRadius: '10px',
+                background: selectedSellMode !== 'All' ? `${activeSellModeColor}18` : 'rgba(0,0,0,0.25)',
+                border: selectedSellMode !== 'All' ? `1.5px solid ${activeSellModeColor}` : '1px solid rgba(255,255,255,0.1)',
+                boxShadow: selectedSellMode !== 'All' ? `0 0 10px ${activeSellModeColor}33` : 'none',
+                color: '#fff',
+                padding: '0 0.65rem',
+                fontSize: '0.82rem',
+                transition: 'all 0.2s ease'
+              }}
             >
               {SELL_MODES.map(m => {
                 const count = m.value === 'All'
                   ? demos.length
                   : demos.filter(d => d.sell_mode === m.value).length
                 return (
-                  <option key={m.value} value={m.value}>
-                    {m.label} ({count})
+                  <option key={m.value} value={m.value} style={{ background: '#1e293b', color: m.color, fontWeight: 600 }}>
+                    {m.emoji} {m.label} ({count})
                   </option>
                 )
               })}
@@ -749,23 +1100,49 @@ export default function DemoManagementClient({
 
           {/* 3. Unit Filter */}
           <div>
-            <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Default Unit
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Default Unit
+              </label>
+              {selectedUnit !== 'All' && (
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: '#fbbf24',
+                  background: 'rgba(245,158,11,0.15)',
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '6px',
+                  border: '1px solid rgba(245,158,11,0.3)'
+                }}>
+                  {unitMap[selectedUnit]}
+                </span>
+              )}
+            </div>
             <select
               id="filter-unit"
               className="form-input"
               value={selectedUnit}
               onChange={e => handleFilterChange(setSelectedUnit, e.target.value)}
-              style={{ width: '100%', height: '38px', borderRadius: '10px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0 0.65rem', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                height: '40px',
+                borderRadius: '10px',
+                background: selectedUnit !== 'All' ? 'rgba(245,158,11,0.15)' : 'rgba(0,0,0,0.25)',
+                border: selectedUnit !== 'All' ? '1.5px solid #f59e0b' : '1px solid rgba(255,255,255,0.1)',
+                boxShadow: selectedUnit !== 'All' ? '0 0 10px rgba(245,158,11,0.25)' : 'none',
+                color: '#fff',
+                padding: '0 0.65rem',
+                fontSize: '0.82rem',
+                transition: 'all 0.2s ease'
+              }}
             >
-              <option value="All">All Units</option>
+              <option value="All" style={{ background: '#1e293b', color: '#fff' }}>All Units</option>
               {units.map(u => {
                 const count = demos.filter(d => d.unit_id === u.id).length
                 if (count === 0) return null
                 return (
-                  <option key={u.id} value={u.id}>
-                    {u.name} ({u.symbol}) — {count}
+                  <option key={u.id} value={u.id} style={{ background: '#1e293b', color: '#fbbf24' }}>
+                    ⚖️ {u.name} ({u.symbol}) — {count}
                   </option>
                 )
               })}
@@ -774,15 +1151,41 @@ export default function DemoManagementClient({
 
           {/* 4. Activity Filter */}
           <div>
-            <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', display: 'block', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-              Activity / Status
-            </label>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+              <label style={{ fontSize: '0.72rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Activity / Status
+              </label>
+              {selectedActivity !== 'All' && (
+                <span style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 700,
+                  color: activeActivityColor,
+                  background: `${activeActivityColor}18`,
+                  padding: '0.1rem 0.4rem',
+                  borderRadius: '6px',
+                  border: `1px solid ${activeActivityColor}40`
+                }}>
+                  {activeActivityObj?.emoji} {selectedActivity}
+                </span>
+              )}
+            </div>
             <select
               id="filter-activity"
               className="form-input"
               value={selectedActivity}
               onChange={e => handleFilterChange(setSelectedActivity, e.target.value)}
-              style={{ width: '100%', height: '38px', borderRadius: '10px', background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0 0.65rem', fontSize: '0.82rem' }}
+              style={{
+                width: '100%',
+                height: '40px',
+                borderRadius: '10px',
+                background: selectedActivity !== 'All' ? `${activeActivityColor}18` : 'rgba(0,0,0,0.25)',
+                border: selectedActivity !== 'All' ? `1.5px solid ${activeActivityColor}` : '1px solid rgba(255,255,255,0.1)',
+                boxShadow: selectedActivity !== 'All' ? `0 0 10px ${activeActivityColor}33` : 'none',
+                color: '#fff',
+                padding: '0 0.65rem',
+                fontSize: '0.82rem',
+                transition: 'all 0.2s ease'
+              }}
             >
               {ACTIVITY_MODES.map(a => {
                 const count = a.value === 'All'
@@ -791,8 +1194,8 @@ export default function DemoManagementClient({
                     ? demos.filter(d => Boolean(d.default_image)).length
                     : demos.filter(d => !d.default_image).length
                 return (
-                  <option key={a.value} value={a.value}>
-                    {a.label} ({count})
+                  <option key={a.value} value={a.value} style={{ background: '#1e293b', color: a.color, fontWeight: 600 }}>
+                    {a.emoji} {a.label} ({count})
                   </option>
                 )
               })}
@@ -800,57 +1203,160 @@ export default function DemoManagementClient({
           </div>
         </div>
 
-        {/* Active Filter Pills & Reset Action */}
-        {isFiltered && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', paddingTop: '0.5rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Active Filters:</span>
-              {searchQuery && (
-                <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>
-                  Search: &quot;{searchQuery}&quot;
-                </span>
-              )}
-              {selectedCategory !== 'All' && (
-                <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>
-                  {catMap[selectedCategory] || 'Category'}
-                </span>
-              )}
-              {selectedSellMode !== 'All' && (
-                <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(16,185,129,0.15)', color: '#34d399' }}>
-                  {selectedSellMode}
-                </span>
-              )}
-              {selectedUnit !== 'All' && (
-                <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(245,158,11,0.15)', color: '#fbbf24' }}>
-                  Unit: {unitMap[selectedUnit]}
-                </span>
-              )}
-              {selectedActivity !== 'All' && (
-                <span style={{ fontSize: '0.75rem', padding: '0.15rem 0.5rem', borderRadius: '8px', background: 'rgba(168,85,247,0.15)', color: '#c084fc' }}>
-                  {selectedActivity === 'WithImage' ? 'With Image' : 'No Image'}
-                </span>
-              )}
-            </div>
+        {/* Active Filter Summary Bar & Dismissible Tags */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '0.6rem',
+          paddingTop: '0.5rem',
+          borderTop: '1px solid rgba(255,255,255,0.06)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', color: '#cbd5e1', fontWeight: 600 }}>
+              Showing <strong style={{ color: '#60a5fa' }}>{totalItems}</strong> of {demos.length} templates
+            </span>
 
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange(setSearchQuery, '')}
+                title="Remove search filter"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  fontSize: '0.75rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '8px',
+                  background: 'rgba(59,130,246,0.18)',
+                  color: '#60a5fa',
+                  border: '1px solid rgba(59,130,246,0.3)',
+                  cursor: 'pointer'
+                }}
+              >
+                <span>Search: &quot;{searchQuery}&quot;</span>
+                <X size={12} />
+              </button>
+            )}
+
+            {selectedCategory !== 'All' && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange(setSelectedCategory, 'All')}
+                title="Remove category filter"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  fontSize: '0.75rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '8px',
+                  background: `${activeCategoryColor}20`,
+                  color: activeCategoryColor,
+                  border: `1px solid ${activeCategoryColor}40`,
+                  cursor: 'pointer'
+                }}
+              >
+                <span>{activeCategoryEmoji} {catMap[selectedCategory] || 'Category'}</span>
+                <X size={12} />
+              </button>
+            )}
+
+            {selectedSellMode !== 'All' && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange(setSelectedSellMode, 'All')}
+                title="Remove sell mode filter"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  fontSize: '0.75rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '8px',
+                  background: `${activeSellModeColor}20`,
+                  color: activeSellModeColor,
+                  border: `1px solid ${activeSellModeColor}40`,
+                  cursor: 'pointer'
+                }}
+              >
+                <span>{activeSellModeObj?.emoji} {selectedSellMode}</span>
+                <X size={12} />
+              </button>
+            )}
+
+            {selectedUnit !== 'All' && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange(setSelectedUnit, 'All')}
+                title="Remove unit filter"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  fontSize: '0.75rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '8px',
+                  background: 'rgba(245,158,11,0.18)',
+                  color: '#fbbf24',
+                  border: '1px solid rgba(245,158,11,0.35)',
+                  cursor: 'pointer'
+                }}
+              >
+                <span>Unit: {unitMap[selectedUnit]}</span>
+                <X size={12} />
+              </button>
+            )}
+
+            {selectedActivity !== 'All' && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange(setSelectedActivity, 'All')}
+                title="Remove activity filter"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  fontSize: '0.75rem',
+                  padding: '0.2rem 0.55rem',
+                  borderRadius: '8px',
+                  background: `${activeActivityColor}20`,
+                  color: activeActivityColor,
+                  border: `1px solid ${activeActivityColor}40`,
+                  cursor: 'pointer'
+                }}
+              >
+                <span>{activeActivityObj?.emoji} {selectedActivity === 'WithImage' ? 'With Image' : 'No Image'}</span>
+                <X size={12} />
+              </button>
+            )}
+          </div>
+
+          {isFiltered && (
             <button
               type="button"
               onClick={resetAllFilters}
               style={{
-                background: 'none',
-                border: 'none',
+                background: 'rgba(239,68,68,0.1)',
+                border: '1px solid rgba(239,68,68,0.25)',
                 color: '#f87171',
-                fontSize: '0.78rem',
-                fontWeight: 600,
+                borderRadius: '8px',
+                padding: '0.25rem 0.65rem',
+                fontSize: '0.76rem',
+                fontWeight: 700,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.25rem'
+                gap: '0.3rem',
+                transition: 'all 0.15s ease'
               }}
             >
-              <X size={14} /> Reset All Filters
+              <X size={13} /> Reset All Filters
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* ─── Cards Grid Layout (Designed like Add Product Step 2) ─── */}
@@ -864,6 +1370,9 @@ export default function DemoManagementClient({
             const catName = d.category_id ? catMap[d.category_id] : null
             const unitSymbol = d.unit_id ? unitMap[d.unit_id] : null
             const reg = findCatalogProduct(d.name)
+            const itemCatColor = catName ? getCategoryColor(catName) : '#3b82f6'
+            const itemCatEmoji = catName ? getCategoryEmoji(catName) : '📦'
+            const itemCatMal = catName ? getCategoryMalayalamName(catName) : ''
 
             const modeColor =
               d.sell_mode === 'Manual' ? '#3b82f6' :
@@ -871,8 +1380,10 @@ export default function DemoManagementClient({
               d.sell_mode === 'Dynamic' ? '#ec4899' : '#f59e0b'
 
             const modeLabel =
-              d.sell_mode === 'Manual' ? 'By Weight' :
-              d.sell_mode === 'Fixed' ? 'Pre-Packed' : d.sell_mode
+              d.sell_mode === 'Manual' ? 'By Weight ⚖️' :
+              d.sell_mode === 'Fixed' ? 'Pre-Packed 📦' :
+              d.sell_mode === 'Dynamic' ? 'Dynamic 📐' :
+              d.sell_mode === 'Portion' ? 'Portion 🔪' : d.sell_mode
 
             return (
               <div
@@ -881,6 +1392,7 @@ export default function DemoManagementClient({
                 style={{
                   background: 'rgba(255,255,255,0.025)',
                   border: '1px solid rgba(255,255,255,0.07)',
+                  borderTop: `3px solid ${itemCatColor}`,
                   borderRadius: '16px',
                   overflow: 'hidden',
                   display: 'flex',
@@ -888,12 +1400,15 @@ export default function DemoManagementClient({
                   transition: 'all 0.2s ease'
                 }}
                 onMouseOver={e => {
-                  e.currentTarget.style.borderColor = 'rgba(59,130,246,0.35)'
+                  e.currentTarget.style.borderColor = itemCatColor
                   e.currentTarget.style.transform = 'translateY(-3px)'
+                  e.currentTarget.style.boxShadow = `0 6px 20px ${itemCatColor}22`
                 }}
                 onMouseOut={e => {
                   e.currentTarget.style.borderColor = 'rgba(255,255,255,0.07)'
+                  e.currentTarget.style.borderTop = `3px solid ${itemCatColor}`
                   e.currentTarget.style.transform = 'none'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 {/* Image & Badges Banner */}
@@ -924,7 +1439,25 @@ export default function DemoManagementClient({
                     {modeLabel}
                   </span>
 
-                  {/* Code Tag or Image Status */}
+                  {/* Missing Image Warning Badge */}
+                  {!d.default_image && (
+                    <span style={{
+                      position: 'absolute',
+                      bottom: '8px',
+                      left: '8px',
+                      fontSize: '0.66rem',
+                      fontWeight: 700,
+                      padding: '0.15rem 0.45rem',
+                      borderRadius: '6px',
+                      background: 'rgba(245,158,11,0.9)',
+                      color: '#000',
+                      backdropFilter: 'blur(4px)'
+                    }}>
+                      ⚠️ Needs Image
+                    </span>
+                  )}
+
+                  {/* Code Tag */}
                   {d.code && (
                     <span style={{
                       position: 'absolute',
@@ -946,11 +1479,23 @@ export default function DemoManagementClient({
                 {/* Card Body */}
                 <div style={{ padding: '0.9rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between', gap: '0.75rem' }}>
                   <div>
-                    {/* Category pill */}
+                    {/* Category pill with distinct category color */}
                     {catName && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#60a5fa', fontSize: '0.72rem', fontWeight: 600, marginBottom: '0.3rem' }}>
-                        {renderCategoryIcon(catName, 13)}
-                        <span>{catName}</span>
+                      <div style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        color: itemCatColor,
+                        background: `${itemCatColor}18`,
+                        border: `1px solid ${itemCatColor}35`,
+                        padding: '0.2rem 0.55rem',
+                        borderRadius: '8px',
+                        fontSize: '0.72rem',
+                        fontWeight: 700,
+                        marginBottom: '0.35rem'
+                      }}>
+                        <span>{itemCatEmoji}</span>
+                        <span>{locale === 'ml' ? itemCatMal : catName}</span>
                       </div>
                     )}
 
@@ -986,7 +1531,7 @@ export default function DemoManagementClient({
                   {/* Actions Row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingTop: '0.65rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                     <Link
-                      href={`/${locale}/admin/demos/${d.id}`}
+                      href={`/${locale}/admin/demos/${d.id}${currentQueryString ? `?${currentQueryString}` : ''}`}
                       style={{
                         flex: 1,
                         height: '34px',
@@ -1052,58 +1597,102 @@ export default function DemoManagementClient({
               </tr>
             </thead>
             <tbody>
-              {paginatedDemos.map(d => (
-                <tr key={d.id} id={`demo-row-${d.id}`}>
-                  <td style={{ padding: '0.85rem 1rem', fontSize: '0.82rem', color: '#94a3b8', fontFamily: 'monospace' }}>
-                    {d.code || '—'}
-                  </td>
-                  <td className="font-medium" style={{ color: '#fff' }}>
-                    {d.name}
-                  </td>
-                  <td>
-                    <span style={{
-                      fontSize: '0.72rem',
-                      padding: '0.2rem 0.55rem',
-                      borderRadius: '6px',
-                      fontWeight: 700,
-                      background: d.sell_mode === 'Manual' ? 'rgba(59,130,246,0.15)' : 'rgba(16,185,129,0.15)',
-                      color: d.sell_mode === 'Manual' ? '#60a5fa' : '#34d399'
-                    }}>
-                      {d.sell_mode === 'Manual' ? 'By Weight' : 'Pre-Packed'}
-                    </span>
-                  </td>
-                  <td className="text-sm text-muted">{d.category_id ? catMap[d.category_id] ?? '—' : '—'}</td>
-                  <td className="text-sm text-muted">{d.unit_id ? unitMap[d.unit_id] ?? '—' : '—'}</td>
-                  <td>
-                    {d.default_image ? (
-                      <a href={d.default_image} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-                        View <ExternalLink size={12} />
-                      </a>
-                    ) : (
-                      <span style={{ color: '#64748b', fontSize: '0.8rem' }}>None</span>
-                    )}
-                  </td>
-                  <td style={{ textAlign: 'right', paddingRight: '1rem' }}>
-                    <div style={{ display: 'inline-flex', gap: '0.4rem', alignItems: 'center' }}>
-                      <Link
-                        href={`/${locale}/admin/demos/${d.id}`}
-                        className="btn btn-sm btn-outline"
-                        style={{ height: '30px', padding: '0 0.65rem', borderRadius: '8px', display: 'flex', gap: '0.3rem', alignItems: 'center', fontSize: '0.78rem' }}
-                      >
-                        <Settings size={13} /> Manage
-                      </Link>
-                      <button
-                        id={`delete-demo-${d.id}`}
-                        className="btn btn-sm"
-                        style={{ height: '30px', padding: '0 0.55rem', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: 'none', display: 'flex', alignItems: 'center' }}
-                        onClick={() => deleteDemo(d.id, d.name)}
-                      >
-                        <Trash2 size={13} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {paginatedDemos.map(d => {
+                const catName = d.category_id ? catMap[d.category_id] : null
+                const catCol = catName ? getCategoryColor(catName) : '#94a3b8'
+                const catEmo = catName ? getCategoryEmoji(catName) : '📦'
+                const catMal = catName ? getCategoryMalayalamName(catName) : ''
+
+                const modeColor =
+                  d.sell_mode === 'Manual' ? '#3b82f6' :
+                  d.sell_mode === 'Fixed' ? '#10b981' :
+                  d.sell_mode === 'Dynamic' ? '#ec4899' : '#f59e0b'
+
+                const modeLabel =
+                  d.sell_mode === 'Manual' ? 'By Weight ⚖️' :
+                  d.sell_mode === 'Fixed' ? 'Pre-Packed 📦' :
+                  d.sell_mode === 'Dynamic' ? 'Dynamic 📐' :
+                  d.sell_mode === 'Portion' ? 'Portion 🔪' : d.sell_mode
+
+                return (
+                  <tr key={d.id} id={`demo-row-${d.id}`}>
+                    <td style={{ padding: '0.85rem 1rem', fontSize: '0.82rem', color: '#94a3b8', fontFamily: 'monospace' }}>
+                      {d.code || '—'}
+                    </td>
+                    <td className="font-medium" style={{ color: '#fff' }}>
+                      <div>{d.name}</div>
+                      {locale === 'ml' && findCatalogProduct(d.name)?.malayalam && (
+                        <div style={{ fontSize: '0.74rem', color: '#94a3b8', marginTop: '2px' }}>
+                          {findCatalogProduct(d.name)?.malayalam}
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <span style={{
+                        fontSize: '0.72rem',
+                        padding: '0.2rem 0.55rem',
+                        borderRadius: '6px',
+                        fontWeight: 700,
+                        background: `${modeColor}18`,
+                        color: modeColor,
+                        border: `1px solid ${modeColor}33`
+                      }}>
+                        {modeLabel}
+                      </span>
+                    </td>
+                    <td>
+                      {catName ? (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                          padding: '0.2rem 0.55rem',
+                          borderRadius: '6px',
+                          fontSize: '0.74rem',
+                          fontWeight: 700,
+                          background: `${catCol}15`,
+                          color: catCol,
+                          border: `1px solid ${catCol}35`
+                        }}>
+                          <span>{catEmo}</span>
+                          <span>{locale === 'ml' ? catMal : catName}</span>
+                        </span>
+                      ) : (
+                        <span style={{ color: '#64748b', fontSize: '0.78rem' }}>—</span>
+                      )}
+                    </td>
+                    <td className="text-sm text-muted">{d.unit_id ? unitMap[d.unit_id] ?? '—' : '—'}</td>
+                    <td>
+                      {d.default_image ? (
+                        <a href={d.default_image} target="_blank" rel="noopener noreferrer" style={{ color: '#60a5fa', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                          View <ExternalLink size={12} />
+                        </a>
+                      ) : (
+                        <span style={{ color: '#f59e0b', fontSize: '0.76rem', fontWeight: 600 }}>⚠️ Needs Image</span>
+                      )}
+                    </td>
+                    <td style={{ textAlign: 'right', paddingRight: '1rem' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.4rem', alignItems: 'center' }}>
+                        <Link
+                          href={`/${locale}/admin/demos/${d.id}${currentQueryString ? `?${currentQueryString}` : ''}`}
+                          className="btn btn-sm btn-outline"
+                          style={{ height: '30px', padding: '0 0.65rem', borderRadius: '8px', display: 'flex', gap: '0.3rem', alignItems: 'center', fontSize: '0.78rem' }}
+                        >
+                          <Settings size={13} /> Manage
+                        </Link>
+                        <button
+                          id={`delete-demo-${d.id}`}
+                          className="btn btn-sm"
+                          style={{ height: '30px', padding: '0 0.55rem', borderRadius: '8px', background: 'rgba(239,68,68,0.1)', color: '#f87171', border: 'none', display: 'flex', alignItems: 'center' }}
+                          onClick={() => deleteDemo(d.id, d.name)}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </div>

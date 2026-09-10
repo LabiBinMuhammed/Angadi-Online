@@ -17,6 +17,8 @@ import {
   uploadDemoImageAction
 } from './actions'
 
+import { getCategoryColor, getCategoryEmoji } from '@/lib/catalog/categoryImages'
+
 type CategoryOption = {
   id: string
   name: string
@@ -30,6 +32,7 @@ type Props = {
   categories: CategoryOption[]
   initialMalayalam?: string
   locale?: string
+  returnQuery?: string
 }
 
 export default function DemoDetailClient({
@@ -39,10 +42,12 @@ export default function DemoDetailClient({
   units,
   categories,
   initialMalayalam = '',
-  locale = 'en'
+  locale = 'en',
+  returnQuery = ''
 }: Props) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'details' | 'config' | 'variants'>('details')
+
 
   // Top Banner / Header state
   const [currentDemo, setCurrentDemo] = useState<DemoItem>(demo)
@@ -391,7 +396,7 @@ export default function DemoDetailClient({
 
       showToast('Template deleted successfully. Redirecting...')
       setTimeout(() => {
-        router.push(`/${locale || 'en'}/admin/demos`)
+        router.push(`/${locale || 'en'}/admin/demos${returnQuery ? `?${returnQuery}` : ''}`)
         router.refresh()
       }, 700)
     } catch (err: any) {
@@ -536,8 +541,32 @@ export default function DemoDetailClient({
           </div>
         </div>
 
-        {/* Right: Actions (Delete Button & Switchers) */}
+        {/* Right: Actions (Back to Catalog & Delete Button) */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            type="button"
+            onClick={() => {
+              router.push(`/${locale || 'en'}/admin/demos${returnQuery ? `?${returnQuery}` : ''}`)
+            }}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.06)',
+              color: '#cbd5e1',
+              border: '1.5px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: '10px',
+              padding: '9px 16px',
+              fontSize: '0.88rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              transition: 'all 0.15s ease'
+            }}
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Catalog</span>
+          </button>
+
           <button
             id="delete-template-header-btn"
             onClick={() => setShowDeleteModal(true)}
@@ -949,12 +978,26 @@ export default function DemoDetailClient({
                   className="form-input"
                   value={categoryId}
                   onChange={e => setCategoryId(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid var(--border-color, #cbd5e1)', fontSize: '0.92rem' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: categoryObj ? `2px solid ${getCategoryColor(categoryObj.name)}` : '1.5px solid var(--border-color, #cbd5e1)',
+                    fontSize: '0.92rem',
+                    background: 'var(--bg-card, #1e293b)',
+                    color: '#fff'
+                  }}
                 >
                   <option value="">Select Category</option>
-                  {categories.map(c => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
+                  {categories.map(c => {
+                    const col = getCategoryColor(c.name)
+                    const emo = getCategoryEmoji(c.name)
+                    return (
+                      <option key={c.id} value={c.id} style={{ color: col, background: '#1e293b' }}>
+                        {emo} {c.name}
+                      </option>
+                    )
+                  })}
                 </select>
               </div>
 
