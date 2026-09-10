@@ -77,12 +77,12 @@ function renderCategoryIcon(name: string, size = 16) {
   if (n.includes('veg') || n.includes('produce')) return <Carrot size={size} />
   if (n.includes('fruit')) return <Apple size={size} />
   if (n.includes('dairy') || n.includes('milk')) return <Milk size={size} />
-  if (n.includes('grain') || n.includes('cereal') || n.includes('rice')) return <Wheat size={size} />
+  if (n.includes('grain') || n.includes('cereal') || n.includes('rice') || n.includes('flour') || n.includes('dry')) return <Wheat size={size} />
   if (n.includes('spice')) return <Flame size={size} />
-  if (n.includes('bakery') || n.includes('bread')) return <Croissant size={size} />
-  if (n.includes('oil')) return <GlassWater size={size} />
+  if (n.includes('bakery') || n.includes('bread') || n.includes('cake')) return <Croissant size={size} />
+  if (n.includes('oil') || n.includes('cooking')) return <GlassWater size={size} />
   if (n.includes('meat') || n.includes('fish')) return <Fish size={size} />
-  if (n.includes('household') || n.includes('essentials') || n.includes('clean')) return <Sparkles size={size} />
+  if (n.includes('household') || n.includes('clean')) return <Sparkles size={size} />
   if (n.includes('stationery') || n.includes('pen')) return <PenTool size={size} />
   return <Package size={size} />
 }

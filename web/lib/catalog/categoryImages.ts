@@ -26,6 +26,13 @@ export const CATEGORY_VISUALS: Record<string, CategoryVisualMeta> = {
     malayalamDefault: 'പഴങ്ങൾ',
     tags: ['fruit', 'banana', 'mango', 'apple', 'tropical']
   },
+  'Rice, Atta, Flours & Mixes': {
+    imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80',
+    emoji: '🌾',
+    color: '#eab308',
+    malayalamDefault: 'അരി, ആട്ട, പൊടികൾ & മിക്സുകൾ',
+    tags: ['rice', 'matta', 'atta', 'flour', 'puttu podi', 'mixes', 'batter']
+  },
   'Rice, Atta & Flours': {
     imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80',
     emoji: '🌾',
@@ -46,6 +53,13 @@ export const CATEGORY_VISUALS: Record<string, CategoryVisualMeta> = {
     color: '#0284c7',
     malayalamDefault: 'പാൽ ഉൽപ്പന്നങ്ങൾ',
     tags: ['milk', 'curd', 'milma', 'paneer', 'butter']
+  },
+  'Cooking Essentials': {
+    imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600&auto=format&fit=crop&q=80',
+    emoji: '🧈',
+    color: '#f59e0b',
+    malayalamDefault: 'പാചക അവശ്യവസ്തുക്കൾ',
+    tags: ['coconut oil', 'velichenna', 'ghee', 'gingelly oil', 'cooking essentials']
   },
   'Oils & Ghee': {
     imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=600&auto=format&fit=crop&q=80',
@@ -74,6 +88,13 @@ export const CATEGORY_VISUALS: Record<string, CategoryVisualMeta> = {
     color: '#ec4899',
     malayalamDefault: 'ബിസ്ക്കറ്റുകൾ & കുക്കികൾ',
     tags: ['biscuit', 'cookies', 'crackers', 'rusk']
+  },
+  'Dry Goods & Cereals': {
+    imageUrl: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=600&auto=format&fit=crop&q=80',
+    emoji: '🥜',
+    color: '#b45309',
+    malayalamDefault: 'ഡ്രൈ ഫ്രൂട്ട്സ് & ധാന്യങ്ങൾ',
+    tags: ['cashew', 'almond', 'kismis', 'oats', 'cereal', 'dry goods']
   },
   'Dry Fruits & Cereals': {
     imageUrl: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d46?w=600&auto=format&fit=crop&q=80',

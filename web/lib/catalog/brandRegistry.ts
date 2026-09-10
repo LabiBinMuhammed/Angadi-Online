@@ -1888,11 +1888,21 @@ export function findCatalogProduct(name: string): MasterCatalogProduct | undefin
   )
 }
 
+// Helper to normalize category names across new and legacy labels
+export function normalizeCategoryName(cat: string): string {
+  const c = (cat || '').toLowerCase().trim()
+  if (c === 'oils & ghee' || c === 'cooking essentials') return 'cooking essentials'
+  if (c === 'rice, atta & flours' || c === 'rice, atta, flours & mixes') return 'rice, atta, flours & mixes'
+  if (c === 'dry fruits & cereals' || c === 'dry goods & cereals') return 'dry goods & cereals'
+  return c
+}
+
 // Helper to get all available brands for a category
 export function getCategoryBrands(categoryName: string): { brand: string, count: number }[] {
+  const norm = normalizeCategoryName(categoryName)
   const brandCounts: Record<string, number> = {}
   KERALA_BRAND_CATALOG
-    .filter(p => p.category.toLowerCase() === categoryName.toLowerCase())
+    .filter(p => normalizeCategoryName(p.category) === norm)
     .forEach(p => {
       p.brands.forEach(b => {
         brandCounts[b] = (brandCounts[b] || 0) + 1
