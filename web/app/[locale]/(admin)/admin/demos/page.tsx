@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import DemoManagementClient from './DemoManagementClient'
 
 export const metadata: Metadata = { title: 'Demo Templates | Angadi Admin' }
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function DemosPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
