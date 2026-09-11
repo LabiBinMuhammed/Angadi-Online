@@ -1417,6 +1417,7 @@ export default function DemoManagementClient({
                     src={d.default_image || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500'}
                     alt={d.name}
                     loading="lazy"
+                    referrerPolicy="no-referrer"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     onError={e => {
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500'
