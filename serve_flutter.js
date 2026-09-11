@@ -22,6 +22,31 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
+  if (req.url.startsWith('/proxy?url=')) {
+    try {
+      const targetUrl = decodeURIComponent(req.url.slice('/proxy?url='.length));
+      const client = targetUrl.startsWith('https') ? require('https') : require('http');
+      client.get(targetUrl, {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      }, (proxyRes) => {
+        res.writeHead(proxyRes.statusCode, {
+          'Content-Type': proxyRes.headers['content-type'] || 'image/jpeg',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=86400'
+        });
+        proxyRes.pipe(res);
+      }).on('error', (err) => {
+        res.writeHead(500);
+        res.end('Proxy error: ' + err.message);
+      });
+      return;
+    } catch (e) {
+      res.writeHead(400);
+      res.end('Bad URL');
+      return;
+    }
+  }
+
   let reqPath = req.url.split('?')[0];
   if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';

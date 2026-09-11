@@ -277,10 +277,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                               ),
                               clipBehavior: Clip.antiAlias,
                               child: cat.imageUrl != null && cat.imageUrl!.trim().isNotEmpty
-                                  ? Image.network(
-                                      cat.imageUrl!.trim(),
+                                  ? AppCachedImage(
+                                      imageUrl: cat.imageUrl!.trim(),
                                       fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Center(
+                                      errorWidget: Center(
                                         child: Text(
                                           emoji,
                                           style: const TextStyle(fontSize: 26),
@@ -401,10 +401,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 ),
                 clipBehavior: Clip.antiAlias,
                 child: cat.imageUrl != null && cat.imageUrl!.trim().isNotEmpty
-                    ? Image.network(
-                        cat.imageUrl!.trim(),
+                    ? AppCachedImage(
+                        imageUrl: cat.imageUrl!.trim(),
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => Center(
+                        errorWidget: Center(
                           child: Text(
                             _getCatIcon(cat.name),
                             style: const TextStyle(fontSize: 22),

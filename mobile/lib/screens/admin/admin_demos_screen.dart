@@ -9,6 +9,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/supabase_client.dart';
 import '../../../theme/app_theme.dart';
+import '../../../widgets/app_cached_image.dart';
 import 'admin_drawer.dart';
 
 class AdminDemosScreen extends StatefulWidget {
@@ -328,11 +329,9 @@ class _AdminDemosScreenState extends State<AdminDemosScreen> {
                                                     ),
                                                   )
                                                 : previewImage.isNotEmpty
-                                                    ? CachedNetworkImage(
+                                                    ? AppCachedImage(
                                                         imageUrl: previewImage,
                                                         fit: BoxFit.cover,
-                                                        placeholder: (_, __) => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                                                        errorWidget: (_, __, ___) => const Icon(Icons.broken_image, color: Colors.grey),
                                                       )
                                                     : Center(
                                                         child: Column(
@@ -1187,14 +1186,9 @@ class _AdminDemosScreenState extends State<AdminDemosScreen> {
               fit: StackFit.expand,
               children: [
                 hasImg
-                    ? CachedNetworkImage(
+                    ? AppCachedImage(
                         imageUrl: imgUrl,
                         fit: BoxFit.cover,
-                        placeholder: (_, __) => Container(color: Colors.grey.shade200),
-                        errorWidget: (_, __, ___) => Container(
-                          color: Colors.grey.shade100,
-                          child: const Icon(Icons.broken_image, color: Colors.grey),
-                        ),
                       )
                     : Container(
                         color: const Color(0xFFF1F5F9),
@@ -1347,10 +1341,12 @@ class _AdminDemosScreenState extends State<AdminDemosScreen> {
           ),
           clipBehavior: Clip.antiAlias,
           child: hasImg
-              ? CachedNetworkImage(
+              ? AppCachedImage(
                   imageUrl: imgUrl,
+                  width: 44,
+                  height: 44,
                   fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) => const Icon(Icons.broken_image, size: 20),
+                  borderRadius: BorderRadius.circular(8),
                 )
               : const Center(child: Icon(Icons.inventory_2_outlined, size: 24, color: Colors.grey)),
         ),

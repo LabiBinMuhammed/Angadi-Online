@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/supabase_client.dart';
 import 'vendor_theme_helper.dart';
 import 'vendor_drawer.dart';
+import '../../widgets/app_cached_image.dart';
 
 
 class VendorItemsScreen extends StatefulWidget {
@@ -307,8 +308,8 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
                                   child: item['image_url'] != null && (item['image_url'] as String).isNotEmpty
-                                      ? Image.network(
-                                          item['image_url'],
+                                      ? AppCachedImage(
+                                          imageUrl: item['image_url'],
                                           width: 48,
                                           height: 48,
                                           fit: BoxFit.cover,
