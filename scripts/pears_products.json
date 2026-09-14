@@ -1,0 +1,157 @@
+[
+  {
+    "brand": "Pears",
+    "name": "Pears Pure & Gentle Bathing Bar",
+    "category": "Bathing Soaps",
+    "description": "Iconic transparent soap crafted with 98% pure glycerine and natural oils for glowing skin.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/10904a.jpg",
+    "basePrice": 52,
+    "variants": [
+      {
+        "label": "Pack of 3 (3 x 125 g)",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (125 g)",
+        "price": 52,
+        "is_default": false
+      },
+      {
+        "label": "Pack of 5 Multipack (5 x 125 g)",
+        "price": 275,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Pears",
+    "name": "Pears Soft & Fresh Bathing Bar",
+    "category": "Bathing Soaps",
+    "description": "Refreshing blue transparent glycerine soap enriched with cooling mint extracts.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/10904a.jpg",
+    "basePrice": 52,
+    "variants": [
+      {
+        "label": "Pack of 3 (3 x 125 g)",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (125 g)",
+        "price": 52,
+        "is_default": false
+      },
+      {
+        "label": "Pack of 5 Multipack (5 x 125 g)",
+        "price": 275,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Pears",
+    "name": "Pears Oil Clear & Glow Bathing Bar",
+    "category": "Bathing Soaps",
+    "description": "Green transparent soap with lemon flower extracts and glycerine to control excess oil.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/10905a.jpg",
+    "basePrice": 52,
+    "variants": [
+      {
+        "label": "Pack of 3 (3 x 125 g)",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (125 g)",
+        "price": 52,
+        "is_default": false
+      },
+      {
+        "label": "Pack of 5 Multipack (5 x 125 g)",
+        "price": 275,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Pears",
+    "name": "Pears Pure & Gentle Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Dermatologist-tested 100% soap-free body wash with 98% pure glycerine for gentle care.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/458057a.jpg",
+    "basePrice": 140,
+    "variants": [
+      {
+        "label": "250 ml Bottle with Loofah",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "750 ml Pump Dispenser",
+        "price": 340,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Pears",
+    "name": "Pears Soft & Fresh Mint Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Invigorating mint extracts and pure glycerine body wash for revitalizing morning showers.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/458057a.jpg",
+    "basePrice": 140,
+    "variants": [
+      {
+        "label": "250 ml Bottle with Loofah",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (250 ml x 2)",
+        "price": 265,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Pears",
+    "name": "Pears Oil Clear Lemon Flower Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Clarifying body cleanser with lemon flower extracts that cleanses pores without stripping moisture.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/458057a.jpg",
+    "basePrice": 140,
+    "variants": [
+      {
+        "label": "250 ml Bottle with Loofah",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (250 ml x 2)",
+        "price": 265,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Pears",
+    "name": "Pears Pure & Gentle Hand Wash Pump",
+    "category": "Hand Wash",
+    "description": "Gentle liquid hand wash enriched with pure glycerine that kills 99.9% germs while keeping hands soft.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/458057a.jpg",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "250 ml Pump Bottle",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (250 ml x 2)",
+        "price": 185,
+        "is_default": false
+      }
+    ]
+  }
+]

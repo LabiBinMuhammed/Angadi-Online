@@ -1,0 +1,227 @@
+[
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Gold Coconut Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Pure coconut oil enriched with Vitamin E for 10x deeper nourishment.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/160a.jpg",
+    "basePrice": 115,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "300 ml Bottle",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "175 ml Bottle",
+        "price": 115,
+        "is_default": false
+      },
+      {
+        "label": "400 ml Mega Saver Pack",
+        "price": 230,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Aloe Vera Enriched Coconut Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Golden blend of pure coconut oil and miracle aloe vera gel for silk-soft, conditioned hair.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/383186a.jpg",
+    "basePrice": 120,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 155,
+        "is_default": true
+      },
+      {
+        "label": "150 ml Bottle",
+        "price": 95,
+        "is_default": false
+      },
+      {
+        "label": "400 ml Bottle",
+        "price": 240,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Jasmine Coconut Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Non-sticky light coconut hair oil infused with fragrant jasmine extracts and Vitamin E.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/10574a.jpg",
+    "basePrice": 90,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "300 ml Bottle",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "190 ml Bottle",
+        "price": 90,
+        "is_default": false
+      },
+      {
+        "label": "500 ml Family Pack",
+        "price": 250,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Ayurvedic Coconut Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Ayurvedic formulation with 25 potent herbs like Bringharaj, Amla, and Neem to control hair fall.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/19087a.jpg",
+    "basePrice": 130,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "190 ml Bottle",
+        "price": 130,
+        "is_default": true
+      },
+      {
+        "label": "300 ml Bottle",
+        "price": 195,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Onion Enriched Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Red onion extract and coconut oil to stimulate scalp blood flow and promote healthy hair growth.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/470940a.jpg",
+    "basePrice": 180,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "200 ml Bottle with Comb Applicator",
+        "price": 180,
+        "is_default": true
+      },
+      {
+        "label": "300 ml Bottle",
+        "price": 260,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Ayurvedic Hot Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Deep penetrating hot oil with black pepper, hibiscus, and malakangani for winter dryness.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/19087a.jpg",
+    "basePrice": 125,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "190 ml Bottle",
+        "price": 125,
+        "is_default": true
+      },
+      {
+        "label": "300 ml Bottle",
+        "price": 190,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Curry Leaves Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Enriched with curry leaves extract to prevent premature greying and strengthen hair follicles.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/470940a.jpg",
+    "basePrice": 195,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "200 ml Bottle",
+        "price": 195,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2 (200 ml x 2)",
+        "price": 370,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Almond Enriched Coconut Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Nourishing sweet almond oil and coconut oil for shiny, smooth, and manageable hair.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/10574a.jpg",
+    "basePrice": 110,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "190 ml Bottle",
+        "price": 110,
+        "is_default": true
+      },
+      {
+        "label": "300 ml Bottle",
+        "price": 170,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Rosemary Enriched Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Pure rosemary oil infused with coconut oil to awaken dormant roots and promote fuller hair.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/470940a.jpg",
+    "basePrice": 220,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "150 ml Bottle",
+        "price": 220,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (150 ml x 2)",
+        "price": 420,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Parachute Advansed",
+    "name": "Parachute Advansed Argan Enriched Hair Oil",
+    "category": "Hair Care & Hair Oil",
+    "description": "Moroccan argan oil blended with coconut oil for frizz-free, ultra-glossy salon finish.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/383186a.jpg",
+    "basePrice": 240,
+    "unit": "bottle",
+    "variants": [
+      {
+        "label": "150 ml Bottle",
+        "price": 240,
+        "is_default": true
+      },
+      {
+        "label": "250 ml Bottle",
+        "price": 380,
+        "is_default": false
+      }
+    ]
+  }
+]

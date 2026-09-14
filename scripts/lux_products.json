@@ -1,0 +1,172 @@
+[
+  {
+    "brand": "Lux",
+    "name": "Lux Soft Glow Rose & Vitamin E Soap",
+    "category": "Bathing Soaps",
+    "description": "Infused with French Rose essence and Vitamin E for glowing, soft, and perfumed skin.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/445842a.jpg",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 155,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Mega Value Pack (8 x 100 g)",
+        "price": 299,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Velvet Glow Jasmine & Almond Oil Soap",
+    "category": "Bathing Soaps",
+    "description": "Enriched with delicate Jasmine florals and nourishing Almond Oil for satin smooth skin.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/445843a.jpg",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 155,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Mega Value Pack (8 x 100 g)",
+        "price": 299,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Radiant Glow Sandalwood & Honey Soap",
+    "category": "Bathing Soaps",
+    "description": "Rich Sandalwood and golden Honey blend for deep radiant glow and warm long-lasting scent.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/445842a.jpg",
+    "basePrice": 42,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 165,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 42,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Fresh Glow Cooling Mint & Water Lily Soap",
+    "category": "Bathing Soaps",
+    "description": "Crisp mint and aquatic water lily for refreshing revitalisation during every shower.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/445843a.jpg",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 155,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Magical Spell Black Orchid Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Exotic black orchid and juniper oil body wash with 24-hour long-lasting luxury fine fragrance.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/477465a.jpg",
+    "basePrice": 135,
+    "variants": [
+      {
+        "label": "240 ml Bottle with Loofah",
+        "price": 135,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (240 ml x 2)",
+        "price": 250,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Velvet Touch Jasmine & Almond Oil Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Nourishing almond oil and blooming jasmine body cleanser for irresistibly touchable soft skin.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/477465a.jpg",
+    "basePrice": 135,
+    "variants": [
+      {
+        "label": "240 ml Bottle with Loofah",
+        "price": 135,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (240 ml x 2)",
+        "price": 250,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Soft Touch French Rose Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Floral fusion oil and French roses create a rich, creamy lather that leaves skin lightly scented.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/477465a.jpg",
+    "basePrice": 135,
+    "variants": [
+      {
+        "label": "240 ml Bottle with Loofah",
+        "price": 135,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (240 ml x 2)",
+        "price": 250,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Lux",
+    "name": "Lux Botanicals Skin Purify Freesia & Tea Tree Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "description": "Natural botanical extracts and tea tree oil for clean, purified, and revitalized skin.",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/app/images/products/sliding_image/477465a.jpg",
+    "basePrice": 145,
+    "variants": [
+      {
+        "label": "240 ml Bottle with Loofah",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (240 ml x 2)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  }
+]

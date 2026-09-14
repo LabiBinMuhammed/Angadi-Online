@@ -1,0 +1,757 @@
+[
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Purifying Neem Pack 200g",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/HimalayaPurifyingNeemPack200gTube_FOP2.png?v=1785825962",
+    "basePrice": 225,
+    "variants": [
+      {
+        "label": "200g",
+        "price": 225,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Aloe & Cucumber Refreshing Serum Body Lotion",
+    "category": "Body Lotion",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/8300119-1_HimalayaAloe_CucumberRefreshingSerumBodyLotion100ml_FOP.jpg?v=1780557690",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 225,
+        "is_default": false
+      },
+      {
+        "label": "400ml",
+        "price": 465,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Botanique Baby Wash & Shampoo",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BOTANIQUEBABYWASH_SHAMPOO100MLFRONTINDIAJHI2600137RGBIMS.jpg?v=1779361627",
+    "basePrice": 300,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 300,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 560,
+        "is_default": false
+      },
+      {
+        "label": "400ml",
+        "price": 1090,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Botanique Baby Bubble Bath",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BOTANIQUEBABYBUBBLEBATH100MLFRONTINDIAJHI2600135RGBIMS.jpg?v=1779359678",
+    "basePrice": 250,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 250,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 500,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Botanique Baby Bathing Bar",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BOTANIQUEBABYBATHINGBAR75GBACKINDIAJHI2600082RGBIMS.jpg?v=1779348418",
+    "basePrice": 225,
+    "variants": [
+      {
+        "label": "75g",
+        "price": 225,
+        "is_default": true
+      },
+      {
+        "label": "125g",
+        "price": 410,
+        "is_default": false
+      },
+      {
+        "label": "75g (2+1)",
+        "price": 450,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Hydra Plump Aloe Face Serum",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/HimalayaSerumPDP-15ml-01.jpg?v=1778769715",
+    "basePrice": 299,
+    "variants": [
+      {
+        "label": "15ml",
+        "price": 299,
+        "is_default": true
+      },
+      {
+        "label": "30ml",
+        "price": 549,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya SunProtect+ Ultra-Light Sunscreen Creme Gel",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/HFC_Sunprotect_CremeGelPDP-01_1800x1800_20c76d8a-2930-413a-a5cd-6f91efdd14c5.png?v=1778226883",
+    "basePrice": 449,
+    "variants": [
+      {
+        "label": "50g",
+        "price": 449,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Gentle Baby Sunscreen Lotion",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/SunScreenLotion50ml_FOP.jpg?v=1772093416",
+    "basePrice": 400,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 400,
+        "is_default": true
+      },
+      {
+        "label": "100ml",
+        "price": 700,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Purifying Neem Face Serum",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/8006273-1_HimalayaPurifyingNeemFaceSerum15mlCarton_FOP.jpg?v=1773297921",
+    "basePrice": 249,
+    "variants": [
+      {
+        "label": "15ml",
+        "price": 249,
+        "is_default": true
+      },
+      {
+        "label": "30ml",
+        "price": 499,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Acne Clear+ Moisturizing Gel",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/1_4a532c2c-bbe4-4d29-a488-39718e771096.jpg?v=1772025884",
+    "basePrice": 349,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 349,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Soothing Baby Powder",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/SOOTHINGBABYPOWDER100GFRONTINDIARGBIMS.jpg?v=1772085429",
+    "basePrice": 130,
+    "variants": [
+      {
+        "label": "100g",
+        "price": 130,
+        "is_default": true
+      },
+      {
+        "label": "200g",
+        "price": 240,
+        "is_default": false
+      },
+      {
+        "label": "400g",
+        "price": 440,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Hydrating Aloe Vera Face Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/7949501-1_HimalayaHydratingAloeVeraFaceWash50ml_FOP.jpg?v=1772455081",
+    "basePrice": 95,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 95,
+        "is_default": true
+      },
+      {
+        "label": "100ml",
+        "price": 179,
+        "is_default": false
+      },
+      {
+        "label": "200ml",
+        "price": 449,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Gentle Baby Cream",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/GENTLEBABYCREAM50MLFRONTINDIAIMSRGB.jpg?v=1771996457",
+    "basePrice": 105,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 105,
+        "is_default": true
+      },
+      {
+        "label": "100ml",
+        "price": 200,
+        "is_default": false
+      },
+      {
+        "label": "200ml",
+        "price": 400,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Gentle Baby Powder",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/GENTLEBABYPOWDER50GFRONTINDIAIMSRGB.jpg?v=1771872938",
+    "basePrice": 57,
+    "variants": [
+      {
+        "label": "50g",
+        "price": 57,
+        "is_default": true
+      },
+      {
+        "label": "100g",
+        "price": 111,
+        "is_default": false
+      },
+      {
+        "label": "200g",
+        "price": 204,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Cream and Extra Moisturizing Baby Lotion Combo",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BC_ES_G_100ML_EMBL100MLINDFOP.jpg?v=1771329764",
+    "basePrice": 274,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 274,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Ayurveda Secrets Ghee Lip Butter",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/LipButterPDP-01_0a698431-9100-4d29-a774-7f7b16f9210c.png?v=1771312031",
+    "basePrice": 399,
+    "variants": [
+      {
+        "label": "10g",
+        "price": 399,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Ayurveda Secrets Repairing Shampoo",
+    "category": "Hair Care & Hair Oil",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/AyurvedaShampooPDP_v11.jpg?v=1771237480",
+    "basePrice": 249,
+    "variants": [
+      {
+        "label": "200ml",
+        "price": 249,
+        "is_default": true
+      },
+      {
+        "label": "340ml",
+        "price": 399,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Ayurveda Secrets Hair Growth Oil",
+    "category": "Hair Care & Hair Oil",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/1_ebc90b7f-ed09-458e-a277-d17636a10ee5.jpg?v=1771312350",
+    "basePrice": 479,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 479,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 869,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Strawberry Shine Serum Lip Balm",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/lipbalm-01.png?v=1765193473",
+    "basePrice": 299,
+    "variants": [
+      {
+        "label": "4.5g",
+        "price": 299,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Winter Cherry & Aloe Nourishing Serum Body Lotion",
+    "category": "Body Lotion",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/8124537-1_HimalayaWinterCherry_AloeNourishingSerumBodyLotion100ml_FOP.jpg?v=1765183964",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 225,
+        "is_default": false
+      },
+      {
+        "label": "400ml",
+        "price": 445,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Cocoa Butter Intensive Serum Body Lotion",
+    "category": "Body Lotion",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/8124541-1_HimalayaCocoaButterIntensiveSerumBodyLotionVeryDry100ml_FOP.jpg?v=1765171024",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 225,
+        "is_default": false
+      },
+      {
+        "label": "400ml",
+        "price": 445,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Nourishing 2 in 1 Baby Shampoo",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/Untitled_8.jpg?v=1763017392",
+    "basePrice": 400,
+    "variants": [
+      {
+        "label": "400ml",
+        "price": 400,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya SENSITIVE BABY LAUNDRY DETERGENT",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/500mlPouchFOP.jpg?v=1756705308",
+    "basePrice": 329,
+    "variants": [
+      {
+        "label": "500ML (POUCH)",
+        "price": 329,
+        "is_default": true
+      },
+      {
+        "label": "1LTR (POUCH)",
+        "price": 499,
+        "is_default": false
+      },
+      {
+        "label": "1LTR (BOTTLE)",
+        "price": 525,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya refreshing baby soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/REFRESHINGBABYSOAP75GFRONT2INDIAIMSRGB.jpg?v=1764242009",
+    "basePrice": 65,
+    "variants": [
+      {
+        "label": "75g",
+        "price": 65,
+        "is_default": true
+      },
+      {
+        "label": "125g",
+        "price": 93,
+        "is_default": false
+      },
+      {
+        "label": "Buy 3 Get 1 Free",
+        "price": 240,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Refreshing baby lotion",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/REFRESHINGBABYLOTION400MLINDFOP.jpg?v=1752747038",
+    "basePrice": 370,
+    "variants": [
+      {
+        "label": "400ml",
+        "price": 370,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Bar with Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BABYBARWITHPURECOWGHEE75G_BOP.jpg?v=1750316850",
+    "basePrice": 160,
+    "variants": [
+      {
+        "label": "75g",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "125g",
+        "price": 222,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Sun Protect+ Ultra-Light Sunscreen",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/30g.jpg?v=1748345092",
+    "basePrice": 249,
+    "variants": [
+      {
+        "label": "30g",
+        "price": 249,
+        "is_default": true
+      },
+      {
+        "label": "50g",
+        "price": 349,
+        "is_default": false
+      },
+      {
+        "label": "100ml Lotion",
+        "price": 499,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Cradle Cap Cream with Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/JHI2500066.01.jpg?v=1742981605",
+    "basePrice": 200,
+    "variants": [
+      {
+        "label": "30ml",
+        "price": 200,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Intima Feminine Hygiene Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/INTIMA-WASH-100ML-FRONT-INDIA-13834-RGB-GG.jpg?v=1741266094",
+    "basePrice": 170,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 170,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Gentle Baby Lotion",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/GENTLEBABYLOTION50MLFRONTINDIAIMSRGB.jpg?v=1770376156",
+    "basePrice": 60,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 60,
+        "is_default": true
+      },
+      {
+        "label": "100ml",
+        "price": 125,
+        "is_default": false
+      },
+      {
+        "label": "100ml (5+1)",
+        "price": 625,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Brightening Vitamin C Orange Face Serum Cream",
+    "category": "Body Lotion",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/Vit-C-Face-Cream-1x1_1.jpg?v=1733108455",
+    "basePrice": 275,
+    "variants": [
+      {
+        "label": "Serum Cream",
+        "price": 275,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Natural Glow Rose Face Serum",
+    "category": "Skin Care & Face Wash",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/RoseSerumCatalogue1.jpg?v=1732881290",
+    "basePrice": 549,
+    "variants": [
+      {
+        "label": "30ml",
+        "price": 549,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Anti-Hair Fall Bhringaraja Conditioner",
+    "category": "Hair Care & Hair Oil",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/Himalaya-Bringha-80-Cond-Ecom-02_b9ffa926-7b1f-42bb-9524-64b7dfc851dc.jpg?v=1732074952",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "80ml",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "180ml",
+        "price": 199,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Gentle Exfoliating Apricot Face Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/GentleExfoliatingApricotFacewash-01.jpg?v=1731403026",
+    "basePrice": 115,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 115,
+        "is_default": true
+      },
+      {
+        "label": "100ml",
+        "price": 220,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Cream With Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BABY-CREAM-WITH-PURE-COW-GHEE-50ML-SLEEVE-IND-5057305_fop_ae882585-952a-45ef-9841-ecf0501e2369.jpg?v=1727162835",
+    "basePrice": 150,
+    "variants": [
+      {
+        "label": "50ml",
+        "price": 150,
+        "is_default": true
+      },
+      {
+        "label": "200ml",
+        "price": 450,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Youth Eternity Face Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/7393055-2_Himalaya-Youth-Eternity-Face-Wash-100ml_FOP.jpg?v=1713518926",
+    "basePrice": 319,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 319,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Rash Relief Cream with Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BABY-RASH-RELIEF-CREAM-WITH-PURE-COW-GHEE-20G_FOP.jpg?v=1715235859",
+    "basePrice": 100,
+    "variants": [
+      {
+        "label": "20g",
+        "price": 100,
+        "is_default": true
+      },
+      {
+        "label": "50g",
+        "price": 175,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Derma Cream with Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/BABY-DERMA-CREAM-WITH-PURE-COW-GHEE-50G-CARTON-IND-5057492_FOP.jpg?v=1715234287",
+    "basePrice": 125,
+    "variants": [
+      {
+        "label": "50g",
+        "price": 125,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Baby Lotion with Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/Himalaya_Baby-Lotion_100ml_FOP.jpg?v=1715230965",
+    "basePrice": 160,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "400ml",
+        "price": 500,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Himalaya",
+    "name": "Himalaya Head to Toe Baby Wash with Pure Cow Ghee",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0272/4714/9155/files/HEAD-TO-TOE-BABY-WASH-WITH-PURE-COW-GHEE-100ML-LABEL-IND-5057330_FOP.jpg?v=1715229377",
+    "basePrice": 170,
+    "variants": [
+      {
+        "label": "100ml",
+        "price": 170,
+        "is_default": true
+      },
+      {
+        "label": "400ml",
+        "price": 500,
+        "is_default": false
+      }
+    ]
+  }
+]

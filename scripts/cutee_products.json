@@ -1,0 +1,386 @@
+[
+  {
+    "brand": "Cutee",
+    "name": "Cutee Olive Sona",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/olive-sona-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Haldi Manjal",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/haldi-manjal-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Silky Skin Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/silky-skin-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Gulfee Oudh Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/gulfee-audh-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee White Zaffron Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/white-saffron-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Pappaya Fruit Mix",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cutee-papaya-fruit-mix-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Sandal Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cute-sandal-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee International Pure White Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cutee-white-international-pure-white-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee International Green Tea Aroma Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/green-tea-aroma-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Herbow Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cutee-herbow-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Milso Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/milso-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Sandal Gold Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/sandal-gold-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Milky Almond Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cutee-milky-almond-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Lavender Bloom",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cutee-lavender-bloom-soap.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee Sandal Hand Wash",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/cute-sandal-hand-wash.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Cutee",
+    "name": "Cutee The Beauty Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://cuteesoap.com/images/logo2.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 140,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 270,
+        "is_default": false
+      }
+    ]
+  }
+]

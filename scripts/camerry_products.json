@@ -1,0 +1,506 @@
+[
+  {
+    "brand": "Camerry",
+    "rawName": "Red Velvet",
+    "fullName": "Camerry Red Velvet Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/1.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Pista",
+    "fullName": "Camerry Pista Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/2.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Butterscotch",
+    "fullName": "Camerry Butterscotch Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/3.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Jackfruit",
+    "fullName": "Camerry Jackfruit Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/4.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Kiwi",
+    "fullName": "Camerry Kiwi Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/5.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Chikoo",
+    "fullName": "Camerry Chikoo Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/6.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Fig And Honey",
+    "fullName": "Camerry Fig And Honey Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/7.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Kulfi Pistachio",
+    "fullName": "Camerry Kulfi Pistachio Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/8.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Passion Fruit",
+    "fullName": "Camerry Passion Fruit Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/9.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Orange",
+    "fullName": "Camerry Orange Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/10.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Blackcurrant",
+    "fullName": "Camerry Blackcurrant Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/11.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Caramel Latte",
+    "fullName": "Camerry Caramel Latte Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/12.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Kesar Badam Pista",
+    "fullName": "Camerry Kesar Badam Pista Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/13.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Pineapple",
+    "fullName": "Camerry Pineapple Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/14.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Datte",
+    "fullName": "Camerry Datte Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/datte.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Vanilla",
+    "fullName": "Camerry Vanilla Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/vanilla.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Spanish Delight",
+    "fullName": "Camerry Spanish Delight Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/spanish-delight.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Tender Coconut",
+    "fullName": "Camerry Tender Coconut Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/tender-coconut.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Strawberry",
+    "fullName": "Camerry Strawberry Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/strawberry.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Mango",
+    "fullName": "Camerry Mango Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/mango.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Blueberry",
+    "fullName": "Camerry Blueberry Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/blueberry.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Sitaphal",
+    "fullName": "Camerry Sitaphal Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/sitaphal.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Chocolate",
+    "fullName": "Camerry Chocolate Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/chocolate.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Cookies N Cream",
+    "fullName": "Camerry Cookies N Cream Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/cookies-n-cream.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Cotton Candy",
+    "fullName": "Camerry Cotton Candy Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/cotton-candy.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Bon Bon",
+    "fullName": "Camerry Bon Bon Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/bon-bon.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Lemon Pie",
+    "fullName": "Camerry Lemon Pie Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/lemon-pie.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Tiramisu",
+    "fullName": "Camerry Tiramisu Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/tiramisu.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Srawberry Cheese Cake",
+    "fullName": "Camerry Srawberry Cheese Cake Ice Cream (Tub)",
+    "type": "Tub",
+    "imageUrl": "https://www.camerry.in/images/products/strawberry-cheese.png",
+    "source": "https://www.camerry.in/tubs.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Vanilla",
+    "fullName": "Camerry Vanilla Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/1.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Butter Scotch",
+    "fullName": "Camerry Butter Scotch Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/2.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Chocolate",
+    "fullName": "Camerry Chocolate Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/3.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Strawberry",
+    "fullName": "Camerry Strawberry Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-4.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Pista",
+    "fullName": "Camerry Pista Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-5.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Blackcurrant",
+    "fullName": "Camerry Blackcurrant Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-6.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Red Velvet",
+    "fullName": "Camerry Red Velvet Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-7.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Cotton Candy",
+    "fullName": "Camerry Cotton Candy Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-8.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Cookies N Cream",
+    "fullName": "Camerry Cookies N Cream Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-9.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Spanish Delight",
+    "fullName": "Camerry Spanish Delight Ice Cream (Cone)",
+    "type": "Cone",
+    "imageUrl": "https://www.camerry.in/images/cone-10.png",
+    "source": "https://www.camerry.in/cone.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Mango Bar",
+    "fullName": "Camerry Mango Bar Ice Cream (Bar)",
+    "type": "Bar",
+    "imageUrl": "https://www.camerry.in/images/bar-mango.png",
+    "source": "https://www.camerry.in/bars.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Choco Bar",
+    "fullName": "Camerry Choco Bar Ice Cream (Bar)",
+    "type": "Bar",
+    "imageUrl": "https://www.camerry.in/images/bar-choco.png",
+    "source": "https://www.camerry.in/bars.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Funfi Kulfi",
+    "fullName": "Camerry Funfi Kulfi Ice Cream (Bar)",
+    "type": "Bar",
+    "imageUrl": "https://www.camerry.in/images/funfi-kulfi.png",
+    "source": "https://www.camerry.in/bars.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Crunchies Chocolate",
+    "fullName": "Camerry Crunchies Chocolate Ice Cream (Bar)",
+    "type": "Bar",
+    "imageUrl": "https://www.camerry.in/images/crunchies-chocolate.png",
+    "source": "https://www.camerry.in/bars.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Berries N Crunchies",
+    "fullName": "Camerry Berries N Crunchies Ice Cream (Bar)",
+    "type": "Bar",
+    "imageUrl": "https://www.camerry.in/images/berries-n-crunchies.png",
+    "source": "https://www.camerry.in/bars.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Mango Melody",
+    "fullName": "Camerry Mango Melody Ice Cream (Fruiticle / Pop)",
+    "type": "Fruiticle / Pop",
+    "imageUrl": "https://www.camerry.in/images/fruiticle1.png",
+    "source": "https://www.camerry.in/fruiticle.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Pineapple",
+    "fullName": "Camerry Pineapple Ice Cream (Fruiticle / Pop)",
+    "type": "Fruiticle / Pop",
+    "imageUrl": "https://www.camerry.in/images/fruiticle2.png",
+    "source": "https://www.camerry.in/fruiticle.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Strawberry",
+    "fullName": "Camerry Strawberry Ice Cream (Fruiticle / Pop)",
+    "type": "Fruiticle / Pop",
+    "imageUrl": "https://www.camerry.in/images/fruiticle3.png",
+    "source": "https://www.camerry.in/fruiticle.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Tropical Twist",
+    "fullName": "Camerry Tropical Twist Ice Cream (Fruiticle / Pop)",
+    "type": "Fruiticle / Pop",
+    "imageUrl": "https://www.camerry.in/images/fruiticle4.png",
+    "source": "https://www.camerry.in/fruiticle.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Berry Lime",
+    "fullName": "Camerry Berry Lime Ice Cream (Fruiticle / Pop)",
+    "type": "Fruiticle / Pop",
+    "imageUrl": "https://www.camerry.in/images/fruiticle5.png",
+    "source": "https://www.camerry.in/fruiticle.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Chocolate",
+    "fullName": "Camerry Chocolate Ice Cream (Milkies / Bar)",
+    "type": "Milkies / Bar",
+    "imageUrl": "https://www.camerry.in/images/7.png",
+    "source": "https://www.camerry.in/milkies.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Tender Coconut",
+    "fullName": "Camerry Tender Coconut Ice Cream (Milkies / Bar)",
+    "type": "Milkies / Bar",
+    "imageUrl": "https://www.camerry.in/images/tc.png",
+    "source": "https://www.camerry.in/milkies.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Pista",
+    "fullName": "Camerry Pista Ice Cream (Milkies / Bar)",
+    "type": "Milkies / Bar",
+    "imageUrl": "https://www.camerry.in/images/9.png",
+    "source": "https://www.camerry.in/milkies.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Sipie Mango",
+    "fullName": "Camerry Sipie Mango Ice Cream (Sipie)",
+    "type": "Sipie",
+    "imageUrl": "https://www.camerry.in/images/sipie-mango.png",
+    "source": "https://www.camerry.in/sipie.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Sipie Pineapple",
+    "fullName": "Camerry Sipie Pineapple Ice Cream (Sipie)",
+    "type": "Sipie",
+    "imageUrl": "https://www.camerry.in/images/sipie-pineapple.png",
+    "source": "https://www.camerry.in/sipie.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Sipie Pista",
+    "fullName": "Camerry Sipie Pista Ice Cream (Sipie)",
+    "type": "Sipie",
+    "imageUrl": "https://www.camerry.in/images/sipie-pista.png",
+    "source": "https://www.camerry.in/sipie.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Sipie Chocolate",
+    "fullName": "Camerry Sipie Chocolate Ice Cream (Sipie)",
+    "type": "Sipie",
+    "imageUrl": "https://www.camerry.in/images/sipie-chocolate.png",
+    "source": "https://www.camerry.in/sipie.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Sipie Strawberry",
+    "fullName": "Camerry Sipie Strawberry Ice Cream (Sipie)",
+    "type": "Sipie",
+    "imageUrl": "https://www.camerry.in/images/sipie-strawberry.png",
+    "source": "https://www.camerry.in/sipie.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Siesta",
+    "fullName": "Camerry Siesta Ice Cream (Speciality)",
+    "type": "Speciality",
+    "imageUrl": "https://www.camerry.in/images/specialities/1.png",
+    "source": "https://www.camerry.in/specialities.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Puttu",
+    "fullName": "Camerry Puttu Ice Cream (Speciality)",
+    "type": "Speciality",
+    "imageUrl": "https://www.camerry.in/images/specialities/2.png",
+    "source": "https://www.camerry.in/specialities.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Dream Cake",
+    "fullName": "Camerry Dream Cake Ice Cream (Speciality)",
+    "type": "Speciality",
+    "imageUrl": "https://www.camerry.in/images/specialities/3.png",
+    "source": "https://www.camerry.in/specialities.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Fruity Bonanza",
+    "fullName": "Camerry Fruity Bonanza Ice Cream (Speciality)",
+    "type": "Speciality",
+    "imageUrl": "https://www.camerry.in/images/specialities/4.png",
+    "source": "https://www.camerry.in/specialities.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Dilse Red Velvet",
+    "fullName": "Camerry Dilse Red Velvet Ice Cream (Speciality)",
+    "type": "Speciality",
+    "imageUrl": "https://www.camerry.in/images/specialities/5.png",
+    "source": "https://www.camerry.in/specialities.html"
+  },
+  {
+    "brand": "Camerry",
+    "rawName": "Dilse Butterscotch Chocolate",
+    "fullName": "Camerry Dilse Butterscotch Chocolate Ice Cream (Speciality)",
+    "type": "Speciality",
+    "imageUrl": "https://www.camerry.in/images/specialities/6.png",
+    "source": "https://www.camerry.in/specialities.html"
+  }
+]

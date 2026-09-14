@@ -1,0 +1,304 @@
+[
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Spiral Ruled",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/950_-_singlelinecopy2_4359fee6-7227-4629-89d6-694eda976dd9.jpg?v=1679749420",
+    "basePrice": 78,
+    "variants": [
+      {
+        "label": "A4 - 29.7 x 21 cm - 300 Pages - 6 Sub...",
+        "price": 78,
+        "is_default": true
+      },
+      {
+        "label": "A4 - 29.7 x 21 cm - 250 Pages - 5 Sub...",
+        "price": 78,
+        "is_default": false
+      },
+      {
+        "label": "A4 - 29.7 x 21 cm - 160 Pages - 1 Sub...",
+        "price": 78,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Wiro Ruled",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/950_-_singlelinecopy2_4359fee6-7227-4629-89d6-694eda976dd9.jpg?v=1679749420",
+    "basePrice": 78,
+    "variants": [
+      {
+        "label": "A5 - 21 x 14.8 cm - 250 Pages - 5 Sub...",
+        "price": 78,
+        "is_default": true
+      },
+      {
+        "label": "A5 - 21 x 14.8 cm - 160 Pages - 1 Sub...",
+        "price": 78,
+        "is_default": false
+      },
+      {
+        "label": "A4 - 29.7 x 21 cm - 300 Pages - 5 Sub...",
+        "price": 78,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid King 24 x 18 cm Soft Cover",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/amazon_short_brown_cover.jpg?v=1679744488",
+    "basePrice": 252,
+    "variants": [
+      {
+        "label": "172 Pages - Pack of 6 - Ruled",
+        "price": 252,
+        "is_default": true
+      },
+      {
+        "label": "172 Pages - Pack of 10 - Unruled",
+        "price": 252,
+        "is_default": false
+      },
+      {
+        "label": "172 Pages - Pack of 10 - Four Line",
+        "price": 252,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Short 19 x 15.5 cm Hard Cover",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/amazon_short_brown_cover.jpg?v=1679744488",
+    "basePrice": 252,
+    "variants": [
+      {
+        "label": "172 Pages - Pack of 10 - Ruled",
+        "price": 252,
+        "is_default": true
+      },
+      {
+        "label": "172 Pages - Pack of 10 - Unruled",
+        "price": 252,
+        "is_default": false
+      },
+      {
+        "label": "172 Pages - Pack of 10 - Four Line",
+        "price": 252,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Practical Notebook",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/3_11a0eb4e-af1a-4900-ba56-9f6d08cdd075.jpg?v=1679743181",
+    "basePrice": 500,
+    "variants": [
+      {
+        "label": "28 x 22 cm - Physics - 120 Pages - Pa...",
+        "price": 500,
+        "is_default": true
+      },
+      {
+        "label": "28 x 22 cm - Biology - 120 Pages - Pa...",
+        "price": 500,
+        "is_default": false
+      },
+      {
+        "label": "28 x 22 cm - Chemistry - 120 Pages - ...",
+        "price": 500,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Graph Notebook",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/3_11a0eb4e-af1a-4900-ba56-9f6d08cdd075.jpg?v=1679743181",
+    "basePrice": 500,
+    "variants": [
+      {
+        "label": "28 x 22 cm - Graph - 28 Pages - Pack ...",
+        "price": 500,
+        "is_default": true
+      },
+      {
+        "label": "28 x 22 cm - Graph - 64 Pages - Pack ...",
+        "price": 350,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Drawing Notebook",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/3_11a0eb4e-af1a-4900-ba56-9f6d08cdd075.jpg?v=1679743181",
+    "basePrice": 200,
+    "variants": [
+      {
+        "label": "27.5 x 34.7 cm - Drawing - 32 Pages -...",
+        "price": 200,
+        "is_default": true
+      },
+      {
+        "label": "21 x 29.7 cm - Drawing - 32 Pages - P...",
+        "price": 300,
+        "is_default": false
+      },
+      {
+        "label": "21 x 29.7 cm - Drawing - 52 Pages - P...",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Short 19 x 15.5 cm",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/069_c7d88bb3-f00f-411c-8337-361f35d84224.png?v=1679566695",
+    "basePrice": 200,
+    "variants": [
+      {
+        "label": "72 Pages - Pack of 12 - Ruled",
+        "price": 200,
+        "is_default": true
+      },
+      {
+        "label": "72 Pages - Pack of 12 - Unruled",
+        "price": 200,
+        "is_default": false
+      },
+      {
+        "label": "72 Pages - Pack of 12 - Interleaf",
+        "price": 200,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid King 24 x 18 cm",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/069_c7d88bb3-f00f-411c-8337-361f35d84224.png?v=1679566695",
+    "basePrice": 300,
+    "variants": [
+      {
+        "label": "172 Pages - Pack of 6 - Ruled",
+        "price": 300,
+        "is_default": true
+      },
+      {
+        "label": "172 Pages - Pack of 6 - Unruled",
+        "price": 300,
+        "is_default": false
+      },
+      {
+        "label": "172 Pages - Pack of 6 - Interleaf",
+        "price": 300,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Cut 27.2 x 16.7 cm",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/069_c7d88bb3-f00f-411c-8337-361f35d84224.png?v=1679566695",
+    "basePrice": 300,
+    "variants": [
+      {
+        "label": "160 Pages - Pack of 6 - Ruled",
+        "price": 300,
+        "is_default": true
+      },
+      {
+        "label": "160 Pages - Pack of 6 - Unruled",
+        "price": 220,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid A4 29.7 x 21 cm",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/069_c7d88bb3-f00f-411c-8337-361f35d84224.png?v=1679566695",
+    "basePrice": 361,
+    "variants": [
+      {
+        "label": "72 Pages - Pack of 12 - Ruled",
+        "price": 361,
+        "is_default": true
+      },
+      {
+        "label": "72 Pages - Pack of 12 - Unruled",
+        "price": 361,
+        "is_default": false
+      },
+      {
+        "label": "136 Pages - Pack of 6 - Ruled",
+        "price": 300,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Long 31 x 19 cm",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/069_c7d88bb3-f00f-411c-8337-361f35d84224.png?v=1679566695",
+    "basePrice": 408,
+    "variants": [
+      {
+        "label": "72 Pages - Pack of 12 - Ruled",
+        "price": 408,
+        "is_default": true
+      },
+      {
+        "label": "72 Pages - Pack of 12 - Unruled",
+        "price": 408,
+        "is_default": false
+      },
+      {
+        "label": "156 Pages - Pack of 6 - Ruled",
+        "price": 306,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Papergrid",
+    "name": "Papergrid Ultra Long 33 x 21 cm",
+    "category": "Student Notebooks",
+    "imageUrl": "https://cdn.shopify.com/s/files/1/0389/6056/2220/products/069_c7d88bb3-f00f-411c-8337-361f35d84224.png?v=1679566695",
+    "basePrice": 406,
+    "variants": [
+      {
+        "label": "84 Pages - Pack of 12 - Ruled",
+        "price": 406,
+        "is_default": true
+      },
+      {
+        "label": "84 Pages - Pack of 12 - Unruled",
+        "price": 406,
+        "is_default": false
+      },
+      {
+        "label": "156 Pages - Pack of 6 - Ruled",
+        "price": 406,
+        "is_default": false
+      }
+    ]
+  }
+]

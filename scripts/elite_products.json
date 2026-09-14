@@ -1,0 +1,1100 @@
+[
+  {
+    "brand": "Elite",
+    "rawName": "Brown Bread",
+    "fullName": "Elite Brown Bread",
+    "pageName": "More Health Range",
+    "productUrl": "https://elitefoods.co.in/product/brown-bread",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/Brown Bread.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/Brown Bread.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Oats",
+    "fullName": "Elite Oats",
+    "pageName": "More Health Range",
+    "productUrl": "https://elitefoods.co.in/product/arogya-oat",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Oats-Jar.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Oats-Jar.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Nutricare Wheat Germ",
+    "fullName": "Elite Nutricare Wheat Germ",
+    "pageName": "More Health Range",
+    "productUrl": "https://elitefoods.co.in/product/nutricare-wheat-germs",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Wheat-Germ-200g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Wheat-Germ-200g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Fibero Wheat Bran",
+    "fullName": "Elite Fibero Wheat Bran",
+    "pageName": "More Health Range",
+    "productUrl": "https://elitefoods.co.in/product/fibero-wheat-brans",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Wheat-Bran-500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Wheat-Bran-500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Cleaned Ragi",
+    "fullName": "Elite Cleaned Ragi",
+    "pageName": "More Health Range",
+    "productUrl": "https://elitefoods.co.in/product/ragi",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Ragi.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Ragi.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Marble Cake",
+    "fullName": "Elite Marble Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/marble-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/MARBLA CAKE 140g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/MARBLA CAKE 140g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Fruit Bar Cake",
+    "fullName": "Elite Fruit Bar Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/fruit-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Fruit Cake 140g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Fruit Cake 140g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Chocolate Bar Cake",
+    "fullName": "Elite Chocolate Bar Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/chocolate-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Choco Barcake 140g - 8906009990682 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Choco Barcake 140g - 8906009990682 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Vanilla Bar Cake",
+    "fullName": "Elite Vanilla Bar Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/vanilla-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Vanilla  Barcake 140g - 8906009990651 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Vanilla  Barcake 140g - 8906009990651 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Orange Bar Cake",
+    "fullName": "Elite Orange Bar Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/orange-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Orange Barcake 30g - 8906009993195 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Orange Barcake 30g - 8906009993195 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Orange Fruity Cake",
+    "fullName": "Elite Orange Fruity Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/orange-tutty-fruity",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Orange Fruity Barcake 100g - 8906009993157 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Orange Fruity Barcake 100g - 8906009993157 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Pineapple Fruity Cake",
+    "fullName": "Elite Pineapple Fruity Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/pineapple-tutty-fruity",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Pineapple-Fruity-Barcake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Pineapple-Fruity-Barcake.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Orange Chocolate",
+    "fullName": "Elite Orange Chocolate",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/orange-chocolate",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Choco Orange Barcake 140g - 8906009990675 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Choco Orange Barcake 140g - 8906009990675 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Pineapple Chocolate",
+    "fullName": "Elite Pineapple Chocolate",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/pineapple-chocolate",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Choco Pineapple Barcake 140g - 8906009990668 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Choco Pineapple Barcake 140g - 8906009990668 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Black Raisin",
+    "fullName": "Elite Black Raisin",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/black-raisin",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Black-Raisin-Cake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Black-Raisin-Cake.png?ijusgdf?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Banana Pudding Cake Sliced",
+    "fullName": "Elite Banana Pudding Cake Sliced",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/banana-pudding-cake-sliced",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Banana-Pudding-Cake-150g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Banana-Pudding-Cake-150g.png?asuiudgd?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Dates Pudding Cake Sliced",
+    "fullName": "Elite Dates Pudding Cake Sliced",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/dates-pudding-cake-sliced",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Dates-Pudding-Cake-150g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Dates-Pudding-Cake-150g.png?askugd?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jack fruit Pudding Cake Sliced",
+    "fullName": "Elite Jack fruit Pudding Cake Sliced",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/jack-fruit-pudding-cake-sliced",
+    "imageUrl": "https://elitefoods.co.in/img/product/bar-cakes/Jackfruit-Pudding-Cake-150g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/bar-cakes/Jackfruit-Pudding-Cake-150g.png?kjbasd?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Carrot Pudding Cake Sliced",
+    "fullName": "Elite Carrot Pudding Cake Sliced",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/carrot-pudding-cake-sliced",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Carrot-Pudding-Cake-150g2.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Carrot-Pudding-Cake-150g2.png?jiasgud?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Centoz Sweet Heart Strawberry",
+    "fullName": "Elite Centoz Sweet Heart Strawberry",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/centoz-sweet-heart-strawberry",
+    "imageUrl": "https://elitefoods.co.in/img/product/cup-cakes/Heart Cake 54g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cup-cakes/Heart Cake 54g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Choco Cupcake",
+    "fullName": "Elite Choco Cupcake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/chocolate-cup-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/cup-cakes/Choco-Cup-Cake-18g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cup-cakes/Choco-Cup-Cake-18g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Butter Cup Cake",
+    "fullName": "Elite Butter Cup Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/butter-cup-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/cup-cakes/Butter-Cup-Cake-18g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cup-cakes/Butter-Cup-Cake-18g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Strawberry Cup Cake",
+    "fullName": "Elite Strawberry Cup Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/strawberry-cup-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/2025/strawberry-6-1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/2025/strawberry-6-1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Choco Cup Cake 6 in 1",
+    "fullName": "Elite Choco Cup Cake 6 in 1",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/chocolate-cup-cake-6",
+    "imageUrl": "https://elitefoods.co.in/img/product/2025/choco-6-1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/2025/choco-6-1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Butter Cup Cake 6 in 1",
+    "fullName": "Elite Butter Cup Cake 6 in 1",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/butter-cup-cake-6",
+    "imageUrl": "https://elitefoods.co.in/img/product/2025/butter-6-1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/2025/butter-6-1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Carrot Pudding 6 in 1",
+    "fullName": "Elite Carrot Pudding 6 in 1",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/carrot-pudding-6-in-1",
+    "imageUrl": "https://elitefoods.co.in/img/product/2025/carrot-6-1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/2025/carrot-6-1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Centoz Choco",
+    "fullName": "Elite Centoz Choco",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/centoz-choco",
+    "imageUrl": "https://elitefoods.co.in/img/product/cup-cakes/Centoz-Choco-Cup-Cake-1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cup-cakes/Centoz-Choco-Cup-Cake-1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Centoz Strawberry",
+    "fullName": "Elite Centoz Strawberry",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/centoz-strawberry",
+    "imageUrl": "https://elitefoods.co.in/img/product/cup-cakes/Centoz-Strawberry-Cup-Cake-1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cup-cakes/Centoz-Strawberry-Cup-Cake-1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Plum Surprise",
+    "fullName": "Elite Plum Surprise",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/plum-surprise",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/Plum Surprise 680g - 8906009990125 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/Plum Surprise 680g - 8906009990125 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Choco Plum",
+    "fullName": "Elite Choco Plum",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/choco-plum",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/Choco Plum 680g - 8906009990101 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/Choco Plum 680g - 8906009990101 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rich Plum",
+    "fullName": "Elite Rich Plum",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/rich-plum",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/Rich Plum Cake 300g - 8906009991160 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/Rich Plum Cake 300g - 8906009991160 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Plum Classic",
+    "fullName": "Elite Plum Classic",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/plum-classic",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/Plum Classic 680g - 8906009992921 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/Plum Classic 680g - 8906009992921 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Plum Delight",
+    "fullName": "Elite Plum Delight",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/plum-delight",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/Plum Delight Cake 650g-new.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/Plum Delight Cake 650g-new.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rich Plum Cake",
+    "fullName": "Elite Rich Plum Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/tin-cakes",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Rich Plum - Tin-new.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Rich Plum - Tin-new.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "LA Elite Plum Cake",
+    "fullName": "Elite LA Elite Plum Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/la-elite-plum-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/La Elite Tin-new.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/La Elite Tin-new.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Butterscotch Pudding Cake",
+    "fullName": "Elite Butterscotch Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/butterscotch-pudding-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/butterscotch-pudding-cake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/butterscotch-pudding-cake.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Carrot Pudding Cake",
+    "fullName": "Elite Carrot Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/carrot-pudding",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Carrot Pudding Cake 500g - 8906009992679 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Carrot Pudding Cake 500g - 8906009992679 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Dates Pudding Cake",
+    "fullName": "Elite Dates Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/dates-pudding-cake-6",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Dates Pudding Cake 500g - 8906009992518 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Dates Pudding Cake 500g - 8906009992518 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jackfruit Pudding Cake",
+    "fullName": "Elite Jackfruit Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/jackfruit-pudding-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Jackfruit Pudding Cake 500g - 8906009992976 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Jackfruit Pudding Cake 500g - 8906009992976 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Pineapple Pudding Cake",
+    "fullName": "Elite Pineapple Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/pineapple-pudding-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Pineapple Pudding Cake 500g - 8906009994031 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Pineapple Pudding Cake 500g - 8906009994031 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Banana Pudding Cake",
+    "fullName": "Elite Banana Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/banana-pudding-cake-6",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Banana Pudding Cake 500g - 8906009993379 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Banana Pudding Cake 500g - 8906009993379 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jackfruit Pudding cake 700g",
+    "fullName": "Elite Jackfruit Pudding cake 700g",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/jackfruit-pudding-cake-700g",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Jackfruit Pudding Cake -700g - Front1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Jackfruit Pudding Cake -700g - Front1.png?jiasgud?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Carrot pudding Sliced Cake 700g",
+    "fullName": "Elite Carrot pudding Sliced Cake 700g",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/carrot-pudding-sliced-cake-700g",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/Carrot Pudding Cake Sliced -700g - Front1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/Carrot Pudding Cake Sliced -700g - Front1.png?jiasgud?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Tea Cake",
+    "fullName": "Elite Tea Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/tea-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Tea-Cake-500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Tea-Cake-500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Pineapple Cake",
+    "fullName": "Elite Pineapple Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/pineapple-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Pineapple-cake-350g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Pineapple-cake-350g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Sponge Cake",
+    "fullName": "Elite Sponge Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/sponge-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Sponge-Cake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Sponge-Cake.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Choco Brownie Cake",
+    "fullName": "Elite Choco Brownie Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/choco-brownie",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Brownie.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Brownie.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Fruit N Nut Brownie Cake",
+    "fullName": "Elite Fruit N Nut Brownie Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/fruit-n-nut-brownie-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/pudding-cakes/fruit-n-nut-brownie-cake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/pudding-cakes/fruit-n-nut-brownie-cake.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Plum Pudding Cake",
+    "fullName": "Elite Plum Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/plum-pudding-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Plum Pudding Slice Cake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Plum Pudding Slice Cake.png?asD?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Fruit Slice Cake",
+    "fullName": "Elite Fruit Slice Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/fruit-slice",
+    "imageUrl": "https://elitefoods.co.in/img/product/speciality-cakes/Fruit Slice Cake.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/speciality-cakes/Fruit Slice Cake.png?asd?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Choco Brownie Cake",
+    "fullName": "Elite Veg Choco Brownie Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/Veg-Choco-Brownie-Cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg Brownie 40g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg Brownie 40g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Milk Bar Cake",
+    "fullName": "Elite Veg Milk Bar Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-milk-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg Milk Bar Cake (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg Milk Bar Cake (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Orange Bar Cake",
+    "fullName": "Elite Veg Orange Bar Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-orange-bar-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg Orange Bar Cake (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg Orange Bar Cake (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Banana Pudding",
+    "fullName": "Elite Veg Banana Pudding",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-banana-pudding",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/VEG Banana Pudding Cake 150g (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/VEG Banana Pudding Cake 150g (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Dates Pudding",
+    "fullName": "Elite Veg Dates Pudding",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-dates-pudding",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/VEG Dates Pudding Cake150g (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/VEG Dates Pudding Cake150g (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "VEG Jackfruit Pudding Cake",
+    "fullName": "Elite VEG Jackfruit Pudding Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-jackfruit-pudding-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg Jackfruit Pudding Cake 140g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg Jackfruit Pudding Cake 140g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg carrot Pudding cake",
+    "fullName": "Elite Veg carrot Pudding cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-carrot-pudding-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg Carrot Pudding Cake 140g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg Carrot Pudding Cake 140g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Plum Pudding",
+    "fullName": "Elite Veg Plum Pudding",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-plum-pudding",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg-Plum-Pudding-Oblong.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg-Plum-Pudding-Oblong.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Vanilla Oblong Cake",
+    "fullName": "Elite Veg Vanilla Oblong Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-vanilla-oblong-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg-Vanilla-Oblong.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg-Vanilla-Oblong.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Plum Cake",
+    "fullName": "Elite Veg Plum Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-plum-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/plum-cakes/Veg Plum 700g - 8906009993928 - Front.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/plum-cakes/Veg Plum 700g - 8906009993928 - Front.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Veg Vanilla Cup Cake",
+    "fullName": "Elite Veg Vanilla Cup Cake",
+    "pageName": "Cake",
+    "productUrl": "https://elitefoods.co.in/product/veg-vanilla-cup-cake",
+    "imageUrl": "https://elitefoods.co.in/img/product/veg-cakes/Veg Vanilla Cup Cake (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/veg-cakes/Veg Vanilla Cup Cake (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Milk Rusk",
+    "fullName": "Elite Milk Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/milk-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/rusk/MILK-RUSK-182g-New.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/rusk/MILK-RUSK-182g-New.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Classic Rusk",
+    "fullName": "Elite Classic Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/original-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/rusk/CLASSIC RUSK.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/rusk/CLASSIC RUSK.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Elaichi Rusk",
+    "fullName": "Elite Elaichi Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/sooji-elaichy-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/rusk/ELAICHI-RUSK-182g-New.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/rusk/ELAICHI-RUSK-182g-New.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Pizza Rusk",
+    "fullName": "Elite Pizza Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/pizza-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/rusk/Pizzaaa-Rusk-100g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/rusk/Pizzaaa-Rusk-100g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Cake Rusk",
+    "fullName": "Elite Cake Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/cake-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Cake-Rusk-300g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Cake-Rusk-300g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Wheat Rusk",
+    "fullName": "Elite Wheat Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/wheat-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/rusk/Wheat Rusk 200g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/rusk/Wheat Rusk 200g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jeera Rusk",
+    "fullName": "Elite Jeera Rusk",
+    "pageName": "Baking Rusk",
+    "productUrl": "https://elitefoods.co.in/product/jeera-rusk",
+    "imageUrl": "https://elitefoods.co.in/img/product/rusk/Jeera Rusk 182.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/rusk/Jeera Rusk 182.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Family Wonder",
+    "fullName": "Elite Family Wonder",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/family-wonder",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Magic Sweet Bread",
+    "fullName": "Elite Magic Sweet Bread",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/milk-n-sugar-magic",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/Magic Sweet Bread 400g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/Magic Sweet Bread 400g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Tasty Delight",
+    "fullName": "Elite Tasty Delight",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/tasty-delight",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/Tasty Delight Bread 300g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/Tasty Delight Bread 300g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Tasty Treat",
+    "fullName": "Elite Tasty Treat",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/tasty-treat",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/4.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/4.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "White Bread",
+    "fullName": "Elite White Bread",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/white-bread-400g",
+    "imageUrl": "https://elitefoods.co.in/images/Bread2/4.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread2/4.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Fruity Bread",
+    "fullName": "Elite Fruity Bread",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/fruity-bread",
+    "imageUrl": "https://elitefoods.co.in/img/product/8.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/8.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Magic sweet Bun",
+    "fullName": "Elite Magic sweet Bun",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/magic-sweet-bun",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/Magic sweet Bun.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/Magic sweet Bun.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Vanilla Cream Bun Roll",
+    "fullName": "Elite Vanilla Cream Bun Roll",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/vanilla-cream-bun-roll",
+    "imageUrl": "https://elitefoods.co.in/images/Bread2/Vanilla Bun Roll Pack.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread2/Vanilla Bun Roll Pack.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Butterscotch Bunroll",
+    "fullName": "Elite Butterscotch Bunroll",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/butterscotch-bun-roll",
+    "imageUrl": "https://elitefoods.co.in/images/Bread2/Butter Scotch Bun Roll.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread2/Butter Scotch Bun Roll.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Strawberry Bunroll",
+    "fullName": "Elite Strawberry Bunroll",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/strawberry",
+    "imageUrl": "https://elitefoods.co.in/images/Bread2/Strawberry.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread2/Strawberry.png?iasdyu?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Half Cooked Chapathi",
+    "fullName": "Elite Half Cooked Chapathi",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/chapathi",
+    "imageUrl": "https://elitefoods.co.in/images/Bread2/Half_cooked_chapati_new.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread2/Half_cooked_chapati_new.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Half Cooked Poori",
+    "fullName": "Elite Half Cooked Poori",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/half-cooked-poori",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Half-Cooked-Poori.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Half-Cooked-Poori.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "HALF COOKED PAROTTA",
+    "fullName": "Elite HALF COOKED PAROTTA",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/half-cooked-parotta",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/HC Parotta.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/HC Parotta.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "HALF COOKED WHEAT PAROTTA",
+    "fullName": "Elite HALF COOKED WHEAT PAROTTA",
+    "pageName": "Bread & Bun",
+    "productUrl": "https://elitefoods.co.in/product/half-cooked-wheat-parotta",
+    "imageUrl": "https://elitefoods.co.in/images/Bread/Wheat HC Parotta (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Bread/Wheat HC Parotta (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rich Butter",
+    "fullName": "Elite Rich Butter",
+    "pageName": "Snacks",
+    "productUrl": "https://elitefoods.co.in/product/butter-pouch",
+    "imageUrl": "https://elitefoods.co.in/img/product/cookies/Rich-Butter-Cookies-Duplex-75g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cookies/Rich-Butter-Cookies-Duplex-75g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Cashew Almond",
+    "fullName": "Elite Cashew Almond",
+    "pageName": "Snacks",
+    "productUrl": "https://elitefoods.co.in/product/cashew-almond-pouch",
+    "imageUrl": "https://elitefoods.co.in/img/product/cookies/Cashew-Almond-Cookies-Duplex-75g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cookies/Cashew-Almond-Cookies-Duplex-75g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Choco Chips",
+    "fullName": "Elite Choco Chips",
+    "pageName": "Snacks",
+    "productUrl": "https://elitefoods.co.in/product/choco-chip-pouch",
+    "imageUrl": "https://elitefoods.co.in/img/product/cookies/Chocochips-Cookies-Duplex-75g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/cookies/Chocochips-Cookies-Duplex-75g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jowar Orange Flavoured Fills",
+    "fullName": "Elite Jowar Orange Flavoured Fills",
+    "pageName": "Snacks",
+    "productUrl": "https://elitefoods.co.in/product/jowar-orange-flavoured-fills",
+    "imageUrl": "https://elitefoods.co.in/img/product/Orange.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Orange.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jowar Strawberry Flavoured Fills",
+    "fullName": "Elite Jowar Strawberry Flavoured Fills",
+    "pageName": "Snacks",
+    "productUrl": "https://elitefoods.co.in/product/jowar-strawberry-flavoured-fills",
+    "imageUrl": "https://elitefoods.co.in/img/product/Strawberry.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Strawberry.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Raggi Choco Fills",
+    "fullName": "Elite Raggi Choco Fills",
+    "pageName": "Snacks",
+    "productUrl": "https://elitefoods.co.in/product/raggi-choco-fills",
+    "imageUrl": "https://elitefoods.co.in/img/product/Choco.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Choco.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Chakki Atta",
+    "fullName": "Elite Chakki Atta",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/chakki-atta",
+    "imageUrl": "https://elitefoods.co.in/images/Chakki Atta 1kg NEW.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Chakki Atta 1kg NEW.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Multigrain Atta",
+    "fullName": "Elite Multigrain Atta",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/multigrain-atta",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Multigrain-Atta-1kg.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Multigrain-Atta-1kg.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Maida",
+    "fullName": "Elite Maida",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/maida",
+    "imageUrl": "https://elitefoods.co.in/img/product/Maida-1kg.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Maida-1kg.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rava",
+    "fullName": "Elite Rava",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/rava",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Rava_1kg.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Rava_1kg.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Roasted Rava",
+    "fullName": "Elite Roasted Rava",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/roasted-rava",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Roasted_Rava_(Sooji)_1kg.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Roasted_Rava_(Sooji)_1kg.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Double Roasted Rava",
+    "fullName": "Elite Double Roasted Rava",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/double-roasted-rava",
+    "imageUrl": "https://elitefoods.co.in/images/Double Roasted Rava 1kg.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Double Roasted Rava 1kg.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Broken Wheat",
+    "fullName": "Elite Broken Wheat",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/broken-wheat",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Broken_Wheat_500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Broken_Wheat_500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Broken Wheat Fine",
+    "fullName": "Elite Broken Wheat Fine",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/broken-wheat-fine",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Broken-Wheat-Fine-500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Broken-Wheat-Fine-500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Samba Broken Wheat Fine",
+    "fullName": "Elite Samba Broken Wheat Fine",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/samba-broken-wheat-fine",
+    "imageUrl": "https://elitefoods.co.in/images/Samba-Broken-Wheat-Fine-500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Samba-Broken-Wheat-Fine-500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Samba Broken Wheat",
+    "fullName": "Elite Samba Broken Wheat",
+    "pageName": "Wheat Range",
+    "productUrl": "https://elitefoods.co.in/product/samba-broken-wheat",
+    "imageUrl": "https://elitefoods.co.in/images/Samba_Broken_Wheat_500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/Samba_Broken_Wheat_500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Matta Short Grain",
+    "fullName": "Elite Matta Short Grain",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/matta-short-grain",
+    "imageUrl": "https://elitefoods.co.in/img/product/Matta Short grain1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Matta Short grain1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Matta Long Grain",
+    "fullName": "Elite Matta Long Grain",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/matta-long-grain",
+    "imageUrl": "https://elitefoods.co.in/img/product/Matta Long grain1.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Matta Long grain1.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Jaya Rice",
+    "fullName": "Elite Jaya Rice",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/jaya-rice",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Jaya-Rice.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Jaya-Rice.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Surekha Rice",
+    "fullName": "Elite Surekha Rice",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/surekha-rice",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Surekha-Rice.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Surekha-Rice.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Kuruva Rice",
+    "fullName": "Elite Kuruva Rice",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/kuruva-rice",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Kuruva-Rice.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Kuruva-Rice.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Ponni Rice",
+    "fullName": "Elite Ponni Rice",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/ponni-rice",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Ponni-Rice.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Ponni-Rice.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Matta Broken Rice",
+    "fullName": "Elite Matta Broken Rice",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/matta-broken-rice",
+    "imageUrl": "https://elitefoods.co.in/img/product/Matta Broken Rice 500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Matta Broken Rice 500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rice Flakes White",
+    "fullName": "Elite Rice Flakes White",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/rice-flakes-white",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Rice-Flakes-White 500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Rice-Flakes-White 500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Roasted Rice Powder",
+    "fullName": "Elite Roasted Rice Powder",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/rice-powder",
+    "imageUrl": "https://elitefoods.co.in/images/2.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/images/2.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rice Flakes Red",
+    "fullName": "Elite Rice Flakes Red",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/rice-flakes-red",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Rice-Flakes-Red 500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Rice-Flakes-Red 500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rice Ada",
+    "fullName": "Elite Rice Ada",
+    "pageName": "Rice Range",
+    "productUrl": "https://elitefoods.co.in/product/rice-ada",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Rice-Ada.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Rice-Ada.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Rice Puttupodi",
+    "fullName": "Elite Rice Puttupodi",
+    "pageName": "Flour",
+    "productUrl": "https://elitefoods.co.in/product/rice-puttupodi",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Rice Puttupodi.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Rice Puttupodi.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Ragi Puttupodi",
+    "fullName": "Elite Ragi Puttupodi",
+    "pageName": "Flour",
+    "productUrl": "https://elitefoods.co.in/product/ragi-puttupodi",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Ragi Puttupodi 500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Ragi Puttupodi 500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Fibre Rich Puttupodi",
+    "fullName": "Elite Fibre Rich Puttupodi",
+    "pageName": "Flour",
+    "productUrl": "https://elitefoods.co.in/product/chemba-puttupodi",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Fibre Rich Puttupodi 500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Fibre Rich Puttupodi 500g.png?llk?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Wheat Puttupodi",
+    "fullName": "Elite Wheat Puttupodi",
+    "pageName": "Flour",
+    "productUrl": "https://elitefoods.co.in/product/wheat-puttupodi",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Wheat Puttupodi 500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Wheat Puttupodi 500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Easy Palappam Mix",
+    "fullName": "Elite Easy Palappam Mix",
+    "pageName": "Flour",
+    "productUrl": "https://elitefoods.co.in/product/palappam-mix-n",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Palappam-mix-500g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Palappam-mix-500g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "IDIYAPPAM PODI",
+    "fullName": "Elite IDIYAPPAM PODI",
+    "pageName": "Flour",
+    "productUrl": "https://elitefoods.co.in/product/idiyappam-podi-1kg",
+    "imageUrl": "https://elitefoods.co.in/img/product/new/Idiyappam Podi 1kg.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/new/Idiyappam Podi 1kg.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Bajji Bonda Mix",
+    "fullName": "Elite Bajji Bonda Mix",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/bajji-bonda-mix",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Bajji-Bonda-Mix-500g-N.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Bajji-Bonda-Mix-500g-N.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Upma Mix",
+    "fullName": "Elite Upma Mix",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/upma-mix",
+    "imageUrl": "https://elitefoods.co.in/img/product/Upma Mix 200g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/Upma Mix 200g.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Palada payasam Mix",
+    "fullName": "Elite Palada payasam Mix",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/palada-payasam-mix",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Palada Payasam Mix (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Palada Payasam Mix (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Vermicelli payasam Mix",
+    "fullName": "Elite Vermicelli payasam Mix",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/vermicelli-payasam-mix",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Vermicelli Payasam Mix (1).png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Vermicelli Payasam Mix (1).png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Chukku Kappi",
+    "fullName": "Elite Chukku Kappi",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/chukku-kappi",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Chukku-kappi.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Chukku-kappi.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Vermicelli",
+    "fullName": "Elite Vermicelli",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/vermicelli",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Roasted Vermicelli 200.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Roasted Vermicelli 200.png?h=225"
+  },
+  {
+    "brand": "Elite",
+    "rawName": "Sadya Palada Mix",
+    "fullName": "Elite Sadya Palada Mix",
+    "pageName": "Instant Mix",
+    "productUrl": "https://elitefoods.co.in/product/sadya-palada-mix",
+    "imageUrl": "https://elitefoods.co.in/img/product/others/Sadya Palada 200g.png",
+    "rawImageUrl": "http://i0.wp.com/elitefoods.co.in/img/product/others/Sadya Palada 200g.png?h=225"
+  }
+]

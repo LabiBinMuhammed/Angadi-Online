@@ -1,0 +1,488 @@
+[
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "621-be-bold-pencil",
+    "title": "621 BE Bold Pencil",
+    "productUrl": "https://natarajofficial.com/product/621-be-bold-pencil/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/621-pencil.webp"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "checking-pencil",
+    "title": "Checking Pencil",
+    "productUrl": "https://natarajofficial.com/product/checking-pencil/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Checking-pencil-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "colour-pencils",
+    "title": "Colour Pencils",
+    "productUrl": "https://natarajofficial.com/product/colour-pencils/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/colour-natraj.webp"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "define-mechanical-pencil",
+    "title": "Define Mechanical Pencil",
+    "productUrl": "https://natarajofficial.com/product/define-mechanical-pencil/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Define-mechanical-pencil.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "fluro-print-pencil",
+    "title": "Fluro Print Pencil",
+    "productUrl": "https://natarajofficial.com/product/fluro-print-pencil/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/fluro.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "hidey-pencils",
+    "title": "Hidey Pencils",
+    "productUrl": "https://natarajofficial.com/product/hidey-pencils/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Hidey-pencil-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "pointz-lead",
+    "title": "Pointz Lead",
+    "productUrl": "https://natarajofficial.com/product/pointz-lead/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Pointz-lead-pencil-2.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "pokit-mechanical-pencil",
+    "title": "Pokit Mechanical Pencil",
+    "productUrl": "https://natarajofficial.com/product/pokit-mechanical-pencil/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/pokit.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pencils",
+    "categoryName": "Pencils",
+    "slug": "stripes-pencil",
+    "title": "Stripes Pencil",
+    "productUrl": "https://natarajofficial.com/product/stripes-pencil/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Stripes-Pencil-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "erasers",
+    "categoryName": "Erasers",
+    "slug": "621-plasto",
+    "title": "621 Plasto",
+    "productUrl": "https://natarajofficial.com/product/621-plasto/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/621-Plasto-Eraser-1.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "erasers",
+    "categoryName": "Erasers",
+    "slug": "pebbles",
+    "title": "Pebbles",
+    "productUrl": "https://natarajofficial.com/product/pebbles/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Pebbles-eraser-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "erasers",
+    "categoryName": "Erasers",
+    "slug": "petals",
+    "title": "Petals",
+    "productUrl": "https://natarajofficial.com/product/petals/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Petals-eraser-3-1.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "erasers",
+    "categoryName": "Erasers",
+    "slug": "smiley-erasers",
+    "title": "Smiley Erasers",
+    "productUrl": "https://natarajofficial.com/product/smiley-erasers/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Smiley-eraser-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "erasers",
+    "categoryName": "Erasers",
+    "slug": "wild-e",
+    "title": "Wild E",
+    "productUrl": "https://natarajofficial.com/product/wild-e/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Wild-e-eraser-2.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "sharpeners",
+    "categoryName": "Sharpeners",
+    "slug": "621-sharpener",
+    "title": "621 Sharpener",
+    "productUrl": "https://natarajofficial.com/product/621-sharpener/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/621-sharpner.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "sharpeners",
+    "categoryName": "Sharpeners",
+    "slug": "crystal-heart-sharpener",
+    "title": "Crystal Heart Sharpener",
+    "productUrl": "https://natarajofficial.com/product/crystal-heart-sharpener/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/crystal-heart-sharpener-4-1.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "sharpeners",
+    "categoryName": "Sharpeners",
+    "slug": "crystal-round-sharpener",
+    "title": "Crystal Round Sharpener",
+    "productUrl": "https://natarajofficial.com/product/crystal-round-sharpener/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Crystal-Round-Sharpner-1.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "sharpeners",
+    "categoryName": "Sharpeners",
+    "slug": "left-ease-sharpener",
+    "title": "Left Ease Sharpener",
+    "productUrl": "https://natarajofficial.com/product/left-ease-sharpener/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/left-ease-sharpener-3-600x600-1.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "621-scale",
+    "title": "621 Scale",
+    "productUrl": "https://natarajofficial.com/product/621-scale/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/nataraj-15-cm-scale.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "classic-compass",
+    "title": "Classic Compass",
+    "productUrl": "https://natarajofficial.com/product/classic-compass/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Classic-compass-4.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "classic-protractor",
+    "title": "Classic Protractor",
+    "productUrl": "https://natarajofficial.com/product/classic-protractor/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Classic-protractor.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "construct-geometry-box",
+    "title": "Construct Geometry Box",
+    "productUrl": "https://natarajofficial.com/product/construct-geometry-box/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Construct-geomtry-box.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "define-geometry-box",
+    "title": "Define Geometry Box",
+    "productUrl": "https://natarajofficial.com/product/define-geometry-box/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2026/04/define-box.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "fundamental-instrument-set",
+    "title": "Fundamental Instrument Set",
+    "productUrl": "https://natarajofficial.com/product/fundamental-instrument-set/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Fundamental-instrunent.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "onpoint-geometry-box",
+    "title": "Onpoint Geometry Box",
+    "productUrl": "https://natarajofficial.com/product/onpoint-geometry-box/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Onpoint-geomtry-kit-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "pokit-geomtry-box",
+    "title": "Pokit Geomtry Box",
+    "productUrl": "https://natarajofficial.com/product/pokit-geomtry-box/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Pokit-geomtry-box-2.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "scales",
+    "categoryName": "Scales & Rulers",
+    "slug": "toolkit-geometry-box",
+    "title": "Toolkit Geometry Box",
+    "productUrl": "https://natarajofficial.com/product/toolkit-geometry-box/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Toolkit-geomtry-box.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "all-rounder-ball-pen",
+    "title": "All Rounder Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/all-rounder-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2026/04/all-rounder.webp"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "all-spark-ball-pen",
+    "title": "All Spark Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/all-spark-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/All-spark-ball-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "classic-ball-pen",
+    "title": "Classic Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/classic-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/classic.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "gelix-gel-pen",
+    "title": "Gelix Gel Pen",
+    "productUrl": "https://natarajofficial.com/product/gelix-gel-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Gelix-gel-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "gelix-ii-gel-pen",
+    "title": "Gelix II Gel Pen",
+    "productUrl": "https://natarajofficial.com/product/gelix-ii-gel-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/gelix-2.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "glow-ball-pen",
+    "title": "Glow Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/glow-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/glow.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "gripwrite-ball-pen",
+    "title": "Gripwrite Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/gripwrite-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Gripwrite-ball-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "hidey-ball-pen",
+    "title": "Hidey Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/hidey-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2026/04/hidey.webp"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "itip-gel-pen",
+    "title": "Itip Gel Pen",
+    "productUrl": "https://natarajofficial.com/product/itip-gel-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Itip-gel-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "max-grip-ball-pen",
+    "title": "Max Grip Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/max-grip-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/maxgrip-ball-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "max-grip-gel-pen",
+    "title": "Max Grip Gel Pen",
+    "productUrl": "https://natarajofficial.com/product/max-grip-gel-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2026/04/max-grip.webp"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "mist-ball-pen",
+    "title": "Mist Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/mist-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/mist.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "penlock-ball-pen",
+    "title": "Penlock Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/penlock-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/penlock.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "retrax-ball-pen",
+    "title": "Retrax Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/retrax-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Retrax-ball-pen.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "skater-gel-pen",
+    "title": "Skater Gel Pen",
+    "productUrl": "https://natarajofficial.com/product/skater-gel-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Skater-gel-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "slay-ball-pen",
+    "title": "Slay Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/slay-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2026/04/slay.webp"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "snappy-ball-pen",
+    "title": "Snappy Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/snappy-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/snappy.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "superx-ball-pen",
+    "title": "Superx Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/superx-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/SuperX-Ball-Pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "pens",
+    "categoryName": "Pens",
+    "slug": "superx2-ball-pen",
+    "title": "Superx2 Ball Pen",
+    "productUrl": "https://natarajofficial.com/product/superx2-ball-pen/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/SuperX2-Ball-pen-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "kits",
+    "categoryName": "Stationery Kits",
+    "slug": "best-of-luck-kit",
+    "title": "Best Of Luck Kit",
+    "productUrl": "https://natarajofficial.com/product/best-of-luck-kit/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/best-of-luck-kit.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "kits",
+    "categoryName": "Stationery Kits",
+    "slug": "study-kit",
+    "title": "Study Kit",
+    "productUrl": "https://natarajofficial.com/product/study-kit/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Study-kit.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "kits",
+    "categoryName": "Stationery Kits",
+    "slug": "trio-kit",
+    "title": "Trio Kit",
+    "productUrl": "https://natarajofficial.com/product/trio-kit/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Trio-kit.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "kits",
+    "categoryName": "Stationery Kits",
+    "slug": "writing-kit",
+    "title": "Writing Kit",
+    "productUrl": "https://natarajofficial.com/product/writing-kit/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Writing-kit.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "cutters",
+    "categoryName": "Cutters & Scissors",
+    "slug": "classic-cutters",
+    "title": "Classic Cutters",
+    "productUrl": "https://natarajofficial.com/product/classic-cutters/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Classic-cutters-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "cutters",
+    "categoryName": "Cutters & Scissors",
+    "slug": "handy-cutters",
+    "title": "Handy Cutters",
+    "productUrl": "https://natarajofficial.com/product/handy-cutters/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/Handy-cutters-3.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "cutters",
+    "categoryName": "Cutters & Scissors",
+    "slug": "large-cutters",
+    "title": "Large Cutters",
+    "productUrl": "https://natarajofficial.com/product/large-cutters/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/large-cutter.png"
+  },
+  {
+    "brand": "Nataraj",
+    "categorySlug": "cutters",
+    "categoryName": "Cutters & Scissors",
+    "slug": "mini-cutters",
+    "title": "Mini Cutters",
+    "productUrl": "https://natarajofficial.com/product/mini-cutters/",
+    "imageUrl": "https://natarajofficial.com/wp-content/uploads/2025/04/mini-cutters-1.png"
+  }
+]

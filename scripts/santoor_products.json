@@ -1,0 +1,451 @@
+[
+  {
+    "brand": "Santoor",
+    "name": "Santoor Skin Moisturizing Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Sandalwood_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Skin Softening Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Almond%20Soft_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Fresh Skin Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/aloe-fresh-570x320_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Gold Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Santoor-gold_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Pureglo Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Pureflo_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Royal Sandal Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/royal-sandal-570x320_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Gram Flour Soap",
+    "category": "Bathing Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/570X320_0.png",
+    "basePrice": 38,
+    "variants": [
+      {
+        "label": "Pack of 4 (4 x 100 g)",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (100 g)",
+        "price": 38,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (8 x 100 g)",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Mild Handwash Pump",
+    "category": "Hand Wash",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Hand%20Wash_1.png",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "250 ml Pump Dispenser",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "750 ml Refill Pouch",
+        "price": 135,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (250 ml x 2)",
+        "price": 185,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Fresh Handwash Pump",
+    "category": "Hand Wash",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Hand%20Wash_2.png",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "250 ml Pump Dispenser",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "750 ml Refill Pouch",
+        "price": 135,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (250 ml x 2)",
+        "price": 185,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Classic Handwash Pump",
+    "category": "Hand Wash",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Hand%20Wash_4_0.png",
+    "basePrice": 99,
+    "variants": [
+      {
+        "label": "250 ml Pump Dispenser",
+        "price": 99,
+        "is_default": true
+      },
+      {
+        "label": "750 ml Refill Pouch",
+        "price": 135,
+        "is_default": false
+      },
+      {
+        "label": "Twin Pack (250 ml x 2)",
+        "price": 185,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Light Moisturising Body Lotion",
+    "category": "Body Lotion",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Body%20Lotion_4.png",
+    "basePrice": 175,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "400 ml Pump Bottle",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Extra Moisturising Body Lotion",
+    "category": "Body Lotion",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Body%20Lotion_2.png",
+    "basePrice": 175,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "400 ml Pump Bottle",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Whitening & UV Protection Body Lotion",
+    "category": "Body Lotion",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Body%20Lotion_3.png",
+    "basePrice": 175,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 175,
+        "is_default": true
+      },
+      {
+        "label": "400 ml Pump Bottle",
+        "price": 280,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Glowing Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Product_2.png",
+    "basePrice": 160,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2 (250 ml x 2)",
+        "price": 300,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Hydrating Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Product_3.png",
+    "basePrice": 160,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2 (250 ml x 2)",
+        "price": 300,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Refreshing Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Product.png",
+    "basePrice": 160,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2 (250 ml x 2)",
+        "price": 300,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Blushing Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Product_0.png",
+    "basePrice": 160,
+    "variants": [
+      {
+        "label": "250 ml Bottle",
+        "price": 160,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2 (250 ml x 2)",
+        "price": 300,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Talc Powder",
+    "category": "Talcs & Deodorants",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Talc_2.png",
+    "basePrice": 120,
+    "variants": [
+      {
+        "label": "300 g Pack",
+        "price": 145,
+        "is_default": true
+      },
+      {
+        "label": "100 g Pack",
+        "price": 55,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Gold Deodorant",
+    "category": "Talcs & Deodorants",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Deo_1.png",
+    "basePrice": 199,
+    "variants": [
+      {
+        "label": "150 ml Can",
+        "price": 199,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (150 ml x 2)",
+        "price": 375,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Grace Deodorant",
+    "category": "Talcs & Deodorants",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Deo_3.png",
+    "basePrice": 199,
+    "variants": [
+      {
+        "label": "150 ml Can",
+        "price": 199,
+        "is_default": true
+      },
+      {
+        "label": "Twin Pack (150 ml x 2)",
+        "price": 375,
+        "is_default": false
+      }
+    ]
+  },
+  {
+    "brand": "Santoor",
+    "name": "Santoor Baby Soap",
+    "category": "Baby Care & Soaps",
+    "imageUrl": "https://www.santoorstayyoung.com/sites/default/files/Baby%20Soap.png",
+    "basePrice": 45,
+    "variants": [
+      {
+        "label": "Pack of 3 (3 x 75 g)",
+        "price": 130,
+        "is_default": true
+      },
+      {
+        "label": "Single Bar (75 g)",
+        "price": 45,
+        "is_default": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,302 @@
+[
+  {
+    "title": "Pentonic Gel Pen",
+    "cat": "Gel Pens",
+    "desc": "The Pentonic Gel Pen redefines the writing instrument space with its sleek, modern look and innovative features. Waterproof and refillable, driven by design with 0.6mm Japanese tip.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Gel-Pen-2-1920x1080px.png",
+    "price": 10,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 10,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 50
+      },
+      {
+        "label": "Pack of 10 Box",
+        "price": 95
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Ball Pen",
+    "cat": "Ball Pens",
+    "desc": "The Pentonic Ball Pen elevates writing standards with 0.7mm and 1.0mm tips, writing over 1100 meters with feather-lite feel and smart minimalist black finish.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Gel-Pen-2-1920x1080px.png",
+    "price": 10,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 10,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 50
+      },
+      {
+        "label": "Pack of 10 Box",
+        "price": 95
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Cipher Ball Pen",
+    "cat": "Ball Pens",
+    "desc": "Unleash your creativity with Pentonic Cipher! 0.5mm ball pen combining sleek style and precision, perfect for clean notes and fine writing.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Cipher-1920x1080px.png",
+    "price": 10,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 10,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 50
+      },
+      {
+        "label": "Pack of 10 Box",
+        "price": 95
+      }
+    ]
+  },
+  {
+    "title": "Pentonic GRT Retractable Pen",
+    "cat": "Ball Pens",
+    "desc": "Pentonic GRT: A cutting-edge retractable ball pen with frictionless stroke, rapid dry ink, and double molding process for maximum comfort grip.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/GRT-1920x1080px-2.png",
+    "price": 20,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 20,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 3",
+        "price": 58
+      },
+      {
+        "label": "Pack of 5",
+        "price": 95
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Frost Gel Pen",
+    "cat": "Gel Pens",
+    "desc": "Pentonic Frost Gel offers superior writing with premium craftsmanship, refillable convenience, and a sleek durable matte frosted barrel finish.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Frost-Gel-1920x1080px.png",
+    "price": 15,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 15,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 70
+      }
+    ]
+  },
+  {
+    "title": "Pentonic EVO Ball Pen",
+    "cat": "Ball Pens",
+    "desc": "The Pentonic EVO pen features sleek aerodynamic design, vibrant color barrel accents, and a refined 0.7mm tip for ultra-precise writing.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/EVO-1920x1080px.png",
+    "price": 10,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 10,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 50
+      }
+    ]
+  },
+  {
+    "title": "Pentonic CLR Transparent Pen",
+    "cat": "Ball Pens",
+    "desc": "Pentonic CLR Pen: where transparency meets precision. Translucent body, anti-slip contoured grip, and low viscosity ink flow in Blue, Black, and Red.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/CLR-1920x1080px.png",
+    "price": 10,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 10,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 50
+      }
+    ]
+  },
+  {
+    "title": "Pentonic GLITZ Pen",
+    "cat": "Ball Pens",
+    "desc": "Pentonic GLITZ pens are designed with metallic luxury finishes for students and professionals who value performance and premium aesthetics.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/12/Glitz-1920x1080px.png",
+    "price": 20,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 20,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 3",
+        "price": 58
+      }
+    ]
+  },
+  {
+    "title": "Pentonic B-RT Retractable Ball Pen",
+    "cat": "Ball Pens",
+    "desc": "Pentonic B-RT redefines your everyday writing with retractable click mechanism, low friction German ink, and velvety smooth matte grip.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/GRT-1920x1080px-2.png",
+    "price": 20,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 20,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 95
+      }
+    ]
+  },
+  {
+    "title": "Pentonic B-RT Pastel Edition",
+    "cat": "Ball Pens",
+    "desc": "Pentonic B-RT Pastel Edition: modern click retractable ball pen styled in soothing pastel barrel body hues with smudge-free German ink.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/GRT-1920x1080px-2.png",
+    "price": 20,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 20,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 95
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Squad Animal Gel Pen",
+    "cat": "Gel Pens",
+    "desc": "Pentonic Squad combines trusted Pentonic gel smoothness with playful animal-inspired collectible caps and 0.6mm Japanese precision tip.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Gel-Pen-2-1920x1080px.png",
+    "price": 15,
+    "variants": [
+      {
+        "label": "1 Pen",
+        "price": 15,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5 (Assorted)",
+        "price": 70
+      }
+    ]
+  },
+  {
+    "title": "Pentonic GumStik Glue Stick",
+    "cat": "Crafts & Adhesives",
+    "desc": "Pentonic GumStik is the non-toxic, photo-safe smooth glue stick formula for clean school projects, scrapbooking, and office paperwork.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Frost-Gel-1920x1080px.png",
+    "price": 25,
+    "variants": [
+      {
+        "label": "1 Glue Stick (15g)",
+        "price": 25,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2",
+        "price": 48
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Twistick Twist-Up Crayons",
+    "cat": "Drawing & Colouring",
+    "desc": "Pentonic Twistick smooth vibrant twist-up wax crayons. No sharpening, no mess, just twist and color with rich, break-resistant pigmentation.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/12/Glitz-1920x1080px.png",
+    "price": 60,
+    "variants": [
+      {
+        "label": "12 Shades Pack",
+        "price": 60,
+        "is_default": true
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Mechanical Pencil",
+    "cat": "Pencils",
+    "desc": "Pentonic Mechanical Pencil with 2 inbuilt Japanese leads, built-in eraser, and durable clutch mechanism for smooth break-free writing.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/Cipher-1920x1080px.png",
+    "price": 25,
+    "variants": [
+      {
+        "label": "1 Pc",
+        "price": 25,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 2",
+        "price": 48
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Extra Dark Wooden Pencil",
+    "cat": "Pencils",
+    "desc": "Pentonic Extra Dark Wooden Pencil crafted for precision and elegance, offering intense dark graphite lines with smooth wood sharpening.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/EVO-1920x1080px.png",
+    "price": 6,
+    "variants": [
+      {
+        "label": "Box of 10",
+        "price": 60,
+        "is_default": true
+      },
+      {
+        "label": "Pack of 5",
+        "price": 30
+      },
+      {
+        "label": "1 Pc",
+        "price": 6
+      }
+    ]
+  },
+  {
+    "title": "Pentonic Mathematical Geometry Box",
+    "cat": "Mathematical Instruments",
+    "desc": "Pentonic Geometry Instrument Set with modern safe-pin compass, protractor, set squares, and scale for student precision and school safety.",
+    "img": "https://www.pentonic.com/wp-content/uploads/2024/11/CLR-1920x1080px.png",
+    "price": 95,
+    "variants": [
+      {
+        "label": "1 Geometry Box",
+        "price": 95,
+        "is_default": true
+      }
+    ]
+  }
+]

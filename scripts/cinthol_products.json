@@ -1,0 +1,146 @@
+[
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Cool Foam Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "pack_size": "750 ml",
+    "basePrice": 279,
+    "mrp": 330,
+    "unit": "bottle",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/rc-upload-1773909116319-741.png",
+    "variants": [
+      { "label": "750 ml Bottle", "price": 279, "is_default": true },
+      { "label": "Pack of 2 Bottles (750 ml x 2)", "price": 530, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Lime Bath Soap (Buy 4 Get 1 Free)",
+    "category": "Bathing Soaps",
+    "pack_size": "5 x 100 g",
+    "basePrice": 35,
+    "mrp": 185,
+    "unit": "pack",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/23b21433-42e7-460d-b8b0-19918aea6874.png",
+    "variants": [
+      { "label": "Pack of 5 (5 x 100 g)", "price": 154, "is_default": true },
+      { "label": "Single Bar (100 g)", "price": 35, "is_default": false },
+      { "label": "Twin Pack (10 x 100 g)", "price": 299, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Original Bathing Soap",
+    "category": "Bathing Soaps",
+    "pack_size": "4 x 100 g",
+    "basePrice": 45,
+    "mrp": 165,
+    "unit": "pack",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/82ffa4a1-f446-46ea-b094-05f70219bd78.png",
+    "variants": [
+      { "label": "Pack of 4 (4 x 100 g)", "price": 165, "is_default": true },
+      { "label": "Single Bar (100 g)", "price": 45, "is_default": false },
+      { "label": "Pack of 8 (8 x 100 g)", "price": 320, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Cool Aqua Foaming Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "pack_size": "200 ml",
+    "basePrice": 99,
+    "mrp": 120,
+    "unit": "bottle",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/rc-upload-1778820950977-9.png",
+    "variants": [
+      { "label": "200 ml Bottle", "price": 99, "is_default": true },
+      { "label": "Pack of 2 Bottles (200 ml x 2)", "price": 190, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Sandal Foam Body Wash",
+    "category": "Body Wash & Shower Gel",
+    "pack_size": "750 ml",
+    "basePrice": 279,
+    "mrp": 330,
+    "unit": "bottle",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/rc-upload-1776165768870-46.png",
+    "variants": [
+      { "label": "750 ml Bottle", "price": 279, "is_default": true },
+      { "label": "Pack of 2 Bottles (750 ml x 2)", "price": 530, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Cool Bath Soap (Buy 4 Get 1 Free)",
+    "category": "Bathing Soaps",
+    "pack_size": "5 x 100 g",
+    "basePrice": 35,
+    "mrp": 185,
+    "unit": "pack",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/e245ce7d-e25b-4037-b7ea-36e4dd473748.png",
+    "variants": [
+      { "label": "Pack of 5 (5 x 100 g)", "price": 158, "is_default": true },
+      { "label": "Single Bar (100 g)", "price": 35, "is_default": false },
+      { "label": "Twin Pack (10 x 100 g)", "price": 305, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Lime Bath Soap",
+    "category": "Bathing Soaps",
+    "pack_size": "4 x 150 g",
+    "basePrice": 48,
+    "mrp": 220,
+    "unit": "pack",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/b4cd7522-0f1b-4a64-bc37-fa644dce182d.png",
+    "variants": [
+      { "label": "Pack of 4 (4 x 150 g)", "price": 169, "is_default": true },
+      { "label": "Single Bar (150 g)", "price": 48, "is_default": false },
+      { "label": "Pack of 8 (8 x 150 g)", "price": 325, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Foam Body Wash - Lime",
+    "category": "Body Wash & Shower Gel",
+    "pack_size": "200 ml",
+    "basePrice": 99,
+    "mrp": 120,
+    "unit": "bottle",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/rc-upload-1773909116319-562.png",
+    "variants": [
+      { "label": "200 ml Bottle", "price": 99, "is_default": true },
+      { "label": "Pack of 2 Bottles (200 ml x 2)", "price": 190, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Lime Talc",
+    "category": "Talcs & Deodorants",
+    "pack_size": "300 g",
+    "basePrice": 190,
+    "mrp": 190,
+    "unit": "bottle",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/04d96cdf-fdc9-4881-a94c-201db644955c.png",
+    "variants": [
+      { "label": "300 g Pack", "price": 190, "is_default": true },
+      { "label": "Pack of 2 (300 g x 2)", "price": 360, "is_default": false }
+    ]
+  },
+  {
+    "brand": "Cinthol",
+    "name": "Cinthol Foam Body Wash - Original",
+    "category": "Body Wash & Shower Gel",
+    "pack_size": "200 ml",
+    "basePrice": 99,
+    "mrp": 120,
+    "unit": "bottle",
+    "imageUrl": "https://cdn.grofers.com/cdn-cgi/image/f=auto,fit=scale-down,q=90,metadata=none,w=1000/da/cms-assets/cms/product/rc-upload-1772772544327-2440.png",
+    "variants": [
+      { "label": "200 ml Bottle", "price": 99, "is_default": true },
+      { "label": "Pack of 2 Bottles (200 ml x 2)", "price": 190, "is_default": false }
+    ]
+  }
+]
