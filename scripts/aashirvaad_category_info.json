@@ -1,0 +1,560 @@
+{
+  "categoryTitle": "Our Products",
+  "categorySubTitle": null,
+  "loadMoreButtonLabel": "Explore Now",
+  "loadMoreProdCount": "6",
+  "initialProdCount": "3",
+  "courses": [
+    "All",
+    "Atta",
+    "Vermicelli",
+    "Rava",
+    "Instant Mixes",
+    "Instant Meals",
+    " Salt",
+    "Besan",
+    "Frozen Naans & Parathas",
+    "Basic Spices",
+    "Masalas",
+    "Millets",
+    "Organic",
+    " Ghee",
+    "Ready To Cook Chapati"
+  ],
+  "variant": "product-range",
+  "categoryProdItems": [
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/select-atta-thumbnail?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/select-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/asvd-select-atta-5kg-cleaning-clfr-1",
+      "productName": "Select Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Image-685-2x?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/shudh-chakki-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/brand/aashirvaad",
+      "productName": "Shudh Chakki Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Superior-MP-1?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/superior-mp-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-superior-mp-atta-5kg",
+      "productName": "Superior MP Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/MP Chakki Atta?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/mp-chakki-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/brand/aashirvaad",
+      "productName": "MP Chakki Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/dq?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/mg-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-atta-with-multigrains-5kg",
+      "productName": "Atta with Multigrains",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/sugar-release-control-atta?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com//our-products/atta/sugar-release-control-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-sugar-release-control-atta-5kg",
+      "productName": "Sugar Release Control Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Fortified FOP1?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/fortified-chakki-atta.html",
+      "filterCourses": [
+        "Atta",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/brand/aashirvaad",
+      "productName": "Fortified Chakki Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Vermicelli?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/vermicelli/vermicelli.html",
+      "filterCourses": [
+        "Vermicelli",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/staples/besan-rava-vermicelli",
+      "productName": "Vermicelli",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/ROSTED VERMICELLI?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/vermicelli/roasted-vermicelli.html",
+      "filterCourses": [
+        "Vermicelli",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/staples/besan-rava-vermicelli",
+      "productName": "Roasted Vermicelli",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/SAMBA-BROKEN-flat-copy?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/rava/samba-broken-wheat.html",
+      "filterCourses": [
+        "Rava",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/staples/besan-rava-vermicelli",
+      "productName": "Samba Broken Wheat",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Gulab Jamun Instant Mix?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-mixes/instant-gulab-jamun-mix.html",
+      "filterCourses": [
+        "Instant Mixes",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Gulab Jamun Instant Mix",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Rice Idli Instant Mix?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-mixes/instant-rice-idli.html",
+      "filterCourses": [
+        "Instant Mixes",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Rice Idli",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Rava Idli Instant Mix?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-mixes/instant-rava-idli.html",
+      "filterCourses": [
+        "Instant Mixes",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Rava Idli",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/RICE-DOSA?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-mixes/instant-rice-dosa.html",
+      "filterCourses": [
+        "Instant Mixes",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Rice Dosa",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Instant Veggie Upma?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-meals/instant-upma.html",
+      "filterCourses": [
+        "Instant Meals",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Upma",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Instant Khata meetha poha?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-meals/instant-poha.html",
+      "filterCourses": [
+        "Instant Meals",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Poha",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Instant Mini Idli Sambar?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-meals/instant-mini-idli-sambar.html",
+      "filterCourses": [
+        "Instant Meals",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Mini Idli Sambar",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Instant Suji Halwa with Jaggery?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/instant-meals/instant-halwa.html",
+      "filterCourses": [
+        "Instant Meals",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Instant Halwa",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Iodized Salt 1kg?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/salt/iodized-salt.html",
+      "filterCourses": [
+        " Salt",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Iodized Salt",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/salt-active?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/salt/salt-active.html",
+      "filterCourses": [
+        " Salt",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Salt Active",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Besan 1kg?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/besan/besan.html",
+      "filterCourses": [
+        "Besan",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/staples/besan-rava-vermicelli",
+      "productName": "Besan",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Garlic _ Coriander Naan?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/frozen-naans-parathas/garlic-and-coriander-naan.html",
+      "filterCourses": [
+        "Frozen Naans & Parathas",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Garlic and Coriander Naan",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Malabar Paratha?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/frozen-naans-parathas/malabar-paratha.html",
+      "filterCourses": [
+        "Frozen Naans & Parathas",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Malabar Paratha",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvad Aloo Paratha?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/frozen-naans-parathas/aloo-paratha.html",
+      "filterCourses": [
+        "Frozen Naans & Parathas",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Aloo Paratha",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Paneer Paratha?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/frozen-naans-parathas/paneer-paratha.html",
+      "filterCourses": [
+        "Frozen Naans & Parathas",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": " Paneer Paratha",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Tandoori Naan?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/frozen-naans-parathas/tandoori-naan.html",
+      "filterCourses": [
+        "Frozen Naans & Parathas",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Tandoori Naan",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/gluten-free-flour?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/atta/gluten-free-flour.html",
+      "filterCourses": [
+        "All",
+        "Atta"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-gluten-free-atta-500-g",
+      "productName": " Gluten Free Flour",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Ragi flour?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/millets/ragi-flour.html",
+      "filterCourses": [
+        "Millets",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-ragi-flour-1kg",
+      "productName": "Ragi Flour",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Organic Whole Wheat Atta?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/organic/organic-atta.html",
+      "filterCourses": [
+        "Organic",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Organic Whole Wheat Atta",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Organic Chana Dal?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/organic/organic-chana-dal.html",
+      "filterCourses": [
+        "Organic",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Organic Chana Dal",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Organic Tur_Arhar Dal?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/organic/organic-tur-dal.html",
+      "filterCourses": [
+        "Organic",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Organic Arhar/Tur Dal",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Organic Moong Dal_?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/organic/organic-moong-dal.html",
+      "filterCourses": [
+        "Organic",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Organic Moong Dal",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Aashirvaad Organic Urad Dal Split?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/organic/organic-urad-dal.html",
+      "filterCourses": [
+        "Organic",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": " Organic Urad Dal",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/aashirvaad ghee?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/svasti-ghee/svasti-ghee.html",
+      "filterCourses": [
+        " Ghee",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-svasti-pure-cow-ghee-500ml",
+      "productName": "  Svasti Ghee",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Ready to Cook Chapati?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/header-pages/our-products/ready-to-cook-chapati/rtc-chapati.html",
+      "filterCourses": [
+        "Ready To Cook Chapati",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "  Ready To Cook Chapati",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/BANSI-RAVA-copy?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/rava/bansi-rava.html",
+      "filterCourses": [
+        "Rava",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/staples/besan-rava-vermicelli",
+      "productName": "Bansi Rava",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/SUJI--DOUBLE-ROSTED-flat-copy?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/rava/double-roasted-suji-rava.html",
+      "filterCourses": [
+        "Rava",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/staples/besan-rava-vermicelli",
+      "productName": "Double Roasted Suji Rava",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Atta with millets?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/millets/atta-with-millets.html",
+      "filterCourses": [
+        "Millets",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvad-atta-with-millets-1kg",
+      "productName": "Atta with Millets",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Batter mix?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/millets/batter-mix.html",
+      "filterCourses": [
+        "Millets",
+        "All"
+      ],
+      "productCtaRedirection": "https://www.itcstore.in/aashirvaad-millets-batter-mix-mixed-flour-rich-in-fibre-protein-80-g",
+      "productName": "Millets Batter mix",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/himalayan-pink-salt?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/salt/himalayan-pink-salt.html",
+      "filterCourses": [
+        " Salt",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Himalayan Pink Salt",
+      "target": "_blank"
+    },
+    {
+      "productImage": "https://s7ap1.scene7.com/is/image/itcportalprod/Iodized-crystal-Salt?fmt=webp-alpha",
+      "altText": "popular-products-1",
+      "productCtaLabel": "Buy Now",
+      "redirectionLink": "https://aashirvaad.com/our-products/salt/iodized-crystal-salt.html",
+      "filterCourses": [
+        " Salt",
+        "All"
+      ],
+      "productCtaRedirection": "https://itcstore.in/",
+      "productName": "Iodized Crystal Salt",
+      "target": "_blank"
+    }
+  ]
+}

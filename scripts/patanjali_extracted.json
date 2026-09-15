@@ -1,0 +1,1498 @@
+[
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Ghee",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ghee.webp",
+    "category": "Cooking Essentials",
+    "pageName": "Ghee",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Cow’s Ghee",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/gheepix1.png",
+    "category": "Cooking Essentials",
+    "pageName": "Ghee",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Cow’s Ghee",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/gheepix4.png",
+    "category": "Cooking Essentials",
+    "pageName": "Ghee",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Cow’s Ghee 5 ltr",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/gheepix2.png",
+    "category": "Cooking Essentials",
+    "pageName": "Ghee",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Desi Ghee",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/gheepix3.png",
+    "category": "Cooking Essentials",
+    "pageName": "Ghee",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Desi Ghee",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/gheepix5.png",
+    "category": "Cooking Essentials",
+    "pageName": "Ghee",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Lauki Amla Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix1.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Karela Amla Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix2.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Giloy Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix3.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Giloy-Amla Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix4.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Arjun-Amla Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix5.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Amla Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix6.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Jamun Vinegar",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix7.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Aarogya Swaras",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix8.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Aloevera Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix9.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Amla-Aloevera Juice with Wheat Grass",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix10.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Aloevera Juice with Fiber and Orange Flavour",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix11.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Tulasi Panchang Swaras",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix12.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Apple Vinegar",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix13.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Karela Jamun Juice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix14.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Thandai Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix15.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Basil (Tulasi) Drink",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix161.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Dates Syrup",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix181.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Litchi",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix16.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Litchi Basil Drink",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix17.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Mix Fruit",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix18.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Guava",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix19.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Lemon Drink",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix20.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Pineapple Basil Drink",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix21.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Gulab Sharbat",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix22.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Bel Sharbat",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix23.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Brahmi Sharbat",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix24.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Khus Sharbat",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/beveragespix25.png",
+    "category": "Beverages",
+    "pageName": "Beverages",
+    "codePrefix": "ANG-BEV-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rice-pulses.webp",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Shakti Mogra Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix1.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Shakti Mini Dubar Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix2.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Diamond Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix3.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Gold Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix4.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Samridhhi Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix5.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Tibar Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix6.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Katarani Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix7.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Brown Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix8.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Brown Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix9.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Silver Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix10.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sona Masoori Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix11.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Lashkari Kolam Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix12.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Special Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix13.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Dhanashree Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix14.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Shakti XXL Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix15.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rozana Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix16.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Super Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix17.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sampoorn Traditional Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix18.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Samak Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix19.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Dubar Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix20.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Royal Sona Masoori Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix21.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Shakti Mini Mogra Basmati Rice",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/ricepix22.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Urad Dhuli",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix1.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Urad Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix2.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Urad Chilka",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix3.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rajma (Sharmili)",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix4.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rajma (Chitra)",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix5.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali White Peas",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix6.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Moong Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix7.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Malka Masur Dal",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix8.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chhole (Kabuli Chana)",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix9.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chana",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix10.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Arhar Dal (Tuvar Dal)",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix11.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chana Dal",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix12.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Moong Dal Chilka",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix13.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Mix Pulses",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix14.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Raw Peanuts",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix15.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali High Nutri Soy Chunks",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/pulsespix16.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Bandhani Hing Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix1.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Coriander Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix2.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Small Cardamom",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix3.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Red Chilli Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix4.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Fenugreek Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix5.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Cumin Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix6.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Coriander Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix7.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Carom Seeds",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix8.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Black Pepper Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix9.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Black Pepper Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix10.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Garam Masala Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix11.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chhole Masala",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix12.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chaat Masala",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix13.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Turmeric Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix14.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Bandhani Hing",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix15.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Large Cardamom",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix16.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Whole Brown Mustard",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix17.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Fennel Whole",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix18.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sabzi Masala",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix19.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Poppy Seeds",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix20.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Khubkala",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/spicespix21.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Rice & Pulses",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Shila Tulsi",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix1.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Shilajit Capsule",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix2.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Yovan Gold plus",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix3.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Ashvagandha Capsule",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix4.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sea Buckthorn Capsules",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix5.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Musli Pak",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix6.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Wheat Grass Powder",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix7.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Isabgol Bhusi",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix8.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Kesar",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix9.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Herbal Power Vita",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix10.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Glucoshakti Orange",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/herbalpix11.png",
+    "category": "Personal Care & Hygiene",
+    "pageName": "Herbal & Health",
+    "codePrefix": "ANG-PER-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Dry Fruits",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dry-fruits.webp",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Pistachio",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix1.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Anjeer",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix2.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Raisin",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix3.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Raisin Black",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix4.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Cashew",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix5.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Walnut Kernel",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix6.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Munakka Raisins",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix7.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Almond",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix8.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Mamra Almond Premium",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix9.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Walnut Inshell",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix10.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Makhana",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix11.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Dates",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix12.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Medjool Dates",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix13.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Ajwa Dates",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix14.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Kalmi Dates",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix15.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Super Food - Mixed Dry Fruits",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/dryfruitspix16.png",
+    "category": "Dry Goods & Cereals",
+    "pageName": "Dry Fruits",
+    "codePrefix": "ANG-DRY-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Honey",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix1.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Honey",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix2.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Honey Squeezy",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix3.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Organic Wild Honey",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix4.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Traceable Honey",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix5.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Traceable Honey",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix6.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Traceable Honey",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/honeypix7.png",
+    "category": "Cooking Essentials",
+    "pageName": "Honey",
+    "codePrefix": "ANG-OIL-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Traditional Whole Wheat Chakki Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta01.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Gluten Free Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta02.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Navratna Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta03.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Missi Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta04.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Extra Fibre Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta05.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Diabetic Care Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta06.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sharbati Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta07.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Jawar Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta08.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Ragi Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta09.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Makka Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta10.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Jau Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta11.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Gluten free Singhada Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta12.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Kuttu Atta",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta13.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Maida",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta14.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Besan",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/atta15.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Khand",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/sgr01.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sugar",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/sgr02.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Bura Sugar",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/sgr03.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Brown Sugar",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/sgr04.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Madhuram",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/sgr05.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Gur",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/sgr06.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rock Salt",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/rck01.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Iodised Salt",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/rck02.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Black Salt",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/rck03.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Sabudana",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth01.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Vermicelli Roasted",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth02.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Vermicelli Plain",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth03.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Vermicelli Roasted",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth04.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Vermicelli Plain",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth05.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Poha",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth06.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Dalia",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth07.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Multi-Grain Dalia",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth08.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Barley Dalia",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth09.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Instant Wheat Dalia",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/08/oth10.png",
+    "category": "Rice, Atta, Flours & Mixes",
+    "pageName": "Staples & Atta",
+    "codePrefix": "ANG-RIC-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Roasted Diet",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/roasted-diet-namkeen.webp",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Roasted Mixture Lime",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rd01.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Quinoa Puff- Masala",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rd02.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rice Crispy Mixture",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rd03.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Oats Mix Wasabi",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rd04.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Flaxseeds Chilli Lime",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rd05.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Flaxseeds Black Salt",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/rd06.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chana Dal",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-1.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Masala Boondi",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-2.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Rayta Boondi",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-3.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Soyavita Masala Soya Katori",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-4.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Soyavita Soya Katori",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-5.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Chana Papad",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-6.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Kali Mirch Papad",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-7.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Roasted Chana",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-8.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Moong Dal Papad",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-9.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Malai Sev",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-10.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Khatta Meetha",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-12.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Hing Chana",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-13.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Moong Dal",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-14.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Murmura (Puffed Rice)",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-15.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Aloo Bhujia",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-16.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Classic Peanuts",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-17.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Crunchy Spicy Coated Peanuts",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-18.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  },
+  {
+    "brand": "Patanjali",
+    "name": "Patanjali Navratan Mixture",
+    "image": "https://www.patanjalifoods.com/wp-content/uploads/2025/07/nk-19.png",
+    "category": "Biscuits & Cookies",
+    "pageName": "Roasted Diet & Namkeen",
+    "codePrefix": "ANG-BIS-"
+  }
+]
