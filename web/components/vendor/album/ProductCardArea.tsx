@@ -49,12 +49,17 @@ export default function ProductCardArea({
             <img
               src={activeImageUrl}
               alt={name}
+              loading="lazy"
+              referrerPolicy="no-referrer"
               style={{
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
                 padding: '0.5rem',
                 transition: 'transform 0.3s ease'
+              }}
+              onError={e => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80'
               }}
             />
           ) : (

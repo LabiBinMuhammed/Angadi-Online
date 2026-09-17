@@ -148,13 +148,23 @@ export default function VendorItemsClient({
                 const itStatus = item.status || (item.is_active ? 'published' : 'draft')
                 const thumb = item.item_images?.find(img => img.is_primary)?.image_url
                             ?? item.item_images?.[0]?.image_url
+                            ?? (item as any).image_url
 
                 return (
                   <tr key={item.id} id={`item-row-${item.id}`}>
                     <td style={{ padding: '0.5rem 0.5rem', overflow: 'hidden' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
                         {thumb
-                          ? <img src={thumb} alt={item.name} style={{ width: 36, height: 36, borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }} />
+                          ? <img
+                              src={thumb}
+                              alt={item.name}
+                              loading="lazy"
+                              referrerPolicy="no-referrer"
+                              style={{ width: 36, height: 36, borderRadius: '8px', objectFit: 'cover', border: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}
+                              onError={e => {
+                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=100&auto=format&fit=crop&q=80'
+                              }}
+                            />
                           : <div style={{ width: 36, height: 36, borderRadius: '8px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64748b', flexShrink: 0 }}><Package size={18} /></div>
                         }
                         <div style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
