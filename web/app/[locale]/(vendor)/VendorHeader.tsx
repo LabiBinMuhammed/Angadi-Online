@@ -10,7 +10,7 @@ interface VendorHeaderProps {
 }
 
 export default function VendorHeader({ role, toggleSidebar }: VendorHeaderProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
 
   return (
     <header className="vendor-header">
@@ -19,20 +19,20 @@ export default function VendorHeader({ role, toggleSidebar }: VendorHeaderProps)
           onClick={toggleSidebar} 
           className="sidebar-toggle-btn"
           id="vendor-sidebar-toggle"
-          aria-label={t('vendor_nav.toggle_sidebar')}
+          aria-label={t('vendor_nav.toggle_sidebar') || 'Toggle Sidebar'}
         >
           <Menu size={22} />
         </button>
-        <Link href="/vendor/dashboard" className="vendor-header-brand">
-          <span className="brand-text">{t('vendor_nav.portal_title')}</span>
+        <Link href={`/${locale}/vendor/dashboard`} className="vendor-header-brand">
+          <span className="brand-text">{t('vendor_nav.portal_title') || 'Vendor Portal'}</span>
         </Link>
       </div>
 
       <div className="vendor-header-right">
         {role === 'admin' && (
           <Link 
-            href="/admin/dashboard" 
-            title={t('vendor_nav.admin_panel')} 
+            href={`/${locale}/admin/dashboard`} 
+            title={t('vendor_nav.admin_panel') || 'Admin Panel'} 
             className="vendor-header-action-btn"
             id="vheader-admin-panel"
           >
@@ -40,8 +40,8 @@ export default function VendorHeader({ role, toggleSidebar }: VendorHeaderProps)
           </Link>
         )}
         <Link 
-          href="/notifications" 
-          title={t('vendor_nav.notifications')} 
+          href={`/${locale}/notifications`} 
+          title={t('vendor_nav.notifications') || 'Notifications'} 
           className="vendor-header-action-btn"
           id="vheader-notifications"
         >
@@ -49,8 +49,8 @@ export default function VendorHeader({ role, toggleSidebar }: VendorHeaderProps)
           <span className="notification-badge" />
         </Link>
         <Link 
-          href="/home" 
-          title={t('vendor_nav.back_to_marketplace')} 
+          href={`/${locale}/home`} 
+          title={t('vendor_nav.back_to_marketplace') || 'Back to Marketplace'} 
           className="vendor-header-action-btn"
           id="vheader-back-marketplace"
         >

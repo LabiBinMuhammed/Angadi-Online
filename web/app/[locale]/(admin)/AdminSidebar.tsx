@@ -13,40 +13,40 @@ import { useTheme } from '@/components/ThemeProvider'
 import { useTranslation } from '@/lib/i18n/I18nContext'
 
 const NAV = [
-  { section: 'Overview', items: [
-    { href: '/admin/dashboard',      icon: LayoutDashboard, label: 'Dashboard' },
+  { sectionKey: 'admin_nav.sec_overview', defaultSection: 'Overview', items: [
+    { href: '/admin/dashboard',      icon: LayoutDashboard, labelKey: 'admin_nav.dashboard', defaultLabel: 'Dashboard' },
   ]},
-  { section: 'Catalog', items: [
-    { href: '/admin/categories',     icon: Tag,       label: 'Categories' },
-    { href: '/admin/units',          icon: Scale,     label: 'Units' },
-    { href: '/admin/category-units', icon: Link2,     label: 'Category-Unit Map' },
-    { href: '/admin/demos',          icon: BookOpen,  label: 'Demo Templates' },
+  { sectionKey: 'admin_nav.sec_catalog', defaultSection: 'Catalog', items: [
+    { href: '/admin/categories',     icon: Tag,       labelKey: 'admin_nav.categories', defaultLabel: 'Categories' },
+    { href: '/admin/units',          icon: Scale,     labelKey: 'admin_nav.units', defaultLabel: 'Units' },
+    { href: '/admin/category-units', icon: Link2,     labelKey: 'admin_nav.category_units', defaultLabel: 'Category-Unit Map' },
+    { href: '/admin/demos',          icon: BookOpen,  labelKey: 'admin_nav.demos', defaultLabel: 'Demo Templates' },
   ]},
-  { section: 'Marketplace', items: [
-    { href: '/admin/shops',          icon: Store,     label: 'Shops' },
-    { href: '/admin/locations',      icon: MapPin,    label: 'Locations' },
-    { href: '/admin/users',          icon: Users,     label: 'Users' },
-    { href: '/admin/orders',         icon: Package,   label: 'Orders' },
-    { href: '/admin/replacements',   icon: RefreshCcw, label: 'Replacements' },
+  { sectionKey: 'admin_nav.sec_marketplace', defaultSection: 'Marketplace', items: [
+    { href: '/admin/shops',          icon: Store,     labelKey: 'admin_nav.shops', defaultLabel: 'Shops' },
+    { href: '/admin/locations',      icon: MapPin,    labelKey: 'admin_nav.locations', defaultLabel: 'Locations' },
+    { href: '/admin/users',          icon: Users,     labelKey: 'admin_nav.users', defaultLabel: 'Users' },
+    { href: '/admin/orders',         icon: Package,   labelKey: 'admin_nav.orders', defaultLabel: 'Orders' },
+    { href: '/admin/replacements',   icon: RefreshCcw, labelKey: 'admin_nav.replacements', defaultLabel: 'Replacements' },
   ]},
-  { section: 'Finance', items: [
-    { href: '/admin/credit',         icon: CreditCard, label: 'Credit Monitor' },
-    { href: '/admin/commission',     icon: Coins,      label: 'Commission Management' },
+  { sectionKey: 'admin_nav.sec_finance', defaultSection: 'Finance', items: [
+    { href: '/admin/credit',         icon: CreditCard, labelKey: 'admin_nav.credit_monitor', defaultLabel: 'Credit Monitor' },
+    { href: '/admin/commission',     icon: Coins,      labelKey: 'admin_nav.commission_mgmt', defaultLabel: 'Commission Management' },
   ]},
-  { section: 'System', items: [
-    { href: '/admin/translations',   icon: Languages,      label: 'Translations' },
-    { href: '/admin/logs',           icon: ClipboardList,  label: 'Activity Logs' },
-    { href: '/admin/disputes',       icon: AlertTriangle,  label: 'Disputes' },
-    { href: '/admin/feedbacks',      icon: MessageSquare,  label: 'Feedbacks' },
-    { href: '/admin/settings',       icon: Settings,       label: 'Settings' },
-    { href: '/admin/notifications',  icon: Bell,           label: 'Notifications' },
+  { sectionKey: 'admin_nav.sec_system', defaultSection: 'System', items: [
+    { href: '/admin/translations',   icon: Languages,      labelKey: 'admin_nav.translations', defaultLabel: 'Translations' },
+    { href: '/admin/logs',           icon: ClipboardList,  labelKey: 'admin_nav.activity_logs', defaultLabel: 'Activity Logs' },
+    { href: '/admin/disputes',       icon: AlertTriangle,  labelKey: 'admin_nav.disputes', defaultLabel: 'Disputes' },
+    { href: '/admin/feedbacks',      icon: MessageSquare,  labelKey: 'admin_nav.feedbacks', defaultLabel: 'Feedbacks' },
+    { href: '/admin/settings',       icon: Settings,       labelKey: 'admin_nav.settings', defaultLabel: 'Settings' },
+    { href: '/admin/notifications',  icon: Bell,           labelKey: 'admin_nav.notifications', defaultLabel: 'Notifications' },
   ]},
 ]
 
 export default function AdminSidebar() {
   const path = usePathname()
   const { theme, toggleTheme } = useTheme()
-  const { locale } = useTranslation()
+  const { t, locale } = useTranslation()
 
   return (
     <aside className="panel-sidebar">
@@ -59,21 +59,22 @@ export default function AdminSidebar() {
 
       <div className="panel-sidebar-menu" style={{ flex: 1, paddingTop: '.5rem' }}>
         {NAV.map(group => (
-          <div key={group.section} className="panel-nav-group">
-            <div className="panel-nav-section">{group.section}</div>
+          <div key={group.sectionKey} className="panel-nav-group">
+            <div className="panel-nav-section">{t(group.sectionKey) || group.defaultSection}</div>
             {group.items.map(item => {
               const Icon = item.icon
               const localizedHref = `/${locale}${item.href}`
               const isActive = path === localizedHref || path.startsWith(localizedHref + '/')
+              const label = t(item.labelKey) || item.defaultLabel
               return (
                 <Link
                   key={item.href}
                   href={localizedHref}
-                  id={`anav-${item.label.toLowerCase().replace(/[\s-]+/g, '-')}`}
+                  id={`anav-${item.defaultLabel.toLowerCase().replace(/[\s-]+/g, '-')}`}
                   className={`panel-nav-item${isActive ? ' active' : ''}`}
                 >
                   <Icon size={17} className="nav-icon" style={{ flexShrink: 0 }} />
-                  <span>{item.label}</span>
+                  <span>{label}</span>
                 </Link>
               )
             })}
@@ -81,7 +82,7 @@ export default function AdminSidebar() {
         ))}
       </div>
 
-      <div className="panel-sidebar-footer" style={{ padding: '.75rem 0', borderTop: '1px solid rgba(255,255,255,.06)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+      <div className="panel-sidebar-footer" style={{ padding: '.75rem 0', borderTop: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         <button
           onClick={toggleTheme}
           className="panel-nav-item"
@@ -89,12 +90,12 @@ export default function AdminSidebar() {
           id="anav-theme-toggle"
         >
           {theme === 'dark' ? <Sun size={17} className="nav-icon" style={{ flexShrink: 0 }} /> : <Moon size={17} className="nav-icon" style={{ flexShrink: 0 }} />}
-          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+          <span>{theme === 'dark' ? (t('admin_nav.light_mode') || 'Light Mode') : (t('admin_nav.dark_mode') || 'Dark Mode')}</span>
         </button>
 
         <Link href={`/${locale}/home`} className="panel-nav-item" id="anav-back-shop">
           <ArrowLeft size={17} className="nav-icon" style={{ flexShrink: 0 }} />
-          <span>Back to Shop</span>
+          <span>{t('admin_nav.back_to_shop') || 'Back to Shop'}</span>
         </Link>
       </div>
     </aside>

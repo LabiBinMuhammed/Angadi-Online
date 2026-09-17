@@ -1554,10 +1554,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (w >= 650) {
                         // md & lg devices: 4 products per row
                         numCols = 4;
-                      } else if (w <= 360) {
-                        numCols = 1;
                       } else {
-                        // Mobile: 2 products per row
+                        // All phone devices: 2 products per row (2x2 grid)
                         numCols = 2;
                       }
 
@@ -1566,13 +1564,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         columns[i % numCols].add(itemsToShow[i]);
                       }
 
+                      final horizontalPadding = w <= 380 ? 12.0 : 20.0;
+
                       return Padding(
-                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                        padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 100),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             for (int c = 0; c < numCols; c++) ...[
-                              if (c > 0) const SizedBox(width: 12),
+                              if (c > 0) SizedBox(width: w <= 360 ? 8 : 12),
                               Expanded(
                                 child: Column(
                                   children: columns[c].map((item) {

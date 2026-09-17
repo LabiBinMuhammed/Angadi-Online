@@ -29,6 +29,8 @@ import '../screens/vendor/vendor_dashboard_screen.dart';
 import '../screens/vendor/vendor_commission_screen.dart';
 import '../screens/vendor/vendor_items_screen.dart';
 import '../screens/vendor/vendor_add_edit_item_screen.dart';
+import '../screens/vendor/vendor_catalog_categories_screen.dart';
+import '../screens/vendor/vendor_catalog_album_screen.dart';
 import '../screens/vendor/vendor_orders_screen.dart';
 import '../screens/vendor/vendor_order_processing_screen.dart';
 import '../screens/vendor/vendor_credit_screen.dart';
@@ -134,6 +136,11 @@ GoRouter buildRouter() {
       GoRoute(path: '/vendor/dashboard',  builder: (_, __) => const VendorDashboardScreen()),
       GoRoute(path: '/vendor/commission', builder: (_, __) => const VendorCommissionScreen()),
       GoRoute(path: '/vendor/items',      builder: (_, __) => const VendorItemsScreen()),
+      GoRoute(path: '/vendor/catalog',    builder: (_, __) => const VendorCatalogCategoriesScreen()),
+      GoRoute(
+        path: '/vendor/catalog/:categoryId',
+        builder: (_, state) => VendorCatalogAlbumScreen(categoryId: state.pathParameters['categoryId']!),
+      ),
       GoRoute(path: '/vendor/items/new',  builder: (_, __) => const VendorAddEditItemScreen()),
       GoRoute(
         path: '/vendor/items/:itemId',

@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X, ShieldCheck, ArrowLeft } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/I18nContext'
 import AdminSidebar from './AdminSidebar'
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { t, locale } = useTranslation()
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg-base)' }}>
@@ -41,20 +43,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               transition: 'background 0.2s'
             }}
             className="sidebar-toggle-btn"
+            aria-label="Toggle Sidebar"
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
           {/* Brand name */}
-          <Link href="/admin/dashboard" style={{ textDecoration: 'none', color: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
+          <Link href={`/${locale}/admin/dashboard`} style={{ textDecoration: 'none', color: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
             <ShieldCheck size={20} color="var(--wa-green-dark)" />
-            <span>Admin Console</span>
+            <span>{t('admin_nav.console_title') || 'Admin Console'}</span>
           </Link>
         </div>
 
         <Link 
-          href="/home" 
-          title="Back to Shop"
+          href={`/${locale}/home`} 
+          title={t('admin_nav.back_to_shop') || 'Back to Shop'}
           style={{
             display: 'flex',
             alignItems: 'center',

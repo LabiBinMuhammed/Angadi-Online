@@ -73,7 +73,7 @@ function getImageForName(name) {
 }
 
 async function fixAllRemaining() {
-  const domains = ['milma.com', 'elanadumilk.com', 'elitefoods.co.in'];
+  const domains = ['elanadumilk.com', 'elitefoods.co.in'];
   console.log('Fetching demo items with broken domains:', domains);
 
   let totalUpdated = 0;

@@ -538,12 +538,9 @@ class _ShopScreenState extends State<ShopScreen> {
                               if (w >= 650) {
                                 crossAxisCount = 4;
                                 childAspectRatio = 0.68;
-                              } else if (w <= 360) {
-                                crossAxisCount = 1;
-                                childAspectRatio = 1.15;
                               } else {
                                 crossAxisCount = 2;
-                                childAspectRatio = 0.65;
+                                childAspectRatio = w <= 360 ? 0.60 : 0.65;
                               }
 
                               return GridView.builder(

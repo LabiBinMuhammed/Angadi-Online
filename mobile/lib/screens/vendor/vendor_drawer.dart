@@ -73,6 +73,12 @@ class VendorDrawer extends StatelessWidget {
                   ),
                   _buildDrawerItem(
                     context: context,
+                    icon: HugeIcons.strokeRoundedBookOpen01,
+                    label: 'Catalog Album',
+                    route: '/vendor/catalog',
+                  ),
+                  _buildDrawerItem(
+                    context: context,
                     icon: HugeIcons.strokeRoundedAddCircle,
                     label: l10n.vendorDrawerAddProduct,
                     route: '/vendor/items/new',

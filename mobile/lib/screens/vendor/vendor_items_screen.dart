@@ -185,6 +185,11 @@ class _VendorItemsScreenState extends State<VendorItemsScreen> {
               ),
         actions: [
           IconButton(
+            tooltip: 'Catalog Album',
+            icon: const HugeIcon(icon: HugeIcons.strokeRoundedBookOpen01, size: 24, color: Color(0xFF60A5FA)),
+            onPressed: () => context.push('/vendor/catalog').then((_) => _load()),
+          ),
+          IconButton(
             icon: const HugeIcon(icon: HugeIcons.strokeRoundedAddCircle, size: 26, color: Color(0xFF60A5FA)),
             onPressed: () => context.push('/vendor/items/new').then((_) => _load()),
           ),

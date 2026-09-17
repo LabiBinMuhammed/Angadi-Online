@@ -377,6 +377,25 @@ export default function ItemFormClient({
         is_active: v.is_active,
         image_url: demo.default_image || ''
       })))
+    } else if (demo.sell_mode === 'Dynamic') {
+      const defDyn = [
+        { label: 'Quarter', value: 0.25, is_default: false },
+        { label: 'Half', value: 0.5, is_default: false },
+        { label: 'Small', value: 1, is_default: true },
+        { label: 'Large', value: 2, is_default: false }
+      ]
+      setVariants(defDyn.map(d => ({
+        variant_type: 'Dynamic' as const,
+        label: d.label,
+        unit_id: demo.unit_id || '',
+        value: d.value,
+        price: '',
+        min_value: null,
+        max_value: null,
+        is_default: d.is_default,
+        is_active: true,
+        image_url: demo.default_image || ''
+      })))
     } else {
       setVariants([])
     }

@@ -381,14 +381,23 @@ class _VendorAddEditItemScreenState extends State<VendorAddEditItemScreen> {
           { 'label': '500g', 'value': '500', 'price': '', 'is_default': true,  'is_active': true, 'variant_type': 'Manual', 'unit_id': unitId, 'image_url': '', 'image_source': null },
           { 'label': '1kg',  'value': '1000', 'price': '', 'is_default': false, 'is_active': true, 'variant_type': 'Manual', 'unit_id': unitId, 'image_url': '', 'image_source': null }
         ];
-        _recalculatePrices();
       } else if (_sellMode == 'Dynamic') {
-        _variants = _variants.map((v) {
-          final size = v['size'] ?? 'Size';
-          final weight = double.tryParse(v['value']?.toString() ?? '') ?? 0.0;
-          v['label'] = '$size (est. ${weight.toStringAsFixed(weight.truncateToDouble() == weight ? 0 : 1)}$symbol)';
-          return v;
-        }).toList();
+        if (_variants.isEmpty) {
+          _variants = [
+            { 'label': 'Quarter', 'size': 'Quarter', 'value': '0.25', 'price': '', 'is_default': false, 'is_active': true, 'variant_type': 'Dynamic', 'unit_id': unitId, 'image_url': '', 'image_source': null },
+            { 'label': 'Half', 'size': 'Half', 'value': '0.5', 'price': '', 'is_default': false, 'is_active': true, 'variant_type': 'Dynamic', 'unit_id': unitId, 'image_url': '', 'image_source': null },
+            { 'label': 'Small', 'size': 'Small', 'value': '1', 'price': '', 'is_default': true,  'is_active': true, 'variant_type': 'Dynamic', 'unit_id': unitId, 'image_url': '', 'image_source': null },
+            { 'label': 'Large', 'size': 'Large', 'value': '2', 'price': '', 'is_default': false, 'is_active': true, 'variant_type': 'Dynamic', 'unit_id': unitId, 'image_url': '', 'image_source': null }
+          ];
+        } else {
+          _variants = _variants.map((v) {
+            final size = v['size'] ?? v['label'] ?? 'Size';
+            final weight = double.tryParse(v['value']?.toString() ?? '') ?? 0.0;
+            v['label'] = weight > 0 && symbol.isNotEmpty ? '$size (est. ${weight.toStringAsFixed(weight.truncateToDouble() == weight ? 0 : 1)}$symbol)' : size;
+            return v;
+          }).toList();
+        }
+        _recalculatePrices();
       } else {
         _variants = [];
       }

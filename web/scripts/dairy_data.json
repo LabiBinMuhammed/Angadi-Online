@@ -57,7 +57,7 @@
     "description": "Evenly homogenised fresh toned milk preventing cream layer separation, perfect for tea and coffee.",
     "sell_mode": "Fixed",
     "default_quantity": "500 ml",
-    "default_image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80",
+    "default_image": "https://aadutygzgrbexxuznqlr.supabase.co/storage/v1/object/public/item-images/demos/milma/milma_homogenised_toned_milk.png",
     "variants": [
       "500 ml",
       "1 L"
@@ -97,7 +97,7 @@
     "description": "Refreshing traditional Kerala spiced buttermilk infused with ginger, green chillies, curry leaves, and asafoetida.",
     "sell_mode": "Fixed",
     "default_quantity": "200 ml",
-    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "default_image": "https://aadutygzgrbexxuznqlr.supabase.co/storage/v1/object/public/item-images/demos/milma/milma_sambharam_spiced_buttermilk.jpg",
     "variants": [
       "200 ml",
       "500 ml"
@@ -123,7 +123,7 @@
     "description": "Pure unsalted white cooking butter, ideal for baking, making homemade ghee, and traditional sweets.",
     "sell_mode": "Fixed",
     "default_quantity": "500 g",
-    "default_image": "https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?w=500&auto=format&fit=crop&q=80",
+    "default_image": "https://aadutygzgrbexxuznqlr.supabase.co/storage/v1/object/public/item-images/demos/milma/milma_cooking_butter_unsalted.jpg",
     "variants": [
       "100 g",
       "500 g"
@@ -239,7 +239,7 @@
     "description": "Rich cultured yogurt blended with natural mango pulp.",
     "sell_mode": "Fixed",
     "default_quantity": "200 ml",
-    "default_image": "https://images.unsplash.com/photo-1556881286-fc6915169721?w=500&auto=format&fit=crop&q=80",
+    "default_image": "https://aadutygzgrbexxuznqlr.supabase.co/storage/v1/object/public/item-images/demos/milma/milma_mango_lassi.jpg",
     "variants": [
       "200 ml"
     ]
